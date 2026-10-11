@@ -52,7 +52,11 @@ include `commune1070`, `royalBench1170`, `parliament1265`, `sheriff1066`,
 - Construction: `stoneKeep` 1080, `stoneCurtain` 1150,
   `castleRoundTowers` 1220, `castleBarbican` 1230,
   `castleOuterCurtain` 1280. `gothic` 1140 governs future native vault/large church
-  methods. Shared construction queries use this same knowledge/adoption state.
+  methods. Native quoted church upgrades additionally use `churchMasonry` 980,
+  `churchAisles` 1080, `churchTransepts` 1100, `churchGothic` 1190 (needs the
+  general Gothic method), and `churchStoneSpire` 1230. `houseMasonry` 1200
+  preserves the existing upper-tier housing era while requiring knowledge and
+  actual stone. Shared queries use this same knowledge/adoption state.
 
 `constructionCapability` retains its explicit pre-initialization legacy calendar
 fallback. Real generated worlds always initialize knowledge first; advancing the
