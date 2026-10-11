@@ -132,7 +132,22 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // paid work now records only buildWorks net wage cash and saves fractional days.
  // The storage client retains its existing land policy (#63). Commodity ownership,
  // physical title/claim writers and arithmetic provenance are unchanged.
- assert.equal(digest(source.slice(a,b)),"0c25c072ad61f5a764276235b759c288da409aa01ba98ef227a57a3013703997");
+ // Medieval institutions (#35–47, #62): corporate account keys resolve to their actual
+ // holders; native marriage/split hooks carry real credit references without changing
+ // the existing goods partition. Corporate titles retain stable external owner keys.
+ // Paid fabric/compound works validate exact ground, named title holders, tenant release
+ // and retained payment receipts before installing consumed materials and paid work.
+ // Storage uses that same ground contract; paid barn carriage plans reserve actual
+ // capacity and transfer only the quantity funded by each owner's actual wage bill.
+ // Staff-limited abbey milk/fleece passes actual new output through finite forwards.
+ // The outside corpus includes real abbey gifts, court pledges/subsidy valuation,
+ // installed-equipment reads and actual hosted-meal deduction. Its direct writers
+ // transfer existing held title or breeding-safe pledged animals; witness/card
+ // additions only read existing stock. The explicit worker inspector stays unchanged.
+ // Source review against 877bb3, native government/credit/abbey/equipment/estate fixtures
+ // and custody/ground/routing conservation checks renew this source tripwire; the
+ // coordinated release gate owns full-world conservation and exact-optimization proofs.
+ assert.equal(digest(source.slice(a,b)),"500963bc391f8d182ad2ca34630a7875533a771fb59c72ff60f97d2d69b51c70");
  // This explicit worker inspector copies existing balances. Pin the entire line
  // before excluding it so a future mutation cannot hide behind the read exemption.
  const inspectorLine=source.split('\n').find(l=>l.trim().startsWith("if(kind==='household'){const h=W.households.get(payload.id);"));
@@ -168,6 +183,6 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // Free confiscated stock blends zero purchase cost into the Crown’s old reserve by actual quantities.
  // royal-justice.test.mjs covers both ledgers, cost basis, spent evidence, protected stock, shared budgets and coin;
  // the forced-era native world-save fixture covers the real accounts, rulings, circuit and continuation.
- assert.equal(digest(outside),"200b46163503ce4e6583ef2e57d92905603c18e8668a8f87281015bc42840013");
+ assert.equal(digest(outside),"e779290adad24e64186e55621888d384e5d980a51a361cc647bbf4155d009641");
  assert.equal((source.match(/storageTitleDirty\(/g)||[]).length,3);
 });
