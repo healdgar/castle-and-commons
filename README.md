@@ -26,6 +26,17 @@ textures live in `assets/`.
 
 Two views from the running simulation in AD 1068 (land seed 42, fate 42).
 
+Start in AD 1066, choose a later medieval year, or retain the sparse AD 850
+opening. Later starts generate an established world directly; they do not need
+centuries of simulation before play begins.
+
+Castles and abbeys develop through functional buildings on available land,
+with actual material purchases, builders and paid work. Religious houses admit
+existing people, work their grants, keep stores and provide board and alms.
+Courts, credit, schools, guilds, lordly service and productive estates share the
+same households and economy. Knowledge and local adoption govern which
+institutions, materials and methods are available.
+
 ## Run it
 
 Open `index.html` in a browser with `assets/` beside it, or put both on any
