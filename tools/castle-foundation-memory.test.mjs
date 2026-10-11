@@ -20,7 +20,7 @@ const READS=NATIVE_LINE.match(/\(\{(.*?)\}\)/)[1].split(',').filter(n=>!['planCe
 const HELPERS=['const lerp=','const clamp=','const dist2d=','const cIdx=','const inB=','const cellX=','const cellZ=','const toCell=','const planCellOK='];
 const sha=s=>createHash('sha256').update(s).digest('hex').slice(0,16);
 // Repin only after reviewing the full writer list in CASTLE-FOUNDATION-DEPENDENCIES.md.
-const PINNED={"castleFoundationSite":"b6cf469c8a997b35","castleFoundationCentersPossible":"97f734a95ed5fce1","castleFoundationSurveyRead":"17a8904c7a94968f","castleFoundationLandOK":"1c1323d61765ed95","castleFoundationGround":"dba79eab8b76f97a","castleFoundationBoxMayHit":"430a45b7b287d2d6","castleFoundationSegmentMayHitBox":"c1ff83639ad0c277","slopeAt":"f04f3db9f54bcfa6","hAt":"f459c5ff2804ca09","riverAt":"c4bda44c2b489b2e","lakeAt":"6a14ce0b475936f4","furlongAt":"aca164d39bde3f54","compoundGround":"800cfe4973552f94","occupiedGroundCells":"e4195f51df13de4f","occupiedGroundFields":"2ba9dbf41d8bc2ee","computeFurlongPoly":"605c31b180f2da7f","graveyardPolygonsOverlap":"65258af15a0c47a1","inPoly":"abebffb4a9abafff","inPolyXZ":"641dd4b3ae9a6dad","fortContains":"9f6ca02fc957e17d","fortCircuits":"7eca461ef4c3091c","fortCenter":"70fbd07bf1bf54a1","casRing":"a6921fd1103e167c","wallRadAt":"fbbec3db03bd0ce6","circuitLen":"9deb244c96e6486c","placeFitRadii":"8a45384e2759f058","placeR":"63335d5f5f19eb27","placeHit":"62746e6b8c8200de","serviceDoor":"a4312db07cdce77e","locW":"833ae0c87356ca4b","obbCorners":"490b7d06b8d4a63f","obbOverlap":"5267c37bd7733324","streetFootprintOverlap":"ba1725bce82e34ce","segDist":"01b34b3baef31aff","segSegDist":"debb34048a0acf69","resample":"a590253bb5bcd7f5","lerpPt":"f218c11d09086fc4","makeHash":"b1d9816147e072f3","helpers":"626d791b92980e90","compoundPolys":"2059f5631f5d5e48"};
+const PINNED={"castleFoundationSite":"b6cf469c8a997b35","castleFoundationCentersPossible":"97f734a95ed5fce1","castleFoundationSurveyRead":"f2820f884f7dad61","castleFoundationLandOK":"1c1323d61765ed95","castleFoundationGround":"dba79eab8b76f97a","castleFoundationBoxMayHit":"430a45b7b287d2d6","castleFoundationSegmentMayHitBox":"c1ff83639ad0c277","slopeAt":"f04f3db9f54bcfa6","hAt":"f459c5ff2804ca09","riverAt":"c4bda44c2b489b2e","lakeAt":"6a14ce0b475936f4","furlongAt":"aca164d39bde3f54","compoundGround":"800cfe4973552f94","occupiedGroundCells":"e4195f51df13de4f","occupiedGroundFields":"2ba9dbf41d8bc2ee","computeFurlongPoly":"605c31b180f2da7f","graveyardPolygonsOverlap":"65258af15a0c47a1","inPoly":"abebffb4a9abafff","inPolyXZ":"641dd4b3ae9a6dad","fortContains":"9f6ca02fc957e17d","fortCircuits":"7eca461ef4c3091c","fortCenter":"70fbd07bf1bf54a1","casRing":"a6921fd1103e167c","wallRadAt":"fbbec3db03bd0ce6","circuitLen":"9deb244c96e6486c","placeFitRadii":"8a45384e2759f058","placeR":"63335d5f5f19eb27","placeHit":"62746e6b8c8200de","serviceDoor":"a4312db07cdce77e","locW":"833ae0c87356ca4b","obbCorners":"490b7d06b8d4a63f","obbOverlap":"5267c37bd7733324","streetFootprintOverlap":"ba1725bce82e34ce","segDist":"01b34b3baef31aff","segSegDist":"debb34048a0acf69","resample":"a590253bb5bcd7f5","lerpPt":"f218c11d09086fc4","makeHash":"b1d9816147e072f3","helpers":"626d791b92980e90","compoundPolys":"2059f5631f5d5e48"};
 test('the certified survey still reads the reviewed native helpers',()=>{
   assert.deepEqual(Object.fromEntries([...READS.map(n=>[n,sha(fn(n))]),['helpers',sha(HELPERS.map(line).join('\n'))]]),PINNED,
     'Survey dependency changed: audit the writer certificate and private hash stamps before repinning.');
@@ -95,6 +95,23 @@ test('nongeometry cash, prices, project progress and crop colors do not fabricat
   const c=realm();run(c,'W.projects=[{type:"clear",x:0,z:0,r:3,done:0}];');assert.equal(run(c,'ask()'),null);
   run(c,'town.pop=500;town.prosperity=70;town.gold=1;W.projects[0].done=.5;W.land.mask[0]=180;W.land.mask[1]=90;W.land.mask[3]=60;W.land.mask[2]=3;');
   assert.equal(run(c,'ask()'),null);assert.equal(stats(c).hits,1,'financial decisions remain outside the geometry certificate');
+});
+
+test('projects without survey geometry preserve null reuse and exact stamps until their actual type reserves ground',()=>{
+  const off=realm(false),on=realm(true);equalAsk(off,on,'opening');
+  const changes=[
+    'W.projects.push({type:"equipment",si:0,kind:"siegeEngine",done:0})',
+    'W.projects.push({type:"pave",si:0,r:{path:[{x:-100,z:0},{x:100,z:0}]},done:0})',
+    'W.projects.push({type:"persuade",si:0,x:0,z:0,decide:4})',
+    'W.projects.push({type:"buy",si:0,f:{x:0,z:0},decide:4})',
+    'W.projects[0].done=.5;W.projects[1].r.path[0].x=-101;W.projects[2].decide=5;W.projects[3].f.x=1',
+    'W.projects[1].dead=true;W.projects.splice(2,1)',
+  ];
+  for(const change of changes){const before=stats(on);for(const c of[off,on])run(c,change);equalAsk(off,on,change);
+    assert.equal(stats(on).hits,before.hits+1,'inert project changes reuse the same native failure');assert.equal(stats(on).misses,1);}
+  for(const c of[off,on])run(c,'Object.assign(W.projects[0],{type:"clear",x:0,z:0,r:3});');
+  equalAsk(off,on,'actual type becomes reserved ground');assert.equal(stats(on).misses,2,'the newly recognized geometry is freshly surveyed');
+  equalAsk(off,on,'unchanged reserved ground');assert.equal(stats(on).misses,2);
 });
 
 test('an overridden helper and a stamp beyond the current counter bypass memory',()=>{

@@ -8208,7 +8208,7 @@ function castleFoundationSurveyRead(buffer=null){ // exact writer certificate, n
   value(W.roads?.length??0);for(const r of W.roads||[])poly(r.open||r.path||[]);
   value(W.trackSet?.size??W.trackSet?.length??0);for(const key of W.trackSet||[]){value(key);const e=W.tg.E.get(key);value(!!e);if(e){point(W.tg.pts[e.a]);point(W.tg.pts[e.b]);}}
   const R=W.rivHash;value(!!R);if(R){value(R.near.cell);value(R.historyCells.size);for(const[key,A]of R.historyCells){value(key);value(A.length);for(const r of A){point(r.a);point(r.b);value(r.hw);}}}
-  const Q=(W.projects||[]).filter(q=>!q.dead);value(Q.length);for(const q of Q){value(q.type);value(q.kind);value(q.si);
+  const Q=(W.projects||[]).filter(q=>!q.dead&&['road','castle','compound','fabric','storage','clear','plan'].includes(q.type));value(Q.length);for(const q of Q){value(q.type);value(q.kind);value(q.si);
     if(q.type==='road')poly(q.P?.path||[]);
     if(q.type==='castle'&&q.site){point(q.site.ward);value(q.site.ward.r);poly(q.site.path);}
     if((q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')&&q.site)site(q.site);
