@@ -20320,7 +20320,7 @@ function presStep(now=performance.now()){
 // Where a townsman is at the screen's day v, from the steps of his walk the worker kept (T: their days, R: x, z, yaw and
 // whether he is out of doors and walking, four to a step): between the two steps either side of v, as the main-thread
 // screen walked him a frame at a time; before the first, at the first; past the last, where the last left him.
-function trackAt(T,R,v){
+function walkTrackAt(T,R,v){
   const n=Math.min(T?.length|0,(R?.length|0)>>2);if(!n)return null;let i=0,f=0;
   if(n>1&&v>T[0]){if(v>=T[n-1])i=n-1;else{let lo=0,hi=n-1;while(hi-lo>1){const m=(lo+hi)>>1;if(T[m]<=v)lo=m;else hi=m;}i=lo;f=(v-T[i])/(T[i+1]-T[i]);}}
   const a=i*4,b=f>0?a+4:a,s=R[(f<0.5?a:b)+3];
@@ -20363,7 +20363,7 @@ function renderTransportCitizens(nearest,d){
   const now=performance.now(),si=W.settlements.indexOf(nearest),prior=G.workerActorFocus,close=nearest&&cam.cur.dist<700&&d<(nearest.extentR||nearest.radius)+160;
   if((!prior||dist2d(prior.x,prior.z,cam.cur.focus.x,cam.cur.focus.z)>30||now-prior.t>(speedIdx===5?1000:150))&&!BACKGROUND.reads?.has('actors')){G.workerActorFocus={x:cam.cur.focus.x,z:cam.cur.focus.z,t:now};workerRefreshActors();}
   const list=close&&G.workerCitizens?.si===si?G.workerCitizens.people:[];let k=0;G.citIdx=[];const vs=clamp(cam.cur.dist/220,1,2.6),v=displayDay(),run=list.length?(v-G.workerCitizens.day)*DAYSEC:0; // calendar seconds since the worker's walkers stood where it last left them
-  for(const c of list){const w=k<160&&trackAt(G.workerCitizens.times,c.track,v);if(!w?.out)continue;const bob=w.walking&&speedIdx===LIFE?Math.abs(Math.sin((c.time+run)*8.5))*0.06:0,p={id:c.id,si:c.si,sx:c.sex},y=surfY(w.x,w.z)+.28+bob,sc=c.scale*vs;if(cam.follow&&cam.follow.pid===c.id)cam.follow.pos={x:w.x,z:w.z,y};setInst(G.citizens,k,w.x,y,w.z,w.yaw,sc,sc,sc);setInst(G.citKit,k,w.x,y,w.z,w.yaw,sc,sc,sc);G.citizens.setColorAt(k,new THREE.Color(c.colour.hex).multiplyScalar(c.colour.gain));G.citIdx[k]={p,s:nearest,x:w.x,z:w.z,out:true};k++;}
+  for(const c of list){const w=k<160&&walkTrackAt(G.workerCitizens.times,c.track,v);if(!w?.out)continue;const bob=w.walking&&speedIdx===LIFE?Math.abs(Math.sin((c.time+run)*8.5))*0.06:0,p={id:c.id,si:c.si,sx:c.sex},y=surfY(w.x,w.z)+.28+bob,sc=c.scale*vs;if(cam.follow&&cam.follow.pid===c.id)cam.follow.pos={x:w.x,z:w.z,y};setInst(G.citizens,k,w.x,y,w.z,w.yaw,sc,sc,sc);setInst(G.citKit,k,w.x,y,w.z,w.yaw,sc,sc,sc);G.citizens.setColorAt(k,new THREE.Color(c.colour.hex).multiplyScalar(c.colour.gain));G.citIdx[k]={p,s:nearest,x:w.x,z:w.z,out:true};k++;}
   G.citizens.count=G.citKit.count=k;G.citizens.instanceMatrix.needsUpdate=G.citKit.instanceMatrix.needsUpdate=true;if(G.citizens.instanceColor)G.citizens.instanceColor.needsUpdate=true;
 }
 function projectTransportFences(){

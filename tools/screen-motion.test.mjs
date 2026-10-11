@@ -1,10 +1,11 @@
 // The screen's own clock in worker mode (presStep): it runs on between the worker's readings at the chosen pace, eases
 // toward each, never runs back, freezes on pause, and never runs far past the last day reported. Walkers and flocks
-// carry on between replies (trackAt over the steps the worker keeps, workerWalkOn; reconcileFlocks).
+// carry on between replies (walkTrackAt over the steps the worker keeps, workerWalkOn; reconcileFlocks).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {contextFor,inlineGameScript} from './simulation-boundary.mjs';
 
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const slice=(from,to)=>{const a=source.indexOf(from),b=source.indexOf(to,a);assert.ok(a>=0&&b>a,`markers ${from}`);return source.slice(a,b);};
@@ -92,19 +93,19 @@ test('a change of pace runs from the worker\'s reading of it: no creeping at hal
 test('a walker between the steps the worker kept: in between them, at the first before it, at the last past it',()=>{
   const c=vm.createContext({Math,Number});vm.runInContext(block.replace(/const SCREEN_CLOCK[\s\S]*?(?=\/\/ Where a townsman)/,''),c);
   const T=Float64Array.from([10,10.5,11]),R=Float32Array.from([0,0,0,0, 4,0,1,3, 4,8,2,1]);
-  const at=v=>{const w=c.trackAt(T,R,v);return [w.x,w.z,w.yaw,w.out,w.walking];};
+  const at=v=>{const w=c.walkTrackAt(T,R,v);return [w.x,w.z,w.yaw,w.out,w.walking];};
   assert.deepEqual(at(9),[0,0,0,false,false],'before the first step');
   assert.deepEqual(at(10.2).map(v=>typeof v==='number'?+v.toFixed(9):v),[1.6,0,1,false,false],'between: the way he faces is the next step\'s; indoors or out as the nearer step');
   assert.deepEqual(at(10.3).map(v=>typeof v==='number'?+v.toFixed(9):v),[2.4,0,1,true,true]);
   assert.deepEqual(at(10.5),[4,0,1,true,true],'on a step');
   assert.deepEqual(at(10.75),[4,4,2,true,false]);
   assert.deepEqual(at(12),[4,8,2,true,false],'past the last, where it left him');
-  assert.deepEqual([c.trackAt(T,Float32Array.from([7,8,9,1]),10.7)].map(w=>[w.x,w.z,w.out]),[[7,8,true]],'one place for one who stands');
-  assert.equal(c.trackAt(T,null,10),null);
+  assert.deepEqual([c.walkTrackAt(T,Float32Array.from([7,8,9,1]),10.7)].map(w=>[w.x,w.z,w.out]),[[7,8,true]],'one place for one who stands');
+  assert.equal(c.walkTrackAt(T,null,10),null);
 });
 
 // The worker's walk of a little town against the main-thread screen's, frame by frame: the canonical stepWalker and
-// planWalk on a grid of streets, the worker's walkOn/track and the screen's trackAt.
+// planWalk on a grid of streets, the worker's walkOn/track and the screen's walkTrackAt.
 const WALK_MOST=+source.match(/const WALK_TRACK=\{[^}]*most:(\d+)/)[1];
 const walkSource=slice('function nearestNode(','function rockNear(')+slice('function workerRenderFinite(','function workerRenderCitizens(')+slice('// Where a townsman','// A new plan of the herds');
 function town(speed=1){
@@ -135,9 +136,9 @@ function workerBuild(c,people,t0,frames,{every=()=>9,late=()=>0,lead=()=>0}={}){
   const reply=now=>{c.clock.day=Math.floor(now);c.workerWalkOn(entry,now,now-Math.floor(now));return{times:Float64Array.from(entry.times),day:entry.day,tracks:people.map(w=>c.workerWalkTrack(w))};};
   let packet=reply(t0),pending=null,next=every(),t=t0;const out=[],switches=[];
   for(let k=0;k<frames;k++){t+=h;
-    if(pending){const v=t+lead(k),was=packet.tracks.map(R=>c.trackAt(packet.times,R,v));packet=pending;pending=null;switches.push(was.map((w,i)=>[w,c.trackAt(packet.times,packet.tracks[i],v)]));}
+    if(pending){const v=t+lead(k),was=packet.tracks.map(R=>c.walkTrackAt(packet.times,R,v));packet=pending;pending=null;switches.push(was.map((w,i)=>[w,c.walkTrackAt(packet.times,packet.tracks[i],v)]));}
     if(--next<=0){pending=reply(t-late(k)*h);next=every();} // the reply comes the next frame
-    const v=t+lead(k);out.push({t,v,at:packet.tracks.map(R=>c.trackAt(packet.times,R,v)),ahead:packet.times.at(-1)-t});}
+    const v=t+lead(k);out.push({t,v,at:packet.tracks.map(R=>c.walkTrackAt(packet.times,R,v)),ahead:packet.times.at(-1)-t});}
   return{out,switches,entry};
 }
 
@@ -177,7 +178,7 @@ test('at life pace the walk keeps to the screen\'s clock, ahead of the reading a
     let t=t0,packet=null;const drawn=[];
     const reply=(now,view)=>{c.clock.day=Math.floor(now);c.workerWalkOn(entry,now,now-Math.floor(now),view);return{times:Float64Array.from(entry.times),tracks:people.map(w=>c.workerWalkTrack(w))};};
     let v=t0;for(let i=0;i<ahead;i++)v+=h; // the screen's clock, on the same frames as the worker's
-    for(let k=0;k<frames;k++){if(k%9===0)packet=reply(t,v);t+=h;v+=h;drawn.push(packet.tracks.map(R=>c.trackAt(packet.times,R,v)));}
+    for(let k=0;k<frames;k++){if(k%9===0)packet=reply(t,v);t+=h;v+=h;drawn.push(packet.tracks.map(R=>c.walkTrackAt(packet.times,R,v)));}
     let still=0,moving=0;
     for(let k=1;k<frames;k++)for(let i=0;i<people.length;i++){const a=drawn[k-1][i],b=drawn[k][i];if(!a.out||!b.out||!b.walking)continue;moving++;const d=Math.hypot(b.x-a.x,b.z-a.z);if(d<1e-4)still++;
       assert.ok(d<=3*h*c.DAYSEC+1e-6,`${ahead} frames ahead, frame ${k} walker ${i}: a stride of ${d} m`);}
@@ -196,7 +197,7 @@ test('into life pace from Normal, from a pause and from Fast: no leap at the cha
     const reply=()=>{c.clock.day=Math.floor(v);c.workerWalkOn(entry,v,v-Math.floor(v),v);return{times:Float64Array.from(entry.times),tracks:people.map(w=>c.workerWalkTrack(w))};};
     for(const [speed,frames] of route){c.speedIdx=speed;for(let k=0;k<frames;k++,f++){
       if(pending){packet=pending;pending=null;}if(f%9===0){pending=reply();if(!packet){packet=pending;pending=null;}}
-      v+=SPEEDS[speed]/60;clock.push(v);drawn.push({speed,at:packet.tracks.map(R=>c.trackAt(packet.times,R,v))});}}
+      v+=SPEEDS[speed]/60;clock.push(v);drawn.push({speed,at:packet.tracks.map(R=>c.walkTrackAt(packet.times,R,v))});}}
     const name=route.map(r=>r[0]).join('→');let still=0,walking=0;
     for(let k=1;k<drawn.length;k++)for(let i=0;i<people.length;i++){const a=drawn[k-1].at[i],b=drawn[k].at[i];if(!a.out||!b.out)continue;const d=Math.hypot(b.x-a.x,b.z-a.z);
       assert.ok(d<=3*(clock[k]-clock[k-1])*c.DAYSEC+1e-6,`${name} frame ${k} walker ${i}: ${d} m in a frame of ${(clock[k]-clock[k-1])*c.DAYSEC} s`);
@@ -232,3 +233,5 @@ test('a new herd plan keeps each flock in its field where it has wandered, and r
   const C=c.reconcileFlocks(B,[plan([{x:100,z:0},{x:150,z:0},{x:150,z:50}])]);assert.notEqual(C[0],B[0],'another field: a new flock');assert.equal(C[0].mem[1].x,21);
   assert.equal(c.reconcileFlocks([],[plan([])])[0].P,null,'no field: unfenced, not fenced out of everywhere');
 });
+
+test('the assembled game retains separate native track clearance and screen interpolation',()=>{const c=contextFor(inlineGameScript(source),'#s=1001&f=42&c=sea&y=850');const result=vm.runInContext(`(()=>{BACKGROUND=null;W.trackSet=new Set(['edge']);W.tg={E:new Map([['edge',{a:0,b:1}]]),pts:[{x:0,z:0},{x:20,z:0}]};return{on:trackAt(10,1,2),off:trackAt(10,5,2),walk:walkTrackAt([0,2],new Float32Array([0,0,0,3,20,0,0,3]),1)};})()`,c);assert.equal(result.on,true);assert.equal(result.off,false);assert.equal(result.walk.x,10);assert.equal(result.walk.walking,true);});
