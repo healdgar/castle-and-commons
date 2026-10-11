@@ -11078,7 +11078,7 @@ function townCashHTML(s,prefix){
   return h+'<p class="note">The town chest and the lord’s treasury are separate. Local receipts and costs are included in their owner’s accounts; do not add them again. Household trade is private. Shared host and court costs are charged where incurred, not divided into invented town shares.</p>';
 }
 function accountSheetHTML(town=null,prefix='ledger'){
-  const B=accountBalances(town),names={crown:'Royal treasury',houses:'Great houses',households:'Household purses',church:'Church fabric funds',townFunds:'Town wall funds',craftFunds:'Craft and market funds',hoard:'Dragon hoard',escrow:'Money held for projects',abbeys:'Abbey chests',guilds:'Guild chests'};
+  const B=accountBalances(town),names={crown:'Royal treasury',houses:'Great houses',households:'Household purses',church:'Church fabric funds',townFunds:'Town wall funds',craftFunds:'Craft and market funds',hoard:'Dragon hoard',escrow:'Money held for projects',abbeys:'Abbey chests',guilds:'Guild chests',churchBodies:'Bishopric and chapter chests',companies:'Company chests',orders:'Chivalric order chest',expeditions:'Expedition chests'};
   const rows=Object.entries(B.by).filter(([k,v])=>!town||!['crown','houses','hoard','escrow'].includes(k)).map(([k,v])=>[names[k],detailNumber(v)]);
   rows.push(['Total coin'+(town?' in these accounts':''),detailNumber(B.total)]);
   let h=detailTable(prefix+'-accounts',(town?'Town':'Kingdom')+' balance sheet · '+esc(dateStr()),['Account','Gold'],rows);
