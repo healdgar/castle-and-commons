@@ -278,6 +278,6 @@ test('retained Abbey licences and recruitment books stay private while actual ap
  assert.deepEqual(out.record.site.f,{x:200,z:0,w:12,d:22,rot:0});
  assert.equal(out.record.site.access.endpoint.kind,'road');assert.equal(out.record.site.access.privatePolys[0].length,4);
  const drift=fs.readFileSync(new URL('./simulation-projection-drift.test.mjs',import.meta.url),'utf8');
- assert.match(drift,/project:\{approachClaim:/,'paid claim explanation belongs to project completeness');
+ assert.match(drift,/project:\{abbeyOwner:[^\n]*approachClaim:/,'paid claim explanation belongs to project completeness');
  assert.match(drift,/approachPayments:/,'actual named receipt explanation belongs to project completeness');
 });
