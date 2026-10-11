@@ -4,7 +4,11 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
-const helper=source.match(/const CONSTRUCTION_METHODS=Object\.freeze\(\{stoneKeep:[^\n]+\}\);\nfunction constructionCapability\(s,method,ad=AD\(\)\)\{[\s\S]*?\n\}/)?.[0];
+// The shared calendar fallback retains 1070; initialized knowledge uses the
+// intentionally adopted 1080 technology gate. Other methods precede stoneKeep.
+const methods=source.match(/^const CONSTRUCTION_METHODS=.*$/m)?.[0];
+const capability=source.match(/^function constructionCapability\b[\s\S]*?(?=^function |^const |^\/\*|$(?![\s\S]))/m)?.[0];
+const helper=methods&&capability?methods+'\n'+capability:null;
 const foundationSpec=source.match(/function castleFoundationSpec\(s\)\{[\s\S]*?\n\}/)?.[0];
 
 test('stone keep construction hook is a pure historical fallback before world technology initialization',()=>{

@@ -6,12 +6,18 @@ import {execFileSync} from 'node:child_process';
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const baseline=execFileSync('git',['show','24be535:index.html'],{encoding:'utf8',maxBuffer:20e6});
 function fn(s,n){return s.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |$(?![\\s\\S]))','m'))[0];}
+// Daily alliance decisions and actual knightly consent are intentional model
+// changes. Compare the current model on both sides, replacing only the index
+// consumers with their original complete archive traversals in the reference.
+const politicsReference=fn(source,'tickPolitics').replaceAll('of livingNotables()','of W.notables').replaceAll('livingNotableCandidates(','W.notables.filter(').replaceAll('livingNotableCount()','W.notables.filter(n=>n.alive).length').replaceAll('notableSetAlive(n,false)','n.alive=false').replace('notableMarriageCleanup(single);','W.notables.forEach(n=>delete n._just);');
+assert.doesNotMatch(politicsReference,/livingNotable|notableMarriageCleanup|notableSetAlive/);
+const deathReference=fn(source,'killNotable').replace('notableSetAlive(n,false);','n.alive=false;');
 function realm(old=false){const history=[],draws=[];let state=0xabcdef01;
 const r=vm.createContext({console,history,draws,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),chance:(stream,p)=>{state^=state<<13;state^=state>>>17;state^=state<<5;const u=(state>>>0)/4294967296;draws.push([stream,p,u]);return u<p;},pick:(stream,x)=>x[0],vary:(key,x)=>x[0](),nameUse(){},endow:n=>{},deriveTraits:()=>[],twoTraits:()=>[],personName:()=> 'Newborn',emit:(...args)=>history.push(args),houseOf:n=>r.run('W').houses[n.house],fullTitle:n=>n.name,checkWarSpark(){},sheltered:()=>0,mythMult:()=>1,ordinal:x=>String(x),educate(){},lordsNaturalChild(){},GV:0,GF:4,MOD:{fert:1,aggr:0,tax:12}});
 vm.runInContext("'use strict';let W={clock:{day:1},notables:[],legitimacy:70,houses:[{name:'Royal',seat:0}],settlements:[{name:'Town',pos:{x:0,z:0},pop:100,unrest:0,kind:'capital'}],treasury:1000};W.capital=W.settlements[0];function day(){return W.clock.day}function ageOf(n){return Math.floor((day()-n.birthDay)/360)}",r);
 const cast=(old?baseline:source);const start=old?cast.indexOf('let NID=1;'):cast.indexOf('const NOTABLE_INDEXES=');
-vm.runInContext("'use strict';"+cast.slice(start,cast.indexOf('\nconst TRAITS=',start))+fn(cast,'notableById')+fn(cast,'killNotable')+fn(cast,'tickPolitics'),r);
-if(!old)vm.runInContext(fn(cast,'publicOrderMen'),r);
+vm.runInContext("'use strict';"+cast.slice(start,cast.indexOf('\nconst TRAITS=',start))+fn(cast,'notableById')+(old?deathReference:fn(source,'killNotable'))+(old?politicsReference:fn(source,'tickPolitics')),r);
+vm.runInContext(['publicOrderMen','awayNow','knightMarriageHolder','knightMarriageConsent','knightWedding','knightAid'].map(n=>fn(source,n)).join('\n'),r);
 if(!old)vm.runInContext('notableIndexRebuild()',r);
 r.run=s=>vm.runInContext(s,r);r.world=()=>r.run('W');return r;}
 function pair(){return[realm(true),realm()];}
@@ -38,6 +44,8 @@ assert.match(source.slice(source.indexOf('async function generateWorld('),source
 // These two assignments set IDs on newly-created event DOM nodes; retain them
 // as exact allowlisted sites alongside the existing non-notable ID writers.
 // The world save numbers the shapes (key lists) it writes: t.id is a shape's place in its table, not a notable's.
-assert.deepEqual(ids,["state.id=q.storageProjectId","el.id='terrlegend'","el.id='terrlegend'","el.id='terrlegend'","events.id='eventpanel'","bubble.id='eventbubble'","h.id=next.id+'-title'","el.id='mapview'","this.id=id","o.id=auto?'auto:'+o.hash:'s'+Date.now()","t.id=shapes.length","el.id='advchat'"]);
+// A paid compound plan also receives its own corporate project ID; it neither
+// renumbers a native person nor edits the authoritative notable archive.
+assert.deepEqual(ids,["state.id=q.storageProjectId","q.id=C.id+':project:'+C.next++","el.id='terrlegend'","el.id='terrlegend'","el.id='terrlegend'","events.id='eventpanel'","bubble.id='eventbubble'","h.id=next.id+'-title'","el.id='mapview'","this.id=id","o.id=auto?'auto:'+o.hash:'s'+Date.now()","t.id=shapes.length","el.id='advchat'"]);
 assert.equal((source.match(/W\.notables\s*=/g)||[]).length,0);
 });
