@@ -15,13 +15,15 @@ institution eligibility decisions form the coupled `2d81f11` batch. The assemble
 wall seconds and load 0.00→1.00. All 1,965 current unique checks are verified
 across that batch and the reviewed three-file rerun (1.37 CPU seconds, load
 0.20→0.20). These are test costs, not daily simulation throughput.
+The final native 150-day comparison preserves full world/globals/layouts/closure code, every RNG stream and all 906 accepted raw rows at all seven speeds. A day-37 native save/resave/replay also matches through day 150. Its controlled reference uses original full native craft/ground/mint/lodging selectors and disables castle survey/work reuse, with all intended model changes and candidate-cache maintenance common to both sides. Audited step CPU is 623.96 versus 230.08 seconds over 150 days; the complete comparison/replay runner costs 2,127.22 CPU / 1,989.30 wall seconds, load 0.10→1.34. These costs include inventory audits and serialization, omit browser persistence, and do not establish game throughput.
+
 Earlier exact-reuse diagnostics and failures are retained in
 [HANDOFF.md](HANDOFF.md); they are not a final 150-day or shipping speed result.
 
 The current institution integration uses daily housing, road, castle and
 institution decisions with actual paid component projects. The assembled daily
 contract has 59 phases and 200 checked prerequisites. It retains dated market,
-court, harvest, lease and study obligations. Final native validation and
+court, harvest, lease and study obligations. Remaining native institution/worker/conservation validation and
 measurement are pending; the century-per-minute target is not established.
 
 An obsolete integration suite was interrupted after 2,010 wall seconds and
@@ -33,7 +35,7 @@ operation-local polygon reuse and a certified failed-survey memory retain actual
 geometry authority. These are diagnostic samples, not a measured throughput
 claim. The same suite also exposed private mill counters entering display
 packets; that projection defect is repaired without changing simulation work.
-The combined source still requires the final suite and native exactness gates.
+The combined source passes the current suite and native exactness gate; actual paid institution, multi-era conservation, worker and drawing gates remain pending.
 
 The earlier growth/property batch below kept daily occupancy and live valuation
 inputs while retaining the then unfinished six-day housing/fabric throttle.
