@@ -1,5 +1,7 @@
 # Simulation performance
 
+Latest diagnostic (`972beba`,11 October): proposal-local native terrain/scopes/circuits reuse passes47 focused checks, but fresh native AD1200 still reaches the unchanged120s tick50 deadline after49 audited closed days.261.79 childCPU/252.88 wall seconds,load0→1.08. The5.24s live sample attributes~55% to pathfinding and~42% to final clearance; self time includes full clearance scans22%, conservative bounds13%, repeated51-helper certificates12%. Subsequent work targets those exact local costs. This is failed diagnostic evidence, not browser throughput or a completed history gate. The captured partial world is not a baseline.
+
 Fresh maps, every daily tick, every named person and household, and existing ownership and
 inheritance rules remain intact. No era presets, saved-world bank, actor culling or SQLite were added.
 The app remains a single HTML file with no build step.
