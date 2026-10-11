@@ -50,6 +50,38 @@ Draw harness SHA256:
 church in AD 1068, land seed 42 and fate 42. It remains an earlier running-world
 capture, not a picture of the newly implemented connected Abbey ranges.
 
-A fresh completed Abbey compound capture remains pending. The earlier
+A fresh simulated completed Abbey compound capture remains pending. The earlier
 `docs/images/abbey-church-ad1201.png` shows only a church from an older source;
 it is not evidence of a completed current Abbey, residence, grange or cloister.
+
+## Current Abbey layout preview — 11 October 2026
+
+`assets/screenshots/abbey-layout-preview.png` is a newly rendered illustrative
+completed layout, explicitly captioned as a preview. It uses the same frozen
+game script as the current castle capture, with the unchanged
+`abbeyConnectedSpec`, `compoundLayoutPoses`, `compoundLayoutRoute`,
+`compoundCourtGeometry`, `projectBuildingInstance`, `drawChurch` and
+`drawCompoundCourt` functions. Five local room fixtures and a cloister occupy
+a separate disposable scene group. They are never added to native world or
+projected building records.
+
+The existing pure day150 ground/season and actor DTOs initialize the normal
+native display frame; the surrounding native town and actor meshes are hidden.
+No world is generated, loaded, stepped or commanded for this preview. It makes
+no simulated completion, title, payment, housing, industry or Abbey actor claim.
+The underlying church, residence, grange, chapter house, refectory and roofed
+courtyard geometry is from the current renderer, not generated concept art.
+
+Both views verify every room body in view and the exact instance matrices,
+colours and material attributes for all 64 cloister piers and four roof parts.
+The suppressed central body/roof is excluded from positive visibility evidence.
+Textures are ready and browser/texture errors are zero. Correct native display
+initialization applies the current lighting and shadows; the earlier distant,
+unlit preview and the failed incomplete lighting setup remain separate evidence.
+
+Preview harness SHA256:
+`23a5794ab7bb2f232f420f389346605664842106e6205ea1bb6bd323819812f9`.
+Wrapper CPU `1.543634` / wall `11.296498` seconds, load
+`0.027344→0.859375`, RSS `229332` KB; Chrome descendants may be excluded.
+These are capture costs, not simulation throughput. Current and earlier results
+remain in the ignored government-institutions capture folder.

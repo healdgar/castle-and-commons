@@ -28,6 +28,12 @@ The town view is from AD 1068 (land seed 42, fate 42). The castle was captured
 from the current working build in AD 1200 (land seed 1001, fate 42).
 See [capture provenance](docs/SCREENSHOTS.md).
 
+![Current renderer preview of an Abbey's church, dormitory, grange, chapter house, refectory and roofed cloister](assets/screenshots/abbey-layout-preview.png)
+
+The Abbey image is a finished-layout preview using the current game's connected
+building geometry and renderer. Its construction campaign in the simulation is
+still being validated.
+
 Start in AD 1066, choose a later medieval year, or retain the sparse AD 850
 opening. Later starts generate an established world directly; they do not need
 centuries of simulation before play begins.
