@@ -37,14 +37,14 @@ const WORKER_ONLY={
     joinOut:'layout planner',landing:'shore landing for boats',burns:'generation burn scars',mill:'crosses as millId',
     custom:'the customs of the manor: the lord\'s and crown\'s panels and the settlement card ask the worker',pleas:'the manor court\'s roll (#37)',court:'court accounts and rulings: inspectors ask the worker',enrolments:'land and customary transaction witnesses: court inspectors ask the worker',royalPleas:'held criminal presentments: court inspectors ask the worker',royalCourt:'royal rulings and receipts: court inspectors ask the worker'},
   building:{s:'crosses as si',title:'title accounts',hh:'households',st:'street link, for gate placement in the worker',why:'planner notes',
-    ownerId:'accessor; crosses when it names an owner',farm:'the mill\'s or bakehouse\'s farm: the settlement card asks the worker'},
+    ownerId:'accessor; crosses when it names an owner',groundClaim:'the occupied footprint licence: inspector and accounting',farm:'the mill\'s or bakehouse\'s farm: the settlement card asks the worker'},
   field:{title:'title accounts',trees:'cross as treeRefs',own:'accessor; crosses when it names a holder',wk:'accessor; crosses when it names a worker',
     wild0:'a day number when set'},
   army:{flag:'foreground flags are its own',target:'a settlement index when set'},
   caravan:{m:'merchant account',drv:'driver',crew:'crew',storageCargo:'cargo ledger (its id is the render key)'},
   dragon:{target:'the town it means to raid'},
-  project:{payer:'an account, for storage works',reason:'a sentence when set',spec:'the foundation construction bill; surveyed site geometry crosses'},
-  road:{open:'the untrimmed open-country path; path and drawn cross'},
+  project:{payer:'the actual construction account',before:'the native fabric and ownership snapshot used for validation',slot:'the native frontage candidate held by a paid house project',occupant:'the native household taking a paid refit',groundClaim:'paid ground licence and receipt recipients',landPayments:'actual named landowner receipts',reason:'a sentence when set',spec:'the foundation construction bill; surveyed site geometry crosses'},
+  road:{groundClaim:'the paid public right of way licence',open:'the untrimmed open-country path; path and drawn cross'},
   banditCamp:{king:'a name when set'},
 };
 
