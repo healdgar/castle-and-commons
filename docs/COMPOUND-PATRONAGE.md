@@ -33,6 +33,7 @@ on the same day. The dependency audit records this as #80: a common deterministi
 daily allocation needs an explicit recipe work unit before it can represent
 finite attendance. Consolidating those consumers can also reuse their native
 worker selection, rather than searching and dividing each bill independently.
+The consumer and ordering audit is recorded in [DAILY-LABOUR.md](DAILY-LABOUR.md).
 This next phase must retain actual named payments and paid project progress;
 it supplies no established economic multiplier or browser speedup yet.
 
