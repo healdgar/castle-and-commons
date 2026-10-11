@@ -177,3 +177,11 @@ Shop room title reads resolve actual canonical accounts. Symbolic `lord`,
 unresolved account strings are rejected. Pure room/equipment cards never
 change the native title to perform this read. Paid room rents reach the actual
 local house, town, church, household or corporate purse.
+
+A lock foundation retains the actual impound-owning house account as its title,
+including when the territorial lord has changed; numeric house indices never
+pass through person-id property resolution. A sovereign's manual lock command
+can fund only its own actual impound title, while profitable automatic corporate
+investment remains independent. Operator validation requires the actual keeper's
+matching role, office and building office reference. Losing that contract stops
+passage and later wages and clears only the old lock's own employment fields.
