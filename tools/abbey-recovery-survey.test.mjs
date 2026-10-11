@@ -75,3 +75,24 @@ test('missing or replaced native reader captures retain the original conservativ
  assert.equal(r.run('C.native'),false);assert.equal(r.run('C.coldRecovery===undefined'),true,'reader replacement is the existing cold policy');
  assert.equal(r.run('C.terrain===undefined&&C.projectIndex===undefined'),true);
 });
+
+
+test('a stale supplied survey loses retained terrain and world/authority truth after reader replacement',()=>{
+ const r=setup();corridor(r);
+ r.run(`const old=abbeyCorridorReady(s,C,null,q,0,C.terrain),T=C.terrain;
+   old.memo.set('span:old',true);old.claims.set('old-field',true);T.memo.set('terrain-old',true);
+   const before=JSON.stringify(W),original=castleFoundationReserved;castleFoundationReserved=(...args)=>original(...args);
+   const fresh=abbeyCorridorReady(s,C,null,q,0,T);`);
+ assert.equal(r.run('abbeyApproachSurveyNative()'),false);
+ assert.equal(r.run('fresh!==old&&fresh.C!==C&&fresh.C.native===false'),true);
+ assert.equal(r.run('fresh.terrain===null&&fresh.memo.abbeyTerrain===undefined'),true);
+ assert.equal(r.run('fresh.memo.size===0&&fresh.claims.size===0'),true);
+ assert.equal(r.run('fresh.memo.scopes!==T.memo.scopes&&fresh.memo.circuits!==T.memo.circuits'),true);
+ assert.equal(r.run("old.memo.get('span:old')&&old.claims.get('old-field')&&T.memo.get('terrain-old')"),true,'discarding reuse does not mutate the caller’s old memo');
+ assert.equal(r.run('JSON.stringify(W)===before'),true);
+});
+
+test('a current native previous corridor still reuses the same uninterrupted operation',()=>{
+ const r=setup();corridor(r);r.run('const first=abbeyCorridorReady(s,C,null,q,0,C.terrain),second=abbeyCorridorReady(s,C,null,q,0,C.terrain);');
+ assert.equal(r.run('first===second&&first.C===C&&first.terrain===C.terrain'),true);
+});
