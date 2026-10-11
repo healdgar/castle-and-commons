@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {realm,near} from './ownership-fixture.mjs';
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const technologyRules=source.slice(source.indexOf('const TECH_RULES=Object.freeze('),source.indexOf('function technologyKey('));
 const learning=source.slice(source.indexOf('/* LEARNING (#40):'),source.indexOf('/* the rank-and-file notables share'));
 function fn(n){return source.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))','m'))?.[0]||'';}
 function fixture(households=4){
@@ -14,11 +15,11 @@ function fixture(households=4){
   for(const p of f.H.slice(4))Object.assign(p,{age:35,sk:new Float32Array([.8,.7,.5,.6,0,0,0,0,0])});
   f.eval('H.forEach(householdAccount);householdAccount(H[0]);bindHousehold(H[2],householdAccount(H[1]));bindHousehold(H[3],householdAccount(H[1]));householdsOf(s)');
   f.s._job={merchant:{sum:2000,n:1},reeve:{sum:1000,n:1},ploughman:{sum:200,n:1},priest:{sum:0,n:1}};
-  const room={idx:0,arch:'temple',state:'sound',w:18,d:20};f.s.buildings=[room];f.W.bldList=[room];f.W._pm=new Map(f.H.map(p=>[p.id,p]));
+  const room={idx:0,arch:'temple',state:'sound',w:18,d:20};f.s.buildings=[room];f.W.bldList=[room];f.W._pm=new Map(f.H.map(p=>[p.id,p]));f.W.technology={known:{}};f.s.technology={adopted:{}};
   Object.assign(f.C,{KL:0,KR:1,KS:2,KLaw:3,KA:4,KRi:5,KC:6,KCr:7,KH:8,GW:1,GD:2,GV:3,GB:4,TILLERS:new Set(['ploughman']),TRADE_W:{merchant:1.6,reeve:.3},day:()=>d,year:()=>1,AD:()=>1250,
     RESID:new Set(['inn','hospital','house']),institutionalCapability:()=>({available:false}),livingNotableCandidates:()=>[],trait:()=>0,technologyActorsDirty:()=>{},technologyRecordTeaching:(s,p,v)=>{s.receipts=(s.receipts||0)+v;},houseAcct:hi=>hi?f.W.houses[hi]:'crown',purse:hi=>hi?f.W.houses[hi].gold:f.W.treasury,
     rentDue:()=>0,sovOn:()=>true,plyH:()=>0,esc:String,householdHeadsChanged:()=>{},emit:()=>{}});
-  vm.runInContext(fn('tradeIncome')+'\n'+fn('capOf')+'\n'+learning,f.C);
+  vm.runInContext(technologyRules+'\n'+['technologyKey','technologyCapability','technologyEffect','tradeIncome','capOf'].map(fn).join('\n')+'\n'+learning,f.C);
   return {...f,master,parent,kid,other,room,setDay:x=>d=x};
 }
 
