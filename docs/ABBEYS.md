@@ -56,6 +56,30 @@ open seasonal court. Each stage retains its own paid footprint and lawful intern
 connection to the existing entrance. Native titles, physical access, materials,
 wages and food reserves can refuse a stage; unbuilt wings occupy no ground.
 Chapter, refectory and covered court provide no additional housing or storage.
+The arrangement is a preference selected when a connected component actually
+completes; its pending project retains the proposed side and court width without
+claiming future wings. New quotes use the current registered, owned, sound church.
+If the old anchor is unavailable and a different church has really been paid for,
+the bounded mirrored site search runs around that root. Its first completed
+connected component replaces the stale preference. Surviving buildings and
+their original parent, street, path and titles are never rebound or relocated.
+
+An actual recorded ruin is offered paid same-site rebuilding before a duplicate
+foundation. The common Castle/Abbey recovery adapter enforces current rubble
+readiness, ownership, granted footprint, retained access, technology and bread
+reserve; real installed materials and wages restore the original native building
+only at completion. A blocked or underfunded retained ruin waits, with its refusal
+shown in the existing Works diagnostics. Rebuilding the same church index restores
+its surviving lawful child connections. A part-paid connected range waits while
+its exact ruined church is rebuilt; only that validated dependency allows the
+root repair beside the pending range. The range resumes its original paid
+contract and connection rather than being commissioned or charged again.
+A truly removed or foreign-owned captured parent abandons its unfinishable
+pending child contract, retaining its spent work and materials without refund.
+Completed older ranges keep their original connections. Missing parents or lost
+access cannot be repaired by changing a layout preference; those older routes
+remain unusable until a separate lawful repair exists.
+
 The native cellarer serves actual member pantries through existing meal receipts,
 so household consumption cannot feed the same person twice. College lodging uses
 the same shared layout/connection service. See
