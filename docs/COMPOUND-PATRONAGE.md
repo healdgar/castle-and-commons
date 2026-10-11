@@ -2,8 +2,8 @@
 
 A compound is a native collection of paid components, connections and rights. It
 has no purse. `compoundPatronRecipient` resolves its current registered owner:
-a Castle, College or private estate pays into its actual Crown/great-house
-account; an abbey pays into its existing `abbey:N` corporate account. Gone,
+a gift to a Castle, College or private estate reaches its actual Crown/great-house
+account; a gift to an abbey reaches its existing `abbey:N` corporate account. Gone,
 detached, unknown or dead-holder references cannot receive patronage. Giving to
 your own account is refused because the coin is already there.
 
@@ -15,6 +15,15 @@ record the capital movement; it is not recurring income or an ecclesiastical
 assessment base. The quote rejects an insufficient purse instead of letting
 `transfer` clip the gift. No goods, workers, rights or construction progress are
 created or copied.
+
+Construction turns that available capital into sustained local demand: successive
+paid components buy real timber and stone, pay builders and use the existing
+merchant and transport economy. Recipients can spend their earnings through the
+ordinary household and craft mechanisms. Funding remains a transfer from a real
+patron, not newly created income for the realm or a guaranteed multiplier. Supply,
+prices, food and other commitments can delay or prevent a campaign. Later upkeep
+and rebuilding must arise from actual asset needs through the same ownership and
+payment rules.
 
 The current player consumer is `abbey-gift`, with the exact journal payload
 `donorHouse:abbeyId:amount`. Worker policy and the simulation both check the
