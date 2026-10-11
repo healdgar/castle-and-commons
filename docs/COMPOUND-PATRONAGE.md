@@ -25,6 +25,17 @@ prices, food and other commitments can delay or prevent a campaign. Later upkeep
 and rebuilding must arise from actual asset needs through the same ownership and
 payment rules.
 
+The current labour measure remains abstract: project progress follows the paid
+fraction of its recipe's daily labour bill. Recipients are actual eligible heads,
+but `buildWorks` reserves no shared person-day capacity across projects, upkeep
+and ordinary craft work. Several employers may therefore pay the same builder
+on the same day. The dependency audit records this as #80: a common deterministic
+daily allocation needs an explicit recipe work unit before it can represent
+finite attendance. Consolidating those consumers can also reuse their native
+worker selection, rather than searching and dividing each bill independently.
+This next phase must retain actual named payments and paid project progress;
+it supplies no established economic multiplier or browser speedup yet.
+
 The current player consumer is `abbey-gift`, with the exact journal payload
 `donorHouse:abbeyId:amount`. Worker policy and the simulation both check the
 explicit named donor against the current ruler. The Crown may give to any living
