@@ -143,7 +143,7 @@ Local adoption alone changes none of these quantities.
 | Rudder, cog, compass, charts, carrack | Paid actual boatman equipment changes his real native trip time/freight; native cargo limits and wreck rules are unchanged |
 | Crossbow, longbow, plate, ram, trebuchet, cannon | Paid actual army recipe and recorded living holders; `technologyArmyEquipmentFactor` is the battle/siege adapter contract |
 | Post windmill | Paid native retained exposed site/approach, real timber and crew; present native master grinding shares finite mill time, actual earned multure and cash service receipts |
-| Numerals, bills, double entry | Finance clients must use actual clerk/merchant claims; no simulated accounting errors or free remote payments |
+| Numerals, bills, double entry | Later finance-client detail, outside the current accepted institution completion contract. Capabilities/prerequisites exist; actual remote bill settlement and bookkeeping effects are not implemented. Future clients must use real liabilities and clerk/merchant work, not invented errors or free payments |
 | Quarantine | The port-health client requires actual exposure evidence, paid native attendants and finite consignment holds |
 | Pound lock | Paid native wet pond/weir chamber and keeper house; real exclusive keeper wages, finite served passages, actual merchant receipts and boatman portage fallback |
 
