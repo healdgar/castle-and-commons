@@ -5,6 +5,8 @@ import vm from 'node:vm';
 // Hosts sent home, hosts given orders, and what the annals say of them.
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const fn=name=>{const s=html.indexOf(`function ${name}(`);assert.notEqual(s,-1,`missing ${name}`);const e=html.indexOf('\nfunction ',s+1);return html.slice(s,e<0?html.length:e);};
+const equipmentRules=html.slice(html.indexOf('const TECH_EQUIPMENT=Object.freeze('),html.indexOf('function technologyEquipmentTarget('));
+assert.ok(equipmentRules.includes('individual:true'),'actual equipment ownership rules found');
 const dist2d=(x,z,a,b)=>Math.hypot(x-a,z-b);
 
 function homeRealm(position){
@@ -56,10 +58,16 @@ test('a host in flight is told the order will wait for the rally; at the rally i
 test('a lord\'s hosts camped together in the field join under one banner, as they would at a town',()=>{
   const host=(id,x,extra)=>({id,house:2,side:'host',state:'idle',at:0,strength:100,supply:60,morale:70,men:[],horses:0,field:{x,z:0},name:'Host '+id,...extra});
   const a=host(6,500),b=host(10,500),far=host(11,900),W={armies:[a,b,far],settlements:[{owner:2,pos:{x:0,z:0},name:'Ashby'}],war:null};
+  const first={id:1},second={id:2},engine={method:'trebuchet',installed:true,materials:{timber:40,tools:6,stone:6},paid:100},otherEngine={method:'trebuchet',installed:true,materials:{timber:40,tools:6,stone:6},paid:110};
+  a.men=[first];b.men=[second];a.techEquipment={crossbow:{installed:true,holders:[1],materials:{tools:2,timber:1},paid:11},trebuchet:engine,siegeEngine:engine};b.techEquipment={crossbow:{installed:true,holders:[2],materials:{tools:3,timber:2},paid:13},trebuchet:otherEngine,siegeEngine:otherEngine};
   const c=vm.createContext({W,Math,dist2d,day:()=>3,plyH:()=>0,clamp:(v,l,h)=>Math.max(l,Math.min(h,v)),armySimPos:x=>({...x.field}),armiesAtSettlement:()=>[],
     dropArmyFlag:()=>{},dropMarker:()=>{},liftSiege:()=>{},musterSync:()=>{},rollLiving:()=>{},armyHomeward:()=>false,armyLand:()=>{},houseAtWar:()=>false,hostileTo:()=>false,atWar:()=>false,emit:()=>{}});
-  vm.runInContext(fn('mergeArmies')+'\n'+fn('tickMilitary'),c);vm.runInContext('tickMilitary()',c);
+  vm.runInContext(equipmentRules+'\n'+fn('technologyMergeArmyEquipment')+'\n'+fn('mergeArmies')+'\n'+fn('tickMilitary'),c);vm.runInContext('tickMilitary()',c);
   assert.equal(b.gone,true);assert.equal(a.strength,200);assert.deepEqual(W.armies.map(x=>x.id),[6,11],'the far camp keeps its own banner');
+  assert.equal(a.men[0],first);assert.equal(a.men[1],second);assert.equal(b.men.length,0);
+  assert.deepEqual(Array.from(a.techEquipment.crossbow.holders),[1,2]);assert.equal(a.techEquipment.crossbow.materials.tools,5);assert.equal(a.techEquipment.crossbow.materials.timber,3);assert.equal(a.techEquipment.crossbow.paid,24);
+  assert.equal(a.techEquipment.trebuchet,engine);assert.equal(a.techEquipment.siegeEngine,engine);assert.equal(a.reserveEquipment.length,1);assert.equal(a.reserveEquipment[0].record,otherEngine,'one engine stays indivisible and its alias does not create a second reserve');
+  assert.deepEqual(Object.keys(b.techEquipment),[]);assert.equal(b.reserveEquipment.length,0);
 });
 
 function hungryRealm(routes){

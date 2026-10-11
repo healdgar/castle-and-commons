@@ -7,7 +7,7 @@ const fn=n=>src.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^con
 function fixture(){
   const town={name:'Town',pos:{x:0,z:0},buildings:[],murage:20},other={name:'Other',pos:{x:2,z:0},buildings:[],murage:0},lord={name:'House A',gold:100},person={household:true,assets:{w:50}},W={startAD:850,clock:{day:0},treasury:200,houses:[{},lord],settlements:[town,other]};
   const C=vm.createContext({W,town,other,lord,person,day:()=>W.clock.day,year:()=>Math.floor(W.clock.day/360)+1,householdAccount:p=>p,esc:s=>String(s).replaceAll('<','&lt;'),dateStr:d=>'Day '+d,isHouse:x=>W.houses.includes(x),means:x=>x==='crown'?W.treasury:x?.household?x.assets.w:x?.pos?x.murage:x?.gold||0});
-  vm.runInContext(['cashRecord','acct','flow','transfer','book','cashStatementHTML','townCashHTML','detailTable','detailNumber','ledgerHTML'].map(fn).join('\n'),C);
+  vm.runInContext(['cashRecord','acct','flow','foreignAccount','transfer','book','cashStatementHTML','townCashHTML','detailTable','detailNumber','ledgerHTML'].map(fn).join('\n'),C);
   return {C,W,town,other,lord,person,run:x=>vm.runInContext(x,C)};
 }
 test('gross receipts and payments under the same cause are retained, without moving an extra coin',()=>{
@@ -15,6 +15,14 @@ test('gross receipts and payments under the same cause are retained, without mov
   assert.equal(r.lord.gold,105);assert.equal(r.person.assets.w,45);assert.equal(r.lord.ledY.rents,5);
   assert.equal(r.lord.cashY.receipts.rents,12);assert.equal(r.lord.cashY.payments.rents,7);assert.equal(r.lord.cashY.opening,100);assert.equal(r.lord.cashY.closing,105);
   assert.equal(r.lord.cashY.towns.get(r.town).receipts.rents,12);assert.equal(r.person.cashY,undefined);
+});
+test('registered foreign accounts move actual coin and record only its passage across the realm boundary',()=>{
+  const r=fixture(),foreign={id:0,kind:'foreignPolity',foreign:true,gold:15,accounts:[]},merchant={foreign:true,gold:10,polity:foreign};foreign.accounts.push(merchant);r.W.foreignPolities=[foreign];r.C.foreign=foreign;r.C.merchant=merchant;
+  r.run("transfer(lord,foreign,8,'tribute',town);transfer(merchant,lord,3,'ransom',town)");
+  assert.equal(r.lord.gold,95);assert.equal(foreign.gold,23);assert.equal(merchant.gold,7);assert.equal(r.lord.gold+foreign.gold+merchant.gold,125);
+  assert.equal(r.W._flow['>tribute'],8);assert.equal(r.W._flow['<ransom'],3);assert.equal(r.lord.cashY.payments.tribute,8);assert.equal(r.lord.cashY.receipts.ransom,3);
+  r.run("transfer(foreign,merchant,2,'foreign trade',town)");assert.equal(foreign.gold,21);assert.equal(merchant.gold,9);assert.equal(r.W._flow['>foreign trade'],undefined);assert.equal(r.W._flow['<foreign trade'],undefined);
+  assert.equal(r.run('foreignAccount({foreign:true,gold:10})'),false,'an unregistered label creates no foreign account');
 });
 test('annual periods follow the calendar, retain only this and last year, and preserve fractions',()=>{
   const r=fixture();r.W.clock.day=359;r.run("transfer('crown',lord,.125,'grant',town)");const first=r.lord.cashY;
