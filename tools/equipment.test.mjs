@@ -120,3 +120,14 @@ test('immediate abbey grinding uses remaining actual operator time without drain
 test('indexed grinding retains native mill order and validates the current operator without rediscovering every building',()=>{
   const f=fixture();f.eval('craftIndex(s)');f.s.buildings=new Proxy(f.s.buildings,{get:(target,key)=>{if(key===Symbol.iterator)assert.fail('a bread payment must not rescan all town buildings');return Reflect.get(target,key);}});assert.equal(f.eval('technologyGrindingCash(s,H[0],-1)'),0);assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),1);f.H[2].role='company soldier';assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),0);
 });
+
+
+test('guild resistance requires sold work, a real funded writer and authority receipts before it restricts a new machine',()=>{
+  const f=fixture(),coins=f.coins();f.H[5].tr='weaver';f.H[5].craft={rank:'master',qualified:true,room:0,opened:0,takings:10000,guild:0};f.H[0].craft.guild=0;f.H[4].sk[0]=.4;f.H[4].sk[1]=.4;const g={id:0,kind:'guild',storageOwnerId:'guild:0',trade:'weaver',members:[f.H[0].id,f.H[5].id],gold:500,ordinances:{}};f.W.guilds=[g];f.s.guildIds=[0];f.rooms.push({idx:3,arch:'burgher',w:12,d:10,state:'sound',tier:1,ownerId:f.H[5].id,s:f.s,craftMasters:[f.H[5].id]});f.H[5].craft.room=3;delete f.s._craftIndex;f.W.bldList=f.rooms;
+  const Q=f.eval('technologyEquipmentQuote(s,"loom",{kind:"building",id:0},H[0])');assert.ok(Q);f.C.Q=Q;const crown=f.W.treasury,writer=f.H[4].w;assert.equal(f.eval('technologyEquipmentCommission(Q)'),null);assert.ok(g.ordinances.machines.loom.granted);assert.ok(f.W.treasury>crown);assert.ok(f.H[4].w>writer);assert.equal(f.H[4].office,'guildWriter');assert.equal(f.eval('institutionalJobHeld(H[4])'),true);assert.equal(f.W.projects.length,0);near(f.coins()+g.gold,coins+500);assert.equal(f.eval('technologyEquipmentQuote(s,"loom",{kind:"building",id:0},H[0])'),null);
+  f.setDay(g.ordinances.machines.loom.until);f.eval('craftMachineWriterRelease(s,H[4])');assert.equal(f.H[4].office,undefined);assert.ok(f.eval('technologyEquipmentQuote(s,"loom",{kind:"building",id:0},H[0])'));g.gold=0;assert.ok(f.eval('technologyEquipmentCommission(technologyEquipmentQuote(s,"loom",{kind:"building",id:0},H[0]))'));
+});
+
+test('a sovereign machine permission repeals only its actual local purchased ordinance',()=>{
+  const f=fixture(),g={id:0,trade:'weaver',members:[],gold:0,ordinances:{machines:{loom:{until:30,authority:0,licence:5}}}};f.W.guilds=[g];f.s.guildIds=[0];assert.ok(f.eval('craftMachineRestriction(s,"loom")'));const coins=f.coins();assert.equal(f.eval('craftMachineCmd("0:loom:allow")'),true);assert.equal(f.eval('craftMachineRestriction(s,"loom")'),null);near(f.coins(),coins);assert.equal(f.eval('craftMachineCmd("0:loom:ban")'),false);
+});

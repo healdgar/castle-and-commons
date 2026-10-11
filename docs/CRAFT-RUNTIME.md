@@ -61,8 +61,8 @@ weaver processing to actual master rooms and today's paid journeyman fractions.
 Available native household members provide cottage weaving. Actual military,
 foreign, outlaw and religious roles cannot continue their previous private
 workshop work. Paid installed machinery changes working capacity only when its
-actual inputs and operator exist. Guild resistance to a particular machine
-remains a separate policy consumer; knowledge by itself installs no equipment.
+actual inputs and operator exist. Guild resistance to particular machines now uses a funded actual local
+ordinance; knowledge by itself installs no equipment.
 
 Light evidence: inline JavaScript syntax and `tools/guilds.test.mjs`, six focused
 fixtures covering real premiums/wages, takings and chest conservation, measured
@@ -83,3 +83,23 @@ reference-loop fixture verifies the same contracts and transfers with a filled
 guild slot and fewer master-working calculations. Root owns the whole-history
 identity proof and actual CPU measurement; this local evidence claims no
 century-per-minute throughput.
+
+A prospective loom/wheel/fulling, furnace/hammer or saw installation can prompt
+the actual affected trade guild to petition. Only living local masters with
+actual sold-work receipts supply an income-dilution case. A real chest must pay
+a named literate writer for one actual working day and its real lord or commune
+for a licence. The writer holds an exclusive native office until the next day.
+The paid custom is one year; its licence must cover the greater of one month's
+bread per master or the authority's assessed five-percent foregone output
+revenue. The authority refuses a prohibition of its own commissioned equipment.
+No purse, writer, measured loss or affordable worthwhile petition means no rule.
+A purchased ordinance delays new installations of that particular method at that
+place. Already paid machines and commissioned recipes keep working. Deaths,
+expiry, dissolution or changed local authority stop the restriction. Local
+sovereign `s-machine ...:allow` can repeal it; no command grants a free ban or
+changes knowledge or goods prices. The actual petition receipts and finite rule
+are reported in the guild view.
+
+Additional worker-only state is guild `machinePetitions`, `machineWriting`,
+`machineLicences`, `ordinances.machines`, settlement `guildMachinePolicy`, and
+person `guildWriting`. These are actual account/office and licence records.

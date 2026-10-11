@@ -104,8 +104,13 @@ Private additional mill fields are `grindingClaims`, `grindingPending`,
 `grindingWorked`, `grindingOperator`, `multureWorked` and `grindingCash`: actual
 earned grain/service claims and canonical actors, never visual state.
 
-Limits: explicit port quarantine, real canal locks and machine-specific guild
-resistance still require native clients.
+Machine-specific local guild resistance now uses actual sold-work claims,
+a chest-funded writer and authority licence before a finite ordinance delays
+new equipment commissions (see [CRAFT-RUNTIME.md](CRAFT-RUNTIME.md)). Existing
+paid machines and commissioned recipes continue; knowledge and prices do not
+change.
+
+Limits: explicit port quarantine and real canal locks still require native clients.
 Army splits partition actual individual holders and divide their paid recipe
 provenance; one siege engine remains in the original army unless explicitly
 moved. Its method and generic engine alias share the same canonical record.
@@ -118,7 +123,7 @@ Equipment has no separate wear stock; native site/owner/operator loss already
 stops its use. No simulation-century throughput or economy calibration claim
 follows from these focused fixtures.
 
-Light evidence: extracted inline JavaScript syntax and twenty focused cases in
+Light evidence: extracted inline JavaScript syntax and twenty-two focused cases in
 `tools/equipment.test.mjs`, covering both native commodity ledgers, material and
 coin conservation, paid completion, actual exclusivity and current wages,
 finite mill work, held animal teams, paid paper/printing, native army holders,
