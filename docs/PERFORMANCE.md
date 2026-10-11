@@ -11,7 +11,11 @@ The 11 October institution batch is assembled and being gated. Its frozen
 failures: 2,683.46 aggregate child CPU seconds, 1,704.25 wall seconds, load
 0.004→1.00. Those are test-runner costs, not game throughput. The reviewed
 fixture repairs, operative own-use abbey processing and the remaining daily
-institution eligibility decisions form the coupled `2d81f11` batch. Earlier exact-reuse diagnostics and failures are retained in
+institution eligibility decisions form the coupled `2d81f11` batch. The assembled suite records 2,840.95 aggregate child CPU seconds, 1,788.89
+wall seconds and load 0.00→1.00. All 1,965 current unique checks are verified
+across that batch and the reviewed three-file rerun (1.37 CPU seconds, load
+0.20→0.20). These are test costs, not daily simulation throughput.
+Earlier exact-reuse diagnostics and failures are retained in
 [HANDOFF.md](HANDOFF.md); they are not a final 150-day or shipping speed result.
 
 The current institution integration uses daily housing, road, castle and
