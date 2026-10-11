@@ -163,3 +163,11 @@ That repair's fresh native history again matched through49 and timed out on50 at
 The focused `tools/compound-patron-gifts.test.mjs` passes ten native-source checks: named Crown/great-house payers, both commodity ledgers, strict authority/identity/amount/funds refusals, actual Castle/College/Estate recipients, readonly cards/panels, capital-income exclusion, worker routing, one journal entry and exact command replay. The same command has identical observations for all seven speed settings; a full generated-world speed/save/worker gate remains with root.
 
 The unassisted frozen `af07d28` paid-core run remains deliberately stopped at audited closed day720: the Cistercian church has bought30.033/40.869 timber for1050.4357 gold, has0.4395 gold left and has earned no construction labour. That is a real underfunded outcome, not a core pass. A separately recorded patron-assisted gate may use these actual journaled gifts, retaining the original paid-material/labour, admission, meals, crops, industries and continuation assertions and deadlines. It cannot retag the original outcome.
+
+Paid connected work may depend on a sound range other than its captured path
+parent: the cloister requires the dormitory, chapter and refectory. Daily Abbey
+decisions therefore offer missing required components to the same retained
+repair validator before the ordinary one-project guard. Only a current owned
+required ruin with disjoint retained geometry can qualify; unrelated projects
+and altered titles or paths remain refusals. The pending wing keeps its original
+work, material payments and connection while its prerequisite is rebuilt.
