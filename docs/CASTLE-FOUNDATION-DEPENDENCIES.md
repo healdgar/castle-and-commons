@@ -47,3 +47,14 @@ A real failed survey records its exact `HASH_STAMP` increment. A certified recal
 ## Evidence and limits
 
 The focused native fixture covers all writer categories, unchanged-count edits, cold memory, helper overrides, same full graph plus counter at repeated daily calls, fresh success after removing an obstruction, and a verification mode that checks recalled nulls against fresh native surveys. It uses a small fixed terrain and native geometry helpers without generation/rendering/long simulations. It does not establish the whole game's century throughput or checkpoint/worker equivalence. Root's serialized batch profile and full graph/RNG comparison remain the integration gate. `CASTLE_FOUNDATION_SURVEYS.on=false` provides the fresh-survey comparison; `.verify=true` reruns every recalled null and rejects a certificate or stamp-count disagreement.
+
+The `219b90e` raster review adds `occupiedGroundBoxMayHit` to the actual
+first-castle helper certificate, bringing it to 49 identities. Both native
+`occupiedGroundCells` and `occupiedGroundFields` call it before their existing
+exact overlap predicate. It rejects only a finite axis gap greater than one
+metre with every coordinate bounded by 1,048,576; uncertain inputs retain the
+original predicate. Raster/parcel traversal and Set order are unchanged, and
+replacing this helper bypasses failed-survey reuse. Only the Cells/Fields body
+pins and new Box pin change; the other 38 fixture pins remain exact. No world
+field, memory lifetime or daily retry cadence changes. The current serialized
+native gates remain separate from this source/dependency review.

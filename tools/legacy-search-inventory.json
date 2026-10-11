@@ -598,5 +598,19 @@
       }
     ],
     "scope": "Only this actual new recognized occurrence is appended. All existing counts/key order and inventory limits remain; building occurrences rise 191→192. Corridor native scope also reuses current public strips and necessary title/work-right Boolean checks only within one synchronous proposal, never across mutation boundaries/days or retained completion. Full-width route selection intentionally changes the model; native performance/history gates remain pending root work."
+  },
+  "reviewedRasterIncidentRoads": {
+    "sourceCommit": "219b90e0750ed52c9ddc63dd4f53bd5938e6ec18",
+    "indexSHA256": "a6bc6b38703368dc4c43b4267de56cf24a4801b47d96da181303b73f34d95482",
+    "recognizedSites": 418,
+    "reportedFunctionsWithDirectOrTransitiveSearches": 1429,
+    "newRecognizedSiteOccurrences": 0,
+    "actualNewTraversal": {
+      "function": "serviceRoadPlan",
+      "collection": "W.roads",
+      "recognizedByLegacyScanner": false,
+      "scope": "Only optional full-width Abbey corridor proposals iterate actual incident road open/path segments, preserving native road order and endpoint validation before stable closest-first sorting. No ordinary service caller or transaction gains a road scan."
+    },
+    "scope": "All existing recognized counts/key order and inventory limits stay exact. One pure raster bound helper introduces no collection query; optional same-site nativeGround reuse avoids a duplicate raster only inside the current certified native call. The explicitly recorded road loop lies outside the scanner collection vocabulary; it intentionally expands actual rural public targets and is not hidden as a zero-search claim. The current certificate covers 111 route readers and 49 castle helpers. Only certified Abbey proposals skip exhaustive reject-only floods; native target iteration and bounded path/acceptance order remain, and cold/ordinary callers retain native flood behavior."
   }
 }

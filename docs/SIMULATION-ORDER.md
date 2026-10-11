@@ -257,16 +257,17 @@ refusal reasons and annual/lifetime counters remain worker state and detached
 inspector output. This intentionally adds the accepted own-use mechanics and
 changes affected histories; same-speed/history/save discipline still applies.
 
-The assembled static review at `f7ff0f7` retains 59 phases and 200 edges;
-`simTick` is byte-identical to `85f0368`. All 39 own-use-industry pins
-remain exact. The current bundle reviews nine changed and seven new helper
-bodies plus the expanded route certificate; unchanged pins are preserved.
+The assembled static review at `219b90e` retains 59 phases and 200 edges;
+`simTick` is byte-identical to `f7ff0f7`. All 39 own-use-industry pins
+remain exact. The current bundle reviews eight changed bodies and one new pure raster
+helper plus two changed certificate declarations; unchanged pins are preserved.
 The recognized legacy search inventory contains 418 sites across 1429 reported
 functions: 192 building, 73 street, 49 folk and 16 owner collection scans;
 35 `heads_`, 22 `workers_`, 16 `headsOf` helper calls and 15 unscoped entries.
-Only one occurrence is new in this bundle: the full ordered building/graveyard
-fallback in `abbeyCorridorWorldClear`. Earlier inventory additions remain
-separately recorded. These are syntactic counts, not measured costs or a
+No recognized occurrence is new in this bundle; the prior full ordered
+building/graveyard fallback in `abbeyCorridorWorldClear` remains recorded.
+The actual new incident-road index loop is explicit in the JSON helper inventory;
+roads are outside the legacy scanner collection vocabulary. These are syntactic counts, not measured costs or a
 centuries-per-minute result.
 
 Rural abbey surveys share native ordered building/project geometry only within
@@ -289,7 +290,7 @@ exact source and dependency review separately from historical evidence and
 the current source's pending native speed/save/conservation gates.
 
 The later route adapter shares ghost-free terrain edges, native scope/circuit
-lists and certified flood banks only inside that proposal. Its current 110-entry
+lists and certified flood banks only inside that proposal. Its current 111-entry
 identity certificate and current world/place/owner/day/size/cell/placed checks
 guard reuse. Each candidate pose keeps a fresh ghost-edge memo; its current
 ghost still uses the native interpolation and strict rotated footprint test.
@@ -304,9 +305,8 @@ These contexts stay on local service walkers and return only ordinary
 path/street results. Host route recall accepts no `_em`, `settlement` or
 `placed`, and its temporary memo carries no `abbeyTerrain`; actual hosts also
 carry no `abbeyCorridor`. The new corridor and heuristic branches introduce no
-host-memory input. Only the existing `armyDetour` and `armySegmentClear`
-fixture pins change in this bundle; `armyLandPath` and every other fixture pin
-remain exact. `Reach` remains a separately AST-pinned service flood helper.
+host-memory input. All 38 army-route fixture pins remain exact from `f7ff0f7`; no host-memory
+reader body changed in this follow-up. `Reach` remains a separately AST-pinned service flood helper.
 
 The spatial adapter bins the same ordered building/project rows once,
 retaining unknown, oversized and castle-reservation rows unconditionally.
@@ -327,6 +327,33 @@ rights. A zero-price preflight pays nothing and never grants a licence or
 replaces a tenant. The final whole private union is still priced and acquired
 from the actual named owners before paid building work.
 
+Only the optional Abbey corridor also proposes the current place's actual
+incident highways, using each road's native `open || path` geometry and exact
+public endpoint validation. Stable closest-first ordering keeps streets first
+on distance ties; each actual street or road consumes at most one of twelve
+attempts. Ordinary service callers retain their town-street query prefix and
+path/street result. A selected road reference remains ephemeral; the retained
+site contains plain path points and its current numeric native endpoint.
+
+Raster and parcel queries reject only a proven axis gap greater than one metre
+before the existing exact overlap test. Nonfinite, invalid or unusually scaled
+coordinates retain that predicate; native cell/field identity and order stay
+unchanged. Inside the certified synchronous corridor call, `storageGroundClaim`
+may reuse the exact native ground computed for the same site. Ordinary and cold
+calls still survey it afresh; current title/work rights, recipients, licence
+amounts, paid receipts and payment writers are unchanged. Both proposal entry
+points require the exact settlement/excluded-project identity before sharing
+geometry. The first-castle failed-survey certificate now includes this bound
+helper: 49 identities, with only Cells/Fields and the new Box fixture pins
+changed. The other 38 castle pins remain exact.
+
+A current certified Abbey corridor now skips the exhaustive ghost-free reach
+flood. It still tries the native ordered targets through bounded path searches
+and current physical, ghost, rights and acceptance checks. Ordinary, cold or
+uncertified contexts keep the original flood/bank branch. This changes only
+proposal work inside its existing phase; the entire day still closes before
+tomorrow begins, and no partial search becomes a commit or save boundary.
+
 Only these new indirect plans retain plain `site.access.corridorFrom=2`.
 Current validation checks that marker and the exact landing; existing plans
 without it keep their native validation. Corridor edge/claim/public-index/flood
@@ -341,11 +368,12 @@ native distance calls. Heap order, tie-breaks, predecessor updates, visit
 limits and obstacle queries remain unchanged. Ordinary walkers and hosts run
 the original distance queries; these local arrays enter no saved state.
 
-Full corridor width and actual work rights intentionally affect route selection
-and founding outcomes. This carries no old-model 150-day identity claim; the
+Full corridor width, actual work rights and incident highway targets
+intentionally affect route selection and founding outcomes. This carries no old-model 150-day identity claim; the
 current model must still produce identical history at every speed and after
 save/load. Earlier failed native diagnostics establish no clearance of
-`f7ff0f7`. Current-source native performance and release gates remain
+`219b90e`. The certified reject-only flood omission has its own current
+source gates; prior-source evidence is not retagged. Current-source native performance and release gates remain
 coordinator work.
 
 Foreign population/food and current recruitment run first inside

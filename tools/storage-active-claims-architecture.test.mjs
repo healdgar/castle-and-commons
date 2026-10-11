@@ -179,7 +179,14 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // predicates retain original unfactored checks. Existing Abbey industry fixtures
  // cover near-boundary rotated geometry, fresh pending/yard mutations, original
  // fallback, ordered private polygons and grant/water preflight before routing.
- assert.equal(digest(source.slice(a,b)),"e2bc35507ce12162b84cf8f288f3882a096887dd9f712acd164a07eb13fb4602");
+ // Ground reuse (reviewed f7ff0f7..219b90e): this region changes only
+ // storageGroundClaim's optional nativeGround argument and initial survey selection.
+ // Its one admitted caller passes the exact compoundGround result for the same
+ // synchronous site only under the current native corridor guard. Cold/ordinary
+ // calls retain the original survey. Cells, current title/work rights, named
+ // recipients, paid receipts and all quantity/payment writers remain unchanged.
+ // The external writer corpus, inspector and title-dirty call count stay exact.
+ assert.equal(digest(source.slice(a,b)),"0ae008b74de00893188f5eb19d1a1a53e30862d513f1c19fc165b9e8dab0cdb7");
  // This explicit worker inspector copies existing balances. Pin the entire line
  // before excluding it so a future mutation cannot hide behind the read exemption.
  const inspectorLine=source.split('\n').find(l=>l.trim().startsWith("if(kind==='household'){const h=W.households.get(payload.id);"));
