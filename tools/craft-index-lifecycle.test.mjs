@@ -16,7 +16,7 @@ function fixture(){
 const roster=r=>JSON.parse(r.eval('JSON.stringify([...craftIndex(s).trades].map(([tr,L])=>[tr,L.map(p=>p.id)]))'));
 
 test('closing an actual school restores its teacher to the ordered native trade roster',()=>{
-  const r=fixture();r.eval(`H[0].tr='clerk';H[0].office='master';H[0].schoolMaster=0;const S={id:0,si:0,master:H[0].id,masterName:'Teacher',pupils:[],previous:{tr:'smith'},contract:{active:true}};s.school=S;const before=craftIndex(s);`);
+  const r=fixture();r.eval(`H[0].tr='clerk';H[0].office='master';H[0].schoolMaster=0;const S={id:0,si:0,ownerId:null,master:H[0].id,masterName:'Teacher',pupils:[],previous:{tr:'smith'},contract:{active:true}};s.school=S;const before=craftIndex(s);`);
   assert.deepEqual(roster(r),[['weaver',[2]],['carpenter',[3]]]);
   r.eval('learningSchoolClose(S,"no paid pupils")');
   assert.equal(r.eval('s._craftIndex'),undefined);assert.equal(r.eval('H[0].schoolMaster'),undefined);assert.equal(r.eval('before.revision'),r.eval('W._folkRevision'));
