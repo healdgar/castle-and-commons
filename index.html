@@ -3640,9 +3640,9 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
       if([...new Set(placed.near(f.x,f.z,Math.hypot(f.w,f.d)/2+3))].some(o=>o!==b&&!o.removed&&obbOverlap(F,o)))return null;
       if(!probe(f).every(q=>cellOK(q.x,q.z)&&!nearStreet(q.x,q.z,0.5)&&!inPlace(q.x,q.z,0.8))||onStreet(f))return null;
       b.x=f.x;b.z=f.z;b.w=f.w;b.d=f.d;groundBuilding(b);b._r=Math.hypot(b.w,b.d)/2;placed.add(b,b._r+1);if(b.idx!==undefined)updateBuildingInstance(b);return b;},
-    court(take,f){ // a run of plots rebuilt as one house about a courtyard
-      take.forEach(o=>o.removed=true);const ok=fits(f,0.3,true);take.forEach(o=>o.removed=false);if(!ok)return null;
-      live=true;curE=E;take.forEach(unplace);const nb=place('court',2,f,take[0].district||'residential',1);live=false;return nb;},
+    court(take,f,mode='complete',ownProject,ownerId){ // retained paid consolidation; a survey never hides or demolishes native homes
+      if(!take?.length||!fits(f,0.3,true,ownProject,new Set(take)))return null;if(mode==='validate')return f;if(mode!=='complete')return null;
+      live=true;curE=E;take.forEach(unplace);const nb=place('court',2,f,take[0].district||'residential',1,{exactGround:true,ownerId});live=false;return nb;},
     alley(b){ // a house with no way to the street gets an easement: a narrow passage between the neighbours to the nearest street
       if(!b||b.removed)return null;const R=Math.hypot(b.w,b.d)/2;if(nearStreet(b.x,b.z,R+3))return null; // it fronts a street already
       let best=null,bd=1e9;for(let a=0;a<16;a++){const ang=a*Math.PI/8,ux=Math.cos(ang),uz=Math.sin(ang);for(let t=R+2;t<R+40;t+=2){const x=b.x+ux*t,z=b.z+uz*t,g=nearStreet(x,z,1);if(g){if(t<bd){bd=t;best={ux,uz,t};}break;}}}
@@ -5837,8 +5837,8 @@ function citadelProposal(s){ // cheap current strategic/funds gates before any s
 }
 function tickInstitutionFoundations(){for(const s of W.settlements){if(!s._lay?.live||s.siegeBy)continue;institutionParishProposal(s);institutionParishProposal(s,'friary');institutionQuarryProposal(s);institutionWharfProposal(s);citadelProposal(s);}}
 function fabricProjectPayer(q){const p=q.payer;if(!p||p.dead||p.gone||p.exiled||p.household&&p.successors)return null;return accountOwner(p);}
-function fabricPending(b){return(W.projects||[]).some(q=>!q.dead&&(q.type==='fabric'&&q.target===b.idx||q.type==='compound'&&q.site?.target===b.idx));}
-function fabricProjectValidate(q,s){if(q.work==='foundation'){if(s.siegeBy)return{ok:false,reason:'siege'};if(q.authority!=null&&s.owner!==q.authority)return{ok:false,abandon:true,reason:'authority-lost'};if(q.target!=null){const b=W.bldList[q.target];if(!b||b.removed||b.s!==s||JSON.stringify(fabricSnapshot(b))!==JSON.stringify(q.before))return{ok:false,abandon:true,reason:'parent-changed'};if(!graveyardInsideParcel(b.lot,obbCorners(q.site.f.x,q.site.f.z,q.site.f.w,q.site.f.d,q.site.f.rot)))return{ok:false,reason:'private-plot'};}
+function fabricPending(b){return(W.projects||[]).some(q=>!q.dead&&(q.type==='fabric'&&(q.target===b.idx||q.take?.includes(b.idx))||q.type==='compound'&&q.site?.target===b.idx));}
+function fabricProjectValidate(q,s){if(q.work==='consolidate')return courtyardProjectValidate(q,s);if(q.work==='foundation'){if(s.siegeBy)return{ok:false,reason:'siege'};if(q.authority!=null&&s.owner!==q.authority)return{ok:false,abandon:true,reason:'authority-lost'};if(q.target!=null){const b=W.bldList[q.target];if(!b||b.removed||b.s!==s||JSON.stringify(fabricSnapshot(b))!==JSON.stringify(q.before))return{ok:false,abandon:true,reason:'parent-changed'};if(!graveyardInsideParcel(b.lot,obbCorners(q.site.f.x,q.site.f.z,q.site.f.w,q.site.f.d,q.site.f.rot)))return{ok:false,reason:'private-plot'};}
     if(q.method&&!constructionCapability(s,q.method).available)return{ok:false,reason:'technology'};if(q.site.institution){const V=institutionFoundationValidate(q,s);if(!V.ok)return V;}else if(!s._lay?.live?.compoundSite(q.site,'validate',q.ownerId,q))return{ok:false,reason:'site-obstructed'};return storageGroundClaim(s,q,fabricProjectPayer(q));}
   if(q.work==='new'){if(s.siegeBy)return{ok:false,reason:'siege'};if(q.authority!=null&&s.owner!==q.authority)return{ok:false,abandon:true,reason:'authority-lost'};if(q.method&&!constructionCapability(s,q.method).available)return{ok:false,reason:'technology'};if(!q.slot||q.slot.st.gone||q.slot.st.planQ||q.slot.st.hidden&&!s._lay.laneClear(q.slot.st)||!s._lay.buildLot(q.slot,q.site.tier,true,'validate',q.site,q))return{ok:false,reason:'site-obstructed'};return storageGroundClaim(s,q,fabricProjectPayer(q));}
   const b=W.bldList[q.target];if(!b||b.s!==s||b.removed)return{ok:false,abandon:true,reason:'building-lost'};if(JSON.stringify(fabricSnapshot(b))!==JSON.stringify(q.before))return{ok:false,abandon:true,reason:'fabric-changed'};
@@ -5847,11 +5847,12 @@ function fabricProjectValidate(q,s){if(q.work==='foundation'){if(s.siegeBy)retur
   if(!s._lay?.live?.fabricSite(q.site,b,'validate',q))return{ok:false,reason:'site-obstructed'};
   if(q.extension&&typeof storageGroundClaim==='function'){const ground=storageGroundClaim(s,q,fabricProjectPayer(q));if(!ground.ok)return ground;}
   return{ok:true};}
-function fabricProjectCommission(s,b,plan){if(!['new','foundation','use','tier','rebuild','repair','refit','widen','church'].includes(plan?.work))return null;if((!['new','foundation'].includes(plan?.work)&&(!b||b.idx==null)||b&&fabricPending(b))||!Number.isFinite(plan?.labour)||!(plan.labour>0)||!Number.isFinite(plan.days)||!(plan.days>0))return null;
+function fabricProjectCommission(s,b,plan){if(!['consolidate','new','foundation','use','tier','rebuild','repair','refit','widen','church'].includes(plan?.work))return null;if((!['new','foundation'].includes(plan?.work)&&(!b||b.idx==null)||b&&fabricPending(b))||!Number.isFinite(plan?.labour)||!(plan.labour>0)||!Number.isFinite(plan.days)||!(plan.days>0))return null;
   const q={...plan,payer:accountOwner(plan.payer),type:'fabric',si:W.settlements.indexOf(s),target:b?.idx??null,before:b?fabricSnapshot(b):null,site:plan.site||{f:{x:b.x,z:b.z,w:b.w,d:b.d,rot:b.rot}},start:day(),worked:0,done:0,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,status:'building',stalled:false,dead:false};
-  const payer=fabricProjectPayer(q),V=payer&&fabricProjectValidate(q,s);if(!V?.ok)return null;const total=q.labour+q.timber*price(s,'timber')+q.stone*price(s,'stone')+(q.land||0);if(means(payer)<total)return null;
+  if(q.work==='consolidate'){if(!Array.isArray(plan.take)||plan.take.length<2||plan.take.length>4||new Set(plan.take).size!==plan.take.length||plan.take.some(i=>!Number.isInteger(i)||!W.bldList[i]?.lot?.length))return null;q.take=plan.take.slice();q.compensations=q.take.map(i=>{const b=W.bldList[i],total=planComp(b),H=(b.hh||[]).filter(h=>!h.dead),owner=accountOwner(ownerAcct(b,s)),receipts=[{kind:'owner',to:owner,due:H.length?total*.85:total,paid:0},...H.map(h=>({kind:'tenant',to:accountOwner(h),due:total*.15/H.length,paid:0}))];for(const R of receipts)if(R.to===q.payer)R.due=0;return{b,before:fabricSnapshot(b),lot:b.lot.map(p=>({x:p.x,z:p.z})),receipts,bought:false};});}
+  const payer=fabricProjectPayer(q),V=payer&&fabricProjectValidate(q,s);if(!V?.ok)return null;const total=q.labour+q.timber*price(s,'timber')+q.stone*price(s,'stone')+(q.land||0)+(q.compensations||[]).reduce((n,C)=>n+C.receipts.reduce((m,R)=>m+R.due,0),0);if(means(payer)<total)return null;
   (W.projects||(W.projects=[])).push(q);G.ordersDirty=true;return q;}
-function fabricProjectComplete(q,s){if(q.work==='foundation'){const b=q.site.institution?institutionFoundationComplete(q,s):s._lay.live.compoundSite(q.site,'complete',q.ownerId,q);if(!b)return false;b.title={owner:accountOwner(q.payer),beneficiary:q.payer?.gn!==undefined?q.payer:q.payer?.head||null};if(['lord','town','church'].includes(q.ownerId))b.title=propertyRightsResolve(q.ownerId);b.groundClaim=q.groundClaim;b.grown=day();b.idx=W.bldList.length;W.bldList.push(b);markOccupiedGround(s,compoundPolys(q.site));bindPropertyRights(s);if(RESID.has(b.arch))rehouse(s,b);settleParcels([b]);delete s._craftIndex;if(q.site.institution){const t=`${q.title||ARCH[b.arch][4]} opens at ${s.name} after its retained ground, materials and work are paid.`;s.history.push({yr:year(),t});emit('trade',4,b,t);}updateBuildingInstance(b);syncLive(s);return true;}
+function fabricProjectComplete(q,s){if(q.work==='consolidate')return courtyardProjectComplete(q,s);if(q.work==='foundation'){const b=q.site.institution?institutionFoundationComplete(q,s):s._lay.live.compoundSite(q.site,'complete',q.ownerId,q);if(!b)return false;b.title={owner:accountOwner(q.payer),beneficiary:q.payer?.gn!==undefined?q.payer:q.payer?.head||null};if(['lord','town','church'].includes(q.ownerId))b.title=propertyRightsResolve(q.ownerId);b.groundClaim=q.groundClaim;b.grown=day();b.idx=W.bldList.length;W.bldList.push(b);markOccupiedGround(s,compoundPolys(q.site));bindPropertyRights(s);if(RESID.has(b.arch))rehouse(s,b);settleParcels([b]);delete s._craftIndex;if(q.site.institution){const t=`${q.title||ARCH[b.arch][4]} opens at ${s.name} after its retained ground, materials and work are paid.`;s.history.push({yr:year(),t});emit('trade',4,b,t);}updateBuildingInstance(b);syncLive(s);return true;}
   if(q.work==='new'){const b=s._lay.buildLot(q.slot,q.site.tier,true,'complete',q.site,q);if(!b)return false;b.ownerId=q.ownerId;b.title={owner:accountOwner(q.payer),beneficiary:q.payer?.gn!==undefined?q.payer:q.payer?.head||null};if(q.ownerId==='lord')b.title=propertyRightsResolve('lord');b.groundClaim=q.groundClaim;b.exactGround=true;b.grown=day();b.idx=W.bldList.length;W.bldList.push(b);s.growSlots=(s.growSlots||[]).filter(c=>{if(c.st===q.slot.st&&Math.abs(c.mx-q.slot.mx)<0.01&&Math.abs(c.mz-q.slot.mz)<0.01){c.done=true;return false;}return true;});if(q.slot.st.hidden){q.slot.st.hidden=false;G.roadsDirty=true;}clearLandUnder(b);bindPropertyRights(s);rehouse(s,b);settleParcels([b]);updateBuildingInstance(b);s._room=undefined;G.buildingsDirty=G.structuresDirty=true;return true;}
   const b=W.bldList[q.target];if(!s._lay.live.fabricSite(q.site,b,'complete',q))return false;
   if(q.work==='church')churchFabricApply(s,b,q.change);
@@ -5863,6 +5864,7 @@ function fabricProjectComplete(q,s){if(q.work==='foundation'){const b=q.site.ins
   b.exactGround=true;delete s._craftIndex;if(q.extension){b.groundClaim=q.groundClaim;clearLandUnder(b);settleParcels([b]);}updateBuildingInstance(b);s._room=undefined;G.detDirty=true;G.structuresDirty=true;if(q.extension)syncLive(s);return true;}
 function fabricProjectTick(q){if(q.dead)return;const s=W.settlements[q.si],payer=fabricProjectPayer(q),V=s&&payer&&fabricProjectValidate(q,s),stall=reason=>{q.stalled=true;q.reason=reason;q.status='stalled';};if(!s||!payer||V?.abandon){q.dead=true;q.status='abandoned';q.reason=V?.reason||'payer-lost';return;}if(!V?.ok){stall(V?.reason||'site-obstructed');return;}
   if(q.extension&&typeof storageGroundClaim==='function'){const ground=storageGroundClaim(s,q,payer);if(!q.landPaid&&!storageGroundPay(q,s,payer,ground).ok){stall('ground-payment');return;}}
+  if(q.work==='consolidate'&&!courtyardProjectPurchase(q,s,payer)){stall('compensation');return;}
   const share=Math.min(1,Math.max(0,q.days-q.worked)),bill=share*q.labour/q.days;if(means(payer)<bill){stall('funds');return;}if(!constructionProjectMaterials(q,s,payer,{workReserve:bill})){stall('materials');return;}
   const P=constructionProjectPaidWork(q,s,payer,q.work==='church'?'church works':q.work==='repair'?'repairs':q.work==='refit'?'refitting':'building',{share,fullPayTolerance:1e-9});if(!P.complete&&!P.paid){stall(P.reason||'workers');return;}q.stalled=false;q.reason=null;q.status='building';if(!P.complete)return;const final=fabricProjectValidate(q,s);if(!final.ok){stall(final.reason||'site-obstructed');return;}if(!fabricProjectComplete(q,s)){stall('site-obstructed');return;}q.dead=true;q.status='completed';G.ordersDirty=true;}
 function fabricMaterialDemand(s,g){const si=W.settlements.indexOf(s);let n=0;for(const q of W.projects||[])if(!q.dead&&((q.type==='fabric'||q.type==='plan')&&q.si===si||(q.type==='road'||q.type==='pave')&&(q.si??q.ai??q.r?.a)===si))n+=Math.max(0,(q[g]||0)-(q[g+'Installed']||0));return n;}
@@ -8525,8 +8527,8 @@ function planProjectValidate(q,s){
   if(q.land>0||q.landPaid){const G=storageGroundClaim(s,q,planProjectPayer(q));if(!G.ok)return G;}
   return{ok:true};
 }
-function planProjectCompensate(q,s,PA){
-  for(const C of q.compensations||[])for(const R of C.receipts){const due=Math.max(0,R.due-R.paid);if(!due)continue;if(means(PA)<due)return false;const paid=transfer(PA,R.to,due,'works',s)||0;R.paid+=paid;q.compensationPaid=(q.compensationPaid||0)+paid;if(due-paid>1e-9)return false;}
+function planProjectCompensate(q,s,PA,why='works'){
+  for(const C of q.compensations||[])for(const R of C.receipts){const due=Math.max(0,R.due-R.paid);if(!due)continue;if(means(PA)<due)return false;const paid=transfer(PA,R.to,due,why==='land'&&R.kind==='tenant'?'displacement':why,s)||0;R.paid+=paid;q.compensationPaid=(q.compensationPaid||0)+paid;if(due-paid>1e-9)return false;}
   return true;
 }
 
@@ -12041,25 +12043,41 @@ function tickCastles(){ // decisions daily; only commissioned, paid projects cha
     emit(s.owner>0?'house':'trade',3,casKeep(s)||casRing(s),`${s.owner>0?W.houses[s.owner].name:'The crown'} commissions ${q.title} at ${s.name}: ${q.days} paid working days.`);
   });}
 
-function tickCourts(){
-  if(day()%360!==240)return;const ad=AD();if(ad<1150)return;
-  for(const s of W.settlements){if(s.kind==='village'||s.pop<350||!s._lay||!s._lay.live||s.siegeBy||!chance('sim',0.5))continue;
-    if(s._hhY!==year())houseFolk(s);
-    const homes=s.buildings.filter(b=>b.state==='sound'&&!b.removed&&RESID.has(b.arch)&&b.arch!=='cot'&&b.arch!=='court');if(homes.length<30)continue;
-    const vals=homes.map(propValue).sort((x,y)=>x-y),cut=vals[Math.floor(vals.length*0.8)]; // the dearest fifth of the town
-    let best=null,bv=0;
-    for(const b of homes){if(propValue(b)<cut||b.tier<1)continue;for(const h of b.hh||[])if((h.w||0)>60&&h.w>bv){bv=h.w;best={b,h};}}
-    if(!best)continue;const{b,h}=best,P=courtPlan(s,b);if(!P)continue;
-    const buy=P.take.slice(1).reduce((t,o)=>t+propValue(o)*12,0),D=clamp(Math.max(P.e1-P.e0,16),12,22),build=(P.a1-P.a0)*D*0.07,cost=buy+build;
-    if(h.w<cost*1.3)continue;
-    let nb=null;for(const dd of[D,14,Math.max(11,P.e1-P.e0)]){const e0=P.e1-dd,ca=(P.a0+P.a1)/2,ce=(e0+P.e1)/2;
-      const f={x:b.x+P.tx*ca+P.nx*ce,z:b.z+P.tz*ca+P.nz*ce,w:P.a1-P.a0,d:dd,rot:P.rot};nb=s._lay.live.court(P.take,f);if(nb)break;}
-    if(!nb)continue;
-    for(const o of P.take.slice(1))transfer(h,ownerAcct(o,s),propValue(o)*12,'land'); // the neighbouring plots bought from their owners
-    buildWorks(s,build,h);nb.ownerId=h.id;h.bh=nb;nb.fam=famName(h)||h.gn;nb.nm=courtName(s,nb.fam);s._hhY=-1;
-    syncLive(s);
-    const t=`${folkName(h)}${h.tr?', '+h.tr+',':''} buys out ${P.take.length-1} neighbour${P.take.length>2?'s':''} and rebuilds the plots as one house of stone about a courtyard: ${nb.nm}.`;
-    s.history.push({yr:year(),t});emit('trade',2,nb,`${s.name}: ${t}`);}}
+function courtyardPlotContains(take,f){ // subtract the convex native home plots; no unpaid gap or enclosed hole is sampled away
+  if(!f||![f.x,f.z,f.w,f.d,f.rot].every(Number.isFinite)||f.w<13||f.d<11)return false;let remaining=[obbCorners(f.x,f.z,f.w,f.d,f.rot)];
+  const clip=(P,a,b,sign,inside)=>{const out=[],d=p=>sign*((b.x-a.x)*(p.z-a.z)-(b.z-a.z)*(p.x-a.x));for(let k=0;k<P.length;k++){const p=P[k],q=P[(k+1)%P.length],dp=d(p),dq=d(q),pIn=inside?dp>=0:dp<=0,qIn=inside?dq>=0:dq<=0;if(pIn)out.push(p);if(pIn!==qIn){const t=dp/(dp-dq);out.push({x:lerp(p.x,q.x,t),z:lerp(p.z,q.z,t)});}}return out;};
+  for(const b of take){const P=b.lot;if(!P||P.length<3)return false;let twice=0;for(let k=0;k<P.length;k++){const p=P[k],q=P[(k+1)%P.length];twice+=p.x*q.z-q.x*p.z;}if(Math.abs(twice)<1e-8)return false;const sign=twice>0?1:-1,next=[];
+    for(let k=0;k<P.length;k++){const p=P[k],q=P[(k+1)%P.length],r=P[(k+2)%P.length];if(sign*((q.x-p.x)*(r.z-q.z)-(q.z-p.z)*(r.x-q.x))<-1e-7)return false;}
+    for(const Q of remaining){let inside=Q;for(let k=0;k<P.length&&inside.length>=3;k++){const a=P[k],b=P[(k+1)%P.length],outside=clip(inside,a,b,sign,false);if(outside.length>=3&&polyArea(outside)>1e-8)next.push(outside);inside=clip(inside,a,b,sign,true);}}remaining=next;if(!remaining.length)return true;
+  }return remaining.reduce((n,P)=>n+polyArea(P),0)<1e-6;
+}
+function courtyardProjectValidate(q,s){
+  if(s.siegeBy)return{ok:false,reason:'siege'};if(!constructionCapability(s,'houseMasonry').available)return{ok:false,reason:'technology'};const payer=fabricProjectPayer(q),take=q.take?.map(i=>W.bldList[i]);
+  if(!payer?.household||!take||take.length<2||take.length>4||new Set(take).size!==take.length||!q.compensations||q.compensations.length!==take.length)return{ok:false,abandon:true,reason:'contract-lost'};
+  for(const C of q.compensations){const b=C.b;if(!take.includes(b)||!b||b.removed||b.state!=='sound'||b.s!==s||b.inst||b._graveyard||!RESID.has(b.arch)||b.arch==='court')return{ok:false,abandon:true,reason:'building-lost'};
+    if(JSON.stringify(fabricSnapshot(b))!==JSON.stringify(C.before)||JSON.stringify(b.lot?.map(p=>({x:p.x,z:p.z})))!==JSON.stringify(C.lot))return{ok:false,abandon:true,reason:'purchased-plot-changed'};
+    if((b.hh||[]).some(h=>!h.dead&&!C.receipts.some(R=>R.kind==='tenant'&&R.to===accountOwner(h))))return{ok:false,reason:'unpriced-tenant'};}
+  if(!courtyardPlotContains(take,q.site.f)||!s._lay?.live?.court(take,q.site.f,'validate',q))return{ok:false,reason:'site-obstructed'};return storageGroundClaim(s,q,payer);
+}
+function courtyardProjectPurchase(q,s,payer){
+  if(!planProjectCompensate(q,s,payer,'land'))return false;for(const C of q.compensations)if(!C.bought){C.b.title={owner:accountOwner(payer),beneficiary:payer?.head||null};C.bought=true;C.before=fabricSnapshot(C.b);}return true;
+}
+function courtyardProjectComplete(q,s){
+  const payer=fabricProjectPayer(q),head=payer?.head||payer;if(!payer||!head||head.dead||head.si!==q.si||!q.compensations.every(C=>C.bought&&C.receipts.every(R=>R.paid+1e-9>=R.due)))return false;
+  const take=q.take.map(i=>W.bldList[i]),b=s._lay.live.court(take,q.site.f,'complete',q,head.id);if(!b)return false;b.title={owner:payer,beneficiary:head};b.groundClaim=q.groundClaim;b.grown=day();b.idx=W.bldList.length;W.bldList.push(b);b.fam=famName(head)||head.gn;b.nm=courtName(s,b.fam);head.bh=b;b.hh=[head];rehouse(s,b);bindPropertyRights(s);markOccupiedGround(s,compoundPolys(q.site));updateBuildingInstance(b);s._hhY=-1;s._room=undefined;syncLive(s);
+  const t=`${folkName(head)} finishes the paid courtyard house ${b.nm} on ${take.length} purchased home plots`;s.history.push({yr:year(),t:t+'.'});if(!W.prehistory)emit('trade',2,b,`${s.name}: ${t}.`);return true;
+}
+function tickCourts(){ // daily private investment; fixed paid work quantities replace the former annual instant rebuild
+  if(AD()<1150)return;for(const s of W.settlements){if(s.kind==='village'||s.pop<350||!s._lay?.live?.court||s.siegeBy||!constructionCapability(s,'houseMasonry').available||(W.projects||[]).some(q=>!q.dead&&q.type==='fabric'&&q.si===W.settlements.indexOf(s)&&q.work==='consolidate'))continue;
+    const minimum=constructionRecipe(s,13*11*.8*PL(),60,13*11*.04,13*11*.25),floor=minimum.labour+minimum.timber*price(s,'timber')+minimum.stone*price(s,'stone');
+    const rich=heads_(s,h=>h.bh&&!h.bh.removed&&h.bh.tier>=1&&!fabricPending(h.bh)&&means(accountOwner(h))>floor*1.3&&accountOwner(ownerAcct(h.bh,s))===accountOwner(h)).sort((a,b)=>means(accountOwner(b))-means(accountOwner(a)));if(!rich.length)continue;
+    const homes=s.buildings.filter(b=>b.state==='sound'&&!b.removed&&!b.inst&&RESID.has(b.arch)&&!['cot','court','hospital'].includes(b.arch));if(homes.length<30)continue;const vals=homes.map(propValue).sort((a,b)=>a-b),cut=vals[Math.floor(vals.length*.8)];
+    for(const h of rich.slice(0,4)){const b=h.bh;if(propValue(b)<cut)continue;const P=courtPlan(s,b);if(!P||P.take.some(o=>fabricPending(o)||!o.lot?.length||o._graveyard))continue;const D=clamp(Math.max(P.e1-P.e0,16),12,22),payer=accountOwner(h);
+      for(const dd of[D,14,Math.max(11,P.e1-P.e0)]){const e0=P.e1-dd,ca=(P.a0+P.a1)/2,ce=(e0+P.e1)/2,f={x:b.x+P.tx*ca+P.nx*ce,z:b.z+P.tz*ca+P.nz*ce,w:P.a1-P.a0,d:dd,rot:P.rot};if(!courtyardPlotContains(P.take,f)||!s._lay.live.court(P.take,f,'validate'))continue;
+        const recipe=constructionRecipe(s,f.w*f.d*.8*PL(),Math.max(60,f.w*f.d/2),f.w*f.d*.04,f.w*f.d*.25),q=fabricProjectCommission(s,b,{work:'consolidate',payer,ownerId:h.id,method:'houseMasonry',take:P.take.map(o=>o.idx),site:{arch:'court',tier:2,f},extension:true,land:0,...recipe});if(q)break;
+      }if((W.projects||[]).some(q=>!q.dead&&q.type==='fabric'&&q.si===W.settlements.indexOf(s)&&q.work==='consolidate'))break;
+    }}
+}
 
 function tickPlan(q){ // the retained site, named receipts, materials and actual paid work are checked daily
   if(q.dead)return;const s=W.settlements[q.si],PA=planProjectPayer(q),V=s&&PA&&planProjectValidate(q,s),stall=reason=>{q.stalled=true;q.status='stalled';q.reason=reason;};
