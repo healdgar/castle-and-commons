@@ -21,7 +21,7 @@ export function abbeyNativeStateExpression(id=null){return `(()=>{
 export function abbeyNativeEligibilityExpression(order='cistercian'){
   if(!orders.has(order))throw Error('Unknown native abbey order');
   return `(()=>{const order=${JSON.stringify(order)},rule=ABBEY_ORDERS[order],out=[];
-    for(let hi=0;hi<W.houses.length;hi++){const h=W.houses[hi],head=h&&notableById(h.head);for(let si=0;si<W.settlements.length;si++){const s=W.settlements[si];if(s.owner!==hi)continue;
+    for(let hi=0;hi<W.houses.length;hi++){const h=W.houses[hi],head=abbeyFounder(hi);for(let si=0;si<W.settlements.length;si++){const s=W.settlements[si];if(s.owner!==hi)continue;
       const cap=institutionalCapability(s,order),fields=(s.furl||[]).filter(f=>abbeyGrantable(f,hi,si,rule));
       out.push({hi,si,name:s.name,pious:!!head?.alive&&!!(head.traits?.includes('pious')||(head.sk?.[KS]||0)>=.5),surplus:(hi?h?._netA:W._crNetA)||0,gold:means(houseAcct(hi)),reserve:hostTarget(hi)*4,available:cap.available,reason:cap.reason,fields:fields.length,qualifiedResidents:['miller','tanner'].map(job=>({job,people:(s.folk||[]).filter(p=>!p.dead&&abbeyIndustryQualified(p,job)).map(p=>({id:p.id,held:institutionalJobHeld(p),away:awayNow(p),status:p.status,age:ageYrs(p)}))})),project:!!abbeyFoundPlan(hi,si,order)});}}
     return out;})()`;
@@ -31,7 +31,7 @@ function commissionExpression(order,allowCrownGrant){return `(()=>{
   const order=${JSON.stringify(order)},existing=(W.abbeys||[]).find(a=>a.order===order&&!a.gone);if(existing)return {id:existing.id,existing:true};
   for(let hi=0;hi<W.houses.length;hi++)for(let si=0;si<W.settlements.length;si++){if(W.settlements[si].owner!==hi)continue;const P=abbeyFoundPlan(hi,si,order);if(P){const a=abbeyFound(P);if(a)return{id:a.id,existing:false,grant:0};}}
   if(!${!!allowCrownGrant})return null;
-  const rule=ABBEY_ORDERS[order],candidates=[];for(let hi=1;hi<W.houses.length;hi++){const h=W.houses[hi],head=h&&notableById(h.head),surplus=h?._netA||0;if(!head?.alive||h.exiled||!(surplus>0)||!(head.traits?.includes('pious')||(head.sk?.[KS]||0)>=.5)||(W.abbeys||[]).some(a=>!a.gone&&a.founder===hi))continue;
+  const rule=ABBEY_ORDERS[order],candidates=[];for(let hi=1;hi<W.houses.length;hi++){const h=W.houses[hi],head=abbeyFounder(hi),surplus=h?._netA||0;if(!head?.alive||h.exiled||!(surplus>0)||!(head.traits?.includes('pious')||(head.sk?.[KS]||0)>=.5)||(W.abbeys||[]).some(a=>!a.gone&&a.founder===hi))continue;
     for(let si=0;si<W.settlements.length;si++){const s=W.settlements[si];if(s.owner===hi&&!s.siegeBy&&institutionalCapability(s,order).available&&(s.furl||[]).some(f=>abbeyGrantable(f,hi,si,rule)))candidates.push({hi,si,surplus});}}
   candidates.sort((a,b)=>b.surplus-a.surplus||a.hi-b.hi||a.si-b.si);
   for(const c of candidates){const s=W.settlements[c.si],payer=houseAcct(c.hi),target=hostTarget(c.hi)*4+foodYr()*100+STORAGE_TYPES.grange.cost+150*price(s,'timber')+100*price(s,'stone'),spare=Math.max(0,means('crown')-hostTarget(0)*8),want=Math.min(Math.max(0,target-means(payer)),spare,means('crown')/3);
@@ -40,12 +40,12 @@ function commissionExpression(order,allowCrownGrant){return `(()=>{
     const returned=transfer(payer,'crown',paid,'abbey endowment patron refund',s);unearned('crown',returned);if(Math.abs(returned-paid)>1e-8)throw Error('Native test grant could not be returned');}
   return null;})()`;}
 
-export async function reachPaidNativeAbbey({read,step,order='cistercian',maxDays=1440,allowCrownGrant=true}){
+export async function reachPaidNativeAbbey({read,step,order='cistercian',maxDays=1440,allowCrownGrant=true,onProgress=()=>{}}){
   if(!orders.has(order))throw Error('Unknown native abbey order');
   let id=null,foundation=null,last=null;
   for(let i=0;i<=maxDays;i++){
     const state=await read(abbeyNativeStateExpression(id));
-    if(id==null){const existing=state.abbeys.find(a=>a.order===order);if(existing){id=existing.id;foundation=existing;}else if(state.day>=360&&state.day%30===0){const action=await read(commissionExpression(order,allowCrownGrant));if(action){id=action.id;foundation={...action,day:state.day};}}}
+    if(id==null){if(i===0||state.day%30===0)onProgress({day:state.day,order,eligibility:await read(abbeyNativeEligibilityExpression(order))});const existing=state.abbeys.find(a=>a.order===order);if(existing){id=existing.id;foundation=existing;}else if(state.day>0&&state.day%30===0){const action=await read(commissionExpression(order,allowCrownGrant));if(action){id=action.id;foundation={...action,day:state.day};}}}
     if(id!=null){last=(await read(abbeyNativeStateExpression(id))).abbeys[0];const project=last?.projects.find(q=>q.key==='church'&&!q.dead&&q.worked>0&&q.worked<q.days);if(project)return{id,foundation,project,state:last};}
     if(i<maxDays)await step();
   }
