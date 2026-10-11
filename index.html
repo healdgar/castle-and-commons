@@ -920,11 +920,11 @@ function constructionCapability(s,method,ad=AD()){
    still belong to their real owners. A known method never creates its building. */
 const TECH_RULES=Object.freeze({
   timberPalisade:{name:'Timber palisade',year:550,needs:[],kind:'war',gain:0.1},
-  estateWinepress:{name:'Manorial wine press',year:850,needs:[],kind:'estate',gain:0.1},
-  estateDovecote:{name:'Dovecote',year:1066,needs:[],kind:'estate',gain:0.1},
-  estateWarren:{name:'Rabbit warren',year:1150,needs:[],kind:'estate',gain:0.1},
-  estatePark:{name:'Enclosed deer park',year:1066,needs:[],kind:'estate',gain:0.1},
-  estateFishpond:{name:'Managed fishpond',year:1066,needs:[],kind:'estate',gain:0.1},
+  estateWinepress:{name:'Manorial wine press',year:850,needs:[],kind:'estate',estate:'winepress',gain:0.1},
+  estateDovecote:{name:'Dovecote',year:1066,needs:[],kind:'estate',estate:'dovecote',gain:0.1},
+  estateWarren:{name:'Rabbit warren',year:1150,needs:[],kind:'estate',estate:'warren',gain:0.1},
+  estatePark:{name:'Enclosed deer park',year:1066,needs:[],kind:'estate',estate:'park',gain:0.1},
+  estateFishpond:{name:'Managed fishpond',year:1066,needs:[],kind:'estate',estate:'fishpond',gain:0.1},
   watermill:{name:'Water mill',year:850,needs:[],kind:'mill',gain:0.2},
   moneyer:{name:'Moneyer and mint administration',year:850,needs:[],kind:'law',gain:0.1},
   heavyPlough:{name:'Heavy mouldboard plough',year:850,needs:[],kind:'farm',gain:0.2},
@@ -1062,6 +1062,7 @@ function technologyBenefit(s,r,teachers){
   if(r.kind==='war')return ((s.garrison||0)+(s.militia||0))*yearFood*r.gain;
   if(r.kind==='sea')return s.harbor?(s.tradeV||0)*r.gain:0;
   if(r.kind==='road')return ((s.tradeV||0)+(p.horses||0)*yearFood)*r.gain;
+  if(r.kind==='estate'){const F=(s.furl||[]).filter(f=>estateFieldHeld(s,f));if(r.estate==='winepress')return F.filter(f=>f.kind===LK.VINE&&f.state===LS.TILLED).reduce((n,f)=>n+f.area/1e4*0.05*90*0.1*P('wine'),0)*r.gain;if(r.estate==='fishpond')return s.river?F.reduce((n,f)=>n+f.area/1e4,0)*60*P('fish')*r.gain:0;const k=r.estate==='park'?'deer':r.estate==='warren'?'rabbit':'pigeon',S=ESTATE_SPECIES[k];return F.reduce((n,f)=>n+estateHabitat(f,k)*0.25*S.growth*S.carcass*P('meat'),0)*r.gain;}
   if(r.kind==='religious')return ((s.furl||[]).some(f=>f.state===LS.WILD||f.state===LS.WOOD||f.state===LS.SCRUB)?land*(s._gYield||0)*360*P('grain'):0)*r.gain;
   return (s.tradeV||0)*r.gain+(teachers||technologyTeachers(s)).reduce((n,x)=>n+x.skill,0)*yearFood*r.gain;
 }
@@ -13120,7 +13121,7 @@ function estatePressShare(s,grower,q){const C=(s.compounds||[]).find(c=>c.kind==
 function estateMaintenance(s,C){const owner=houseAcct(C.ownerId),cost=C.components.length*foodYr()/360,paid=means(owner)>cost+chestReserve(C.ownerId)?buildWorks(s,cost,owner,'estate maintenance'):0;C.condition=Math.min(1,Math.max(0,(C.condition??1)-1/(20*360)+paid/Math.max(1e-12,cost)/(20*360)));C.upkeep=(C.upkeep||0)+paid;}
 function estateFollowTitle(s,C){if(C.ownerId===s.owner)return;const owner=accountOwner(houseAcct(s.owner)),B=C.components.filter(c=>c.kind==='building').map(c=>W.bldList[c.ref]).filter(b=>b&&!b.removed),F=C.components.filter(c=>c.kind==='field').map(c=>W.land.F[c.ref]).filter(Boolean);if(!B.length&&!F.length&&!C.fishery)return;if(B.some(b=>accountOwner(ownerAcct(b,s))!==owner)||F.some(f=>!estateFieldHeld(s,f)))return;if(C.fishery){const L=s.lake;if(!L||L.ownerId!==C.ownerId||!estateGroundHeld(s,{poly:L.poly,f:{x:L.dam.x,z:L.dam.z,w:L.dam.w,d:4,rot:-(L.dam.a+Math.PI/2)}}))return;L.ownerId=s.owner;}const from=C.ownerId;C.ownerId=s.owner;for(const f of F)f.estateWild.ownerId=C.ownerId;(C.successions||(C.successions=[])).push({day:day(),from,to:C.ownerId});if(C.successions.length>8)C.successions.shift();}
 function tickEstateWork(){if(!W.land)return;estateEcologyPrepare();for(const s of W.settlements)for(const C of s.compounds||[]){if(C.kind!=='estate'||C.gone)continue;estateFollowTitle(s,C);if(C.ownerId!==s.owner)continue;for(const [key,id]of Object.entries(C.jobs||{})){const p=(W._pm||folkIndex()).get(id);if(!p||p.dead||p.estatePaidDay!==day()){estateOfficeRelease(p);delete C.jobs[key];}}estateMaintenance(s,C);estateDovecoteGrowth(s,C);estateDovecote(s,C);estateFish(s,C);for(const c of C.components)if(c.kind==='field'&&compoundComponentPresent(C,c))estateHunt(s,C,c);}}
-function tickEstates(){if(!W.land)return;for(const s of W.settlements){let C=(s.compounds||[]).find(c=>c.kind==='estate'&&c.ownerId===s.owner&&!c.gone);
+function tickEstateProjects(){if(!W.land)return;for(const s of W.settlements){let C=(s.compounds||[]).find(c=>c.kind==='estate'&&c.ownerId===s.owner&&!c.gone);
     if(s.siegeBy||houseAtWar(s.owner)||!s._lay?.live?.compoundSite||(W.projects||[]).some(q=>!q.dead&&q.adapter==='estate'&&q.si===W.settlements.indexOf(s)))continue;const F=(s.furl||[]).filter(f=>estateFieldHeld(s,f));if(!F.length)continue;C=C||compoundEnsure(s,'estate',s.owner);let plan=null;for(const key of ['winepress','dovecote','warren','park']){if(compoundHas(C,key)||!institutionalCapability(s,ESTATE_SPEC[key].method).available)continue;const worker=estateWorker(s,key);if(!worker)continue;for(const f of F){plan=estateProjectPlan(s,key,f,C,worker);if(plan)break;}if(plan)break;}if(!plan&&!compoundHas(C,'fishpond'))plan=estatePondPlan(s,C);if(plan)compoundProjectCommission(s,C,plan);}}
 function estateDetailsHTML(s){let out='';for(const C of s.compounds||[]){if(C.kind!=='estate'||C.gone)continue;const B=C.components.filter(c=>compoundComponentPresent(C,c)),works=(W.projects||[]).filter(q=>!q.dead&&q.compoundId===C.id);if(!B.length&&!works.length)continue;out+=row('Lord’s estate',esc(C.ownerId>0?W.houses[C.ownerId]?.name||'former holder':'The Crown')+' · '+B.map(c=>esc(c.key)).join(', '));out+=row('Estate production',detailNumber(C.meat||0)+' meat, '+detailNumber(C.fish||0)+' pond fish, '+detailNumber(C.press||0)+' wine multure delivered; '+detailNumber(C.wages||0)+' g to actual keepers');if(C.fishery)out+=row('Pond stock',detailNumber(C.fishery.stock)+' loads of live stock · stocked '+dateStr(C.fishery.stocked));if(C.dovecote)out+=row('Dovecote',detailNumber(C.dovecote.stock)+' live pigeons; actual grain feeding');if(works.length)out+=row('Estate work',works.map(q=>esc(q.title)+' '+Math.round((q.done||0)*100)+'%'+(q.stalled?' · '+esc(q.reason||'stalled'):'')).join('; '));}return out;}
 /* ESTATE_PRODUCTION_END */
@@ -16895,7 +16896,7 @@ function simTick(){
   simPart('tickTitles',()=>tickTitles());
   simPart('tickUpkeep',()=>tickUpkeep());
   simPart('tickAbbeys',()=>tickAbbeys());
-  simPart('tickEstates',()=>tickEstates());
+  simPart('tickEstateProjects',()=>tickEstateProjects());
   simPart('tickStorageInvestment',()=>tickStorageInvestment());
   simPart('tickVictory',()=>tickVictory());
   if(day()%360===0&&!REPLAYING&&!W.prehistory&&!MODEL_ONLY)setTimeout(autosave,0);

@@ -99,7 +99,7 @@
         "tickTitles",
         "tickUpkeep",
         "tickAbbeys",
-        "tickEstates",
+        "tickEstateProjects",
         "tickStorageInvestment",
         "tickVictory",
         "commoditySettleAll"
@@ -1034,17 +1034,17 @@
     },
     {
       "before": "tickPopulation",
-      "after": "tickEstates",
+      "after": "tickEstateProjects",
       "reason": "Household meals precede discretionary new estate commissions."
     },
     {
       "before": "tickProjects",
-      "after": "tickEstates",
+      "after": "tickEstateProjects",
       "reason": "Finished native component sites precede daily next-component decisions."
     },
     {
       "before": "tickAbbeys",
-      "after": "tickEstates",
+      "after": "tickEstateProjects",
       "reason": "Endowed corporate title and ordinary gifts precede private estate proposals."
     }
   ],

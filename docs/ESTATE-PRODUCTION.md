@@ -7,7 +7,7 @@ delivered timber/stone, and actual construction wages. Political lordship alone
 does not let a project displace another household's tenant rights.
 
 `tickEstateWork`, after the current actor roll, maintains completed components
-and pays existing residents for actual productive work. `tickEstates`, after
+and pays existing residents for actual productive work. `tickEstateProjects`, after
 meals, completed projects and abbey gifts, decides whether to commission another
 component. The site's expected receipts must cover its real worker's alternative
 income, feeding, forgone land rent and construction over the component's useful
