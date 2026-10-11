@@ -2,11 +2,28 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {parse} from './vendor/acorn/acorn.mjs';
+import {inlineGameScript} from './simulation-boundary.mjs';
 
-const source=fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8');
-const fn=n=>{const text=source.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))','m'))?.[0];assert.ok(text,'missing native '+n);return text;};
-const constant=n=>{const text=source.match(new RegExp('^const '+n+'=.*$','m'))?.[0];assert.ok(text,'missing native '+n);return text;};
-const certificate=constant('ABBEY_ROUTE_SURVEY_NATIVE'),readers=certificate.match(/Object\.freeze\(\{([^}]+)\}\)/)[1].split(',');
+const source=inlineGameScript(fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8'));
+const ast=parse(source,{ecmaVersion:'latest'}),functions=new Map(),variables=new Map();
+for(const node of ast.body){if(node.type==='FunctionDeclaration')functions.set(node.id.name,node);else if(node.type==='VariableDeclaration')for(const declaration of node.declarations)if(declaration.id.type==='Identifier')variables.set(declaration.id.name,{kind:node.kind,node:declaration});}
+const fn=n=>{const node=functions.get(n);assert.ok(node,'missing native '+n);return source.slice(node.start,node.end);};
+const constant=n=>{const declaration=variables.get(n);assert.ok(declaration,'missing native '+n);return declaration.kind+' '+source.slice(declaration.node.start,declaration.node.end)+';';};
+const native=n=>functions.has(n)?fn(n):constant(n);
+const certificate=constant('ABBEY_ROUTE_SURVEY_NATIVE'),certificateNode=variables.get('ABBEY_ROUTE_SURVEY_NATIVE').node.init;
+assert.equal(certificateNode.type,'CallExpression');assert.equal(certificateNode.callee.object.name,'Object');assert.equal(certificateNode.callee.property.name,'freeze');
+const readers=certificateNode.arguments[0].properties.map(property=>{
+ assert.equal(property.type,'Property');assert.equal(property.computed,false);assert.equal(property.method,false);assert.equal(property.key.type,'Identifier');
+ const n=property.key.name,value=property.value;
+ if(value.type==='Identifier')assert.equal(value.name,n);
+ else{assert.equal(value.type,'ConditionalExpression');assert.equal(value.test.type,'BinaryExpression');assert.equal(value.test.operator,'===');assert.equal(value.test.left.type,'UnaryExpression');assert.equal(value.test.left.operator,'typeof');assert.equal(value.test.left.argument.name,n);assert.equal(value.test.right.value,'function');assert.equal(value.consequent.name,n);assert.equal(value.alternate.value,null);}
+ return n;
+});
+// Reviewed corridor extension: native permission/public-graph readers precede
+// the original 53 route identities, which keep their exact previous order.
+const reviewedReaders=('ABBEY_APPROACH_SURVEY_CURRENT resample wallDamage streetGraphFortContext fortStreetRuns fortRoadBlocked lakeAt streetGraph furlongAt computeFurlongPoly bindHousehold newHousehold oldHouseholdHead nonemptyHouseholds folkIndex cellZ cellX locW roadAccessClear streetAccessAt householdAccount corpOf abbeyApproachSurveyNative abbeyApproachSurvey abbeyCorridorCold abbeyCorridorInputs abbeyCorridorReady abbeyCorridorPrivate abbeyCorridorGhostClear abbeyCorridorWorldClear abbeyCorridorSegmentClear abbeySurveyBounds abbeySurveyBoxesMayHit abbeySurveyUnion abbeySurveyIndexRange abbeySurveyIndex abbeySurveyIndexRows abbeySurveyReserved abbeySurveyPublic abbeyPublicStreet abbeyAccessEndpointValid compoundPolys compoundPolygonDifference compoundGround occupiedGroundCells occupiedGroundFields occupiedGroundAreas storageGroundClaim propertyRightsResolve accountOwner houseAcct storageOwnerId graveyardPolygonsOverlap streetFootprintOverlap obbCorners inPolyXZ segSegDist abbeyRouteEnter abbeyRouteLeave serviceRoadPlan armyLandPath armyDetour armyReach armyReaches armyReachClosed armyReachFrom armyReachCovers armySegmentClear armyObstacle armyBridgeAt armyRaftAt armyCauseway hAt riverAt onRoad paidRoadAt walkedRoadAt roadWalkedBounds roadBounds fortGround fortSurface motteSurface fortCircuits casRing fortCenter wallRadAt wallKindAt wallBuilt wallProg wallDmgAt fortGateAngles wallGates citadelBarrier citadelLocal citadelBastion citadelFootprintAt citadelTownCut hostileTo atWar inRevolt inPoly segDist dist2d lerp clamp toCell cIdx inB sstep day').split(' ');
+assert.deepEqual(readers,reviewedReaders);
 const hotDetour=fn('armyDetour');
 // Reconstruct only the two old expressions. All native routing, obstacles,
 // scope certificates, heap comparisons, expansion limits and logs are shared.
@@ -22,7 +39,6 @@ function setup({old=false,prepare='',replaceableDistance=false}={}){
  math.hypot=(...args)=>{count.hypot++;return Math.hypot(...args);};
  const C=vm.createContext({Math:math,count});
  const run=code=>vm.runInContext(code,C);
- const constNames=new Set(['day','dist2d','lerp','clamp','toCell','cIdx','inB','sstep']);
  run(`const GRID=16,CELL=40,SIZE=640,SEA_SURFACE=.5,BACKGROUND=null,MOTTEH=9;let HASH_STAMP=0;
   const s={owner:0,pos:{x:0,z:0},buildings:[],streets:[],_lay:{}};
   const heights=new Float32Array(GRID*GRID).fill(10);
@@ -30,8 +46,8 @@ function setup({old=false,prepare='',replaceableDistance=false}={}){
  `);
  // Only replacement-reader tests make this lexical binding writable. The
  // captured native function body stays exact; replacing it invalidates proof.
- run(readers.map(n=>constNames.has(n)?n==='dist2d'&&replaceableDistance?constant(n).replace(/^const /,'let '):constant(n):n==='armyDetour'&&old?oldDetour:fn(n)).join('\n'));
- run(['abbeyRouteSurveyNative','abbeyRouteSurveyInputs','abbeyRouteTerrain','abbeyRouteMemo','abbeyTerrainSegmentClear','makeHash'].map(fn).join('\n'));
+ run(readers.map(n=>n==='armyDetour'&&old?oldDetour:n==='dist2d'&&replaceableDistance?constant(n).replace(/^const /,'let '):native(n)).join('\n'));
+ run(['abbeyRouteSurveyNative','abbeyRouteSurveyInputs','abbeyRouteTerrain','abbeyRouteMemo','abbeyTerrainSegmentClear','makeHash'].filter(n=>!readers.includes(n)).map(fn).join('\n'));
  run(`W.rivHash=makeHash(40);s._lay.placed=makeHash(16);onRoad.reach=-1;`);
  if(prepare)run(prepare);
  run(certificate);
@@ -51,7 +67,7 @@ function search(r,{p={x:-20,z:0},q={x:26,z:0},pad=24,shared=true,ghost=null,nest
 }
 
 test('actual certified detours preserve full native paths, directed edge logs and expanded-node records',()=>{
- assert.equal(readers.length,53);
+ assert.equal(readers.length,110);assert.equal(new Set(readers).size,110);
  const cases=[{}, {p:{x:-20.7,z:.3},q:{x:26.4,z:-.2}}, {p:{x:26.4,z:-.2},q:{x:-20.7,z:.3}},
   {p:{x:-0,z:-20},q:{x:0,z:22}}, {p:{x:0,z:0},q:{x:.3,z:.4}}, {nested:true},
   {ghost:{x:-15,z:-6,w:6,d:8,rot:.3}}];
@@ -130,4 +146,19 @@ test('a later goal gets fresh operation-local heuristic values without world or 
  assert.deepEqual(search(hot,{useRetained:true}),search(old,{useRetained:true}));
  assert.deepEqual(search(hot,{useRetained:true,q:{x:26,z:13.3}}),search(old,{useRetained:true,q:{x:26,z:13.3}}));
  assert.equal(hot.run("Reflect.ownKeys(W).some(k=>['heuristic','scored','lengths','abbeyRouteGuard'].includes(k))||Reflect.ownKeys(a._em).some(k=>['heuristic','scored','lengths','abbeyRouteGuard'].includes(k))"),false);
+});
+
+test('retained landing metadata projects as detached scalar geometry while survey caches stay local',()=>{
+ const r=setup();r.run(['VISUAL_PRIVATE','VISUAL_LINKS','VISUAL_SHAPES','VISUAL_ENTITY'].map(constant).join('\n')+'\n'+['visualDataNames','visualScalars','visualGeometry','visualPoints','visualPut','visualRecord'].map(fn).join('\n'));
+ // A geometry-copy boundary: no founder, claim, completed building or actor is
+ // created. The actual project DTO recursively carries the retained site.
+ r.run(`const site={f:{x:0,z:0,w:12,d:22,rot:0},path:[{x:0,z:11},{x:0,z:12.2},{x:0,z:13}],access:{corridorFrom:2,endpoint:{kind:'street',ref:0,segment:1,point:{x:0,z:13}},pathKey:'fixed route',privatePolys:[]}};
+  const q={type:'compound',site},packet=VISUAL_ENTITY.project(q),copied=packet.site.access.corridorFrom;packet.site.access.corridorFrom=9;`);
+ assert.equal(r.run('copied'),2);assert.equal(r.run('q.site.access.corridorFrom'),2);
+ assert.equal(r.run('packet.site!==site&&packet.site.access!==site.access&&packet.site.path!==site.path'),true);
+ assert.deepEqual(r.json('packet.site.path'),r.json('site.path'));
+ assert.equal(r.run("Reflect.ownKeys(packet.site.access).some(k=>['corridor','terrain','memo','banks','claims','payer'].includes(k))"),false);
+ assert.match(fn('abbeyCorridorReady'),/C\.corridor=corridor/);
+ assert.match(fn('abbeyApproachPlan'),/site\.access\.corridorFrom=2/);
+ assert.doesNotMatch(fn('abbeyApproachPlan'),/(?:W|site)\.(?:corridor|terrain|memo|banks|claims)\s*=/);
 });
