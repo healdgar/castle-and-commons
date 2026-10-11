@@ -12,6 +12,9 @@ const source=inlineGameScript(html);
 const extract=(from,to)=>{const a=source.indexOf(from),b=source.indexOf(to,a);assert.ok(a>=0&&b>a,`missing source seam: ${from}`);return source.slice(a,b);};
 const extractHTML=(from,to)=>{const a=html.indexOf(from),b=html.indexOf(to,a);assert.ok(a>=0&&b>a,`missing HTML source seam: ${from}`);return html.slice(a,b);};
 const technologyRotation=extract('function technologyRotation(s){','function technologyFarmYield(');
+// Presentation carries the detached health report, never the canonical paid
+// isolation contract. Load its actual pure projectors alongside the packet seam.
+const portHealthReports=extract('function portQuarantineSummary(c){','function portHealthHTML(s){');
 const presentation=extract('function visualScalars(', 'function installPresentation(packet){');
 const installProjection=extract('function installPresentation(packet){', '/*\n * Ephemeral renderer DTO builders');
 const renderPlans=extract('/*\n * Ephemeral renderer DTO builders', '/* Foreground adapters submit intent');
@@ -48,7 +51,7 @@ function context(extra={}){
     let allLines=[],entryCount=0,scene=null;const dateStr=()=>'';let MODEL_ONLY=false,SEED=33,FATE=44,START_AD=850;function storageOutcomeReady(){return true}
     function workerHTML(value){return value}function presentEndgame(){}
   `).runInContext(c);
-  new vm.Script(technologyRotation+'\n'+presentation+'\n'+installProjection+'\n'+renderPlans,{filename:'index.html production projection'}).runInContext(c);
+  new vm.Script(technologyRotation+'\n'+portHealthReports+'\n'+presentation+'\n'+installProjection+'\n'+renderPlans,{filename:'index.html production projection'}).runInContext(c);
   vm.runInContext('workerTrackSegments=()=>[];workerFenceSegments=()=>[]',c);
   return c;
 }
@@ -87,6 +90,30 @@ test('production presentation packet keeps render references and transfers packe
   const lengths=canonical.map(b=>b.byteLength),copy=structuredClone(packet,{transfer:transfers});
   assert.ok(copy.static.h.byteLength>0);assert.ok(packetViews.every(v=>v.byteLength===0));
   assert.deepEqual(canonical.map(b=>b.byteLength),lengths,'canonical source buffers remain attached');
+});
+
+test('paid harbor and institutional reports cross without contracts, people or accounts',()=>{
+  const c=context();
+  vm.runInContext(`
+    const payer={household:{gold:91}},attendant={id:8,account:payer};
+    const quarantine={since:3,until:33,served:4,attendant:8,wages:2,demurrage:1,lost:.25,payer,crew:attendant,source:{source:1,day:2,observedAt:'departure',infected:5}};
+    const cargo={origin:1,dest:0,departDay:3,good:'grain',qty:9,poly:[],portQuarantine:quarantine};
+    const s={name:'Harbor',pos:{x:0,z:0},buildings:[],fires:[],furl:[],streets:[],places:[],folk:[attendant],portHealth:{enabled:true,authority:0,attendant:8,hold:cargo,roll:[{day:2,origin:1,served:30,wages:15,reason:'completed'}]}};
+    W.settlements=[s];W.capital=s;W.caravans=[cargo];
+    W.abbeys=[{id:1,kind:'abbey',storageOwnerId:'abbey:1',name:'Test Abbey',si:0,order:'benedictine',sex:'m',religious:3,layBrothers:1,members:[attendant],account:payer,compound:{payer}}];
+    W.churchBodies=[{id:2,kind:'church',bodyKind:'parish',storageOwnerId:'church:2',name:'Parish',si:0,members:[attendant],account:payer}];
+  `,c);
+  const packet=vm.runInContext('workerPresentation(true)',c);auditDTO(packet);
+  assert.equal(packet.settlements[0].portHealthReport.hold.served,4);
+  assert.equal(packet.caravans[0].portHealthReport.sourceObservedAt,'departure');
+  assert.equal(packet.world.abbeys[0].religious,3);assert.equal(packet.world.churchBodies[0].bodyKind,'parish');
+  assert.equal(packet.caravans[0].portQuarantine,undefined);
+  assert.equal(packet.settlements[0].portHealth,undefined);
+  for(const row of [...packet.world.abbeys,...packet.world.churchBodies]){assert.equal(row.members,undefined);assert.equal(row.compound,undefined);}
+  c.packet=packet;
+  vm.runInContext('packet.settlements[0].portHealthReport.roll[0].wages=99;packet.caravans[0].portHealthReport.served=99',c);
+  assert.equal(vm.runInContext('W.settlements[0].portHealth.roll[0].wages',c),15);
+  assert.equal(vm.runInContext('W.caravans[0].portQuarantine.served',c),4);
 });
 
 test('production citizen-plan adapter calls canonical walker helpers, scales elapsed days, and leaves RNG alone',()=>{
