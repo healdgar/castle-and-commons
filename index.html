@@ -3195,7 +3195,8 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
     let made=0;
     for(const o of starts){
       if(made>=n)break;
-      if(s.streets.some(t=>t.kind==='lane'&&(dist2d(t.pts[0].x,t.pts[0].z,o.p.x,o.p.z)<40||dist2d(t.pts[t.pts.length-1].x,t.pts[t.pts.length-1].z,o.p.x,o.p.z)<25)))continue;
+      // The parent supplies frontage; endpoint spacing prevents another nearby child lane.
+      if(s.streets.some(t=>t!==o.st&&t.kind==='lane'&&(dist2d(t.pts[0].x,t.pts[0].z,o.p.x,o.p.z)<40||dist2d(t.pts[t.pts.length-1].x,t.pts[t.pts.length-1].z,o.p.x,o.p.z)<25)))continue;
       const side=rr()<0.5?1:-1,hd=Math.atan2(o.tz,o.tx)+side*Math.PI/2+(rr()-0.5)*0.5,len=40+rr()*120,hw=HW*0.78;
       let lane=null;
       for(const M of mouths(o.p,o.a,o.b,hd,o.st.hw+2,o.st,hw)){const r=walk(M.m.x,M.m.z,hd,len,o.st,hw);if(r.pts.length>=4||r.joined){lane=[M.p,M.m,...r.pts];break;}}
@@ -3572,7 +3573,8 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
       for(const st of s.streets)if(!st.hidden&&!st.gone&&!st.planQ&&st.kind!=='edge'&&st.kind!=='quay'&&st.kind!=='alley'){
         const P=resample(st.pts,20);for(let k=1;k<P.length-1;k++){const a=P[k-1],b=P[k+1],d=dist2d(P[k].x,P[k].z,C.x,C.z);if(d>18&&d<reach-16)starts.push({p:P[k],a,b,st});}}
       const hw=HW*0.78,oldReach=Rmax;Rmax=reach;
-      try{for(let k=0;k<Math.min(12,starts.length);k++){const o=starts[(day()+k*7919)%starts.length];if(s.streets.some(t=>!t.gone&&t.kind==='lane'&&dist2d(t.pts[0].x,t.pts[0].z,o.p.x,o.p.z)<28))continue;
+      // A short seed lane may parent work; only other lanes veto a nearby child.
+      try{for(let k=0;k<Math.min(12,starts.length);k++){const o=starts[(day()+k*7919)%starts.length];if(s.streets.some(t=>t!==o.st&&!t.gone&&t.kind==='lane'&&dist2d(t.pts[0].x,t.pts[0].z,o.p.x,o.p.z)<28))continue;
           const base=Math.atan2(o.b.z-o.a.z,o.b.x-o.a.x);for(const sd of[1,-1]){const hd=base+sd*Math.PI/2,len=48+(k%4)*16;
             for(const M of mouths(o.p,o.a,o.b,hd,o.st.hw+2,o.st,hw)){const r=walk(M.m.x,M.m.z,hd,len,o.st,hw);if(r.pts.length<4&&!r.joined)continue;const pts=[M.p,M.m,...r.pts];
               return{pts:pts.map(p=>({x:p.x,z:p.z})),hw,reach,startStreet:o.st};}}
