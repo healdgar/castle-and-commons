@@ -20591,7 +20591,7 @@ function visualDataNames(o){
 // town, a churchyard's church, a person or a crew). A link is cut; the same name holding a number (a tree's size
 // s, say) is plain geometry and crosses.
 // (cands: a street's frontage candidates, the layout planner's own scratch: a point every 2.2 m along both sides, most of the bytes of a town and nothing that is drawn.)
-const VISUAL_PRIVATE=new Set(['storage','ledger','holdings','account','ownerAccount','beneficiary','cands','groundClaim','quarryPaidDay','quarryHands','quarryWages','marriageLeave','knighted','marriagePardon']),VISUAL_LINKS=new Set(['s','churchyardOf','title','head','p','men','riders','crew','expedition','vessel']);
+const VISUAL_PRIVATE=new Set(['storage','ledger','holdings','account','ownerAccount','beneficiary','cands','groundClaim','quarryPaidDay','quarryHands','quarryWages','marriageLeave','knighted','marriagePardon','lockSource','riverPlan','lockPayments','boardReceipt','guildWriting']),VISUAL_LINKS=new Set(['s','churchyardOf','title','head','p','men','riders','crew','expedition','vessel']);
 function visualGeometry(value,seen=new Set()){
   if(value===null||['number','string','boolean'].includes(typeof value))return value;
   if(!value||typeof value!=='object'||value instanceof Map||value instanceof Set||value.household||value._hh||seen.has(value))return undefined;
