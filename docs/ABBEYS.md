@@ -34,6 +34,12 @@ Church, residence, grange and guest house/almonry use the shared paid compound p
 
 Canonical buildings supply storage and housing; the compound owns neither a second capacity nor another inventory.
 
+The current visual model is simple: a church, residential range and grange placed as separate functional buildings. A recognizable cloister layout and richer stone ranges are unfinished.
+
+![Corscrug Abbey church in winter AD 1201](images/abbey-church-ad1201.png)
+
+*Actual completed Benedictine church from the frozen `61dd0bb` native run, at verified closed day 660. This view shows the church before residence and grange completion. Full-graph load, exact resave and readonly drawing/RNG checks passed; it is construction progress, not a full-core or industry pass.*
+
 Pending native footprints and approaches also constrain later paid public road, street, square and wall proposals. A connecting road or street may share only the actual current public segment at the abbey's retained endpoint; that does not license a wider band outside its cap, another private approach, a building or a wall. Planned, hidden, stopped and merely proposed public ground supplies no exemption. Reciprocal daily abbey validation uses the same exact public subtraction. Acceptance preserves the native two-metre fit setback around the pending building and approach; this is clearance, not an additional land grant or payment. Connector polygons are reused only within one certified synchronous query; other pending projects retain their indexed geometry. The partial-day-602 predecessor diagnostic identifies a later street's 0.16814 m² private wedge at a Cistercian approach endpoint; it is failure evidence, not a completed construction gate.
 
 A fishpond is a paid contained river reservoir in canonical `s.lake`, only where the settlement has no existing reservoir. The entire retained pond/dam footprint must be granted, terrain must close the water, and no native road/building may be flooded. Completion consumes an actual purchased fish stocking input. Output waits a full growing year and requires today's actual paid fisher; drought and winter affect it. Fish remains the existing native commodity. Initial throughput is an explicit game calibration, not a claim about historical load weights. The pond reuses native masks, route fingerprints, minimap, water surface and dam drawing, with a dedicated worker-to-render hydraulic dirty flag. Its component references the same lake and carries no store or capacity.
