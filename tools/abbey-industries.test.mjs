@@ -376,10 +376,18 @@ test('a replaced spatial predicate cold-checks the complete ordered public surfa
 function groundGeometrySetup(cell=40){
  const context=vm.createContext({Math,Number,Map,Set,GRID:16,CELL:cell,SIZE:cell*16,W:{land:{F:[]}}});
  const cells=fn('occupiedGroundCells'),fields=fn('occupiedGroundFields');
- const legacyCells=cells.replace('function occupiedGroundCells(','function legacyOccupiedGroundCells(').replace('if(!occupiedGroundBoxMayHit(P,ax,bx,az,bz))return false;','');
+ // Reviewed production rectangle scan before row strips (737fcdb); only its name changes.
+ const legacyCells=String.raw`function legacyOccupiedGroundCells(P){ // exact intersections with the native CELL-wide agricultural-mask raster
+  if(!P?.length)return [];let x0=Infinity,x1=-Infinity,z0=Infinity,z1=-Infinity;const cells=[];
+  for(const q of P){x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);z0=Math.min(z0,q.z);z1=Math.max(z1,q.z);}
+  const half=CELL/2,c0=toCell(x0-half),c1=toCell(x1+half),r0=toCell(z0-half),r1=toCell(z1+half),hit=(cx,cz)=>{const ax=cellX(cx)-half,bx=cellX(cx)+half,az=cellZ(cz)-half,bz=cellZ(cz)+half;if(!occupiedGroundBoxMayHit(P,ax,bx,az,bz))return false;const C=[[ax,az],[bx,az],[bx,bz],[ax,bz]];
+    if(C.some(([x,z])=>inPolyXZ(P,x,z))||P.some(q=>q.x>=ax&&q.x<=bx&&q.z>=az&&q.z<=bz))return true;
+    for(let k=0;k<P.length;k++){const a=P[k],b=P[(k+1)%P.length];for(let j=0;j<4;j++){const u={x:C[j][0],z:C[j][1]},v={x:C[(j+1)%4][0],z:C[(j+1)%4][1]};if(segSegDist(a,b,u,v)<0.01)return true;}}return false;};
+  for(let cz=Math.max(0,r0);cz<=Math.min(GRID-1,r1);cz++)for(let cx=Math.max(0,c0);cx<=Math.min(GRID-1,c1);cx++)if(hit(cx,cz))cells.push(cIdx(cx,cz));return cells;
+}`;
  const legacyFields=fields.replace('function occupiedGroundFields(','function legacyOccupiedGroundFields(').replace('occupiedGroundBoxMayHit(poly,x-half,x+half,z-half,z+half)&&','');
  assert.notEqual(legacyCells,cells);assert.notEqual(legacyFields,fields);
- vm.runInContext([constant('clamp'),constant('cIdx'),constant('inB'),constant('toCell'),constant('cellX'),constant('cellZ'),...['obbCorners','segDist','segSegDist','inPolyXZ','graveyardPolygonsOverlap','occupiedGroundBoxMayHit','occupiedGroundCells','occupiedGroundFields','computeFurlongPoly'].map(fn),legacyCells,legacyFields].join('\n'),context);
+ vm.runInContext([constant('clamp'),constant('cIdx'),constant('inB'),constant('toCell'),constant('cellX'),constant('cellZ'),...['obbCorners','segDist','segSegDist','inPolyXZ','graveyardPolygonsOverlap','occupiedGroundBoxMayHit','occupiedGroundCells','occupiedGroundFields','computeFurlongPoly'].map(fn),legacyCells,legacyFields,constant('OCCUPIED_GROUND_NATIVE')].join('\n'),context);
  return{context,eval:s=>vm.runInContext(s,context)};
 }
 
