@@ -7,12 +7,51 @@ const source=fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.
 const fn=n=>{const m=source.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))','m'));assert.ok(m,n);return m[0];};
 const cst=n=>source.match(new RegExp('^const '+n+'=.*$','m'))[0];
 function royal({commodity=false}={}){const r=realm({households:5,cash:0,grain:0,fish:0,crown:100,pop:5,commodity});
-  r.eval(['royalHundreds','royalBudget','royalFine','royalPleaPlan','royalPlans','royalOfficers','royalTravel','royalAppoint','royalEyreStart','royalStockReserve','royalForfeitGoods','royalEyreVisit','royalEyreCmd','royalJusticeHTML','roadSpare','sovOn','plyH','workerCommandTarget','workerCommandIndexText','workerCommandString','runCmd','replayEntry','courtCard'].map(fn).join('\n'));
+  r.eval(['royalHundreds','royalBudget','royalFine','royalPleaPlan','royalPlans','royalOfficers','royalTravel','royalAppoint','royalEyreStart','royalStockReserve','royalForfeitGoods','royalEyreVisit','royalEyreCmd','royalJusticeHTML','courtOfficials','courtAppoint','courtDebtor','courtSession','institutionJobsChanged','technologyActorsDirty','craftPresent','workers_','lordSeat','roadSpare','sovOn','plyH','workerCommandTarget','workerCommandIndexText','workerCommandString','runCmd','replayEntry','courtCard'].map(fn).join('\n'));
   Object.assign(r.C,{KL:0,KLaw:3,esc:x=>String(x),dateStr:d=>'day '+d,MODEL_ONLY:true,backgroundUserRequest:()=>false,workerCommandIsLocal:()=>false});
   r.eval('W.houses=[{name:"the Crown"},{name:"House Ash",gold:0}];W.notables=[];W.roads=[];W.capital=s;W.player={on:true,house:0};s.furl=[];for(const h of H)h.sk=[1,0,0,1];ownershipTick();for(const h of H)householdAccount(h).population.set(s,1);W._pm=folkIndex();storageInit(s);AD=()=>1166;notableById=id=>W.notables.find(n=>n.id===id);notableSetAlive=(n,a)=>n.alive=a;notableFromFolk=(p,o)=>{const n={...o,id:W.notables.length+1,fp:p,name:folkName(p),alive:true};W.notables.push(n);return n;};');return r;}
 const total=r=>r.coins()+(r.W.houses[1].gold||0);
 const robbery=(r,v=100)=>r.eval(`courtRobbery(s,{value:${v},qty:10,good:'cloth',origin:0,dest:0},{id:7},{x:0,z:0})`);
 const hear=r=>r.eval('royalEyreStart();day=()=>2;royalEyreVisit()');
+const personnel=r=>r.eval('JSON.stringify([H.map(p=>[p.id,p.w,p.office,p.officeFor,p.role,p.abbey,p.abbeyJob,p.estateOffice,p.portHealthJob,p.schoolMaster,p.tutorMaster,p.study,p.apprentice,p.craft,p.away]),W.notables.map(n=>[n.id,n.alive,n.fp.id,n.retiredDay,n.endReason]),W.houses.map(h=>h.justice),s.pop])');
+const conflicts=[
+  ['monk','H[0].abbey=0;H[0].role="monk"'],['nun','H[0].abbey=0;H[0].role="nun"'],['canon','H[0].abbey=0;H[0].role="canon"'],
+  ['paid abbey servant','H[0].abbeyJob="carter";H[0].role="abbey servant"'],['paid estate keeper','H[0].estateOffice={project:4,priorTrade:"labourer"}'],
+  ['port attendant','H[0].portHealthJob=0'],['schoolmaster','H[0].schoolMaster=0'],['tutor','H[0].tutorMaster=0'],
+  ['active student','H[0].study={closed:false}'],['active apprentice','H[0].apprentice={closed:false}'],
+  ['paid journeyman','H[0].craft={rank:"journeyman",employer:5}'],['absence','H[0].away={until:90}'],
+  ['lost letters','H[0].sk[KL]=0'],['other court owner','H[0].officeFor=9;H[0].office=office']
+];
+
+for(const kind of ['royal','manor'])for(const retained of [false,true])test(`${kind} ${retained?'retained':'new'} officers exclude actual conflicting jobs and absent or unqualified heads without changing their records`,()=>{
+  for(const[label,change]of conflicts){const r=royal();r.eval(`globalThis.office=${JSON.stringify(kind==='royal'?'justice':'steward')};H[4].w=100;${kind==='manor'?'s.owner=1;W.houses[1].seat=0;':''}`);
+    if(retained){if(kind==='royal'){robbery(r);hear(r);}else r.eval('courtPlead(s,"entry",5,20,{},W.houses[1]);courtSession(s,0)');}
+    r.eval(change);const before=personnel(r),coin=total(r),ids=JSON.parse(r.eval(`JSON.stringify(${kind==='royal'?'royalOfficers()':'courtOfficials(0)'}.picked.map(p=>p.id))`));
+    assert.ok(!ids.includes(1),label);assert.equal(new Set(ids).size,2,label);assert.equal(personnel(r),before,label+' quote changes no office, contract, membership or purse');near(total(r),coin);
+  }
+});
+test('court service admits an independent household craftsman and a graduate, and retains the same compatible offices',()=>{
+  const r=royal();r.eval('H[0].tr="smith";H[0].craft={rank:"master",employees:[]};H[1].study={closed:true};H[1].apprentice={closed:true};H[4].w=100');
+  assert.deepEqual(JSON.parse(r.eval('JSON.stringify(royalOfficers().picked.map(p=>p.id))')),[1,2]);assert.equal(r.eval('craftPresent(s,H[0])'),true);r.eval('s._craftIndex={};s._learningIndex={};s._technologyActors={}');robbery(r);hear(r);const before=personnel(r);r.eval('headsOf=()=>{throw Error("compatible officers need no search")};royalOfficers()');assert.equal(personnel(r),before);assert.equal(r.H[0].tr,'smith');assert.equal(r.H[0].craft.rank,'master');assert.equal(r.eval('craftPresent(s,H[0])'),false);assert.equal(r.eval('workers_(s,p=>p===H[0]).length'),0);for(const cache of ['_craftIndex','_learningIndex','_technologyActors'])assert.equal(r.s[cache],undefined,cache+' is refreshed on actual appointment');
+});
+test('a clerk keeps his own office when an unrecorded incumbent and a vacant steward are reconciled',()=>{
+  const r=royal();r.eval('s.owner=1;W.houses[1].seat=0;H[0].office="clerk";H[0].officeFor=1;H[0].sk[KLaw]=10');
+  assert.deepEqual(JSON.parse(r.eval('JSON.stringify(courtOfficials(0).picked.map(p=>[p.id,p.office]))')),[[2,null],[1,'clerk']]);assert.equal(r.H[0].office,'clerk');
+});
+for(const kind of ['royal','manor'])test(`funded ${kind} replacement releases only its old court markers and pays the present head once`,()=>{
+  const r=royal();r.eval(`H[4].w=100;${kind==='manor'?'s.owner=1;W.houses[1].seat=0;':''}`);
+  if(kind==='royal'){robbery(r);hear(r);}else r.eval('courtPlead(s,"entry",5,20,{},W.houses[1]);courtSession(s,0)');
+  r.eval('H[0].away={until:90};H[0].study={closed:false};day=()=>31');const before=personnel(r),oldCash=r.H[0].w,coin=total(r);
+  r.eval(kind==='royal'?'royalOfficers()':'courtOfficials(0)');assert.equal(personnel(r),before,'candidate quote retains stale owned markers');
+  if(kind==='royal'){robbery(r);r.eval('royalEyreStart();day=()=>32;royalEyreVisit()');assert.equal(r.W.houses[0].justice.eyre.sessions,2);assert.equal(r.W.notables[0].alive,false);assert.equal(r.W.notables.length,3);}else r.eval('courtPlead(s,"entry",5,20,{},W.houses[1]);courtSession(s,0)');
+  near(total(r),coin);near(r.H[0].w,oldCash);assert.equal(r.H[0].office,undefined);assert.equal(r.H[0].officeFor,undefined);assert.equal(r.H[0].away.until,90);assert.equal(r.H[0].study.closed,false);assert.equal(r.H[2].office,kind==='royal'?'justice':'steward');near(r.H[2].w,r.eval('foodYr()/360'));assert.equal(r.s.pop,5);assert.equal(r.H.length,5);
+});
+for(const kind of ['royal','manor'])test(`funded ${kind} replacement preserves a prior holder's reassigned foreign office`,()=>{
+  const r=royal();r.eval(`H[4].w=100;${kind==='manor'?'s.owner=1;W.houses[1].seat=0;':''}`);
+  if(kind==='royal'){robbery(r);hear(r);}else r.eval('courtPlead(s,"entry",5,20,{},W.houses[1]);courtSession(s,0)');
+  r.eval('H[0].officeFor=9;day=()=>31');const coin=total(r);if(kind==='royal'){robbery(r);r.eval('royalEyreStart();day=()=>32;royalEyreVisit()');}else r.eval('courtPlead(s,"entry",5,20,{},W.houses[1]);courtSession(s,0)');
+  near(total(r),coin);assert.equal(r.H[0].office,kind==='royal'?'justice':'steward');assert.equal(r.H[0].officeFor,9);assert.equal(r.H[2].office,kind==='royal'?'justice':'steward');
+});
 
 test('general eyre is gated at 1166; held evidence never charges an early world',()=>{
   const r=royal();r.eval('AD=()=>1165;H[2].w=100');robbery(r);assert.equal(r.eval('royalEyreStart()'),false);near(total(r),200);assert.equal(r.W.notables.length,0);assert.equal(r.s.royalCourt,undefined);

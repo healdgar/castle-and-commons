@@ -37,6 +37,18 @@ capability seam. Heavy release validation is the coordinator's next gate.
   The hook does not yet represent a contested land-title adjudication or move
   a parcel; the corresponding actual pledge/title mechanism must call it.
 
+Court staffing uses the same native employment eligibility as the later
+government offices. New and retained officers must be present, lettered heads
+at their actual seat. Religious members, paid servants or keepers, teachers,
+active students/apprentices and employed journeymen cannot hold a second court
+job. An independent household craft remains eligible; assigning an office
+refreshes the actual work rosters so that its holder no longer works a second
+shift. Stewards and clerks retain their matching office and house, rather than
+swapping a stale incumbent into another vacancy. Candidate quotes change no
+office or financial record. Only a funded sitting/pledge judgement or royal
+appointment releases a replaced holder's exact office-and-employer markers;
+another institution's reassigned office and its contracts remain intact.
+
 ## Attendance and consent
 
 An estate summons sets a notice period and a three-week sitting. Lord
@@ -107,3 +119,11 @@ writ/recovery, sheriff service/farm and read-only accounts. Full native
 speed/RNG, worker, world-save and goods conservation gates remain the serialized
 release runner's responsibility. The 15 light fixtures pass in 0.8953 child CPU
 seconds, load 0.111/0.072/0.038 before and 0.263/0.104/0.049 after (cloud host).
+
+The focused royal/court staffing regression passes all 28 checks, including
+new and retained native employment conflicts, observational selection,
+compatible office reuse, exact replacement markers, actual work-roster
+invalidation and conserved fees. Its final run used 3.47 CPU seconds on the
+cloud host (load 0.17 before and 0.07 after). This is an intended staffing/history
+correction; the coordinator's native release gates still cover the assembled
+model.
