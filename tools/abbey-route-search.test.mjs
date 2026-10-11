@@ -34,7 +34,11 @@ assert.ok(hotDetour.includes(hotScore)&&hotDetour.includes(hotCost));
 const oldDetour=hotDetour.replace(/^  \/\/ Only the uninterrupted[^\n]*\n  const scope=[^\n]*\n/m,'').replace(hotScore,oldScore).replace(hotCost,'const cost=g[k]+dist2d(P.x,P.z,Q.x,Q.z);');
 assert.ok(!oldDetour.includes('heuristic')&&!oldDetour.includes('lengths'));
 
-function setup({old=false,prepare='',replaceableDistance=false}={}){
+const highwayClause=fn('serviceRoadPlan').match(/  \/\/ An Abbey's rural approach[^\n]*\n  if\(corridor\)\{const si=W\.settlements\.indexOf\(s\);[^\n]*\n/)[0];
+const oldServiceRoad=fn('serviceRoadPlan').replace(highwayClause,'').replaceAll('a.st||a.road','a.st').replaceAll('c.st||c.road','c.st').replace('(a.st)===(q.st||q.road)','a.st===q.st').replace("q.road?{path,road:q.road}:{path,street:q.st}","{path,street:q.st}").replace("q.road?{path,road:q.road}:{path,street:q.st}","{path,street:q.st}");
+assert.ok(!oldServiceRoad.includes('q.road')&&!oldServiceRoad.includes('a.road')&&!oldServiceRoad.includes('c.road'));
+
+function setup({old=false,oldService=false,prepare='',replaceableDistance=false}={}){
  const count={hypot:0,heightReads:0},math=Object.create(Math);
  math.hypot=(...args)=>{count.hypot++;return Math.hypot(...args);};
  const C=vm.createContext({Math:math,count});
@@ -46,7 +50,7 @@ function setup({old=false,prepare='',replaceableDistance=false}={}){
  `);
  // Only replacement-reader tests make this lexical binding writable. The
  // captured native function body stays exact; replacing it invalidates proof.
- run(readers.map(n=>n==='armyDetour'&&old?oldDetour:n==='dist2d'&&replaceableDistance?constant(n).replace(/^const /,'let '):native(n)).join('\n'));
+ run(readers.map(n=>n==='armyDetour'&&old?oldDetour:n==='serviceRoadPlan'&&oldService?oldServiceRoad:n==='dist2d'&&replaceableDistance?constant(n).replace(/^const /,'let '):native(n)).join('\n'));
  run(['abbeyRouteSurveyNative','abbeyRouteSurveyInputs','abbeyRouteTerrain','abbeyRouteMemo','abbeyTerrainSegmentClear','makeHash'].filter(n=>!readers.includes(n)).map(fn).join('\n'));
  run(`W.rivHash=makeHash(40);s._lay.placed=makeHash(16);onRoad.reach=-1;`);
  if(prepare)run(prepare);
@@ -161,4 +165,96 @@ test('retained landing metadata projects as detached scalar geometry while surve
  assert.match(fn('abbeyCorridorReady'),/C\.corridor=corridor/);
  assert.match(fn('abbeyApproachPlan'),/site\.access\.corridorFrom=2/);
  assert.doesNotMatch(fn('abbeyApproachPlan'),/(?:W|site)\.(?:corridor|terrain|memo|banks|claims)\s*=/);
+});
+
+// Finite controlled native geometry/title fixture: one Crown-held parcel, no
+// generated people, goods, endowment, licence, commissioned project or RNG.
+function highwaySetup({prepare='',oldService=false,replaceableDistance=false}={}){
+ const extra=['castleFoundationReserved','abbeyAccessEndpoint','lerpPt'].map(fn).join('\n')+'\n'+
+  ['STREET_GRAPH_FORT_CONTEXTS','STREET_GRAPH_FORT_NATIVE','ABBEY_APPROACH_SURVEY_NATIVE'].map(constant).join('\n');
+ return setup({oldService,replaceableDistance,prepare:extra+`
+const FN=1,FG=SIZE,field={k:0,i:0,j:0,jx:.5,jz:.5,lord:0,own:'crown',wk:'crown'};
+  W.houses=[{name:'Crown'},{name:'Other holder',gold:10}];W.projects=[];W.land={F:[field],mask:new Uint8Array(GRID*GRID*4)};
+  for(let i=0;i<GRID*GRID;i++)W.land.mask[i*4]=1;
+  field.title={own:propertyRightsResolve('crown'),work:propertyRightsResolve('crown')};`+prepare});
+}
+function roadSearch(r,{p={x:-100,z:0},corridor=true,accept='undefined',publicAccess='undefined',ghost='undefined'}={}){
+ r.C.roadInput={p,corridor};
+ r.run(`var proposal=roadInput.corridor?abbeyCorridorReady(s,abbeyApproachSurvey(s),'crown',undefined,0,terrain):undefined;
+  var roadAnswer=serviceRoadPlan(s,roadInput.p,s._lay.placed,null,1.3,proposal?.memo||abbeyRouteMemo(terrain),${ghost},proposal?.banks,${accept},${publicAccess},proposal);`);
+ return r.json('roadAnswer');
+}
+const remoteHighway=`const road={a:0,b:1,path:[{x:20,z:-40},{x:20,z:40}]};W.roads.push(road);`;
+
+test('ordinary native service callers retain their original query prefix, targets and acceptance ordering',()=>{
+ const prepare=remoteHighway+`s.streets.push({id:'near',kind:'lane',hw:2,pts:[{x:-20,z:-8},{x:-20,z:8}]},{id:'far',kind:'lane',hw:2,pts:[{x:-12,z:-8},{x:-12,z:8}]});
+  const nativeDistance=dist2d,queries=[],accepted=[];dist2d=(...v)=>{queries.push(v);return nativeDistance(...v);};
+  function acceptService(q){accepted.push({keys:Object.keys(q),id:q.street?.id,path:q.path});return accepted.length===2;}`;
+ const current=highwaySetup({prepare,replaceableDistance:true}),previous=highwaySetup({prepare,oldService:true,replaceableDistance:true});
+ assert.deepEqual(roadSearch(current,{corridor:false,accept:'acceptService'}),roadSearch(previous,{corridor:false,accept:'acceptService'}));
+ assert.deepEqual(current.json('accepted'),previous.json('accepted'));assert.deepEqual(current.json('queries'),previous.json('queries'));
+ assert.deepEqual(current.json('accepted.map(q=>q.id)'),['near','far']);
+ assert.equal(current.run('roadAnswer.street===s.streets[1]&&!Object.hasOwn(roadAnswer,"road")'),true);
+ const onlyHighway=highwaySetup({prepare:remoteHighway});assert.equal(roadSearch(onlyHighway,{corridor:false}),null);
+});
+
+test('an Abbey corridor reaches its actual incident highway beyond the direct 60 metre connector',()=>{
+ const r=highwaySetup({prepare:remoteHighway}),before=r.json('({roads:W.roads.length,streets:s.streets.length,projects:W.projects.length,mask:Array.from(W.land.mask),title:field.title})');
+ const answer=roadSearch(r);assert.ok(answer);assert.deepEqual(answer.path,[{x:-100,z:0},{x:20,z:0}]);
+ assert.equal(r.run('roadAnswer.road===road&&!Object.hasOwn(roadAnswer,"street")&&proposal.C.native'),true);
+ assert.equal(r.run('dist2d(roadInput.p.x,roadInput.p.z,roadAnswer.path.at(-1).x,roadAnswer.path.at(-1).z)>60'),true);
+ r.run('var endpoint=abbeyAccessEndpoint(s,roadAnswer.path);');
+ assert.deepEqual(r.json('endpoint'),{kind:'road',ref:0,segment:1,point:{x:20,z:0}});
+ assert.equal(r.run('abbeyAccessEndpointValid(s,endpoint,roadAnswer.path.at(-1))'),true);
+ assert.deepEqual(r.json('({roads:W.roads.length,streets:s.streets.length,projects:W.projects.length,mask:Array.from(W.land.mask),title:field.title})'),before);
+ assert.equal(r.run('Object.hasOwn(W,"corridor")||Object.hasOwn(s,"corridor")||Object.hasOwn(road,"accessEndpoint")'),false);
+});
+
+test('highway targets use only actual incident open geometry and retained endpoints revalidate current native roads',()=>{
+ const r=highwaySetup({prepare:`W.roads.push({a:1,b:2,path:[{x:-90,z:-20},{x:-90,z:20}]});const road={a:0,b:1,path:[{x:-80,z:-20},{x:-80,z:20}],open:[{x:20,z:-40},{x:20,z:40}]};W.roads.push(road);`});
+ const answer=roadSearch(r);assert.ok(answer);assert.deepEqual(answer.path.at(-1),{x:20,z:0});assert.equal(r.run('roadAnswer.road===W.roads[1]'),true);
+ r.run('var endpoint=abbeyAccessEndpoint(s,roadAnswer.path);');assert.deepEqual(r.json('endpoint'),{kind:'road',ref:1,segment:1,point:{x:20,z:0}});
+ for(const change of ['road.a=2;road.b=3;','road.open=[{x:21,z:-40},{x:21,z:40}];','W.roads[1]={a:0,b:1,open:[{x:30,z:-40},{x:30,z:40}]};']){
+  const x=highwaySetup({prepare:remoteHighway});assert.ok(roadSearch(x));x.run('var endpoint=abbeyAccessEndpoint(s,roadAnswer.path);'+change.replace('W.roads[1]','W.roads[0]'));
+  assert.equal(x.run('abbeyAccessEndpointValid(s,endpoint,roadAnswer.path.at(-1))'),false,change);
+ }
+ const noIncident=highwaySetup({prepare:'W.roads.push({a:1,b:2,path:[{x:20,z:-40},{x:20,z:40}]});'});assert.equal(roadSearch(noIncident),null);
+});
+
+test('native street ties remain first and multiple segments of each actual highway consume one of twelve target attempts',()=>{
+ const r=highwaySetup({prepare:`s.streets.push({id:'street',kind:'lane',hw:2,pts:[{x:-20,z:-20},{x:-20,z:20}]});
+  W.roads.push({a:0,b:1,path:[{x:-20,z:-30},{x:-20,z:0},{x:-20,z:30}]});
+  for(let i=1;i<16;i++)W.roads.push({a:0,b:i+1,path:[{x:-20+i*3,z:-30},{x:-20+i*3,z:0},{x:-20+i*3,z:30}]});
+  const accepted=[];function declineTarget(q){accepted.push({id:q.street?q.street.id:W.roads.indexOf(q.road),end:q.path.at(-1),keys:Object.keys(q)});return false;}`});
+ assert.equal(roadSearch(r,{accept:'declineTarget'}),null);
+ assert.deepEqual(r.json('accepted.map(q=>q.id)'),['street',0,1,2,3,4,5,6,7,8,9,10]);
+ assert.equal(r.run('accepted.length'),12);assert.equal(new Set(r.json('accepted.map(q=>q.id)')).size,12);
+ assert.deepEqual(r.json('accepted.slice(0,2).map(q=>q.keys)'),[['path','street'],['path','road']]);
+});
+
+test('a failed native corridor flood keeps distinct road identities and refuses active work rights without granting a licence',()=>{
+ const r=highwaySetup({prepare:`field.title.work={owner:W.houses[1],beneficiary:null};
+  for(let i=0;i<16;i++)W.roads.push({a:0,b:i+1,path:[{x:-20+i*3,z:-30},{x:-20+i*3,z:0},{x:-20+i*3,z:30}]});
+  const actualReach=armyReach,floodTargets=[];armyReach=(a,p,pts,pad,cap)=>{floodTargets.push(pts.map(q=>({id:W.roads.indexOf(q.road),x:q.x,z:q.z})));return actualReach(a,p,pts,pad,cap);};`});
+ assert.equal(roadSearch(r),null);assert.equal(r.run('floodTargets.length'),1);
+ assert.deepEqual(r.json('floodTargets[0].map(q=>q.id)'),[1,2,3,4,5,6,7,8,9,10,11]);
+ assert.equal(r.run('field.title.work.owner===W.houses[1]&&W.houses[1].gold===10&&W.projects.length===0'),true);
+ assert.equal(r.run('storageGroundClaim(s,{site:{path:[{x:-100,z:0},{x:20,z:0}]},land:1,claimOccupied:true},"crown").reason'), 'occupied-holding');
+});
+
+test('actual highway targets retain water, pending works, standing footprints and ghost clearance vetoes',()=>{
+ for(const obstacle of [
+  'heights.fill(0);',
+  `const b={x:-100,z:0,w:20,d:20,rot:0,state:'sound',arch:'house'};s.buildings.push(b);s._lay.placed.add(b,15);`,
+  `W.projects.push({type:'compound',si:0,site:{f:{x:-100,z:0,w:20,d:20,rot:0}}});`
+ ]){const r=highwaySetup({prepare:remoteHighway+obstacle});assert.equal(roadSearch(r),null,obstacle);}
+ const ghost=highwaySetup({prepare:remoteHighway});assert.equal(roadSearch(ghost,{ghost:'{x:-100,z:0,w:20,d:20,rot:0}'}),null);
+ // The current native river/bridge predicate remains the final physical gate;
+ // discovering a road endpoint alone supplies no crossing through nearby water.
+ const river=highwaySetup({prepare:remoteHighway+`const water={x:0,z:0,a:{x:0,z:-300},b:{x:0,z:300},hw:2,y:10};W.rivHash.add(water,305);`});
+ river.run(`var proposal=abbeyCorridorReady(s,abbeyApproachSurvey(s),'crown',undefined,0,terrain),a=walker();a.abbeyCorridor=proposal;`);
+ assert.equal(river.run('armySegmentClear(a,{x:-100,z:0},{x:20,z:0})'),false);
+ river.run(`W.roads.push({a:1,b:2,path:[{x:-10,z:0},{x:10,z:0}]});`);
+ // Fresh native call after a real highway change must observe its actual crossing.
+ assert.equal(river.run('armySegmentClear(a,{x:-100,z:0},{x:20,z:0})'),true);
 });

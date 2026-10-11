@@ -2222,16 +2222,18 @@ function serviceRoadPlan(s,p,placed,skip,hw=1.3,memo,ghost,banks,accept,publicAc
   for(const st of s.streets||[])if(st!==skip&&!st.hidden&&!st.gone&&!st.planQ&&!st.planned&&st.kind!=='edge'&&(st.kind!=='quay'||st.serviceLinked)&&!st.castlePath)for(let k=1;k<st.pts.length;k++){
     const a=st.pts[k-1],b=st.pts[k],dx=b.x-a.x,dz=b.z-a.z,L=dx*dx+dz*dz||1,t=clamp(((p.x-a.x)*dx+(p.z-a.z)*dz)/L,0,1),x=a.x+dx*t,z=a.z+dz*t;
     if(publicAccess?publicAccess(st,{x,z}):streetAccessAt(s,{x,z}))candidates.push({x,z,d:dist2d(p.x,p.z,x,z),st});}
+  // An Abbey's rural approach may join this place's actual highway beyond the short direct connector.
+  if(corridor){const si=W.settlements.indexOf(s);for(let i=0;i<(W.roads||[]).length;i++){const r=W.roads[i];if(r.a!==si&&r.b!==si)continue;const P=r.open||r.path||[];for(let k=1;k<P.length;k++){const a=P[k-1],b=P[k],dx=b.x-a.x,dz=b.z-a.z,L=dx*dx+dz*dz||1,t=clamp(((p.x-a.x)*dx+(p.z-a.z)*dz)/L,0,1),x=a.x+dx*t,z=a.z+dz*t;if(abbeyAccessEndpointValid(s,{kind:'road',ref:i,segment:k,point:{x,z}},{x,z}))candidates.push({x,z,d:dist2d(p.x,p.z,x,z),road:r});}}}
   candidates.sort((a,b)=>a.d-b.d);const walker={house:s.owner,settlement:s,placed,requireRoadCrossing:true,waterClearance:hw+1,_em:memo||new Map(),ghost},open=ghost?{...walker,ghost:null,_em:banks?.memo||new Map()}:walker;if(corridor){walker.abbeyCorridor=open.abbeyCorridor=corridor;}
   if(armyObstacle(walker,p.x,p.z))return null;
   const attempted=[],banked=banks?banks.floods.filter(R=>R.hw===hw&&armyReachFrom(R,open,p)):[];let reach;
-  const flood=from=>{const pts=[],seen=new Set(attempted.map(a=>a.st));for(let cj=from;cj<candidates.length&&pts.length+attempted.length<12;cj++){const c=candidates[cj];if(seen.has(c.st)||armyObstacle(walker,c.x,c.z))continue;seen.add(c.st);pts.push(c);}
+  const flood=from=>{const pts=[],seen=new Set(attempted.map(a=>a.st||a.road));for(let cj=from;cj<candidates.length&&pts.length+attempted.length<12;cj++){const c=candidates[cj];if(seen.has(c.st||c.road)||armyObstacle(walker,c.x,c.z))continue;seen.add(c.st||c.road);pts.push(c);}
     const span=banks&&pts.length?banks.span.filter(d=>dist2d(d.x,d.z,p.x,p.z)<160):[]; // too wide a box to flood: the door's own targets alone
     reach=pts.length>0?span.length&&armyReach(open,p,[...pts,...span],150,60000)||armyReach(open,p,pts,150,60000):null;if(reach&&banks&&armyReachClosed(reach,open)){reach.hw=hw;banks.floods.push(reach);}};
   if(banked.length)flood(0); // a door on ground already flooded floods its own reach first (its edges are mostly known) and searches only what that reaches
-  for(let ci=0;ci<candidates.length;ci++){const q=candidates[ci];if(armyObstacle(walker,q.x,q.z)||attempted.some(a=>a.st===q.st))continue;attempted.push(q);
+  for(let ci=0;ci<candidates.length;ci++){const q=candidates[ci];if(armyObstacle(walker,q.x,q.z)||attempted.some(a=>(a.st||a.road)===(q.st||q.road)))continue;attempted.push(q);
     if((reach&&!armyReaches(reach,q)||banked.some(R=>armyReachCovers(R,p,q)&&!armyReaches(R,q)))&&!armySegmentClear(walker,p,q)){if(attempted.length===12)break;continue;} // blocked straight on, and no lattice route can reach it
-    const path=armyLandPath(walker,[p,{x:q.x,z:q.z}]);if(path){if(!accept||accept({path,street:q.st}))return{path,street:q.st};if(attempted.length===12)break;continue;}
+    const path=armyLandPath(walker,[p,{x:q.x,z:q.z}]);if(path){if(!accept||accept(q.road?{path,road:q.road}:{path,street:q.st}))return q.road?{path,road:q.road}:{path,street:q.st};if(attempted.length===12)break;continue;}
     if(reach===undefined)flood(ci+1);
     if(attempted.length===12)break;}
   return null;
