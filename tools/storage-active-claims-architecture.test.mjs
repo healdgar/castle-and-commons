@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
+import vm from 'node:vm';
 // Embedded README/docs text (the advisor's rules, refreshed by stamp.sh) is documentation, not game source.
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8').replace(/(<script type="text\/plain" id="adv(?:rules|bridge)">)[\s\S]*?(<\/script>)/g,'$1$2');
 const digest=s=>createHash('sha256').update(s).digest('hex');
@@ -156,7 +157,18 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // consumes the abbey's real hides/bark before crediting bounded leather output.
  // Named present qualified operators, actual wages, paid compound fabric and
  // private own-use milling retain real actor/title and material provenance.
- assert.equal(digest(source.slice(a,b)),"e19fb9f6526d155ff92b2b7e6ee4890870262636fd2223c76167eb58574c9987");
+ // Lawful rural access (reviewed c2059ac..e2fa455): only the Abbey rural
+ // client pays its retained corridor licence at commission and rechecks before
+ // material/work payment. The opt-in claimOccupied flag includes privately titled
+ // core-mask ground; public surface was geometrically removed by that client.
+ // The actual owner and distinct tenant work-right veto remain unchanged.
+ // institutionFoundationPath optionally validates the retained public endpoint;
+ // ordinary clients keep their previous predicate. Paid fixed cells, actual named
+ // receipts, native title/custody and generic work arithmetic remain unchanged.
+ // abbey-industries fixtures cover a public-core tenant refusal, real freeholder
+ // payment once, lawful succession, deceased donor before/after paid permission,
+ // separate building grant, fixed-footprint drift and actual road replacement.
+ assert.equal(digest(source.slice(a,b)),"676e0eba8c5c3c1f2d8ef8e8c4a529928ea5b5252076b1e850cbdf90eee102c0");
  // This explicit worker inspector copies existing balances. Pin the entire line
  // before excluding it so a future mutation cannot hide behind the read exemption.
  const inspectorLine=source.split('\n').find(l=>l.trim().startsWith("if(kind==='household'){const h=W.households.get(payload.id);"));
@@ -196,6 +208,40 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // industry totals, reasons and copied operator/power receipts read current stock.
  // It adds no exemption or stock writer; the explicit household inspector and
  // storageTitleDirty call count remain pinned unchanged.
- assert.equal(digest(outside),"7d8cebde348c2ac4b7c899b411ff107a84675ff3ea6fd89fe3e9a6711a04c688");
+ // Reviewed c2059ac..e2fa455 outside diff: abbeySummary alone adds detached
+ // scalar offer identity/status/dates, genuine quoted service terms, actual paid
+ // travel/board and copied refusal reasons. Its existing _owners read is unchanged;
+ // no external ownership writer or inspector exemption is added.
+ assert.equal(digest(outside),"ccf4ba853e32b844c98cf2e7767ac540e42205e29353e17410f6f12a2319092c");
  assert.equal((source.match(/storageTitleDirty\(/g)||[]).length,3);
+});
+
+// Exercise the actual pure transport bodies without generating or advancing W.
+// Licence/recruitment books stay private; the retained paid construction path
+// and physical footprint remain available to drawing.
+test('retained Abbey licences and recruitment books stay private while actual approach geometry crosses',()=>{
+ const helpers=source.slice(source.indexOf('function visualScalars('),source.indexOf('// DELTA.'));
+ const put=source.slice(source.indexOf('function visualPut('),source.indexOf('function visualSeal('));
+ const project=source.split('\n').find(l=>l.trim().startsWith('project:q=>')).trim().replace(/^project:/,'').replace(/};$/,'');
+ const c=vm.createContext({});vm.runInContext(helpers+'\n'+put+'\nconst nativeProject='+project+';',c);
+ const raw=vm.runInContext(`(()=>{
+   const privateNames=['approachClaim','approachPayments','approachPaid','approachCash','accessDonor','abbeyRecruitment','skilledOffers','skilledRecruitmentPlans','recruitmentPaid','_skilledOfferDay'];
+   const q={id:'abbey:0:project:0',type:'compound',key:'church',site:{f:{x:200,z:0,w:12,d:22,rot:0},path:[{x:200,z:11},{x:200,z:14},{x:0,z:14}],access:{endpoint:{kind:'road',ref:0,segment:1,point:{x:0,z:14}},privatePolys:[[{x:3,z:12},{x:200,z:12},{x:200,z:16},{x:3,z:16}]]}},
+     approachClaim:{cells:[1,2],recipients:[{id:'household:hh1',due:3}]},approachPayments:{'household:hh1':3},approachPaid:true,approachCash:3,accessDonor:0,
+     abbeyRecruitment:'abbey:0',skilledOffers:[{person:{id:1},household:{id:'hh1'},state:'outward'}],skilledRecruitmentPlans:{tanner:'native household offer'},recruitmentPaid:2,_skilledOfferDay:1};
+   let reads=0;Object.defineProperty(q,'economicAccessor',{enumerable:true,get(){reads++;return {holder:'private'};}});
+   const before=JSON.stringify(Object.fromEntries(Object.entries(Object.getOwnPropertyDescriptors(q)).filter(([,d])=>Object.hasOwn(d,'value')).map(([k,d])=>[k,d.value]))),record=nativeProject(q),geometry=visualGeometry(q),privateFlags=privateNames.map(k=>VISUAL_PRIVATE.has(k));
+   const same=before===JSON.stringify(Object.fromEntries(Object.entries(Object.getOwnPropertyDescriptors(q)).filter(([,d])=>Object.hasOwn(d,'value')).map(([k,d])=>[k,d.value]))),result={record,geometry,privateNames,privateFlags,same,reads};
+   result.record.site.path[0].x=-1;result.detached=q.site.path[0].x===200;result.record.site.path[0].x=200;return result;
+ })()`,c);
+ const out=JSON.parse(JSON.stringify(raw));assert.ok(out.same&&out.detached);assert.equal(out.reads,0,'native projectors never read economic accessors');
+ assert.ok(out.privateFlags.every(Boolean),'reviewed books remain classified private');
+ for(const k of out.privateNames){assert.equal(Object.hasOwn(out.record,k),false,k+' crosses project');assert.equal(Object.hasOwn(out.geometry,k),false,k+' crosses geometry');}
+ assert.equal(Object.hasOwn(out.record,'economicAccessor'),false);assert.equal(Object.hasOwn(out.geometry,'economicAccessor'),false);
+ assert.deepEqual(out.record.site.path,[{x:200,z:11},{x:200,z:14},{x:0,z:14}]);
+ assert.deepEqual(out.record.site.f,{x:200,z:0,w:12,d:22,rot:0});
+ assert.equal(out.record.site.access.endpoint.kind,'road');assert.equal(out.record.site.access.privatePolys[0].length,4);
+ const drift=fs.readFileSync(new URL('./simulation-projection-drift.test.mjs',import.meta.url),'utf8');
+ assert.match(drift,/project:\{approachClaim:/,'paid claim explanation belongs to project completeness');
+ assert.match(drift,/approachPayments:/,'actual named receipt explanation belongs to project completeness');
 });
