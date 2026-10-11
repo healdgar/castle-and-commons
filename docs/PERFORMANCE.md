@@ -1,6 +1,6 @@
 # Simulation performance
 
-Current source `61dd0bb` integrates an actual purse/recipe-derived whole-route limit and a necessary landing–goal ellipse only under registered native founding/route provenance. Economic refusals remain per-search, with cold fallback and final lawful licence/payment checks. Its fresh original-120-second-deadline feasibility run passed 90 audited closed days with three actual abbeys, 235 projects, clean goods/faults and maximum cash residual `1.780904312909115e-10`. Day-50/day-90 tick-plus-audit CPU was `1.607689` / `2.994492` seconds; aggregate `233.482374` child CPU / `220.536047` wall seconds, load `0.32861→1.16992`, maximum RSS `1039784` KB, includes generation, audits and saves, not browser throughput. Root's 126 focused checks and full-source boot pass. The fresh same-source 150-day speed/history/save gate is running; paid native core/industry, coupled suite, worker, era and drawing/release gates remain pending. Economy calibration, legacy cadence debt and the century-per-minute target remain explicit limits.
+Current source `61dd0bb` integrates an actual purse/recipe-derived whole-route limit and a necessary landing–goal ellipse only under registered native founding/route provenance. Economic refusals remain per-search, with cold fallback and final lawful licence/payment checks. Its fresh original-120-second-deadline feasibility run passed 90 audited closed days with three actual abbeys, 235 projects, clean goods/faults and maximum cash residual `1.780904312909115e-10`. Day-50/day-90 tick-plus-audit CPU was `1.607689` / `2.994492` seconds; aggregate `233.482374` child CPU / `220.536047` wall seconds, load `0.32861→1.16992`, maximum RSS `1039784` KB, includes generation, audits and saves, not browser throughput. Root's 126 focused checks and full-source boot pass. The fresh same-source 150-day speed/history/save gate is running, with logged matches through day 60/366 raw outcomes, two abbeys and clean money/goods/faults; this is not a final pass; paid native core/industry, coupled suite, worker, era and drawing/release gates remain pending. Economy calibration, legacy cadence debt and the century-per-minute target remain explicit limits.
 
 The frozen `d016a6a` 150-day native gate was deliberately stopped for measured performance after logged matches through 60 closed days and 366 accepted raw outcomes, with two abbeys, 186 projects and clean money/goods/faults; this is neither a timeout nor a 150-day pass. Exactly readonly live partial-day-67 inspection found every native founding/approach certificate true. Its 5.687762-second live sample attributes 97.9698546% inclusive work to `armyDetour`, after the prior day-50 straight-span cost was resolved. The stopped runner used 1308.025605 child CPU / 1251.1622995 wall seconds, load 0.474609→1.0, maximum RSS 1840044 KB; these include generation, audits and saves and are not browser throughput. That frozen diagnosis motivated the funded path-length/ellipse repair now integrated in `61dd0bb`; it is not retagged as current-source evidence. Day-0/day-37 FWS remain same-source; there is no partial-day-67 snapshot or new-source retag. Full native history/save, paid core/industry, coupled suite, worker, era and drawing/release gates remain pending.
 
@@ -13,6 +13,25 @@ inheritance rules remain intact. No era presets, saved-world bank, actor culling
 The app remains a single HTML file with no build step.
 
 ## Exact fast forward (current priority, 2026-10-10)
+
+### Browser alternating-tick report, 11 October
+
+The user reports alternating apparent tick costs. This is under investigation;
+there is no measured attribution or completed optimization. In the frozen
+`61dd0bb` native 90-day log, days 48–90 have even-day median tick-plus-audit CPU
+1.186234 seconds (22 days) and odd-day median 1.171209 (21 days). Their means
+2.3365/1.8032 reflect irregular spikes rather than a strict alternating pattern.
+These native audit timings do not establish the cause of browser latency.
+
+Source review finds an actual day-parity guard in `tickCallToArms`, a Crown
+panel refresh every second 500 ms HUD update, and worker view-inflight/ack plus
+view-before-clock delivery that can affect apparent cadence. These are possible
+places to measure, not attributed causes. Browser `PERF` times foreground
+`advanceSimulation`; when `BACKGROUND` is active that call is skipped and
+`ticks` is zero, so its simulation reading is not worker tick CPU. A matched
+browser/worker trace is still needed to distinguish authoritative day work from
+presentation and delivery latency. The current native 150-day gate remains
+pending; a clean match through day 60 does not close it.
 
 The operative rural-access candidate `73237fe` matches native full graphs/RNG/raw outcomes through day49, then tick50 exceeds its unchanged120-second deadline. This is a failed gate, not a throughput result. The sole diagnostic resumes the valid same-source day37 checkpoint, applies the actual day38 tax command, audits through49 and profiles the unchanged failing tick. It again reaches the deadline:124.47 process CPU seconds for the sampled partial tick; the whole diagnostic uses146.82 child CPU/139.52 wall seconds, load0.10→0.92. No partial diagnostic world becomes a comparison baseline.
 
