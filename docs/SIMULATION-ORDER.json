@@ -54,6 +54,7 @@
       "phases": [
         "tickMarket",
         "tickAbbeyMeals",
+        "governmentMeals",
         "tickPopulation",
         "tickHouseholds"
       ]
@@ -1077,6 +1078,36 @@
       "before": "tickInstitutionFoundations",
       "after": "tickStone",
       "reason": "Remaining material forecasts include current commissioned institutional foundations before new departures."
+    },
+    {
+      "before": "tickMilitary",
+      "after": "governmentMeals",
+      "reason": "Actual early expedition and tournament food receipts prevent a second funded visitor meal."
+    },
+    {
+      "before": "tickTravel",
+      "after": "governmentMeals",
+      "reason": "Actual arrived return-leg stays identify hosted people; people in transit receive no destination meal."
+    },
+    {
+      "before": "peoplePrepare",
+      "after": "governmentMeals",
+      "reason": "Current native person and household identities identify the exact supported mouth."
+    },
+    {
+      "before": "tickMarket",
+      "after": "governmentMeals",
+      "reason": "Actual current provisions and prices fund native destination food before household consumption."
+    },
+    {
+      "before": "tickAbbeyMeals",
+      "after": "governmentMeals",
+      "reason": "Actual prior monastic hospitality receipts reduce remaining food for the same native person."
+    },
+    {
+      "before": "governmentMeals",
+      "after": "tickPopulation",
+      "reason": "Actual consumed destination board reduces the same person\u2019s native home meal and lord hall before population consumption."
     }
   ],
   "splits": [
@@ -2630,6 +2661,23 @@
         "after": "native ladeOut purchase and cargo creation",
         "then": "portPlagueDeparture",
         "reads": "Only actual coastal consignments observe departure outbreak state. Anonymous foreign merchant ships have no modeled crew exposure. The separate existing gate-closure decree remains unchanged."
+      },
+      {
+        "phase": "governmentMeals",
+        "reads": "Only actual previously scheduled living lord, claimant and burgess stays consume real paid destination food, once per native mouth. Shared actual meals precede home household/hall consumption; late justice still creates journeys, hears cases and grants consent."
+      },
+      {
+        "phase": "tickCourts",
+        "reads": "Ordinary private consolidation is daily after paid public and castle work. Actual home-owner surplus precedes a bounded native survey; retained acquired plot geometry, named owner/tenant receipts, public access and paid makers precede demolition. Completion uses the current canonical household head."
+      },
+      {
+        "phase": "tickTechnologyEquipment",
+        "first": [
+          "current native lock keeper staffing",
+          "paid windmill and lock foundation proposals",
+          "paid actual target equipment proposals"
+        ],
+        "reads": "A completed wet chamber has its real title holder and current paid exclusive keeper. Later native barge departures book finite passage service or retain actual boatman portage/time. Native crop and processing share finite current mill operator time."
       }
     ],
     "new_phase_sources": {
@@ -2638,9 +2686,11 @@
       "tickAbbeys": "Actual grants, endowments, admission, charity, saved compound commissions and due order visits after upkeep; new work starts next day.",
       "tickEstateWork": "Current titled fields/live ecology and actual paid keepers, before production/storage; no meat/fish or skill from a display read.",
       "tickEstateProjects": "Current actual receipts, costs, adopted methods, retained public access and native titled ground; paid compound commissions start next day.",
-      "tickInstitutionFoundations": "Actual current worship/harbor/rock demand, adopted methods, named payer, public frontage, native title and paid retained footprint; commissions create saved work, not completed buildings."
+      "tickInstitutionFoundations": "Actual current worship/harbor/rock demand, adopted methods, named payer, public frontage, native title and paid retained footprint; commissions create saved work, not completed buildings.",
+      "governmentMeals": "Actual named already-arrived visitors and consumed food receipts before household and own-seat hall meals; no new journeys, fees, offices or votes.",
+      "tickCourts": "Daily real purchased-home consolidation with exact acquired plot union and retained reachable public approach; bought houses remain standing until all actual work is paid."
     },
     "pending": "Combined native speed/save/worker/conservation/drawing validation.",
-    "integration_source": "Current isolated batch based on 00c7f14; native release gates pending"
+    "integration_source": "Current full operative institution batch; final native release gates pending"
   }
 }
