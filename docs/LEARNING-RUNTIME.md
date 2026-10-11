@@ -84,6 +84,15 @@ only after four actual paid contracts exist. Losing a master or room stops the
 company's teaching. The existing classroom's measured desk capacity is retained;
 masters teach different classroom periods, sharing the daily lesson fraction.
 
+A formerly paid school does not establish that its master is still available.
+University proposals check the actual primary master's presence and matching
+school office before pricing faculty, and revalidate indexed additional masters
+against their current institutional jobs. Missing, absent or reassigned people
+produce no proposal or payment. Equipment candidates apply the same primary
+master checks because worker cards can be read after population changes and
+before the next daily school closure. Readonly selection never closes a school;
+the actual school service retains that responsibility.
+
 Local indexed prospective scholars consider the nearest actual supported
 university. Before route/survey work, their family must afford a ninety-day term;
 expected real lettered earnings must exceed tuition, board and foregone work.

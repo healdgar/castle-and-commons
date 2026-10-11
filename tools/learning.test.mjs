@@ -129,3 +129,32 @@ test('indexed lodging keeps native order and revalidates current room state, cap
   assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,a);assert.equal(scans,1);for(let i=0;i<4;i++)assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,a);assert.equal(scans,1,'prospective students share one native ordered building pass');a.state='ruin';assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,b);a.state='sound';a.hh=[f.parent];f.parent.bh=a;assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,b,'a currently occupied native household slot cannot be offered');b.removed=true;assert.equal(f.eval('learningLodgingQuote(s,H[2])'),null);assert.equal(scans,1);
   const c={idx:3,arch:'inn',state:'sound',w:6,d:10,tier:0,hh:[],title:{owner:'crown'},_rent:360,s:f.s};buildings.push(c);f.W.bldList.push(c);assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,c);assert.equal(scans,2,'a real added building invalidates the structural candidate index immediately');assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,c);assert.equal(scans,2);
 });
+
+function universityProposalFixture(){
+  const f=fixture(8);f.kid.age=16;f.other.age=17;f.kid.sk[0]=.2;f.other.sk[0]=.2;f.H[7].sk[0]=.2;f.s._job.merchant.sum=9000;
+  f.eval('tickLearning()');f.C.institutionalCapability=()=>({available:true});const Q=f.eval('learningUniversityQuote(s)');assert.ok(Q,'the native paid school and three exclusive extra masters can form a supported company');
+  assert.deepEqual(Array.from(Q.staff,p=>p.id),[f.master.id,...f.H.slice(4,7).map(p=>p.id)]);return f;
+}
+const universityQuoteTruth=f=>f.eval('JSON.stringify([W.schools,W.universities,W.treasury,s.schoolIds,s.university,H.map(p=>[p.id,p.office,p.officeFor,p.schoolMaster,p.tr,means(p),Array.from(p.sk)])])');
+
+test('a university quote rejects a missing, dead, absent or reassigned primary master before pricing faculty',()=>{
+  for(const assignment of ['W._pm.delete(H[0].id)','H[0].dead=true','H[0].away={until:10,why:"errand"}','H[0].office="clerk"','H[0].schoolMaster=99','H[0].officeFor="school:99"']){
+    const f=universityProposalFixture();f.eval(assignment);const before=universityQuoteTruth(f),coins=f.coins();assert.equal(f.eval('learningUniversityQuote(s)'),null,assignment);
+    assert.equal(universityQuoteTruth(f),before,'rejection does not appoint, pay or close a school');near(f.coins(),coins);assert.equal(f.W.universities,undefined);assert.equal(f.W.schools[0].gone,false);
+  }
+});
+
+test('a university quote revalidates exclusive extra masters from the current cached native roster',()=>{
+  for(const assignment of ['H[4].estateOffice="keeper"','H[4].abbeyJob="servant"','H[4].schoolMaster=99','H[4].tutorMaster=0','H[4].study={closed:false}','H[4].apprentice={closed:false}','H[4].craft={employer:1}','H[4].away={until:10,why:"errand"}','H[4].dead=true']){
+    const f=universityProposalFixture(),index=f.s._learningIndex;assert.ok(index.masters.includes(f.H[4]));f.eval(assignment);const before=universityQuoteTruth(f),coins=f.coins();assert.equal(f.eval('learningUniversityQuote(s)'),null,assignment);
+    assert.equal(f.s._learningIndex,index,'eligibility revalidation preserves the prepared native candidate order');assert.equal(universityQuoteTruth(f),before);near(f.coins(),coins);assert.equal(f.W.universities,undefined);
+  }
+});
+
+test('readonly school equipment candidates skip a missing or unavailable master before daily school closure',()=>{
+  for(const assignment of ['W._pm.delete(H[0].id)','H[0].dead=true','H[0].away={until:10,why:"errand"}','H[0].office="clerk"','H[0].schoolMaster=99','H[0].officeFor="school:99"']){
+    const f=universityProposalFixture();vm.runInContext(['technologyEquipmentFarms','technologyEquipmentCandidates'].map(fn).join('\n'),f.C);const actual=f.eval('technologyEquipmentCandidates(s,true)');
+    assert.deepEqual(Array.from(actual,q=>q.key),['printing','clock','spectacles']);assert.ok(actual.every(q=>q.payer===f.master));f.eval(assignment);const before=universityQuoteTruth(f),coins=f.coins(),index=f.s._craftIndex;
+    assert.equal(f.eval('technologyEquipmentCandidates(s,true).length'),0,assignment);assert.equal(universityQuoteTruth(f),before);near(f.coins(),coins);assert.equal(f.s._craftIndex,index,'a readonly card does not publish a new actor index');assert.equal(f.W.schools[0].gone,false,'actual daily school service owns closure');
+  }
+});
