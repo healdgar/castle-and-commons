@@ -19693,6 +19693,7 @@ function workerCommandTarget(e){
       if(c==='s-work'){
         const [si,k,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!WORKS.some(w=>w[0]===k))throw Error('Invalid works command');return 'worker';
       }
+      if(c==='s-learning'){const [si,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||v===undefined||v.trim()===''||!Number.isFinite(+v)||+v<0)throw Error('Invalid learning command');return 'worker';}
       if(c==='s-justice'){const [si,k,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||k!=='cap'||!/^\d+(\.\d+)?$/.test(v||'')||+v>1)throw Error('Invalid justice command');return 'worker';}
       if(c==='c-eyre'){if(a!=='')throw Error('Invalid eyre command');return 'worker';}
       if(c==='c-estates'||c==='c-subsidy-rate'){if(!/^\d+(\.\d+)?$/.test(a)||!(+a>0&&+a<=1))throw Error('Invalid estates command');return 'worker';}

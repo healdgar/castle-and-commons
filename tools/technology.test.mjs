@@ -88,3 +88,11 @@ test('batch boundaries and repeated read projections do not change daily discove
   assert.equal(a.eval('JSON.stringify([W.technology,s.technology])'),b.eval('JSON.stringify([W.technology,s.technology])'));
   near(a.W.treasury,b.W.treasury);near(a.eval('means(H[0])'),b.eval('means(H[0])'));
 });
+
+
+test('patronage command is validated at the worker boundary before recording an allowance',()=>{
+  const f=fixture(),helpers=source.slice(source.indexOf('function workerCommandInt('),source.indexOf('function workerCommandArmyArg('));vm.runInContext(helpers,f.C);
+  assert.equal(f.eval('workerCommandTarget({k:"c",c:"s-learning",a:"0:20"})'),'worker');
+  for(const a of ['0:-1','0:Infinity','0:NaN','0:','999:20','0:20:extra'])assert.throws(()=>f.eval(`workerCommandTarget({k:"c",c:"s-learning",a:${JSON.stringify(a)}})`),/Invalid learning command/);
+  assert.equal(f.eval('technologyCmd("0:20")'),true);assert.equal(f.eval('s.technology.patronage[0]'),20);near(f.W.treasury,10000);
+});
