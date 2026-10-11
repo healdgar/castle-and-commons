@@ -59,6 +59,42 @@ test('additional native water-wheel geometry invalidates on actual foundation, f
 
 test('a proposed exclusive own mill cannot count its only operator as retained farm labour',()=>{const r=setup();building(r,'grange');lay(r,0,'miller');r.eval('a.workArea=1000;a.workRatio=1;a.workingHands=1;const before=a.gold;const P=abbeyMillPlan(a,s)');assert.equal(r.eval('P'),null);assert.equal(r.eval('a.industryPlans.mill'),'actual grange throughput cannot support mill costs');near(r.eval('a.gold'),r.eval('before'));assert.equal(r.eval('H[0].abbeyIndustry'),undefined);});
 
+test('shared abbey poses retain the previous eight candidates and exact signed-zero arithmetic',()=>{
+ const math=Object.create(Math);math.random=()=>assert.fail('site poses cannot draw random numbers');
+ const context=vm.createContext({Math:math});vm.runInContext(fn('abbeySitePoses'),context);
+ for(const field of [{x:20,z:20,area:10000},{x:-0,z:-0,area:0},{x:-7,z:3},{x:5,z:-9,area:1e8},{x:1,z:2,area:-1}]){
+  context.field=field;const poses=vm.runInContext('abbeySitePoses(field,12,22)',context);assert.equal(poses.length,8);
+  for(let i=0;i<8;i++){const angle=i*Math.PI/4,radius=i?Math.min(45,Math.sqrt(field.area||0)/5):0,old={x:field.x+Math.cos(angle)*radius,z:field.z+Math.sin(angle)*radius,w:12,d:22,rot:-angle};
+   for(const key of ['x','z','w','d','rot'])assert.ok(Object.is(poses[i][key],old[key]),`pose ${i} ${key}`);
+  }assert.ok(Object.is(poses[0].rot,-0));
+ }
+});
+
+test('church site proposals retain the shared pose order through native survey and legal rejection',()=>{
+ const r=setup();r.eval(`const surveyed=[];s._lay.live.compoundSite=(site,mode,owner)=>{surveyed.push({f:{...site.f},mode,owner,arch:site.arch});return site;};
+  const proposal=abbeySitePlan(s,f,'church',a.storageOwnerId,()=>false);const expected=abbeySitePoses(f,12,22);`);
+ assert.equal(r.eval('proposal'),null);assert.equal(r.eval('surveyed.length'),8);
+ assert.ok(r.eval("surveyed.every((q,i)=>q.mode==='survey'&&q.owner===a.storageOwnerId&&q.arch==='temple'&&['x','z','w','d','rot'].every(k=>Object.is(q.f[k],expected[i][k])))"));
+});
+
+test('own windmill searches beyond its occupied church centroid while retaining grant and power refusals',()=>{
+ const r=setup();r.eval([fn('obbCorners'),fn('obbOverlap')].join('\n'));building(r,'church','temple');lay(r,0,'miller');lay(r,1,'ploughman');lay(r,2,'ploughman');
+ const cash=coins(r),stores=JSON.stringify(r.s.stores),count=r.s.buildings.length;
+ r.eval(`bchurch.w=12;bchurch.d=22;bchurch.rot=0;f.area=10000;W.land.perHead=5000;a.workArea=f.area;a.workRatio=1;a.workingHands=abbeyPeople(a).filter(abbeyLay).length;s._gYield=.0001;
+  let foreign=false;const surveyed=[];occupiedGroundFields=()=>new Set([foreign?{...f,alms:null,own:'crown'}:f]);
+  // Keep the controlled site boundary; use the native separating-axis test for the actual standing church.
+  s._lay.live.compoundSite=(site,mode,owner)=>{if(mode!=='survey')throw Error('proposal must not install a building');surveyed.push({...site.f});
+   if(obbOverlap({...site.f,w:site.f.w+2.4,d:site.f.d+2.4},bchurch))return null;
+   return {...site,path:[{x:site.f.x,z:site.f.z+4.2},{x:site.f.x+15,z:site.f.z+4.2}]};};
+  const proposal=abbeyMillPlan(a,s),offset=abbeySitePoses(f,6,6)[1];`);
+ assert.ok(r.eval("proposal&&proposal.site.arch==='windmill'&&proposal.ownerId===a.storageOwnerId&&proposal.payerId===a.storageOwnerId"));
+ assert.equal(r.eval('surveyed.length'),2);assert.ok(r.eval("['x','z','w','d','rot'].every(k=>Object.is(proposal.site.f[k],offset[k]))"));
+ assert.ok(r.eval("proposal.requires.join(',')==='church,grange'&&proposal.days===240&&proposal.timber===32&&proposal.stone===0&&proposal.labour===foodYr()*8"));
+ r.eval("foreign=true;surveyed.length=0;const foreignProposal=abbeyMillPlan(a,s);");assert.equal(r.eval('foreignProposal'),null);assert.equal(r.eval('surveyed.length'),8);
+ r.eval("foreign=false;W.weather.state='storm';surveyed.length=0;const unpowered=abbeyMillPlan(a,s);");assert.equal(r.eval('unpowered'),null);assert.equal(r.eval('surveyed.length'),8);
+ assert.equal(r.s.buildings.length,count);assert.equal(JSON.stringify(r.s.stores),stores);near(coins(r),cash);assert.equal(r.eval('H[0].abbeyIndustry'),undefined);
+});
+
 
 test('private own-use mill does not veto native public windmill preflight',()=>{const r=setup();building(r,'mill','windmill');r.eval("H[2].tr='miller';H[2].craft={qualified:true,rank:'journeyman'};s.growSlots=[];price(s,'grain');price(s,'timber');let quotes=0;const nativeRecipe=constructionRecipe;constructionRecipe=(...args)=>{quotes++;return nativeRecipe(...args)};technologyWindmillProposal(s,true)");near(r.eval('quotes'),1);r.eval("s.buildings.push({arch:'windmill',state:'sound',removed:false,ownerId:'lord'});technologyWindmillProposal(s,true)");near(r.eval('quotes'),1);assert.ok(r.eval('bmill.abbey===a.storageOwnerId'));});
 
