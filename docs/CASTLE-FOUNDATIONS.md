@@ -1,19 +1,20 @@
 # Daily first-castle foundations
 
-Implemented first-foundation runtime, updated 2026-10-10 following the dependency audit for #60.
+Implemented first-foundation runtime and paid castle-upgrade clients, updated 2026-10-11 following the dependency audit for #60. They are integrated in the unpublished institution batch. All 1,965 current checks are verified across the coordinator's combined suite and affected fixture rerun; final native history/save, paid-institution, conservation, worker and drawing gates are active or pending. See [HANDOFF.md](HANDOFF.md) for release evidence and remaining limits.
 
 The existing simulation supplies ruler authority, named purses, property value and
 threat assessments, real construction wages/materials, saved daily projects,
-fortification circuits and later castle upgrades. The missing operation connects
+fortification circuits and later castle upgrades. The implemented operation connects
 those systems; it does not regenerate a settlement or add a free castle.
 
 A first foundation builds a modest tower and timber ward together. A lone keep
 has no circuit in `fortOf`, so quoting it as a defended castle would give a
-benefit the simulation cannot deliver. Before AD 1070 the tower is timber;
-afterward it may be stone. The existing ward, tower, gate, chapel and outer-wall
+benefit the simulation cannot deliver. In an initialized world the tower may be
+stone only with AD 1080-or-later stone-keep knowledge and local adoption; otherwise
+it is timber. The existing ward, tower, gate, chapel and outer-wall
 development remains separate. Initial foundations do not receive free halls,
-stables or other service buildings. Terrain-fitted motte foundations and broader
-compound development remain further work.
+stables or other service buildings. Terrain-fitted motte foundations and
+unrestricted castle precinct composition remain further work.
 
 ## Dependencies and daily order
 
@@ -57,7 +58,8 @@ compound development remain further work.
    geometry; rendering never chooses a site or pays for work. Native keep placement
    consumes the settlement's deterministic layout RNG, retained by world saves.
 
-The same 52 daily dispatcher phases remain. Site surveys are bounded and occur
+Construction uses the canonical daily dispatcher recorded in
+[SIMULATION-ORDER.md](SIMULATION-ORDER.md). Site surveys are bounded and occur
 only after live eligibility/economic bounds. Fixed-site revalidation is limited
 to active work; no whole settlement regeneration, daily maintained spatial index
 or incompletely certified cross-day proposal reuse is added.
@@ -71,14 +73,16 @@ the native timber-wall cost by fitted perimeter, and approach length. Defence us
 are valued at current native prices for the proposal and bought from actual
 sellers when work proceeds.
 
-Stone availability goes through the shared pure `constructionCapability`
-calendar seam. This preserves the existing AD 1070 gate for generated castle
-forms, first-foundation quotes, timber/motte conversions and stone-demand
-forecasting; it does not read or write a technology tree. The proposed AD 1080
-stone-keep date remains a documented compatibility mismatch pending #44; see
-[TECH-TREE.md](TECH-TREE.md).
+Stone availability goes through `constructionCapability`, which reads the
+implemented realm knowledge, local adoption and prerequisites through
+`technologyCapability` once technology is initialized. Stone-keep technique is
+gated at AD 1080; a later date alone does not unlock it. The legacy AD 1070
+calendar compatibility fallback applies only before technology initialization,
+including old isolated fixtures. Generated forms, first-foundation quotes,
+timber/motte conversions and stone demand use the same query. See
+[TECHNOLOGY-RUNTIME.md](TECHNOLOGY-RUNTIME.md) and [TECH-TREE.md](TECH-TREE.md).
 
-The tower's timber frame is calibrated at 0.06 abstract loads per cubic metre of
+The tower's timber-frame recipe quotes 0.06 abstract loads per cubic metre of
 its envelope; stone towers require timber floors/roof at 0.08 loads per square
 metre. Palisade timber is 0.25 loads per metre. The existing 150-load stone keep
 scope applies to the 13 m tower. Total paid installation duration combines the existing timber
@@ -113,9 +117,12 @@ ground and connected access; same-count terrain/road/building/title edits;
 partial purchases, zero crew and paid-day stalls; single canonical completion;
 outstanding demand and real money/inventory reconciliation; mid-project world
 save/continuation; worker projection purity and identical history at all speeds.
-This deliberately changes eligible settlements' histories. Daily paid conversion of existing castle upgrades is implemented in the working
-batch; its serialized native gates are pending. Century-scale throughput and
-paid housing conversion are not claimed.
+This deliberately changes eligible settlements' histories. Daily paid conversion
+of existing castle upgrades is implemented in the working batch; its final native
+gates remain active or pending. Century-scale throughput, construction calibration
+and universal housing sufficiency are not claimed. Opening frontage #61 retains
+recorded local shortages; exhausted bounded candidates do not prove that all
+usable land in a settlement has been tested.
 
 ## Historical references and next construction phases
 
@@ -130,7 +137,7 @@ a universal plan or a model of every 1066 timber castle.
 The supplied spread makes a useful distinction: the compact castle enclosure
 stands beside a much larger town circuit. Gates, towers and curtain stretches
 are separate building works, and the circuit responds to its site. Subsequent
-phases should model those functional components and their paid construction,
+clients model those functional components and their paid construction,
 rather than automatically placing a copied arrangement or a complete castle
 compound. The present phase builds only a first tower, palisaded yard and
 approach; it does not add a stone town wall or domestic ranges for free.
@@ -153,9 +160,12 @@ The user's compound clarification is recorded in
 [COMPOUND-BUILDINGS.md](COMPOUND-BUILDINGS.md): castles and abbeys share canonical
 component, site and paid-work mechanics, while institution authority, rights,
 accounts and economic reasons remain explicit. Buildings may serve several
-purposes concurrently. The present foundation is the first client slice;
-general compound composition and the actual abbey institution remain future
-work.
+purposes concurrently. The present first-foundation operation remains a narrow
+client. Shared paid castle upgrades and actual endowed abbey components are now
+integrated, with institution-specific accounts, land, workers and native outputs;
+they do not supply a universal precinct editor or unrestricted multi-building
+plan. Their final native operation and projection gates remain with the release
+coordinator.
 
 ## Survey cost and reviewed searches
 
