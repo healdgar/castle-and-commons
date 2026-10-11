@@ -207,3 +207,17 @@ exact matching office and invalidate canonical work rosters in late justice;
 the changed staffing affects tomorrow's ordinary production.
 
 Current institutional details are recorded in the JSON `institution_integration` contract. Paid machinery completes in `tickProjects` after today's ordinary production, so its effect starts tomorrow. Abbey dairy/wool/ordinary crop shares are allocated once; its self-worked area is excluded from the ordinary tillers' grain. Church inheritance evidence follows actual creditor recovery. Foreign holdings and funded voyages update inside `tickKnighthood`, before domestic military work; actors aboard remain absent from home. No screen read makes equipment, advances an institution, changes a title or pays an account.
+
+The own-use abbey industry adapter preserves the 59 top-level phases. Early
+`tickAbbeyWork` releases covered-day tanning bookings and assigns today's real
+qualified operators before calculating field and flock hands. `tickLivestock`
+creates skins only from actual lawful native slaughter; later `tickMarket`
+butcher slaughter supplies subsequent production days. Inside `tickEconomy`,
+public grinding and the abbey crop share one native mill workday; only public
+work creates multure claims. The actual owned hide/timber recipe and finite
+footwear wear follow crop/fish output. Paid retained mill/tannery completion
+follows production, and closing `tickAbbeys` commissions first work tomorrow.
+Actual additional hydraulic geometry crosses the draw boundary; operator jobs,
+refusal reasons and annual/lifetime counters remain worker state and detached
+inspector output. This intentionally adds the accepted own-use mechanics and
+changes affected histories; same-speed/history/save discipline still applies.

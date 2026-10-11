@@ -11,10 +11,11 @@ export function abbeyNativeStateExpression(id=null){return `(()=>{
   return {day:day(),ad:AD(),coin:accountBalances().total,flow:{...W._flow},people:W.settlements.reduce((n,s)=>n+(s.folk||[]).filter(p=>!p.dead).length,0),abbeys:A.map(a=>{
     const s=W.settlements[a.si],x=s._owners?.get(a),B=abbeyBuildings(a),P=abbeyPeople(a);
     return {id:a.id,si:a.si,key:a.storageOwnerId,name:a.name,order:a.order,gold:a.gold,formed:a.formed,
-      members:P.map(p=>({id:p.id,household:p._hh?.id,role:p.role,home:p.bh?.idx??null,housed:!!(p.bh&&!p.bh.removed&&p.bh.state==='sound'&&p.bh.abbey===a.storageOwnerId&&RESID.has(p.bh.arch)),hunger:p._hh?.hunger||0})),
-      buildings:B.map(b=>({idx:b.idx,key:b.compoundKey,arch:b.arch,state:b.state,owner:b.ownerId})),
+      qualifiedResidents:['miller','tanner'].map(job=>({job,people:(s.folk||[]).filter(p=>!p.dead&&abbeyIndustryQualified(p,job)).map(p=>({id:p.id,held:institutionalJobHeld(p),away:awayNow(p),status:p.status,age:ageYrs(p)}))})),
+      members:P.map(p=>({id:p.id,household:p._hh?.id,role:p.role,home:p.bh?.idx??null,housed:!!(p.bh&&!p.bh.removed&&p.bh.state==='sound'&&p.bh.abbey===a.storageOwnerId&&RESID.has(p.bh.arch)),hunger:p._hh?.hunger||0,trade:p.tr,priorTrade:p.abbeyPriorTrade||null,qualified:!!p.craft?.qualified,job:p.abbeyJob||null,industry:p.abbeyIndustry??null})),
+      buildings:B.map(b=>({idx:b.idx,key:b.compoundKey,arch:b.arch,state:b.state,owner:b.ownerId,operator:b.abbeyOperator??null,poweredDay:b.poweredDay?{...b.poweredDay}:null,millWater:b.millWater?{...b.millWater}:null,windExposure:b.windExposure??null})),
       fields:abbeyFields(a).map(f=>({k:f.k,owner:f.own,worker:f.wk,state:f.state,area:f.area})),
-      goods:{held:{...x?.held},sale:{...x?.sale},animals:{...x?.animals}},crop:a.crop||0,foodGiven:a.foodGiven||0,wages:a.wages||0,
+      goods:{held:{...x?.held},sale:{...x?.sale},animals:{...x?.animals}},crop:a.crop||0,foodGiven:a.foodGiven||0,wages:a.wages||0,industryPlans:{...(a.industryPlans||{})},industryTotal:{...(a.industryTotal||{})},prev:a.prev?{...a.prev}:null,millGround:a.millGround||0,hidesTanned:a.hidesTanned||0,barkUsed:a.barkUsed||0,leatherMade:a.leatherMade||0,leatherUsed:a.leatherUsed||0,servants:(a.servants||[]).filter(p=>!p.dead).map(p=>({person:p.id,job:p.abbeyJob,paidDay:p.abbeyPaidDay,industry:p.abbeyIndustry??null,wage:p.abbeyWage,qualified:!!p.craft?.qualified})),
       projects:(W.projects||[]).filter(q=>q.adapter==='abbey'&&q.ownerId===a.storageOwnerId).map(q=>({id:q.id,key:q.key,dead:!!q.dead,status:q.status,reason:q.reason,worked:q.worked||0,days:q.days,done:q.done||0,timberInstalled:q.timberInstalled||0,stoneInstalled:q.stoneInstalled||0}))};})};})()`;}
 
 export function abbeyNativeEligibilityExpression(order='cistercian'){
@@ -22,7 +23,7 @@ export function abbeyNativeEligibilityExpression(order='cistercian'){
   return `(()=>{const order=${JSON.stringify(order)},rule=ABBEY_ORDERS[order],out=[];
     for(let hi=0;hi<W.houses.length;hi++){const h=W.houses[hi],head=h&&notableById(h.head);for(let si=0;si<W.settlements.length;si++){const s=W.settlements[si];if(s.owner!==hi)continue;
       const cap=institutionalCapability(s,order),fields=(s.furl||[]).filter(f=>abbeyGrantable(f,hi,si,rule));
-      out.push({hi,si,name:s.name,pious:!!head?.alive&&!!(head.traits?.includes('pious')||(head.sk?.[KS]||0)>=.5),surplus:(hi?h?._netA:W._crNetA)||0,gold:means(houseAcct(hi)),reserve:hostTarget(hi)*4,available:cap.available,reason:cap.reason,fields:fields.length,project:!!abbeyFoundPlan(hi,si,order)});}}
+      out.push({hi,si,name:s.name,pious:!!head?.alive&&!!(head.traits?.includes('pious')||(head.sk?.[KS]||0)>=.5),surplus:(hi?h?._netA:W._crNetA)||0,gold:means(houseAcct(hi)),reserve:hostTarget(hi)*4,available:cap.available,reason:cap.reason,fields:fields.length,qualifiedResidents:['miller','tanner'].map(job=>({job,people:(s.folk||[]).filter(p=>!p.dead&&abbeyIndustryQualified(p,job)).map(p=>({id:p.id,held:institutionalJobHeld(p),away:awayNow(p),status:p.status,age:ageYrs(p)}))})),project:!!abbeyFoundPlan(hi,si,order)});}}
     return out;})()`;
 }
 

@@ -326,7 +326,9 @@
     "winterFeed|collection:_owners": 1,
     "workOf|collection:buildings": 1,
     "workOf|collection:streets": 1,
-    "yearOfFolk|collection:folk": 3
+    "yearOfFolk|collection:folk": 3,
+    "millWheelBuildings|collection:buildings": 1,
+    "abbeyIndustryCandidate|helper:workers_": 1
   },
   "review": "Worker cutover: inspectorCard replaces showInspect scans; visualSettlement transports building IDs only on layout change; installPresentation reattaches display objects; groundPick scans projected churchyards on click; refreshOverlayNow sorts numeric property-value results. Court grazing: one owner pass only when the existing monthly livestock reckoning finds overstocking, plus one holding pass; no per-family search, persistent index or new daily census. Assize receipts use payCrafts' existing payee loop.",
   "reviewedMoves": [
@@ -453,5 +455,56 @@
       "tickGrowthHousing|helper:workers_",
       "tickGrowthHousing|collection:buildings"
     ]
+  },
+  "review20261011AbbeyIndustries": {
+    "baseCommit": "7460fbcffb81bfdfd1ee2a055a75acdce249c298",
+    "isolatedSourceSha256": "ad3f91962465dd3344bccec0d7aeecf818fd99e60a4e95f7c3d66850dd1dce0f",
+    "reviewedFunctionSha256": {
+      "slaughterSkins": "a2ef1d682174fb36bd92afd3b78529b738875c585c16c28be584dd52e20f82cd",
+      "herdTake": "ba7669bf3022d2a6819791abd648aebb407375b09bd54ffa43513ef875f6194b",
+      "abbeyCompoundValidate": "28cf377ee55b1ac7198f001dcdc503ac9aea6085b90fe1799ee94749b6132757",
+      "abbeyCompoundComplete": "c3af894308970b94ced1d0c82ac62bc0564ca71c831d205e6af2aaeb11977d0e",
+      "abbeySitePlan": "5d6a8b9275c337dd6dbfe2ebf2188da2ad71484de32d7cb321427147d96e23e3",
+      "abbeyCommission": "3cc00b8d1cfcfd39be21dd124fa381e2d41e20ac5371d3e54ba983ebc492bf64",
+      "abbeyYear": "3e53350f13860299736ac8de8a409aab10064bba5368cb93b6c8fbfd7d19d08c",
+      "abbeyAdmit": "312aec1480453ddf38ae95e3910b83ffaa028bfeceeb0c78134f97aa632bedb8",
+      "abbeyStaff": "106225e31b7d492fd0742e0f71656a4cc852bacd6b8954e2cfe7f9bd9169c885",
+      "abbeyIndustryNeeded": "390b8019787551a9abbefaf475d002f7f7a4ab620557b90840bdf0e6aeb34ae9",
+      "abbeyIndustryQualified": "9e6a59f880e92c02bde0754ac78a43ee6c031300fc0d05c9705c9c49bc845d48",
+      "abbeyIndustryCandidate": "01ef562a38d40b772bf96730000708480e4249a14898683e21046e569be1597e",
+      "abbeyIndustryOperator": "381bb80a70ed77926f7654410322a7fd337e6d6a8073354a22a14745425997fc",
+      "abbeyIndustryPrepare": "f6181744cd8bebee4486414fae9a435305cca1607ec1c56174ac331ffffdcba5",
+      "abbeyMillPower": "a87ce3a013885c3f66fa9c9dc93e5c3a204f7049163d51d9736c1498f0863108",
+      "abbeyMillPlan": "3b8e88c0c9b0dd5d330e4a80f20a44640470ab93f1964653b343f110f1b39684",
+      "abbeyLeatherMouths": "d0d62e97e2a1b4e65aa803f54bceeb16e7242c06ae42d4f67fee4e07f5bd5061",
+      "abbeyTanningTarget": "eb74aef07a4831ab54421db7292143e643346c0dbb33267f3bc31341cb5fdde0",
+      "abbeyTanneryPlan": "272e9cd69aa12eb2a0d61ebbaf3ce68c4cdc1fbb740f97b29ae099857436c444",
+      "abbeyIndustryInput": "260b0aad2c7b73e689b7a969dee2e6e4d58f2d65e6c2cc02b1944ceb6aafa5d8",
+      "abbeyIndustryCount": "79309fe65ab8140fd9841a3a3f61984bac66b987a62192616d957f1175014076",
+      "abbeyIndustries": "2df7cd967fc70e513135d761f479e89f022c266f61bf69d1286c4269ce07c117",
+      "abbeyWork": "d5a8bee53fb7585c3326c492033651cd01b45947e5b6c082d314f2fcc1c9e5cc",
+      "tickAbbeyWork": "82114a982acb8086f8e8840b676602bb2f24c599457b362c552cf1f3e570b251",
+      "abbeyCrop": "fb3e336d457e52e96bfd7fe18cf920cc0c4df648c779d19d0e3e654803bfaa84",
+      "abbeyGrantWork": "c484e6c15c831bc618378776b100e0928009b1f89712bbcf752b12419efa52f9",
+      "abbeyHerdHands": "9752454b401090dd070bb9285c2185a69093642942b8a9167dfb940c73895c2d",
+      "abbeySummary": "a628eeb38b3f0eb722bd4fd7001daab8b2a0eddfedbc4542ab3dc16f521cd433",
+      "technologyBenefit": "a9fbe202f3c810d73da161cf41bbb8e46e04ef06dca90082628f1df25a5fcd2d",
+      "technologyGrindingPower": "4e23fbd5345fee8faab3c72af1ab5bce33bdd31b1129ecaddfeb8b1c7272cb10",
+      "technologyGrindingDay": "f57eb242aafc2d4939d2422a1b8260a4da684ae6f1e3b4107e51e40770664738",
+      "technologyMultureOffer": "aa0fa8fefc9087b2a4de78444d466ee80fabd06cd05cb1f4a2e3fcf857859854",
+      "technologyGrindingCash": "c2d74968a74df588948222472c1342de7af45530fce4c2a86a7cba1e721c000e",
+      "millWheelBuildings": "27efa13b7b605f40b0d1ac1befae9666664198bedcdaae739bc3fecccdf2d8e3",
+      "millWheelKey": "44d65ce9eaba2eb15225a073a9cfd1a6428cd164ed77feb48d229602ab9c2e35",
+      "rebuildMillWheels": "f5a0813dd9f74ed209d9602db937cba478d9d303ea1141c320313c267efbc0b2",
+      "storageSiteQuote": "a8e944bd641af141f6d3a0108989e4755c28b072e0f7062c4d3af488ff5a4062",
+      "technologyWindmillProposal": "48b594b4da0db07118f0f67b5148dfce4a9b779b7b74f9e9cff1e2245c4c427a"
+    },
+    "reviewedKeys": [
+      "millWheelBuildings|collection:buildings",
+      "abbeyIndustryCandidate|helper:workers_"
+    ],
+    "geometry": "millWheelBuildings enumerates actual additional native water mills only when drawing the hydraulic key/rebuild; no authoritative decision or transaction-wide actor traversal.",
+    "vacancy": "abbeyIndustryCandidate reuses the existing ordered native workers_ household roster only for a qualified vacant own-use operation or funded proposal/adoption assessment. Existing assigned operators use actual member/servant identities; the native land-title exclusion retains actual current claims. No extra per-purchase buyer/seller/lender scan.",
+    "boundary": "Actual millWater/wheel/feeder geometry remains projected. Jobs, proposal refusals and actual annual/cumulative production counters stay private and cross only detached worker inspector output. No new top-level daily phase."
   }
 }
