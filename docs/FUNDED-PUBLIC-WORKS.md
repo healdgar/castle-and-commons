@@ -1,0 +1,19 @@
+# Paid public works
+
+Public street, quarter, square and curtain decisions use the existing saved `type:'plan'` channel. Their native streets, places and circuits are installed only after a retained plan has paid its actual ground, affected householders, material sellers and workers. A market charter changes the legal classification of a settlement; it does not create four streets for free.
+
+`planProjectCommission(D,payer,account?)` stores plain surveyed geometry and fixed native building references. `payer` is the settlement's actual political authority; the optional `account` is the existing lord or murage account which finances an automatic work. It does not create a civic purse. `planProjectValidate`, `planProjectCompensate` and `tickPlan` are source functions reconstructed with the normal simulation source, not saved callbacks.
+
+Each affected building has its own fixed structural/title snapshot and named owner/tenant receipt rows. A household's canonical account remains the recipient after its head changes. The project transfers the quoted money to those accounts, and retains the standing building until actual work is completed. An owner financing work on their own property requires no cash transfer to themselves. A new obstruction or a changed priced structure stops the work; completion does not pull down an unpriced neighbour.
+
+The exact ground helper checks the full native footprint and all intersected titles. Only completed receipts create a paid footprint licence. The licence burdens the same exact ground after lawful parcel succession; it neither moves to new ground nor transfers the whole agricultural parcel. Another worker's holding remains subject to the existing native permission check.
+
+Recipes quote labour, working days, timber and stone once. Bridge-bearing streets require actual timber. Squares require actual paving stone. Timber curtains require timber, stone curtains require stone and scaffolding timber, and adopted construction equipment adds its physical timber before its fixed labour factor is applied. The pending quantities enter ordinary material demand exactly once. Installed material does not advance work without actual wages paid to the native crew.
+
+`live.laneSurvey` reuses the settlement's existing public streets, mouths, terrain-following walk, fortification rules and native structure collision checks. It returns one fixed connected lane without installing it or changing the settlement's reach. Ordinary lane need and town-wall eligibility are evaluated daily. Working days determine the pace of construction; the old 90-day extension retry and annual free-lane path are gone. Failed surveys are not cached across days.
+
+Completed paid streets and places carry native `paidPublic` flags. Mask reconstruction derives their occupied ground from those native references. Components for completed curtains refer to the operative native defensive circuit and add no second defense, housing or stock. Plans cross to the foreground as plain fixed geometry and progress; payer accounts, compensation receipts and native demolition references stay in the worker.
+
+`tools/funded-public-works.test.mjs` is a small account fixture with controlled layout validation. Six cases exercise native cash conservation, real material sellers, actual crew absence, completion timing, named compensation and changed structure/route rejection. It does not prove native map-generation fit, saved-world restoration or presentation transport; those checks remain in the root's serialized combined gate.
+
+Legacy automatic institutional foundations, backyard building and street-shortening decisions are being migrated next. They are not represented as completed by this document. Existing legacy plan records without a fixed funded recipe are abandoned rather than continuing crewless work under an assumed payment history. Direct-era opening generation remains separate from recorded paid construction.

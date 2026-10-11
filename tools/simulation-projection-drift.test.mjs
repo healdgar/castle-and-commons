@@ -43,7 +43,7 @@ const WORKER_ONLY={
   army:{flag:'foreground flags are its own',target:'a settlement index when set'},
   caravan:{m:'merchant account',drv:'driver',crew:'crew',storageCargo:'cargo ledger (its id is the render key)'},
   dragon:{target:'the town it means to raid'},
-  project:{payer:'the actual construction account',before:'the native fabric and ownership snapshot used for validation',slot:'the native frontage candidate held by a paid house project',occupant:'the native household taking a paid refit',groundClaim:'paid ground licence and receipt recipients',landPayments:'actual named landowner receipts',reason:'a sentence when set',spec:'the foundation construction bill; surveyed site geometry crosses'},
+  project:{payer:'the actual construction account',account:'the public work\'s native murage or lord account',hit:'native buildings individually priced for a compensated public work',compensations:'fixed native building snapshots and named owner/tenant receipts',circuit:'native defensive circuit identity; its fixed rad and surveyed site cross',cuts:'native wall demolition references used at paid completion',keep:'native street pieces retained when a paid work closes a lane',before:'the native fabric and ownership snapshot used for validation',slot:'the native frontage candidate held by a paid house project',occupant:'the native household taking a paid refit',groundClaim:'paid ground licence and receipt recipients',landPayments:'actual named landowner receipts',reason:'a sentence when set',spec:'the foundation construction bill; surveyed site geometry crosses'},
   road:{groundClaim:'the paid public right of way licence',open:'the untrimmed open-country path; path and drawn cross'},
   banditCamp:{king:'a name when set'},
 };

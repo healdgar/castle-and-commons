@@ -21,3 +21,5 @@ Eleven small controlled source fixtures check native material receipts, native w
 A fully paid ground licence records its exact full native mask cells only after all required named receipts complete. Lawful parcel succession retains that footprint permission without a second compensation payment; a moved footprint into different cells is rejected. Ordinary owner projects capture the actual canonical household account, so a change of its head alone does not discard the funded contract.
 
 Remaining construction migration in this batch's successor: town-history public works, new public lanes/extent, private backyard infill and other legacy instant institutional clients. The unused legacy `addBuildingLive` implementation is also due to retire. Ordinary frontage houses currently use already surveyed native frontage; they do not manufacture a free new street when frontage is exhausted.
+
+Public lanes, town curtains and brush works now use the paid retained channel described in [FUNDED-PUBLIC-WORKS.md](FUNDED-PUBLIC-WORKS.md). A completed roof repair also cancels any previously queued native fall for that empty house.
