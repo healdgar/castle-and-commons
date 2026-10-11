@@ -3946,10 +3946,10 @@ function yearOfFolk(s,si){ // deaths by age and frailty; schooling; weddings
     if(hungry&&a<16)p.fed-=0.04; // a hungry childhood stunts
     educate(p,a,s,false);}
   const men=[],women=[];
-  for(const p of s.folk)if(!p.sp&&!p.outlawCampId){const a=ageYrs(p);if(p.sx==='m'&&a>=18&&a<45)men.push(p);else if(p.sx==='f'&&a>=16&&a<38)women.push(p);}
+  for(const p of s.folk)if(!p.sp&&!p.outlawCampId&&p.abbey==null){const a=ageYrs(p);if(p.sx==='m'&&a>=18&&a<45)men.push(p);else if(p.sx==='f'&&a>=16&&a<38)women.push(p);}
   for(const w of women){if(frand()>0.4)continue;
     let pool=men,far=null;
-    if(!pool.length||frand()<0.12){const o=nearestOther(s,si);if(o){far=o;pool=(o.folk||[]).filter(p=>p.sx==='m'&&!p.sp&&ageYrs(p)>=18&&ageYrs(p)<45);}}
+    if(!pool.length||frand()<0.12){const o=nearestOther(s,si);if(o){far=o;pool=(o.folk||[]).filter(p=>p.sx==='m'&&!p.sp&&p.abbey==null&&ageYrs(p)>=18&&ageYrs(p)<45);}}
     if(!pool.length)continue;
     let best=null,bs=-1e9;for(let t=0;t<4;t++){const m=pool[Math.floor(frand()*pool.length)];if(m.sp||m.fam===w.fam)continue;
       const d=attraction(w,m)+attraction(m,w)-0.5*Math.abs(standing(m)-standing(w));if(d>bs){bs=d;best=m;}} // mutual liking, and families that match
@@ -3959,10 +3959,10 @@ function yearOfFolk(s,si){ // deaths by age and frailty; schooling; weddings
     if(far)for(const p of bridal)if(p.si===si&&householdAccount(p)===householdAccount(best)){const i=s.folk.indexOf(p);if(i>=0){removeAt(s,i);journey(p,si,W.settlements.indexOf(far),'bride');}}
     const mi=men.indexOf(best);if(mi>=0)men.splice(mi,1);}
   for(const w of s.folk){ // affairs: the bold and the heedless stray; now and then a child comes of it
-    if(w.sx!=='f'||w.dead||w.outlawCampId||day()-w.lb<450)continue;const a=ageYrs(w);if(a<16||a>=40)continue;
+    if(w.sx!=='f'||w.dead||w.outlawCampId||w.abbey!=null||day()-w.lb<450)continue;const a=ageYrs(w);if(a<16||a>=40)continue;
     const lust=0.012*Math.exp(0.45*trait(w,GB)-0.5*trait(w,GD)-(w.sp?0.3*trait(w,GWa):0))*(w.sp?1:1.5);
     if(frand()>=lust)continue;
-    let best=null,bv=-1e9;for(let t=0;t<5;t++){const m=s.folk[Math.floor(frand()*s.folk.length)];if(!m||m.outlawCampId||m.sx!=='m'||m===w.sp||m.fam===w.fam)continue;const ma=ageYrs(m);if(ma<18||ma>55)continue;
+    let best=null,bv=-1e9;for(let t=0;t<5;t++){const m=s.folk[Math.floor(frand()*s.folk.length)];if(!m||m.outlawCampId||m.abbey!=null||m.sx!=='m'||m===w.sp||m.fam===w.fam)continue;const ma=ageYrs(m);if(ma<18||ma>55)continue;
       if(frand()>0.5*Math.exp(0.4*trait(m,GB)-0.4*trait(m,GD)))continue;const v=attraction(w,m);if(v>bv){bv=v;best=m;}}
     if(best&&bv>0.3&&frand()<0.3)naturalChild(s,si,w,best,null);}
   houseFolk(s);}
@@ -3977,10 +3977,10 @@ function tickFolk(){
   const mig=[];
   Ss.forEach((s,si)=>{ // too many souls for the place: to the host, down the road, or to the churchyard
     let k=-diff[si];if(k<=0)return;
-    if(s._levy>0){const lv=pickK(s.folk.filter(p=>p.sx==='m'&&!p.dead&&!p.outlawCampId&&ageYrs(p)>=16&&ageYrs(p)<42),Math.min(k,Math.round(s._levy)),()=>1);
+    if(s._levy>0){const lv=pickK(s.folk.filter(p=>p.sx==='m'&&!p.dead&&!p.outlawCampId&&p.abbey==null&&ageYrs(p)>=16&&ageYrs(p)<42),Math.min(k,Math.round(s._levy)),()=>1);
       for(const p of lv){removeAt(s,s.folk.indexOf(p));p.home=si;W.levies.push(p);}k-=lv.length;s._levy=Math.max(0,s._levy-lv.length);}
     const go=Math.round(k*clamp(need/Math.max(1,spare),0,1)*((s.unrest||0)>50||(s.prosperity||50)<35?0.8:0.5));
-    const leave=pickK(s.folk,go,p=>{if(p.outlawCampId||p.sp?.outlawCampId||[...(p._hh?.members||[])].some(q=>q.outlawCampId))return 0;const a=ageYrs(p);return a>=16&&a<35?(p.sp?1:3):0.05;});
+    const leave=pickK(s.folk,go,p=>{if(p.abbey!=null||p.outlawCampId||p.sp?.outlawCampId||[...(p._hh?.members||[])].some(q=>q.outlawCampId))return 0;const a=ageYrs(p);return a>=16&&a<35?(p.sp?1:3):0.05;});
     for(const p of leave){const i0=s.folk.indexOf(p);if(i0<0)continue;removeAt(s,i0);mig.push(p);if(p.sp&&!p.sp.outlawCampId){const w=p.sp;if(w.si===si&&frand()<0.8){const j=s.folk.indexOf(w);if(j>=0){removeAt(s,j);mig.push(w);}}}} // a spouse already gone with their partner is not sent twice
     const die=pickK(s.folk,k-leave.length,p=>{const a=ageYrs(p);return (a<2?3:a>55?1+(a-55)/5:0.25)*Math.exp(-0.5*trait(p,GV));});
     for(const p of die){removeAt(s,s.folk.indexOf(p));dropPerson(p,ageYrs(p)<2?'Died in infancy':`Died at ${s.name}, aged ${Math.floor(ageYrs(p))}${s.hunger>0.2?', in a hungry time':s.infected>0?', of the pestilence':''}`);}});
@@ -4051,7 +4051,7 @@ function householdFieldsBind(p,h,keys=HH_FIELDS){for(const k of keys)Object.defi
 function householdAccount(p){if(!p||p.merc)return null;if(p.household)return p;if(p._hh)return p._hh;
   const q=oldHouseholdHead(p),h=q._hh||newHousehold(q);bindHousehold(q,h);if(p!==q)bindHousehold(p,h);return h;}
 function householdHead(p){const h=householdAccount(p);return h&&h.head&&!h.head.dead?h.head:p;}
-function accountOwner(x){return x&&x.gn!==undefined&&!x.merc?householdAccount(x):x;}
+function accountOwner(x){if(typeof x==='string'){const c=corpOf(x);if(c)return c;if(x.startsWith('household:'))return W.households?.get(x.slice(10))||x;}return x&&x.gn!==undefined&&!x.merc?householdAccount(x):x;}
 function householdHeadsChanged(s){if(typeof marketTradeIndexInvalidate==='function')marketTradeIndexInvalidate();s._householdsD=-1;s._hdC=null;s._tcY=-1;s._hbC=null;}
 function householdsOf(s){if(s._householdsD===day()&&s._householdsN===(s.folk||[]).length)return s.households||[];
   if(s._householdsD>=0&&s._householdsV===(W._folkRevision||0)&&s._householdsN===(s.folk||[]).length){s._householdsD=day();return s.households||[];}
@@ -5254,7 +5254,7 @@ function consumeOwned(s,who,g,q){if(commodityActive(s)&&!BEASTS.includes(g))retu
 function consumeOwnStock(s,who,g,q){if(commodityActive(s)&&!BEASTS.includes(g)){const v=commodityConsume(s,who,g,q);return v+commodityConsume(s,who,g,q-v,'sale');}let got=consumeOwned(s,who,g,q);const L=mkt(s,g);let v=Math.max(0,Math.min(q-got,L.get(who)||0,s.stores[g]||0));if(v>0){if(s.storage&&!BEASTS.includes(g))v=storageConsumeSale(s,who,g,v);const left=(L.get(who)||0)-v;if(left>0)L.set(who,left);else{L.delete(who);rsv(s,g).delete(who);}if(!s.storage||BEASTS.includes(g))s.stores[g]-=v;got+=v;}return got;}
 function herdProduce(s){const owners=[...(s._owners||new Map())].filter(([,x])=>BEASTS.some(g=>x.animals[g]>0)),owned={};for(const g of BEASTS)owned[g]=owners.reduce((n,[,x])=>n+(x.animals[g]||0),0);
   const lord=lordAcct(s),remainder=Object.fromEntries(BEASTS.map(g=>[g,Math.max(0,(s.stores[g]||0)-(owned[g]||0))]));
-  for(const[o,x]of [...owners,[lord,{animals:remainder}]]){const H=x.animals,food=(H.cattle||0)*MILK.cattle+(H.sheep||0)*MILK.sheep,wool=(H.sheep||0)*FLEECE; /* milk and cheese, counted as grain until there is a dairy good (#53); the pigs' meat comes at Martinmas (martinmas) */s.stores.grain+=food;s.stores.wool=(s.stores.wool||0)+wool;
+  for(const[o,x]of [...owners,[lord,{animals:remainder}]]){const H=x.animals,care=o?.kind==='abbey'&&typeof abbeyHerdCare==='function'?abbeyHerdCare(o,s):1,food=((H.cattle||0)*MILK.cattle+(H.sheep||0)*MILK.sheep)*care,wool=(H.sheep||0)*FLEECE*care; /* milk and cheese, counted as grain until there is a dairy good (#53); the pigs' meat comes at Martinmas (martinmas) */s.stores.grain+=food;s.stores.wool=(s.stores.wool||0)+wool;
     if(o&&o.household)addHeld(s,o,'grain',food);else offer(s,'grain',o,food);offer(s,'wool',o,wool);}
   for(const[o]of owners){if(!o||!o.household)continue;const wool=(mkt(s,'wool').get(o)||0)+(pantry(s,o).wool||0),q=consumeOwnStock(s,o,'wool',wool*0.08);s.stores.cloth=(s.stores.cloth||0)+q*0.5;addHeld(s,o,'cloth',q*0.5);}}
 function winterFeed(s,snow){herdSync(s);const owners=[...(s._owners||new Map())].filter(([,x])=>BEASTS.some(g=>x.animals[g]>0)),totals={};for(const g of BEASTS)totals[g]=owners.reduce((n,[,x])=>n+(x.animals[g]||0),0);
@@ -5297,17 +5297,17 @@ function ownerShares(w,seen=new Set()){if(w&&w.dead&&w._estateShares)return w._e
 function transferOwnership(from,shares){shares=shares.flatMap(([to,f])=>ownerShares(to).map(([x,q])=>[x,f*q]));for(const s of W.settlements){const M=s._owners,x=M&&M.get(from);if(!x)continue;if(commodityActive(s)){commodityInheritance(s,from,shares);continue;}if(s.storage){storageTitles(s);for(const lot of s.storage.matching({owner:from})){const qty=lot.qty;let left=qty;for(let i=0;i<shares.length;i++){const[to,f]=shares[i],q=i===shares.length-1?left:Math.min(left,qty*f);if(q>0){s.storage.transfer(lot,to,q,lot.availability);left-=q;}}}}const snapshot={held:{...x.held},sale:{...x.sale},reserve:{...x.reserve},animals:{...x.animals}};storageClaimReplace(x,'held',{});storageClaimReplace(x,'sale',{});x.reserve={};x.animals={};
   for(const[to,f]of shares){const y=stockOf(s,to),had={};for(const g in snapshot.reserve)had[g]=y.sale[g]||0;for(const type of ['held','sale','animals'])for(const g in snapshot[type]){const dest=type==='animals'&&!(to&&to.household)?'sale':type;y[dest][g]=(y[dest][g]||0)+snapshot[type][g]*f;}for(const g of Object.keys(snapshot.held).concat(Object.keys(snapshot.sale)))storageTitleKnownDirty(s,g);for(const g in snapshot.reserve){const r=costBlend(y.reserve[g],had[g],snapshot.reserve[g],(snapshot.sale[g]||0)*f);if(r>0)y.reserve[g]=r;}}
   }}
-function propertyRightsResolve(id){const p=typeof id==='number'&&id>=0?((W._pm||folkIndex()).get(id)||folkIndex().get(id)):null;return p?{owner:householdAccount(p),beneficiary:p}: {owner:id,beneficiary:null};}
+function propertyRightsResolve(id){const p=typeof id==='number'&&id>=0?((W._pm||folkIndex()).get(id)||folkIndex().get(id)):null;if(p)return{owner:householdAccount(p),beneficiary:p};const o=accountOwner(id);return{owner:o,beneficiary:o&&o.household?o.head||null:null};}
 function bindPropertyRights(s){const resolve=propertyRightsResolve;
   if(s._rightsF!==(s.furl||[]).length){for(const f of s.furl||[])if(!f.title){f.title={own:resolve(f.own),work:resolve(f.wk)};
     furlongRightsBind(f,resolve);}s._rightsF=(s.furl||[]).length;}
   if(s._rightsB!==(s.buildings||[]).length){for(const b of s.buildings||[]){if(Object.getOwnPropertyDescriptor(b,'ownerId')?.get)continue;if(!b.title)b.title=resolve(b.ownerId);
     buildingRightsBind(b,resolve);}s._rightsB=(s.buildings||[]).length;}}
 function furlongRightsBind(f,resolve){
-    Object.defineProperty(f,'own',{configurable:true,enumerable:true,get(){return this.title.own.beneficiary?this.title.own.beneficiary.id:this.title.own.owner;},set(id){this.title.own=resolve(id);}});
-    Object.defineProperty(f,'wk',{configurable:true,enumerable:true,get(){const o=this.title.work.owner;return o&&o.household?o.head?o.head.id:-1:o;},set(id){this.title.work=resolve(id);}});}
+    Object.defineProperty(f,'own',{configurable:true,enumerable:true,get(){const r=this.title.own;return r.beneficiary?r.beneficiary.id:r.owner?.storageOwnerId||r.owner;},set(id){this.title.own=resolve(id);}});
+    Object.defineProperty(f,'wk',{configurable:true,enumerable:true,get(){const o=this.title.work.owner;return o&&o.household?o.head?o.head.id:-1:o?.storageOwnerId||o;},set(id){this.title.work=resolve(id);}});}
 function buildingRightsBind(b,resolve){
-    Object.defineProperty(b,'ownerId',{configurable:true,enumerable:true,get(){return this.title.beneficiary?this.title.beneficiary.id:this.title.owner;},set(id){this.title=resolve(id);}});}
+    Object.defineProperty(b,'ownerId',{configurable:true,enumerable:true,get(){return this.title.beneficiary?this.title.beneficiary.id:this.title.owner?.storageOwnerId||this.title.owner;},set(id){this.title=resolve(id);}});}
 function ownershipTick(){W._pm=folkIndex();for(const s of W.settlements){householdsOf(s);initOwnership(s);bindPropertyRights(s);}if(day()%30===0)ownersRetire();}
 // A household that has ended (no member left, its estate passed to its successors) and holds nothing in any place, nor has a load on
 // the road, leaves every place's owners: nothing is given to it again (its heirs take in its stead: acct, means, ownerShares), and every
@@ -5327,14 +5327,15 @@ function ownersRetire(){if(!W.households)return;let road=null;
 function houseFolk(s){
   const homes=(s.buildings||[]).filter(b=>RESID.has(b.arch)&&b.state==='sound'&&!b.removed),cap=new Map();for(const b of homes){cap.set(b,capOf(b));b.hh=[];}
   const heads=new Set();for(const p of s.folk||[])heads.add(householdHead(p));
-  const later=[];for(const h of heads){const b=h.bh;if(b&&cap.get(b)>0){cap.set(b,cap.get(b)-1);b.hh.push(h);}else later.push(h);}
+  const eligible=(b,h)=>b.abbey?b.abbey===((h.abbey!=null||h.corrodian!=null)?'abbey:'+(h.abbey??h.corrodian):null):h.abbey==null;
+  const later=[];for(const h of heads){const b=h.bh;if(b&&cap.get(b)>0&&eligible(b,h)){cap.set(b,cap.get(b)-1);b.hh.push(h);}else later.push(h);}
   const shared=typeof lvReadNative==='function'&&lvReadNative('home');let F=null;
   let rr=0;for(const h of later){const want=TRADE_ARCH[h.tr];let b=null;
-    if(want)b=homes.find(x=>x.arch===want&&cap.get(x)>0);
+    if(want)b=homes.find(x=>x.arch===want&&cap.get(x)>0&&eligible(x,h));
     if(!b){const wk=workOf(h,s);let bs=-1e9;const st=Math.max(1,Math.floor(homes.length/40)),o0=(h.id>>>0)%st; // a household looks over some forty houses with room, not every one in a great town
-      for(let ii=o0;ii<homes.length;ii+=st){const x=homes[ii];if(!(cap.get(x)>0))continue;const v=(shared?homeScore(h,s,x.x,x.z,x.st,wk,F||(F=lvField(s))):homeScore(h,s,x.x,x.z,x.st,wk))+(TILLERS.has(h.tr)&&(x.arch==='house'||x.arch==='longhouse'||x.arch==='cot')?0.4:0);if(v>bs){bs=v;b=x;}}} // the nearest to its work it can afford
-    if(!b)b=homes.find(x=>cap.get(x)>0)||null; // none with room among those it looked at: the first that has any
-    if(!b&&homes.length)b=homes[(rr++)%homes.length]; // no room left: they lodge with another household
+      for(let ii=o0;ii<homes.length;ii+=st){const x=homes[ii];if(!(cap.get(x)>0)||!eligible(x,h))continue;const v=(shared?homeScore(h,s,x.x,x.z,x.st,wk,F||(F=lvField(s))):homeScore(h,s,x.x,x.z,x.st,wk))+(TILLERS.has(h.tr)&&(x.arch==='house'||x.arch==='longhouse'||x.arch==='cot')?0.4:0);if(v>bs){bs=v;b=x;}}} // the nearest to its work it can afford
+    if(!b)b=homes.find(x=>cap.get(x)>0&&eligible(x,h))||null; // none with room among those it looked at: the first that has any
+    if(!b&&homes.length){const free=homes.filter(x=>eligible(x,h));if(free.length)b=free[(rr++)%free.length];} // no room left: they lodge with another household
     if(b){cap.set(b,(cap.get(b)||0)-1);b.hh.push(h);}h.bh=b;}
   for(const b of homes)if(b.hh.length)b._vac=0; // lived in: its empty years count afresh
   if(typeof resetVacantResidentials==='function')resetVacantResidentials(s,homes.filter(b=>!(b.hh&&b.hh.length)));
@@ -5734,7 +5735,7 @@ function sheepHolder(P,f){if(!P||f.dom!==P.si||f.lord!==P.lord||!ARABLE.has(f.ki
 function pasturePays(P,f,q=sheepHolder(P,f)){return !!(q&&q.past>0&&(1-0.33*0.6)*Math.min(q.sheep,q.past/10000/LU.sheep)*P.net/q.past>P.grain);} // ploughing returns some stubble grazing; the fleece and milk lost must be worth more than the corn gained
 function chooseLandUse(s,si,PM){ // once a year: corn, hay or a freeholder's grazing, by what the land yields and the market wants; the freeholder keeps his flock, his bread and the means to winter the lambs
   if(!s._gYield||!W.land||!(s._pxN>=12))return;const pg=s._pxY.grain,ph=s._pxY.hay; /* a farmer goes by a year of the prices the market found, not a first guess (#21: the opening prices, set from stocks the world began with, made hay dear and corn cheap, and half the ploughland went to meadow in the first year) */if(!(pg>0)||!(ph>0))return;const gA0=s._gYield*0.87*360,E=s._dAvg||{},wetOf=f=>f.n?clamp(f.fl/f.n/0.35,0,1):0,hY=f=>12/1e4*(0.6+0.4*wetOf(f));
-  const T=(s.furl||[]).filter(f=>f.dom===si&&f.lord===s.owner&&f.state===LS.TILLED&&f.area);let haySup=0,grSup=0;for(const f of T){if(f.kind===LK.MEADOW)haySup+=hY(f)*f.area;else if(ARABLE.has(f.kind))grSup+=gA0*f.area;}
+  const T=(s.furl||[]).filter(f=>f.alms==null&&f.dom===si&&f.lord===s.owner&&f.state===LS.TILLED&&f.area);let haySup=0,grSup=0;for(const f of T){if(f.kind===LK.MEADOW)haySup+=hY(f)*f.area;else if(ARABLE.has(f.kind))grSup+=gA0*f.area;}
   const Y=s._dYr||E,hayDem=(Y.hay||0)*12,grDem=Math.max((Y.grain||0)*12,(s.pop||0)*NEED.grain*360); // a farmer lays down meadow for the year's want, not the autumn's; and the place wants at least its own people's bread, bought or grown (#21: corn wanted was only what the market sold, so families eating their own corn never called a meadow back to the plough)
   if(ph*12/1e4>pg*gA0)for(const f of T.filter(f=>ARABLE.has(f.kind)&&f.kind!==LK.DEMESNE).sort((a,b)=>wetOf(b)-wetOf(a))){if(haySup>=hayDem)break;const hA=hY(f)*ph,gA=gA0*pg;if(hA-gA<=gA/4)continue; // hay pays, and the town is short of it: the year's gain must pay for the season the strip lies out while the sward takes (#23: a hand-set threshold before)
     f.kind0=f.kind;f.kind=LK.MEADOW;writeFurlong(f);G.fenceDirty=true;haySup+=hY(f)*f.area;grSup-=gA0*f.area;}
@@ -9909,6 +9910,7 @@ function syncArmyFlags(){
 function armyDisplayPos(a){return G.armyPositions?.get(a)||armySimPos(a);}
 function projectStructures(){
   if(!G.bodies||!G.roofs)return;
+  if(G.hydraulicsDirty){projectLakeWater();G.hydraulicsDirty=false;}
   const mills=G.buildingsDirty||G.structuresDirty||G.buildingDirty?.size>0;
   if(mills&&G.wheels&&millWheelKey()!==G.millKey)rebuildMillWheels(); // a mill founded, moved, burned or pulled down since: its wheel and race follow
   if(G.labelsDirty){buildLabels();G.labelsDirty=false;}
@@ -9919,6 +9921,12 @@ function projectStructures(){
     for(const o of W.settlements){featWalls(o);for(const b of o.buildings)if(b.state!=='gone'&&!b.removed)featBuilding(b);}featRoads();F.mute=false;
     featDirty(-SIZE/2,-SIZE/2,SIZE/2,SIZE/2);G.structuresDirty=false;
   }
+}
+function projectLakeWater(){ // Native reservoir geometry only; opening or drawing water produces no fish or rights.
+  if(G.lakes){scene.remove(G.lakes);disposeTree(G.lakes);G.lakes=null;}const A=newAcc();
+  for(const s of W.settlements)if(s.lake){const L=s.lake,base=A.p.length/3;for(const q of L.poly){A.p.push(q.x,L.y,q.z);A.n.push(0,1,0);C1.setHex(0x356a8f);A.c.push(C1.r,C1.g,C1.b);}for(let i=1;i<L.poly.length-1;i++)A.i.push(base,base+i+1,base+i);
+    if(G.feat){const P=L.poly,x=P.map(p=>p.x),z=P.map(p=>p.z);featRect(Math.min(...x),Math.min(...z),Math.max(...x),Math.max(...z),(i,wx,wz)=>{if(inPoly(P,wx,wz))G.feat.src[0][i]=1;});}}
+  if(A.i.length){G.lakes=accMesh(A,waterMaterial({vertexColors:true,side:THREE.DoubleSide}));scene.add(G.lakes);}if(G.feat)featDirty(-SIZE/2,-SIZE/2,SIZE/2,SIZE/2);
 }
 function houseTints(){ // the land edged in each lord's own colour; the territory map uses colours chosen to be told apart at a glance
   if(!(W.land&&G.landView?.uni))return;const terr=overlayMode==='territory';
@@ -10488,7 +10496,7 @@ function contextAnchor(pk){
   if(!pk)return null;if(BACKGROUND&&pk._anchor)return pk._anchor;
   let p=null;
   switch(pk.type){
-    case 'court':case 'settlement':case 'wall':case 'beast':p=(pk.s||W.settlements[pk.si])?.pos;break;
+    case 'abbey':case 'court':case 'settlement':case 'wall':case 'beast':p=(pk.s||W.settlements[pk.si])?.pos;break;
     case 'building':p=pk.b;break;
     case 'churchyard':p=pk.yard;break;
     case 'event':p=pk.ev?.pos;break;
@@ -10675,7 +10683,8 @@ function inspectorCard(pk,full=false){
   full=!!full;
   const row=(k,v)=>`<div class="row${String(v).replace(/<[^>]*>/g,'').length>26?' long':''}"><span>${k}</span><b>${v}</b></div>`; // a long value reads left to right under itself, not squeezed against its label
   const name=detailNaming();
-  if(pk.type==='court'){title.innerHTML='The hallmote';sub.textContent=pk.s.name;h=courtCard(pk.s,W.settlements.indexOf(pk.s));}
+  if(pk.type==='abbey'){title.innerHTML=esc(pk.abbey.name);sub.textContent=W.settlements[pk.abbey.si]?.name||'';h=abbeyCard(pk.abbey);}
+  else if(pk.type==='court'){title.innerHTML='The hallmote';sub.textContent=pk.s.name;h=courtCard(pk.s,W.settlements.indexOf(pk.s));}
   else if(pk.type==='settlement'){
     const s=pk.s,house=W.houses[s.owner],population=detailPopulation(s);
     setHTML(title,`<img src="${sigURL(s.owner)}">`+esc(s.name));
@@ -10683,6 +10692,7 @@ function inspectorCard(pk,full=false){
     if(full)h+=detailJumps([['detail-accounts','Accounts'],['detail-stores','Stores'],['detail-buildings','Buildings'],['detail-households','Households'],['detail-families','Families'],...(s.history?.length?[['detail-history','History']]:[])]);
     h+=row('Population',Math.round(population).toLocaleString());
     {const note=openingCapacityNote(s);if(note)h+=row('Opening housing',note);}
+    {const A=(W.abbeys||[]).filter(a=>!a.gone&&a.si===W.settlements.indexOf(s));if(A.length)h+=row('Religious houses',A.map(a=>`<a class="nm" data-nm="${a.storageOwnerId}">${esc(a.name)}</a>`).join(', '));}
     if(s.cult)h+=row('Tongue',CULT[s.cult].name);
     h+=row('Prosperity',Math.round(s.prosperity));
     h+=row('Unrest',Math.round(s.unrest));
@@ -10978,6 +10988,7 @@ function inspectorPickCode(pk){
   if(pk.type==='building')return buildingReference(pk.b,pk.b.s);
   if(pk.type==='churchyard')return graveyardReference(pk.b,pk.s);
   if(pk.type==='court')return 'court:'+si;
+  if(pk.type==='abbey')return pk.abbey.storageOwnerId;
   if(pk.type==='notable')return'n'+pk.n.id;
   if(pk.type==='person')return'p'+pk.p.id;
   if(pk.type==='army')return'a'+pk.a.id;
@@ -11009,7 +11020,7 @@ function workerInspectionCode(code){
   const forms={
     building:/^\d+:-?\d+(?:\.\d+)?:-?\d+(?:\.\d+)?:[a-z][a-z0-9_-]*$/,
     graveyard:/^\d+:-?\d+(?:\.\d+)?:-?\d+(?:\.\d+)?$/,
-    court:/^\d+$/,street:/^\d+:\d+$/,land:/^\d+:\d+$/,camp:/^\d+$/,
+    abbey:/^\d+$/,court:/^\d+$/,street:/^\d+:\d+$/,land:/^\d+:\d+$/,camp:/^\d+$/,
     family:/^\d+$/,household:/^\d+$/,surname:/^[^\u0000-\u001f]*$/,
     good:/^-?\d+:[a-z][a-z0-9_-]*$/,trade:/^-?\d+:[a-z][a-z0-9_-]*$/,structure:/^-?\d+:[a-z][a-z0-9_-]*$/,
     choose:/^[A-Za-z0-9_%-]+$/,road:/^\d+$/,river:/^\d+$/,wall:/^\d+:(?:town|outer|ward|bailey|hill|motte)$/,
@@ -11519,7 +11530,7 @@ function claimFurlong(f,si,colonists){
   (s.furl||(s.furl=[])).push(f);
 }
 function tillTo(s,need){ // today's ploughland: the nearest open land, and if too little, woods cleared long ago
-  const own=(s.furl||[]).filter(f=>ARABLE.has(f.kind)&&f.area>0);
+  const own=(s.furl||[]).filter(f=>f.alms==null&&ARABLE.has(f.kind)&&f.area>0);
   own.sort((a,b)=>(a.state===LS.WOOD?500:0)+dist2d(a.x,a.z,s.pos.x,s.pos.z)-((b.state===LS.WOOD?500:0)+dist2d(b.x,b.z,s.pos.x,s.pos.z)));
   let got=0;for(const f of own){if(got>=need)break;if(f.state===LS.WOOD&&f.kind===LK.FIELD)shapeFurlong(f,s,LK.CLOSE);f.state=LS.TILLED;got+=f.area;}
 }
@@ -12116,10 +12127,10 @@ function tickLand(){ // monthly: the countryside follows the people
     s._needLand=tilled<need; // (a place that needs no more land does not stand in a neighbour's way)
     if(tilled<need&&!s.siegeBy){ // take in more land: old pasture, open waste, scrub, then the wood; beyond the bounds if need be
       const clearing=s.clearUntil>now,bonus={[LS.PASTURE]:0.8,[LS.WILD]:0.5,[LS.SCRUB]:clearing?0.4:-0.2,[LS.WOOD]:clearing?0.3:-0.9}; // paid assarters take the wood and scrub first
-      let c=own.filter(f=>ARABLE.has(f.kind)&&f.area>0&&bonus[f.state]!==undefined&&f.lord===s.owner&&!(f.state===LS.PASTURE&&pasturePays(grazing,f))); // profitable freehold grazing is already worked, not idle land to plough again (#51)
+      let c=own.filter(f=>f.alms==null&&ARABLE.has(f.kind)&&f.area>0&&bonus[f.state]!==undefined&&f.lord===s.owner&&!(f.state===LS.PASTURE&&pasturePays(grazing,f))); // profitable freehold grazing is already worked, not idle land to plough again (#51)
       const reach=domReach(s)*1.5*(clearing?1.35:1);
       const nearest=f=>!W.settlements.some(o=>o!==s&&o._needLand&&o.owner===s.owner&&dist2d(f.x,f.z,o.pos.x,o.pos.z)<d(f)*0.85); // waste goes to whichever of the lord's places needs it and lies nearer; a neighbour with land enough does not bar the way
-      c=c.concat(F.filter(f=>f.ar>=f.n*0.3&&d(f)<reach&&(f.lord<0||f.lord===s.owner)&&(f.dom<0||f.dom!==si&&(f.state===LS.WILD||f.state===LS.WOOD)&&ARABLE.has(f.kind))&&nearest(f)));
+      c=c.concat(F.filter(f=>f.alms==null&&f.ar>=f.n*0.3&&d(f)<reach&&(f.lord<0||f.lord===s.owner)&&(f.dom<0||f.dom!==si&&(f.state===LS.WILD||f.state===LS.WOOD)&&ARABLE.has(f.kind))&&nearest(f)));
       const score=f=>-d(f)/350+(f.dom!==si?(f.fo>f.ar*0.5?-0.9:0.5)-(f.dom<0?0.7:1):bonus[f.state])+0.6*f.fa/Math.max(1,f.n); // the lord grants his waste to the nearer village
       c.sort((a,b)=>score(b)-score(a));
       {const ease={[LS.PASTURE]:0.8,[LS.WILD]:0.6,[LS.SCRUB]:0.4,[LS.WOOD]:0.25};let w=0;for(const g of c)if(g.state!==LS.TILLED&&g.state!==LS.BURNT)w+=g.area*(ease[g.state]||0.3)*Math.exp(-d(g)/1500);s.wasteHa=w;} // what is left to take, as food it could grow once cleared
@@ -12139,7 +12150,7 @@ function tickLand(){ // monthly: the countryside follows the people
       if(!f&&!s.landShort){s.landShort=now;
         if(s.kind!=='village'||s.pop>120)emit('trade',3,s.pos,vary('no_land',[()=>`There is no more land to plough about ${s.name}; its younger sons look elsewhere.`,()=>`The plough has reached the last of the land about ${s.name}, and its younger sons look elsewhere.`,()=>`Its younger sons look elsewhere: there is no more land to plough about ${s.name}.`,()=>`About ${s.name} every furlong is under the plough and there is no more land to be had; its younger sons look elsewhere.`,()=>`There is no land left to plough about ${s.name}, and its younger sons look elsewhere.`]));}
     }else{ // more ploughland than the farming households can work: the farthest and poorest field goes back to grass, if letting it go still leaves them enough
-      const c=own.filter(f=>ARABLE.has(f.kind)&&f.state===LS.TILLED&&f.lord===s.owner).sort((a,b)=>d(b)-d(a)).slice(0,10);
+      const c=own.filter(f=>f.alms==null&&ARABLE.has(f.kind)&&f.state===LS.TILLED&&f.lord===s.owner).sort((a,b)=>d(b)-d(a)).slice(0,10);
       const f=wpick(c,f=>d(f)/350-0.6*f.fa/Math.max(1,f.n),0.35);
       if(f&&tilled-f.area>=need)setFurlong(f,LS.PASTURE);
     }
@@ -12250,7 +12261,7 @@ function landValue(f){ // a furlong's worth: what it yields as it lies, and how 
 }
 function prodOf(s){ // a year's output by good (the same sums the economy runs daily)
   const r=s.res||{},smiths=(s.buildings||[]).filter(b=>b.arch==='smithy'&&b.state==='sound').length;
-  return {grain:(s._gYield&&s._bearA!=null?s._gYield*s._bearA*(s.ploughF??1):(r.farm||0)*0.92)*(typeof technologyFarmYield==='function'?technologyFarmYield(s):1)*0.87*360,fish:(r.fish||0)*0.8*360,timber:(r.forest||0)*0.05*360,ore:(r.ore||0)*0.05*360,tools:smiths*20,
+  return {grain:(s._gYield&&s._bearA!=null?s._gYield*s._bearA*(s.ploughF??1):(r.farm||0)*0.92)*(typeof technologyFarmYield==='function'?technologyFarmYield(s):1)*0.87*360,fish:(r.fish||0)*0.8*360+(typeof abbeyFishRate==='function'?abbeyFishRate(s)*360:0),timber:(r.forest||0)*0.05*360,ore:(r.ore||0)*0.05*360,tools:smiths*20,
     cloth:(s._dyers||0)*0.5*0.8*360+(s.stores.sheep||0)*0.012*12*0.55+(s.buildings||[]).filter(b=>b.arch==='shop').length*3,wool:(s.stores.sheep||0)*0.012*12,sheep:(s.stores.sheep||0)*HERDR.sheep,cattle:(s.stores.cattle||0)*HERDR.cattle,horses:(s.stores.horses||0)*HERDR.horses,swine:(s.stores.swine||0)*HERDR.swine,meat:(s.stores.swine||0)*LITTER,wine:s.kind==='capital'?0.7*360:(s.furl||[]).filter(f=>f.kind===LK.VINE&&f.state===LS.TILLED).length*12};
 }
 /* ---------------- beasts: every place keeps sheep, cattle, horses and swine on what its land can feed.
@@ -12290,12 +12301,12 @@ function woolWant(s){return looms(s)*6+(s.kind==='village'?2:5);}
    salts the rest; the lord's meat is salted and sold. The butchers of a town buy beasts when their meat pays for them (provision). */
 function herdOwners(s,k){ // whose the place's beasts of a kind are: each family's byre, and the lord's (what of the herd no family owns and no dealer has in the pens for sale)
   const out=[],lord=lordAcct(s);let fam=0,sold=0;
-  for(const[o,x]of s._owners||[]){const a=x.animals[k]||0;if(o&&o.household&&a>0){out.push([o,a]);fam+=a;}}
+  for(const[o,x]of s._owners||[]){const a=x.animals[k]||0;if(o&&(o.household||o.storageOwnerId)&&a>0){out.push([o,a]);fam+=a;}}
   for(const[w,v]of mkt(s,k).ownedEntries())if(w!==lord)sold+=v;
   const l=Math.max(0,(s.stores[k]||0)-fam-sold);if(l>0)out.push([lord,l]);return out;}
 function herdTake(s,o,k,q,pens=false){ // an owner's beasts go to the shambles: a family's from its byre (or a dealer's from his pens at the market), the lord's from his pens and then from what of the herd is no one else's
   q=Math.min(q,s.stores[k]||0);if(!(q>0))return 0;
-  if(o&&o.household&&!pens){const H=stockOf(s,o).animals;q=Math.min(q,H[k]||0);H[k]-=q;}
+  if(o&&(o.household||o.storageOwnerId)&&!pens){const H=stockOf(s,o).animals;q=Math.min(q,H[k]||0);H[k]-=q;}
   else{const L=mkt(s,k),v=Math.min(q,L.get(o)||0);if(pens)q=v;if(v>0){const left=L.get(o)-v;if(left>0)L.set(o,left);else{L.delete(o);rsv(s,k).delete(o);}}}
   if(!(q>0))return 0;s.stores[k]-=q;if(s._herdLast)s._herdLast[k]=s.stores[k];return q;}
 function herdCull(s,k,q,fresh=false){ // beasts killed from the whole herd, each owner's by his share of it; the carcasses are their owners' meat
@@ -12579,6 +12590,125 @@ function simInit(seed=true){
   if(seed)seedFolk(); // every soul in every place, with a name, a family, a nature and a schooling
 }
 
+/* ABBEY_INSTITUTION_BEGIN */
+// A charter grants existing property and silver. It creates neither monks nor produce.
+const ABBEY_ORDERS={cistercian:{name:'Cistercian',from:1128,self:true},benedictine:{name:'Benedictine',from:850,self:false},augustinian:{name:'Augustinian',from:1100,self:false}};
+function abbeyOrderAvailable(s,order){const o=ABBEY_ORDERS[order];if(!o)return false;return typeof institutionalCapability==='function'?institutionalCapability(s,order).available:AD()>=o.from;}
+function abbeyField(f){const a=f&&f.alms!=null&&(W.abbeys||[])[f.alms];return a&&!a.gone&&f.own===a.storageOwnerId?a:null;}
+const abbeyLay=p=>p?.role==='lay brother'||p?.role==='lay sister';
+function abbeyPeople(a){return (a.members||[]).filter(p=>!p.dead&&p.abbey===a.id&&p.si===a.si);}
+function abbeyCapacity(a){const s=W.settlements[a.si];return (s?.buildings||[]).filter(b=>!b.removed&&b.state==='sound'&&RESID.has(b.arch)&&b.ownerId===a.storageOwnerId).reduce((n,b)=>n+capOf(b),0);}
+function abbeyBuildings(a){return (W.settlements[a.si]?.buildings||[]).filter(b=>!b.removed&&b.state==='sound'&&b.ownerId===a.storageOwnerId);}
+function abbeyFood(a,s=W.settlements[a.si]){const x=s?._owners?.get(a);return x?(x.held.grain||0)+(x.sale.grain||0)+(x.held.fish||0)+(x.sale.fish||0):0;}
+function abbeyMouths(a,s=W.settlements[a.si]){let n=0;for(const p of abbeyPeople(a))n+=p._hh?.population.get(s)||1;for(const c of a.corrodies||[]){const h=c.household;if(h.members.size&&[...h.members].some(p=>!p.dead))n+=h.population.get(s)||0;}return n;}
+function abbeyReserve(a,s=W.settlements[a.si]){return abbeyMouths(a,s)*FOOD*360;}
+function abbeyStockGift(s,a,h,g,q){const x=stockOf(s,a),H=stockOf(s,h);q=Math.max(0,Math.min(q,x.held[g]||0));if(!(q>0))return 0;
+  if(commodityActive(s)){commodityTransfer(s,a,h,g,q,'held','held');return q;}
+  if(s.storage){let left=q;for(const l of [...s.storage.matching({owner:a,good:g,availability:'held'})]){const v=Math.min(left,l.qty);if(v>0){s.storage.transfer(l,accountOwner(h),v,'held');left-=v;}if(!(left>0))break;}q-=left;}
+  x.held[g]-=q;H.held[g]=(H.held[g]||0)+q;return q;}
+function abbeyFeed(a,s){const P=abbeyPeople(a),targets=P.map(p=>p._hh).filter(Boolean);for(const c of a.corrodies||[])if(c.household.members.size&&[...c.household.members].some(p=>!p.dead))targets.push(c.household);
+  const unique=[...new Set(targets)],L=pantry(s,a);let mouths=0;for(const h of unique)mouths+=h.population.get(s)||0;
+  // The rule forbids four-footed meat. Real grain and fish feed the same native mouths once.
+  for(const g of ['grain','fish']){const need=Math.max(0,mouths*NEED[g]*30-(L[g]||0));if(need>0){purchase(s,g,a,need);commodityCreditPurchase(s,a,g,purchase.got);}}
+  let given=0;for(const h of unique){let q=Math.max(0,(h.population.get(s)||0)*FOOD-((pantry(s,h).grain||0)+(pantry(s,h).fish||0)));for(const g of ['fish','grain']){const v=abbeyStockGift(s,a,h,g,q);q-=v;given+=v;if(!(q>0))break;}}
+  a.foodGiven=(a.foodGiven||0)+given;return given;}
+function abbeyEligiblePerson(s,p,sex='m'){if(!p||p.dead||p.role||p.outlawCampId||p.office||p.sp||p.sx!==sex||p.away||p.abbey!=null)return false;const age=ageYrs(p),h=householdAccount(p);return age>=16&&age<55&&h&&!(h.assets._debt>0)&&![...h.members].some(q=>q!==p&&!q.dead&&(q.ma===p||q.pa===p||q.sp===p))&&!W.settlements.some(t=>(t.furl||[]).some(f=>f.wk===p.id||f.own===p.id));}
+function abbeyAdmit(a,p,lay=false){const s=W.settlements[a.si];if(!s||!abbeyEligiblePerson(s,p,a.sex||'m')||abbeyPeople(a).length+(a.corrodies||[]).filter(c=>c.household.members.size).length>=abbeyCapacity(a))return false;
+  const old=householdAccount(p),n=old.population.get(s)||old.members.size,share=old.members.size>1?1/old.members.size:1,gift=Math.max(0,(old.assets.w||0)-n*foodYr())*share;
+  if(!(gift>=foodYr()/12)||abbeyFood(a,s)<abbeyReserve(a,s)+FOOD*360)return false;
+  transfer(old,a,gift,'entry gift',s);const own=householdPortion(p,0);transferOwnership(own,[[a,1]]); // a professed adult's own chattels, never the parents' estate
+  if(means(own)>0)transfer(own,a,means(own),'profession gift',s);
+  p.abbey=a.id;p.role=lay?(a.sex==='f'?'lay sister':'lay brother'):a.sex==='f'?'nun':'monk';p.tr=lay?'ploughman':'clerk';p.own=true;own.abbey=a.id;(a.members||(a.members=[])).push(p);
+  householdHeadsChanged(s);householdsOf(s);life(p,`Entered ${a.name} as ${p.role}`);abbeyChooseLeader(a);houseFolk(s);return true;}
+function abbeyChooseLeader(a){const P=abbeyPeople(a),current=P.find(p=>p.id===a.leader);if(current)return current;const R=P.filter(p=>!abbeyLay(p));R.sort((p,q)=>(q.sk?.[KS]||0)+(q.sk?.[KL]||0)-(p.sk?.[KS]||0)-(p.sk?.[KL]||0)||p.id-q.id);const leader=R[0];a.leader=leader?.id??null;if(leader){leader.role=a.sex==='f'?'abbess':'abbot';life(leader,`Chosen ${leader.role} of ${a.name}`);}return leader||null;}
+function abbeyGroundOwned(a,site){const ground=compoundGround(site);if(!ground.cells.length)return false;const fields=[...occupiedGroundFields(ground.cells)];return fields.length>0&&fields.every(f=>abbeyField(f)===a);}
+function abbeyCompoundValidate(q,s,C){const a=corpOf(q.ownerId);if(!a||a.gone||a.si!==q.si||C.ownerId!==q.ownerId)return{ok:false,reason:'the abbey no longer holds this charter',abandon:true};if(s.siegeBy)return{ok:false,reason:'the site is besieged'};
+  if(!abbeyGroundOwned(a,q.site))return{ok:false,reason:'the abbey no longer holds the granted ground',abandon:true};if(q.site.hydraulic)return abbeyPondClear(s,q.site)?{ok:true}:{ok:false,reason:'the pond would flood an occupied site or road'};if(!s._lay?.live?.compoundSite(q.site,'validate',q.ownerId,q))return{ok:false,reason:'the fixed footprint or approach is obstructed'};return{ok:true};}
+function abbeyCompoundComplete(q,s,C){if(!abbeyCompoundValidate(q,s,C).ok)return false;const a=corpOf(q.ownerId);if(q.site.hydraulic)return abbeyPondComplete(q,s,C,a);const b=s._lay.live.compoundSite(q.site,'complete',q.ownerId,q);if(!b)return false;
+  b.ownerId=a.storageOwnerId;b.abbey=a.storageOwnerId;b.inst=true;b.storagePublic=false;b.compoundKey=q.key;if(b.arch==='temple')b.nm=a.name+' church';else b.nm=a.name+' '+q.title;
+  bindPropertyRights(s);markOccupiedGround(s,compoundGround(q.site).polys);syncLive(s);compoundBindBuilding(C,b,q.purposes);updateBuildingInstance(b);G.detDirty=true;
+  if(q.key==='church')a.church=b.idx;if(q.key==='grange')a.grange=b.idx;if(q.key==='school')a.school={building:b.idx,ownerId:a.storageOwnerId};emit('trade',3,b,`${a.name} completes ${q.title}, paid from its own chest.`);return true;}
+function abbeySitePlan(s,f,key,ownerId,legal){const specs={church:{arch:'temple',w:12,d:22,tier:0,hm:1,labour:foodYr()*12,days:360,timber:40,stone:0,purposes:['worship']},residence:{arch:'longhouse',w:24,d:8,tier:1,hm:1,labour:foodYr()*8,days:180,timber:32,stone:0,purposes:['residential','domestic']},grange:{arch:'grange',w:12,d:10,tier:0,hm:1,labour:STORAGE_TYPES.grange.cost,days:STORAGE_TYPES.grange.days,timber:STORAGE_TYPES.grange.timber,stone:0,purposes:['storage','productive']},hospital:{arch:'hospital',w:20,d:10,tier:0,hm:1,labour:foodYr()*10,days:270,timber:36,stone:0,purposes:['hospitality','charity']},school:{arch:'hall',w:12,d:8,tier:0,hm:1,labour:foodYr()*6,days:180,timber:24,stone:0,purposes:['school']}};
+  const spec=specs[key];if(!spec||!s._lay?.live?.compoundSite)return null;
+  for(let i=0;i<8;i++){const a=i*Math.PI/4,r=i?Math.min(45,Math.sqrt(f.area||0)/5):0,site=s._lay.live.compoundSite({key,arch:spec.arch,tier:spec.tier,hm:spec.hm,f:{x:f.x+Math.cos(a)*r,z:f.z+Math.sin(a)*r,w:spec.w,d:spec.d,rot:-a}},'survey',ownerId);if(site&&(!legal||legal(site)))return{adapter:'abbey',key,ownerId,payerId:ownerId,title:key==='residence'?'a residential range':key==='hospital'?'a guest house and almonry':key==='school'?'a school':key==='church'?'the abbey church':'a grange',site,timber:spec.timber,stone:spec.stone,labour:spec.labour,days:spec.days,purposes:spec.purposes,requires:key==='church'?[]:['church']};}return null;}
+function abbeyFoundPlan(hi,si,order='cistercian',sex='m'){const s=W.settlements[si],h=W.houses[hi],head=h&&notableById(h.head),who=houseAcct(hi),rule=ABBEY_ORDERS[order];if(!s||s.owner!==hi||s.siegeBy||!rule||!abbeyOrderAvailable(s,order)||h?.exiled||(W.abbeys||[]).some(a=>!a.gone&&a.founder===hi))return null;
+  if(!head||!head.alive||!(head.traits?.includes('pious')||(head.sk?.[KS]||0)>=0.5))return null;const surplus=(hi?h?._netA:W._crNetA)||0,reserve=hostTarget(hi)*4,minimum=foodYr()*40+STORAGE_TYPES.grange.cost+(STORAGE_TYPES.grange.timber+32)*price(s,'timber');if(!(surplus>0)||means(who)-reserve<minimum)return null;
+  const F=(s.furl||[]).filter(f=>abbeyGrantable(f,hi,si,rule)).sort((a,b)=>dist2d(a.x,a.z,s.pos.x,s.pos.z)-dist2d(b.x,b.z,s.pos.x,s.pos.z)||a.k-b.k);
+  const key='abbey:'+((W.abbeys||[]).length);for(const f of F.slice(0,12)){const yieldY=(s._gYield||soilYield(s))*f.area*0.87*360*price(s,'grain');if(!(yieldY>0&&yieldY<surplus*12))continue;const plan=abbeySitePlan(s,f,'church',key,site=>[...occupiedGroundFields(compoundGround(site).cells)].every(g=>abbeyGrantable(g,hi,si,rule)));if(!plan)continue;const granted=new Set([f]);let legal=true;
+    for(const g of occupiedGroundFields(compoundGround(plan.site).cells)){if(!abbeyGrantable(g,hi,si,rule)){legal=false;break;}granted.add(g);}if(!legal||[...granted].reduce((n,g)=>n+g.area*(s._gYield||soilYield(s))*0.87*360*price(s,'grain'),0)>=surplus*12)continue;
+    const gift=plan.labour+plan.timber*price(s,'timber')+minimum;if(means(who)-reserve<gift)continue;return{hi,si,order,sex,fields:[...granted],plan,gift};}return null;}
+function abbeyFound(P){if(!P)return null;const s=W.settlements[P.si],fresh=abbeyFoundPlan(P.hi,P.si,P.order,P.sex);if(!fresh)return null;P=fresh;
+  const a=corpFound('abbey',{name:s.name+' Abbey',si:P.si,founder:P.hi,order:P.order,sex:P.sex,formed:day(),members:[],religious:0,layBrothers:0,servants:[],corrodies:[],granges:[],charter:{selfWorked:ABBEY_ORDERS[P.order].self,titheExempt:ABBEY_ORDERS[P.order].self},roll:{rows:[],over:{}}});
+  for(const f of P.fields){const was=courtHolding(f);f.alms=a.id;f.own=a.storageOwnerId;f.wk=a.storageOwnerId;f.ten='alms';f.title={own:propertyRightsResolve(a.storageOwnerId),work:propertyRightsResolve(a.storageOwnerId)};furlongRightsBind(f,propertyRightsResolve);a.granges.push(f.k);writeFurlong(f);courtLand(s,f,was,'free alms');}
+  transfer(houseAcct(P.hi),a,P.gift,'abbey endowment',s);stockOf(s,a);const C=compoundEnsure(s,'abbey',a.storageOwnerId);a.compound=C.id;compoundProjectCommission(s,C,P.plan);
+  emit('trade',5,s.pos,`${P.hi?W.houses[P.hi].name:'The Crown'} grants ${P.fields.length} furlong${P.fields.length===1?'':'s'} in free alms and ${Math.round(P.gift)} gold to found ${a.name}, a ${ABBEY_ORDERS[P.order].name} ${P.sex==='f'?'nunnery':'house'}. Its church is built as the workers are paid.`);return a;}
+function abbeyCommission(a){const s=W.settlements[a.si],C=(s?.compounds||[]).find(c=>c.id===a.compound);if(!C||s.siegeBy||(W.projects||[]).some(q=>!q.dead&&q.type==='compound'&&q.ownerId===a.storageOwnerId))return false;const B=abbeyBuildings(a),have=key=>B.some(b=>b.compoundKey===key);let key=!have('church')?'church':!have('residence')?'residence':!have('grange')?'grange':!have('hospital')&&abbeyPeople(a).length>2?'hospital':!have('school')&&typeof abbeySchoolEligibility==='function'&&abbeySchoolEligibility(a,s).available?'school':null;
+  if(!key){const P=abbeyPondPlan(a,s);return P?compoundProjectCommission(s,C,P):false;}const reserve=abbeyReserve(a,s)*Math.min(price(s,'grain'),price(s,'fish')),F=a.granges.map(k=>W.land.F[k]).filter(f=>abbeyField(f)===a);for(const f of F){const P=abbeySitePlan(s,f,key,a.storageOwnerId,site=>abbeyGroundOwned(a,site));if(!P||!abbeyGroundOwned(a,P.site))continue;if(means(a)<P.labour+P.timber*price(s,'timber')+reserve)return false;return compoundProjectCommission(s,C,P);}return false;}
+function abbeyGrantWork(a,s){if(!abbeyBuildings(a).some(b=>b.compoundKey==='grange'))return;const P=abbeyPeople(a),lay=P.filter(p=>abbeyLay(p)&&!awayNow(p)).length+(a.servants||[]).filter(p=>p.abbeyJob==='ploughman'&&p.abbeyPaidDay===day()).reduce((n,p)=>n+Math.min(HOUSEHOLD,p._hh?.population.get(s)||1),0),F=a.granges.map(k=>W.land.F[k]).filter(f=>abbeyField(f)===a);if(!lay)return;
+  const worked=F.filter(f=>f.state===LS.TILLED).reduce((n,f)=>n+f.area,0),perHand=s._haHH||W.land.perHead*HOUSEHOLD,room=lay*perHand/HOUSEHOLD-worked,f=F.find(f=>[LS.WILD,LS.WOOD,LS.SCRUB].includes(f.state)&&f.area<=room);if(!f)return;
+  const cost=f.area/1e4*foodYr()/12,progress=f.abbeyClear||(f.abbeyClear={cost,paid:0}),need=Math.min(cost-progress.paid,cost/90);if(!(need>0))return;
+  const before=means(a);buildWorks(s,Math.min(need,Math.max(0,before-abbeyReserve(a,s)*price(s,'grain'))),a,'grange clearing');progress.paid+=Math.max(0,before-means(a));
+  if(progress.paid+1e-9>=cost){shapeFurlong(f,s,LK.CLOSE);setFurlong(f,LS.TILLED);s._bearA=tilledOf(s,a.si).reduce((n,g)=>n+g.area,0);s._gYield=soilYield(s);a.cleared=(a.cleared||0)+f.area;}}
+function abbeyYear(a,s){a.members=(a.members||[]).filter(p=>!p.dead&&p.abbey===a.id);a.religious=abbeyPeople(a).filter(p=>!abbeyLay(p)).length;a.layBrothers=abbeyPeople(a).filter(p=>abbeyLay(p)).length;abbeyChooseLeader(a);
+  if(a.y===year())return;if(a.y!=null)a.prev={year:a.y,foodGiven:a.foodGiven||0,alms:a.alms||0,wages:a.wages||0,wool:a.woolSold||0};a.y=year();a.foodGiven=0;a.alms=0;a.wages=0;a.woolSold=0;a.woolReceipts=0;a.crop=0;a.fishCaught=0;a.hospitality=0;}
+function abbeyCharity(a,s){const spare=Math.max(0,abbeyFood(a,s)-abbeyReserve(a,s));if(!(spare>0))return 0;const L=pantry(s,a),q=Math.min(spare,(L.grain||0)+((s._owners?.get(a)?.sale.grain)||0),Math.max(0,s.pop*(s.hunger||0)*FOOD));if(!(q>0))return 0;
+  if((L.grain||0)<q){purchase(s,'grain',a,q-(L.grain||0));commodityCreditPurchase(s,a,'grain',purchase.got);}const given=Math.min(q,L.grain||0);giveFood(s,'grain',given,a);a.alms=(a.alms||0)+given;return given;}
+function abbeyCorrodyPrice(a,p){const s=W.settlements[a.si];let survival=1,years=0;for(let age=Math.floor(ageYrs(p));age<110;age++){years+=survival;survival*=Math.max(0,1-0.009*Math.exp((age-45)/9));}return years*FOOD*360*Math.min(price(s,'grain'),price(s,'fish'));}
+function abbeyCorrody(a,p){const s=W.settlements[a.si],h=householdAccount(p);if(!h||p.dead||p.abbey!=null||p.corrodian!=null||p.si!==a.si||ageYrs(p)<50||h.members.size!==1||abbeyPeople(a).length+(a.corrodies||[]).length>=abbeyCapacity(a)||abbeyFood(a,s)<abbeyReserve(a,s)+FOOD*360)return false;const cost=abbeyCorrodyPrice(a,p);if(means(h)<cost+foodYr())return false;
+  if(transfer(h,a,cost,'corrody',s)!==cost)return false;p.corrodian=a.id;h.corrodian=a.id;(a.corrodies||(a.corrodies=[])).push({person:p.id,household:h,price:cost,day:day(),bread:FOOD});life(p,`Bought board for life at ${a.name}`);houseFolk(s);return true;}
+function abbeyRecruit(a,s){if(!abbeyBuildings(a).some(b=>b.compoundKey==='church')||abbeyPeople(a).length>=abbeyCapacity(a))return false;
+  const P=(s.folk||[]).filter(p=>abbeyEligiblePerson(s,p,a.sex||'m')).sort((p,q)=>(q.sk?.[KS]||0)-(p.sk?.[KS]||0)||p.id-q.id);for(const p of P){if(tradeIncome(s,p.tr)>=foodYr()&&!((p.sk?.[KS]||0)>=0.5))continue;const H=householdAccount(p),n=H.population.get(s)||H.members.size,share=H.members.size>1?1/H.members.size:1,gift=Math.max(0,(H.assets.w||0)-n*foodYr())*share;if(gift<foodYr()/12)continue;const need=abbeyReserve(a,s)+FOOD*360-abbeyFood(a,s);if(need>0){purchase(s,'grain',a,need);commodityCreditPurchase(s,a,'grain',purchase.got);}if(abbeyAdmit(a,p,abbeyPeople(a).length>0&&a.layBrothers<a.religious))return true;}return false;}
+function abbeyHerd(a,s){if(!a.layBrothers||!abbeyBuildings(a).some(b=>b.compoundKey==='grange'))return;const X=stockOf(s,a),H=X.animals,F=a.granges.map(k=>W.land.F[k]).filter(f=>abbeyField(f)===a),grass=F.reduce((n,f)=>n+f.area/1e4*(f.state===LS.PASTURE?1:f.state===LS.WILD||f.state===LS.SCRUB?0.45:f.state===LS.TILLED?0.33*0.6:0),0),room=Math.max(0,grass/LU.sheep-(H.sheep||0)),net=beastYield(s,'sheep')-LU.sheep*WINTER_HAY*price(s,'hay');if(!(room>=1&&net>0))return;
+  const reserve=abbeyReserve(a,s)*price(s,'grain'),pk=price(s,'sheep'),q=Math.floor(Math.min(room,Math.max(0,means(a)-reserve)/(pk+LU.sheep*WINTER_HAY*price(s,'hay'))));if(q>0){purchase(s,'sheep',a,q);H.sheep=(H.sheep||0)+purchase.got;}const want=(H.sheep||0)*LU.sheep*WINTER_HAY-(X.held.hay||0);if(want>0){purchase(s,'hay',a,Math.min(want,Math.max(0,means(a)-reserve)/Math.max(1e-9,price(s,'hay'))));commodityCreditPurchase(s,a,'hay',purchase.got);}}
+function tickAbbeyMeals(){for(const a of W.abbeys||[]){if(a.gone)continue;const s=W.settlements[a.si];if(!s)continue;abbeyYear(a,s);a.corrodies=(a.corrodies||[]).filter(c=>c.household.members.size&&[...c.household.members].some(p=>!p.dead));abbeyFeed(a,s);abbeyHospitality(a,s);}}
+function tickAbbeys(){for(const a of W.abbeys||[]){if(a.gone)continue;const s=W.settlements[a.si];if(!s)continue;abbeyYear(a,s);abbeyCommission(a);abbeyRecruit(a,s);abbeyGrantWork(a,s);abbeyCharity(a,s);abbeyVisit(a,s);if((a.corrodies||[]).length<2)for(const p of s.folk||[])if(abbeyCorrody(a,p))break;if(dueOn(a.si,30,11))abbeyHerd(a,s);}
+  for(let hi=0;hi<W.houses.length;hi++){if((W.abbeys||[]).some(a=>!a.gone&&a.founder===hi))continue;const h=W.houses[hi],surplus=(hi?h?._netA:W._crNetA)||0;if(!(surplus>0)||means(houseAcct(hi))-hostTarget(hi)*4<foodYr()*30+STORAGE_TYPES.grange.cost)continue;for(let si=0;si<W.settlements.length;si++){const s=W.settlements[si];if(s.owner!==hi||!abbeyOrderAvailable(s,'cistercian'))continue;const P=abbeyFoundPlan(hi,si);if(P){abbeyFound(P);break;}}}}
+function abbeyPlayerFound(arg){const [si,order='cistercian',sex='m']=String(arg).split(':');if(!sovOn()||!Number.isInteger(+si)||order!=='cistercian'||!ABBEY_ORDERS[order]||!['m','f'].includes(sex))return false;return !!abbeyFound(abbeyFoundPlan(plyH(),+si,order,sex));}
+function abbeyCard(a){if(!a)return '';const s=W.settlements[a.si],P=abbeyPeople(a),leader=P.find(p=>p.id===a.leader),stock=s?._owners?.get(a),fields=(a.granges||[]).map(k=>W.land?.F?.[k]).filter(f=>f&&abbeyField(f)===a),B=abbeyBuildings(a),works=(W.projects||[]).filter(q=>!q.dead&&q.ownerId===a.storageOwnerId);
+  const row=(k,v)=>`<div class="row long"><span>${k}</span><b>${v}</b></div>`,person=p=>`<a class="nm" data-nm="p${p.id}">${esc(folkName(p))}</a>`;
+  return row('Order',esc(ABBEY_ORDERS[a.order]?.name||a.order)+(a.sex==='f'?' nunnery':''))+row(a.sex==='f'?'Abbess':'Abbot',leader?person(leader):'not yet professed')+row('Religious',P.filter(p=>!abbeyLay(p)).length)+row(a.sex==='f'?'Lay sisters':'Lay brothers',P.filter(p=>abbeyLay(p)).length)+row('Chest',detailNumber(a.gold||0)+' g')+row('Granted land',fields.length+' furlongs · '+detailNumber(fields.reduce((n,f)=>n+f.area,0)/1e4)+' ha')+row('Charter',a.charter?.selfWorked?'Self-worked granges; no serf rents or appropriated parish tithes; tithe-exempt':'Endowed free-alms property')+row('Owned stores',stock?['grain','fish','hay','wool'].map(g=>g+': '+detailNumber((stock.held[g]||0)+(stock.sale[g]||0))).join(' · '):'none')+row('Sheep',detailNumber(stock?.animals.sheep||0))+row('Wool sold this year',detailNumber(a.woolSold||0)+' loads · '+detailNumber(a.woolReceipts||0)+' g')+row('Working hands',detailNumber(a.workingHands||0)+' · '+Math.round((a.workRatio||0)*100)+'% of cultivated grant')+row('Paid servants',(a.servants||[]).filter(p=>!p.dead).map(p=>person(p)+' · '+esc(p.abbeyJob)).join(', ')||'none')+row('Fishery',s.lake?.ownerId===a.storageOwnerId?detailNumber(a.fishCaught||0)+' loads caught this year · stocked '+dateStr(a.fishery?.stocked):'no owned pond')+row('Hospitality',detailNumber(a.hospitality||0)+' loads given this year')+row('Order visitation',a.visitation?dateStr(a.visitation.until)+' · '+detailNumber(a.visitation.paid)+' g paid':'no funded journey this year')+row('Bread given this year',detailNumber(a.foodGiven||0))+row('Alms this year',detailNumber(a.alms||0))+row('Corrodians',(a.corrodies||[]).map(c=>`<a class="nm" data-nm="p${c.person}">board for life</a>`).join(', ')||'none')+row('Buildings',B.map(b=>`<a class="nm" data-nm="${esc(buildingReference(b,s))}">${esc(b.nm||ARCH[b.arch][4])}</a>`).join(', ')||'not yet built')+row('Works',works.map(q=>esc(q.title)+' '+Math.round((q.done||0)*100)+'%'+(q.stalled?' · '+esc(q.reason||q.stallReason||'stalled'):'')).join(', ')||'none')+row('Members',P.map(person).join(', ')||'no one admitted before there is a funded roof and food');}
+function abbeyOrdersHTML(s,hi=s.owner){const A=(W.abbeys||[]).filter(a=>!a.gone&&a.founder===hi);let out=A.map(a=>`<div class="note"><a class="nm" data-nm="${a.storageOwnerId}">${esc(a.name)}</a> · ${ABBEY_ORDERS[a.order]?.name||a.order} · ${a.religious||0} religious · ${Math.round(a.gold||0)} g</div>`).join('');if(A.length)return out;
+  for(const order of ['cistercian'])if(abbeyOrderAvailable(s,order)){out+=`<button class="wbtn" data-cmd="abbey-found" data-arg="${W.settlements.indexOf(s)}:${order}:m">Endow a ${esc(ABBEY_ORDERS[order].name)} abbey from unheld land and your own chest</button><button class="wbtn" data-cmd="abbey-found" data-arg="${W.settlements.indexOf(s)}:${order}:f">Endow a ${esc(ABBEY_ORDERS[order].name)} nunnery</button>`;}return out;}
+// Paid native people supply work; a corporate label by itself never produces crops or fish.
+function abbeyFields(a){return(a.granges||[]).map(k=>W.land?.F?.[k]).filter(f=>f&&abbeyField(f)===a);}
+function abbeyServiceWage(s,p){return foodYr()*1.5*Math.max(1,p._hh?.population.get(s)||1);}
+function abbeyServiceRelease(a,p){if(p?.abbeyService!==a.storageOwnerId)return;p.role=null;delete p.abbeyService;delete p.abbeyJob;delete p.abbeyWage;householdHeadsChanged(W.settlements[a.si]);}
+function abbeyStaff(a,s){const P=abbeyPeople(a),cellarer=P.filter(p=>!awayNow(p)).sort((p,q)=>(q.sk?.[KS]||0)-(p.sk?.[KS]||0)||p.id-q.id)[0];if(cellarer){cellarer.office='cellarer';cellarer.officeFor=a.storageOwnerId;}
+  if(a._wagesDay===day())return;a._wagesDay=day();a.servants=(a.servants||[]).filter(p=>{if(p.dead||p.si!==a.si||p.abbeyService!==a.storageOwnerId)return false;const bill=(p.abbeyWage||0)/360;if(awayNow(p)||s.siegeBy||means(a)-bill<abbeyReserve(a,s)*price(s,'grain')){abbeyServiceRelease(a,p);return false;}const paid=transfer(a,p,bill,'abbey wages',s);if(paid+1e-9<bill){abbeyServiceRelease(a,p);return false;}a.wages=(a.wages||0)+paid;p.abbeyPaidDay=day();return true;});
+  const fieldHands=P.filter(p=>abbeyLay(p)&&!awayNow(p)).length+a.servants.filter(p=>p.abbeyJob==='ploughman').reduce((n,p)=>n+Math.min(HOUSEHOLD,p._hh?.population.get(s)||1),0),F=abbeyFields(a),cleared=F.filter(f=>f.state===LS.TILLED).reduce((n,f)=>n+f.area,0),first=F.filter(f=>[LS.WILD,LS.WOOD,LS.SCRUB].includes(f.state)).reduce((n,f)=>Math.min(n,f.area),Infinity),area=cleared+(Number.isFinite(first)?first:0)+(stockOf(s,a).animals.sheep||0)/150*(s._haHH||W.land.perHead*HOUSEHOLD)/HOUSEHOLD,perHand=(s._haHH||W.land.perHead*HOUSEHOLD)/HOUSEHOLD;
+  const needs=[];if(abbeyBuildings(a).some(b=>b.compoundKey==='grange')&&fieldHands*perHand<Math.max(area,perHand))needs.push('ploughman');if(s.lake?.ownerId===a.storageOwnerId&&!a.servants.some(p=>p.abbeyJob==='fisher'))needs.push('fisher');if(abbeyBuildings(a).some(b=>b.compoundKey==='hospital')&&!a.servants.some(p=>p.abbeyJob==='hospitaller'))needs.push('hospitaller');
+  for(const job of needs){const annualRoom=means(a)-abbeyReserve(a,s)*price(s,'grain');if(annualRoom<foodYr()*1.5)continue;const candidates=workers_(s,p=>!p.office&&!awayNow(p)&&ageYrs(p)>=16&&ageYrs(p)<60&&!W.settlements.some(t=>(t.furl||[]).some(f=>f.wk===p.id||f.own===p.id))&&(job!=='fisher'||p.tr==='fisher'||p.tr==='boatman')).sort((p,q)=>(p._hh?.assets._incY??tradeIncome(s,p.tr))-(q._hh?.assets._incY??tradeIncome(s,q.tr))||p.id-q.id),p=candidates.find(p=>{const wage=abbeyServiceWage(s,p);return annualRoom>=wage&&(p._hh?.assets._incY??tradeIncome(s,p.tr))<wage;});if(!p)continue;const wage=abbeyServiceWage(s,p);
+    const paid=transfer(a,p,wage/360,'abbey wages',s);if(paid+1e-9<wage/360)continue;p.abbeyService=a.storageOwnerId;p.abbeyJob=job;p.abbeyWage=wage;p.abbeyPaidDay=day();p.role='abbey servant';a.servants.push(p);a.wages=(a.wages||0)+paid;householdHeadsChanged(s);life(p,`Hired by ${a.name} as ${job}, for ${Math.round(wage)} gold a year`);}}
+function abbeyWork(a,s){const P=abbeyPeople(a),hands=P.filter(p=>abbeyLay(p)&&!awayNow(p)).reduce((n,p)=>n+(p._hh?.assets._fill??1),0)+(a.servants||[]).filter(p=>!p.dead&&p.abbeyJob==='ploughman'&&p.abbeyPaidDay===day()).reduce((n,p)=>n+(p._hh?.assets._fill??1)*Math.min(HOUSEHOLD,p._hh?.population.get(s)||1),0),F=abbeyFields(a),area=F.filter(f=>ARABLE.has(f.kind)&&f.state===LS.TILLED).reduce((n,f)=>n+f.area,0),capacity=abbeyBuildings(a).some(b=>b.compoundKey==='grange')?hands*(s._haHH||W.land.perHead*HOUSEHOLD)/HOUSEHOLD:0;
+  a.workArea=area;a.workRatio=area>0?Math.min(1,capacity/area):0;a.workingHands=hands;return area;}
+function tickAbbeyWork(){if(!W.abbeys?.length)return;for(const s of new Set(W.abbeys.map(a=>W.settlements[a.si]).filter(Boolean)))s._abbeyArea=0;for(const a of W.abbeys||[]){if(a.gone)continue;const s=W.settlements[a.si];if(!s)continue;abbeyYear(a,s);abbeyStaff(a,s);s._abbeyArea+=abbeyWork(a,s);}}
+function abbeyCrop(s,coefficient){for(const a of W.abbeys||[]){if(a.gone||W.settlements[a.si]!==s||!(a.workRatio>0))continue;const q=(s._gYield||soilYield(s))*(a.workArea||0)*a.workRatio*coefficient;if(!(q>0))continue;s.stores.grain+=q;
+  const parish=parishOf(s),tithe=parish&&!a.charter.titheExempt?q*0.1:0,mill=s.buildings.find(b=>['mill','windmill'].includes(b.arch)&&b.state==='sound'&&!b.removed),mult=mill?q*0.06:0;if(tithe)offer(s,'grain',parish,tithe);if(mult)offer(s,'grain',millHolder(mill,s),mult);if(typeof forwardOffer==='function')forwardOffer(s,'grain',a,q-tithe-mult);else offer(s,'grain',a,q-tithe-mult);a.crop=(a.crop||0)+q-tithe-mult;}}
+function abbeyPondClear(s,site){const L=site.lake;if(!L||!L.poly?.length||!L.dam||s.lake)return false;const wet=(x,z)=>hAt(x,z)<L.y&&inPoly(L.poly,x,z);if(s.buildings.some(b=>!b.removed&&[...obbCorners(b.x,b.z,b.w,b.d,b.rot),{x:b.x,z:b.z}].some(p=>wet(p.x,p.z))))return false;
+  for(const P of [...(W.roads||[]).map(r=>r.path),...(s.streets||[]).filter(t=>!t.gone).map(t=>t.pts)])for(let k=1;k<(P?.length||0);k++){const A=P[k-1],B=P[k],n=Math.max(1,Math.ceil(dist2d(A.x,A.z,B.x,B.z)/4));for(let j=0;j<=n;j++)if(wet(lerp(A.x,B.x,j/n),lerp(A.z,B.z,j/n)))return false;}return true;}
+function abbeyPondPlan(a,s){if(s.lake||!s.river||means(a)<foodYr()*4+abbeyReserve(a,s)*price(s,'grain'))return null;const F=abbeyFields(a),fisher=workers_(s,p=>!p.office&&!awayNow(p)&&['fisher','boatman'].includes(p.tr)&&ageYrs(p)>=16&&ageYrs(p)<60).sort((p,q)=>abbeyServiceWage(s,p)-abbeyServiceWage(s,q)||p.id-q.id)[0];if(!fisher)return null;const wage=abbeyServiceWage(s,fisher),options=[];
+  for(const r of W.rivStrips||[])if(!r.canal)for(let k=6;k<r.pts.length-1;k+=2){const D=r.pts[k];if(!F.some(f=>dist2d(D.x,D.z,f.x,f.z)<Math.sqrt(f.area)*0.9))continue;options.push({r,k,d:dist2d(D.x,D.z,s.pos.x,s.pos.z)});}options.sort((p,q)=>p.d-q.d||p.k-q.k);
+  for(const {r,k}of options.slice(0,12)){const D=r.pts[k],U=r.pts[k-3],base=Math.atan2(U.z-D.z,U.x-D.x),level=r.ys[k]+1.2,span=millDamSpan(D.x,D.z,-Math.sin(base),Math.cos(base),level);if(!span||span.width>80)continue;const rad=[];let closed=true;for(let i=0;i<=24;i++){const th=base+(i/24*2-1)*1.65;let radius=4;for(;radius<100;radius+=4)if(hAt(D.x+Math.cos(th)*radius,D.z+Math.sin(th)*radius)>level)break;if(radius>=100){closed=false;break;}rad.push(radius);}if(!closed)continue;
+    const poly=[{x:D.x,z:D.z},...rad.map((radius,i)=>{const th=base+(i/24*2-1)*1.65;return{x:D.x+Math.cos(th)*radius,z:D.z+Math.sin(th)*radius};})],area=polyArea(poly);if(!(area>=200&&area<12000))continue;const yearly=Math.min(area/1e4*120,FOOD*2*360,abbeyMouths(a,s)*NEED.fish*360),capital=foodYr()*4+area/1e4*foodYr()+Math.ceil(span.width/2)*price(s,'timber')+Math.ceil(span.width/3)*price(s,'stone'),margin=yearly*price(s,'fish')-wage;if(!(margin>0&&capital<margin*20))continue;const lake={poly,y:level-0.15,dam:{x:D.x,z:D.z,a:base,w:span.width,lo:span.min,hi:span.max,bed:Math.min(hAt(D.x,D.z)-1.5,r.ys[k]-1.5)},ownerId:a.storageOwnerId,compoundKey:'fishpond',area},site={key:'fishpond',hydraulic:true,poly,lake,f:{x:D.x,z:D.z,w:span.width,d:4,rot:-(base+Math.PI/2)}};if(!abbeyGroundOwned(a,site)||!abbeyPondClear(s,site))continue;
+    return{adapter:'abbey',key:'fishpond',ownerId:a.storageOwnerId,payerId:a.storageOwnerId,title:'a dammed fishpond',site,labour:foodYr()*4+area/1e4*foodYr(),days:180,timber:Math.ceil(span.width/2),stone:Math.ceil(span.width/3),requires:['church','grange'],purposes:['productive','diet']};}return null;}
+function abbeyPondComplete(q,s,C,a){if(!abbeyPondClear(s,q.site))return false;const seed=Math.max(1,q.site.lake.area/1000),held=pantry(s,a).fish||0;if(held<seed){purchase(s,'fish',a,seed-held);commodityCreditPurchase(s,a,'fish',purchase.got);}if((pantry(s,a).fish||0)+1e-9<seed)return false;if(consumeOwned(s,a,'fish',seed)+1e-9<seed)return false;
+  s.lake=q.site.lake;const mask=W.land?.mask;for(const i of compoundGround(q.site).cells)if(mask){const x=cellX(i%GRID),z=cellZ((i/GRID)|0);if(lakeAt(s,x,z,1)){mask[i*4]=mask[i*4+1]=mask[i*4+3]=0;}}a.fishery={ref:'lake',stocked:day(),seed};markOccupiedGround(s,compoundGround(q.site).polys);C.components.push({id:C.id+':hydraulic:lake',key:'fishpond',kind:'hydraulic',ref:'lake',purposes:['productive','diet']});G.hydraulicsDirty=G.structuresDirty=G.detDirty=G.roadsDirty=true;emit('trade',3,s.lake.dam,`${a.name} completes its paid fishpond and stocks it with ${seed.toFixed(1)} loads of live fish.`);return true;}
+function abbeyFishRate(s,workF=1){const L=s.lake,a=L?.ownerId&&corpOf(L.ownerId);if(!a||a.gone||!a.fishery||day()-a.fishery.stocked<360)return 0;const P=(a.servants||[]).filter(p=>!p.dead&&p.abbeyJob==='fisher'&&p.abbeyPaidDay===day());if(!P.length)return 0;
+  // Initial calibrated-game pond throughput of 120 loads per hectare-year; real water, stocking, a full growing year and paid hands are required.
+  const q=Math.min(L.area/1e4*120/360,P.length*FOOD*2)*workF*(W.drought?0.25:1)*(1-Math.min(0.8,W.snowpack||0));return Math.max(0,q);}
+function abbeyFish(s,workF){const q=abbeyFishRate(s,workF),a=s.lake?.ownerId&&corpOf(s.lake.ownerId);if(!(q>0)||!a)return;s.stores.fish+=q;offer(s,'fish',a,q);a.fishCaught=(a.fishCaught||0)+q;}
+function abbeyHospitality(a,s){if(!abbeyBuildings(a).some(b=>b.compoundKey==='hospital')||!(a.servants||[]).some(p=>p.abbeyJob==='hospitaller'&&p.abbeyPaidDay===day()))return 0;const T=(W.travellers||[]).filter(t=>t.errand&&t.to===a.si&&t.p.si===a.si&&t.depart<=day()&&t.arrive+1>=day()&&!t.p.dead).slice(0,6);let given=0;
+  for(const t of T){const household=householdAccount(t.p);if(!household||abbeyFood(a,s)<=abbeyReserve(a,s)+FOOD)continue;let need=Math.max(0,FOOD-foodIn(pantry(s,household)));for(const g of ['fish','grain']){const q=abbeyStockGift(s,a,household,g,need);need-=q;given+=q;if(!(need>0))break;}}
+  a.hospitality=(a.hospitality||0)+given;return given;}
+function abbeyVisit(a,s){if(day()%360!==253||a.visitation?.year===year())return;const p=abbeyChooseLeader(a);if(!p||awayNow(p)||s.siegeBy)return;const mothers=(W.abbeys||[]).filter(b=>b!==a&&!b.gone&&b.order===a.order&&b.formed<a.formed&&abbeyPeople(b).length).sort((b,c)=>b.formed-c.formed||b.id-c.id),mother=mothers[0],destination=mother?W.settlements[mother.si]:W.settlements.filter(t=>t.harbor&&!t.siegeBy).sort((b,c)=>dist2d(b.pos.x,b.pos.z,s.pos.x,s.pos.z)-dist2d(c.pos.x,c.pos.z,s.pos.x,s.pos.z))[0];if(!destination)return;
+  const to=W.settlements.indexOf(destination),R=route(a.si,to);if(to!==a.si&&!R)return;const cost=(R?.len||0)/WALK_MPD*FOOD*price(s,'grain')*2+FOOD*3*price(destination,'grain')+(mother?0:foodYr()/12);if(means(a)<cost+abbeyReserve(a,s)*price(s,'grain'))return;if(to!==a.si&&!errand(p,a.si,to,mother?'abbey visitation':'General Chapter',mother?3:60))return;
+  if(to===a.si)p.away={until:day()+(mother?3:60),why:mother?'abbey visitation':'General Chapter',to};const board=FOOD*3*price(destination,'grain'),paid=transfer(a,mother||'out',board,'order hospitality',s)+transfer(a,'out',cost-board,'order journey',s);a.visitation={year:year(),leader:p.id,mother:mother?.id??null,paid,until:p.away.until};life(p,mother?`Travelled to ${mother.name} for the order's visitation`:'Departed for the annual General Chapter abroad');}
+function abbeySummary(a){const s=W.settlements[a.si],P=abbeyPeople(a),x=s?._owners?.get(a);return{id:a.id,code:a.storageOwnerId,name:a.name,order:a.order,town:s?.name,leader:P.find(p=>p.id===a.leader)&&folkName(P.find(p=>p.id===a.leader)),religious:P.filter(p=>!abbeyLay(p)).length,layBrothers:P.filter(p=>abbeyLay(p)).length,servants:(a.servants||[]).filter(p=>!p.dead).map(p=>({person:p.id,job:p.abbeyJob,wage:p.abbeyWage})),chest:a.gold||0,landHa:abbeyFields(a).reduce((n,f)=>n+f.area/1e4,0),food:abbeyFood(a,s),sheep:x?.animals.sheep||0,wool:(x?.held.wool||0)+(x?.sale.wool||0),crop:a.crop||0,fish:a.fishCaught||0,alms:a.alms||0,hospitality:a.hospitality||0,visitation:a.visitation||null};}
+
+function abbeyHerdCare(a,s){const hands=abbeyPeople(a).filter(p=>abbeyLay(p)&&!awayNow(p)).reduce((n,p)=>n+(p._hh?.assets._fill??1),0)+(a.servants||[]).filter(p=>!p.dead&&p.abbeyJob==='ploughman'&&p.abbeyPaidDay===day()).reduce((n,p)=>n+(p._hh?.assets._fill??1)*Math.min(HOUSEHOLD,p._hh?.population.get(s)||1),0),used=(a.workArea||0)*(a.workRatio||0)/Math.max(1,(s._haHH||W.land.perHead*HOUSEHOLD)/HOUSEHOLD),sheep=s._owners?.get(a)?.animals.sheep||0;return sheep>0?clamp(Math.max(0,hands-used)*150/sheep,0,1):Math.min(1,hands);}
+function abbeyGrantable(f,hi,si,rule){if(!f||f.lord!==hi||f.dom!==si||f.core>=0||f.held||f.alms!=null||f.area<=0||!ARABLE.has(f.kind)||f.ten&&f.ten!=='demesne')return false;const native=id=>id==null||id===-1||id==='lord'||id==='crown'&&hi===0||accountOwner(id)===houseAcct(hi);return native(f.own)&&native(f.wk)&&(rule.self?[LS.WILD,LS.WOOD,LS.SCRUB].includes(f.state):[LS.WILD,LS.WOOD,LS.SCRUB,LS.TILLED].includes(f.state));}
+/* ABBEY_INSTITUTION_END */
+
 /* ============================ WEATHER ==================================== */
 function tickWeather(){
   const w=W.weather,si=seasonIdx();
@@ -12756,11 +12886,12 @@ function craftWork(s,h,trs,v){ // a household pays for work done by a trade of t
   if(spent>0){if(h.gn!==undefined)h.w=(h.w||0)-spent;else acct(h,-spent,'Craft work',s);}return spent+suit;} // used up by the households that bought them
 function shareOutput(s,si,PM,heads,foodOnly=false){const M=s._made||{};s._made=foodOnly?{...M,grain:0,fish:0}:{};
   if(foodOnly&&!(M.grain>0)&&!(M.fish>0))return;
-  const T=tilledOf(s,si);if(heads.length&&T.some(f=>!f.ten)){const fresh=T.filter(f=>!f.ten);settleTenure(s,si,heads);for(const f of fresh)writeFurlong(f);} /* a strip comes into crop already held: the lord keeps his home farm and lets the rest, as at the year's reckoning (#23: till then every new strip's corn was the lord's, and he paid its harvest wages) */const church=parishOf(s),mill=s.buildings.find(b=>(b.arch==='mill'||b.arch==='windmill')&&b.state==='sound'&&!b.removed),dues=(s.owner>0&&W.houses[s.owner]&&W.houses[s.owner].dues)||1,gp=price(s,'grain');
+  const T=tilledOf(s,si).filter(f=>f.alms==null||typeof abbeyField!=='function'||!abbeyField(f));if(heads.length&&T.some(f=>!f.ten)){const fresh=T.filter(f=>!f.ten);settleTenure(s,si,heads);for(const f of fresh)writeFurlong(f);} /* a strip comes into crop already held: the lord keeps his home farm and lets the rest, as at the year's reckoning (#23: till then every new strip's corn was the lord's, and he paid its harvest wages) */const church=parishOf(s),mill=s.buildings.find(b=>(b.arch==='mill'||b.arch==='windmill')&&b.state==='sound'&&!b.removed),dues=(s.owner>0&&W.houses[s.owner]&&W.houses[s.owner].dues)||1,gp=price(s,'grain');
   let tA=0;for(const f of T)tA+=f.area;const sheaf=new Map();if(church)chOf(church);
   if(M.grain>0){const mh=mill?millHolder(mill,s,PM):lordAcct(s),mt=mill&&(mill._tk||(mill._tk={mult:0,suit:0})),ml=mh==='crown'||isHouse(mh); // the multure is the mill's farmer's while the farm runs (#36)
-    if(!T.length){offer(s,'grain',lordAcct(s),M.grain);lordGot(s,lordAcct(s),M.grain);}else for(const f of T){const q=M.grain*f.area/Math.max(1,tA),tithe=church?q*0.1:0,mult=mill||(s.works&&s.works.mill)?q*0.06:0,net=q-tithe-mult,lordOf=f.lord>=0?houseAcct(f.lord):lordAcct(s);
+    if(!T.length){offer(s,'grain',lordAcct(s),M.grain);lordGot(s,lordAcct(s),M.grain);}else for(const f of T){const q=M.grain*f.area/Math.max(1,tA),abbey=f.alms!=null&&typeof abbeyField==='function'?abbeyField(f):null,tithe=church&&!abbey?.charter?.titheExempt?q*0.1:0,mult=mill||(s.works&&s.works.mill)?q*0.06:0,net=q-tithe-mult,lordOf=abbey||(f.lord>=0?houseAcct(f.lord):lordAcct(s));
     if(tithe)offer(s,'grain',church,tithe);if(mult){offer(s,'grain',mh,mult);if(mt)mt.mult+=mult;if(ml)lordGot(s,mh,mult);}f._cy=(f._cy||0)+net; // each strip's crop, for its rent (#36)
+    if(abbey){offer(s,'grain',abbey,net);continue;} // self-worked free-alms land pays its actual owner, without a serf rent
     if(f.ten==='demesne'||!f.ten){offer(s,'grain',lordOf,net*0.7);lordGot(s,lordOf,net*0.7);sheaf.set(lordOf,(sheaf.get(lordOf)||0)+net*0.3);continue;} // the home farm's crop is the lord's; the reapers take three-tenths of it in sheaves, by custom (#23: paid in coin before, from a purse the crop had not yet filled)
     const w=PM.get(f.wk),sh=clamp(tenShare(f)-(dues-1)*0.15,0.2,0.95),rest=net*(1-sh);if(w&&!w.dead)offerLand(s,'grain',w,net*sh,f);else{offer(s,'grain',lordOf,net*sh);lordGot(s,lordOf,net*sh);}
     const o=PM.get(f.own),lq=f.ten==='crop'?rest*0.15:rest;f._lq=(f._lq||0)+lq;if(f.ten==='crop'&&o&&!o.dead){offerLand(s,'grain',o,rest*0.85,f);offer(s,'grain',lordOf,lq);}else offer(s,'grain',lordOf,rest);lordGot(s,lordOf,f.ten==='crop'&&o&&!o.dead?lq:rest);}}
@@ -12770,9 +12901,9 @@ function shareOutput(s,si,PM,heads,foodOnly=false){const M=s._made||{};s._made=f
   for(const g of(foodOnly?['fish']:['fish','timber','ore','tools','cloth'])){if(!(M[g]>0))continue;const L=heads.filter(h=>(PRODUCE[h.tr]||'')===g);if(L.length)for(const h of L)offer(s,g,h,M[g]/L.length,cost[g]);
     else{offer(s,g,lordAcct(s),M[g]);const U=s._unmet||(s._unmet={});U[MAKER[g]]=(U[MAKER[g]]||0)+M[g]*price(s,g)*0.5;}}
   if(foodOnly)return; // an extra visit for bread does not bring the month's other goods to market
-  if(M.wine>0){const V=(s.furl||[]).filter(f=>f.dom===si&&f.kind===LK.VINE&&f.state===LS.TILLED),vA=V.reduce((t,f)=>t+f.area,0);if(!vA)offer(s,'wine',lordAcct(s),M.wine);else for(const f of V){const w=PM.get(f.wk);offer(s,'wine',w&&!w.dead?w:lordAcct(s),M.wine*f.area/vA);}}
+  if(M.wine>0){const V=(s.furl||[]).filter(f=>f.dom===si&&f.kind===LK.VINE&&f.state===LS.TILLED),vA=V.reduce((t,f)=>t+f.area,0);if(!vA)offer(s,'wine',lordAcct(s),M.wine);else for(const f of V){const a=f.alms!=null&&typeof abbeyField==='function'?abbeyField(f):null,w=PM.get(f.wk);offer(s,'wine',a||(w&&!w.dead?w:lordAcct(s)),M.wine*f.area/vA);}}
   if(M.hay>0){const Md=(s.furl||[]).filter(f=>f.dom===si&&f.kind===LK.MEADOW&&f.state===LS.TILLED),mA=Md.reduce((t,f)=>t+f.area,0);
-    if(!mA)offer(s,'hay',lordAcct(s),M.hay);else for(const f of Md){const w=PM.get(f.wk);offer(s,'hay',w&&!w.dead?w:lordAcct(s),M.hay*f.area/mA);}}} // the hay, his who mows the meadow
+    if(!mA)offer(s,'hay',lordAcct(s),M.hay);else for(const f of Md){const a=f.alms!=null&&typeof abbeyField==='function'?abbeyField(f):null,w=PM.get(f.wk);offer(s,'hay',a||(w&&!w.dead?w:lordAcct(s)),M.hay*f.area/mA);}}} // the hay, his who mows the meadow
 function reconcile(s,heads,goods=GOODS){if(commodityActive(s)){commodityReconcile(s,heads,goods);goods=goods.filter(g=>BEASTS.includes(g));} // the stores and their owners agree: what was lost (eaten by armies, burned, spoiled, plundered) is lost by all in proportion; what came unowned (the fleeces, a gift of grain) is the lord's, or the shepherds'
   const Ld=lard(s);
   for(const g of goods){const L=mkt(s,g);
@@ -12787,15 +12918,15 @@ function reconcile(s,heads,goods=GOODS){if(commodityActive(s)){commodityReconcil
     else if(T<have-1e-6){const f=have>0?T/have:0;for(const[w,v]of L.ownedEntries())L.set(w,v*f);if(Ld[g])Ld[g]*=f;if(g==='timber'&&Ld.char)Ld.char*=f;}}}
 function topUpFood(s,need,PM,prepared=false){const H=householdsOf(s),plans=[];let short=0;
   for(const h of H){const n=h.population.get(s)||0,L=pantry(s,h),herd=h.assets.herd||{},home=0;
-    const q=Math.max(0,n*FOOD*(s._ration??1)-home-foodIn(L));if(q>1e-9){plans.push({owner:h,buyer:h.head||lordAcct(s),q});short+=q;}} // the day's food, as much of it as the family buys at the month's prices (provision)
+    const q=Math.max(0,n*FOOD*(s._ration??1)-home-(h.abbey!=null?(L.grain||0)+(L.fish||0):foodIn(L)));if(q>1e-9){plans.push({owner:h,buyer:h.head||lordAcct(s),q});short+=q;}} // the day's food, as much of it as the family buys at the month's prices (provision)
   if(!(short>0)||foodIn(s.stores)<=0)return;
   if(!prepared){const heads=heads_(s,()=>true);shareOutput(s,W.settlements.indexOf(s),PM,heads,true);reconcile(s,heads,FOODS);
     // Standalone callers may have reckoned demand before spoilage was reconciled.
-    for(const pl of plans){const L=pantry(s,pl.owner),n=pl.owner.population.get(s)||0;pl.q=Math.max(0,n*FOOD*(s._ration??1)-foodIn(L));}}
+    for(const pl of plans){const L=pantry(s,pl.owner),n=pl.owner.population.get(s)||0;pl.q=Math.max(0,n*FOOD*(s._ration??1)-(pl.owner.abbey!=null?(L.grain||0)+(L.fish||0):foodIn(L)));}}
   const take=(pl,g,q)=>{const gift=accountOwner(pl.buyer)!==accountOwner(pl.owner);if(gift)storageGiftTitle(s,pl.buyer,pl.owner,g,q);commodityCreditPurchase(s,pl.owner,g,q,gift);pl.q=Math.max(0,pl.q-q);craftWork(s,pl.buyer,MARGIN[g],Math.min(Math.max(0,means(pl.buyer)),q*price(s,g)*CUT[g]/(1-CUT[g])));};
-  for(const pl of plans)for(const g of FOODS){const q=Math.min(pl.q,mkt(s,g).get(pl.buyer)||0);if(q>0){purchase(s,g,pl.buyer,q);take(pl,g,purchase.got);}}
-  for(const g of FOODS.slice().sort((a,b)=>price(s,a)/(1-CUT[a])-price(s,b)/(1-CUT[b]))){const got=clearMarket(s,g,plans.map(pl=>[pl.buyer,pl.q]));plans.forEach((pl,i)=>take(pl,g,got[i]));}} // the cheapest food at the table first
-function eatFood(s,o,need){ // a day's food from what an owner holds: the fish first, for it rots; then the fresh meat of the slaughter while it lasts (martinmas); then bread and salted meat, each as it lies in the larder. Returns what was eaten
+  for(const pl of plans)for(const g of FOODS){if(pl.owner.abbey!=null&&g==='meat')continue;const q=Math.min(pl.q,mkt(s,g).get(pl.buyer)||0);if(q>0){purchase(s,g,pl.buyer,q);take(pl,g,purchase.got);}}
+  for(const g of FOODS.slice().sort((a,b)=>price(s,a)/(1-CUT[a])-price(s,b)/(1-CUT[b]))){const got=clearMarket(s,g,plans.map(pl=>[pl.buyer,pl.owner.abbey!=null&&g==='meat'?0:pl.q]));plans.forEach((pl,i)=>take(pl,g,got[i]));}} // the cheapest food at the table first
+function eatFood(s,o,need){if(o?.abbey!=null){let got=consumeOwned(s,o,'fish',need);return got+consumeOwned(s,o,'grain',need-got);} // a day's food from what an owner holds: the fish first, for it rots; then the fresh meat of the slaughter while it lasts (martinmas); then bread and salted meat, each as it lies in the larder. Returns what was eaten
   let got=consumeOwned(s,o,'fish',need);if(!(got<need))return got;const L=pantry(s,o),A=o&&o.household?o.assets:null;
   if(A&&A._fresh>0){const v=consumeOwned(s,o,'meat',Math.min(need-got,A._fresh));got+=v;A._fresh=v<A._fresh&&(L.meat||0)>0?A._fresh-v:0;if(!(A._fresh>0))delete A._fresh;}
   const m=L.meat||0;if(got<need&&m>0)got+=consumeOwned(s,o,'meat',(need-got)*m/(m+(L.grain||0)));
@@ -13088,11 +13219,12 @@ function tickEconomy(){
   for(const s of W.settlements){
     storageInit(s);const phaseK=commodityActive(s)?s.storage:undefined;
     const workF=clamp(s.pop/(s.pop+s.plagueDead+1),0.4,1)*(s.siegeBy?0.15:1),P0=['grain','fish','timber','ore'].map(g=>phaseK?phaseK.quantity(null,g,'unassigned'):s.stores[g]);
-    if(W.land&&s._bearA==null)landYield(s);s.stores.grain+=(s._gYield&&s._bearA!=null?s._gYield*s._bearA:s.res.farm*0.92)*(typeof technologyFarmYield==='function'?technologyFarmYield(s):1)*seasonF*MOD.harvest*(W.drought?0.35:1)*workF*(s.works&&s.works.mill?1.2:1)*(s.ploughF??1); // too little land under the plough, crops burned, or too few beasts to draw the plough
+    if(W.land&&s._bearA==null)landYield(s);s.stores.grain+=(s._gYield&&s._bearA!=null?s._gYield*Math.max(0,s._bearA-(s._abbeyArea||0)):s.res.farm*0.92)*(typeof technologyFarmYield==='function'?technologyFarmYield(s):1)*seasonF*MOD.harvest*(W.drought?0.35:1)*workF*(s.works&&s.works.mill?1.2:1)*(s.ploughF??1); // too little land under the plough, crops burned, or too few beasts to draw the plough
     s.stores.fish+=s.res.fish*0.8*workF;
     s.stores.timber+=s.res.forest*0.05*workF*(s._wcF??1)*(waterMill(s)&&typeof technologyCapability==='function'&&technologyCapability(s,'sawmill').available&&s.mill?.techEquipment?.sawmill?1.25:1); // the woodcutters' axes; and a water-driven saw more
     s.stores.ore+=s.res.ore*0.05*workF;
     ['grain','fish','timber','ore'].forEach((g,i)=>made(s,g,(phaseK?phaseK.quantity(null,g,'unassigned'):s.stores[g])-P0[i])); // credit actual unassigned production; summing all owners before and after can invent a rounding excess
+    if(W.abbeys?.length){abbeyCrop(s,seasonF*MOD.harvest*(W.drought?0.35:1)*workF*(s.works&&s.works.mill?1.2:1)*(s.ploughF??1));abbeyFish(s,workF);}
     if(s._shopY!==year()){s._shopY=year();let sm=0,dy=0;for(const b of s.buildings)if(b.state==='sound'&&!b.removed){if(b.arch==='smithy')sm+=1+b.tier*0.5;else if(b.arch==='dyer')dy+=1+b.tier*0.5;}
       let vine=0;for(const f of s.furl||[])if(f.kind===LK.VINE&&f.state===LS.TILLED)vine+=f.area;s._smiths=sm;s._dyers=dy;s._vineHa=vine/1e4;} // the workshops and vineyards the place has, counted once a year
     { // crafts where there are workshops and the stuff to work: iron and charcoal into tools at the smithies, wool into cloth at the looms (every cottage spins and weaves a little), grapes into wine
@@ -13213,7 +13345,7 @@ function tickPopulation(){let PM=W._pm;
     const pf=clamp(s.prosperity/60,0.6,1.25),x=s.pop/K;
     const dbase=s.kind==='capital'?0.032:s.kind==='town'?0.030:0.026;
     for(const h of householdsOf(s)){const n=h.population.get(s)||0,hh=h.hunger||0;
-      const births=n*(BIRTH0/360)*MOD.birth*pf*clamp(1.6-x,0.1,1.2)*(1-hh*0.8),deaths=n*(dbase/360)*MOD.mort*(1+hh*4)*(s.siegeBy?1.5:1)*(x>1.3?1+(x-1.3):1);
+      const births=h.abbey!=null||h.corrodian!=null?0:n*(BIRTH0/360)*MOD.birth*pf*clamp(1.6-x,0.1,1.2)*(1-hh*0.8),deaths=n*(dbase/360)*MOD.mort*(1+hh*4)*(s.siegeBy?1.5:1)*(x>1.3?1+(x-1.3):1);
       h.population.set(s,Math.max(0,n+births-deaths));}if(s.pop<5)s.pop=5;
     if(!Number.isFinite(s.pop))s.pop=Math.max(5,Math.min(K,50));
     if(s.recovered>0)s.recovered*=0.9995; // immunity fades over years, not overnight
@@ -15019,7 +15151,7 @@ function estateShares(p,s){const widow=p.sp&&!p.sp.dead?p.sp:null,kin=estateKin(
 function offerLand(s,g,who,q,f){const widow=f.dower&&(W._pm||folkIndex()).get(f.dower),part=widow&&!widow.dead?clamp(f.dowerFraction||0,0,1):0;
   if(part&&accountOwner(widow)!==accountOwner(who)){offer(s,g,widow,q*part);q*=1-part;}offer(s,g,who,q);}
 function settleTenure(s,si,heads){ // strips without a holder are given out: the lord keeps a home farm, the rest go to the households that plough
-  const all=tilledOf(s,si),F=all.filter(f=>!f.ten);if(!F.length)return;
+  const all=tilledOf(s,si).filter(f=>f.alms==null),F=all.filter(f=>!f.ten);if(!F.length)return;
   const share=s.kind==='village'?0.2:0.3;let dem=all.filter(f=>f.ten==='demesne').length;const tillers=heads.filter(h=>tills(h,s));
   F.sort((a,b)=>dist2d(a.x,a.z,s.pos.x,s.pos.z)-dist2d(b.x,b.z,s.pos.x,s.pos.z));
   for(const f of F){if(dem<all.length*share||!tillers.length){f.ten='demesne';f.own=-1;f.wk=-1;dem++;continue;}
@@ -15042,7 +15174,7 @@ function courtHolding(f){const name=k=>{const r=f.title?.[k],p=(k==='work'?r?.ow
   const widow=(W._pm||W._folkIndex)?.get(f.dower);return {ten:f.ten||'',own:f.own??-1,wk:f.wk??-1,ownName:name('own'),workName:name('work'),dower:f.dower??-1,dowerFraction:f.dowerFraction||0,dowerName:widow?folkName(widow):''};}
 function courtLand(s,f,before,action,paid){const after=courtHolding(f);if(before.ten===after.ten&&before.own===after.own&&before.wk===after.wk)return;
   return courtEnrol(s,'land',null,{field:f.k??-1,ha:(f.area||0)/1e4,action,before,after,...courtLord(s,f,stripLord(f,s)),...(paid!==undefined?{paid}:{})});}
-function courtLord(s,f,lord){return {lord:lord==='crown'?'crown':'h'+(f?.lord>=0?f.lord:s.owner),lordName:lord==='crown'?'the Crown':lord.name};}
+function courtLord(s,f,lord){return {lord:lord==='crown'?'crown':lord?.storageOwnerId||'h'+(f?.lord>=0?f.lord:s.owner),lordName:lord==='crown'?'the Crown':lord.name};}
 /* THE HALLMOTE (#37): the quarter day's court hears existing dues, year-old loans and grazing trespass; the great court hears the assize.
    A plea points to its holding, farm or loan entry; voluntary payment or surrender clears that same obligation.
    Only a place's bounded roll is read. Officials are chosen at the lord's seat when business first pays their fees. */
@@ -15379,12 +15511,12 @@ function suitMill(s,tr){if(tr!=='miller'&&tr!=='baker')return null;let c=SUIT_MI
 function millHolder(b,s,PM){const F=b.farm;if(F&&F.until>day()){const p=(PM||W._pm||folkIndex()).get(F.who);if(p&&!p.dead)return p;}return ownerAcct(b,s);} // while the farm runs, the mill's takings are its farmer's; else its owner's
 function lordTally(s,w){if(w!=='crown'&&(!w||w.household||!isHouse(w)))return null;const M=s._lg||(s._lg=new Map());let T=M.get(w);if(!T)M.set(w,T={got:0,out:0,rot:0,coin:0});return T;} // a lord's grain at this place this year: allotted him (got), sold or eaten (out) for coin, spoiled (rot)
 function lordGot(s,who,q){if(q>0){const T=lordTally(s,who);if(T)T.got+=q;}} // rents in kind, the home farm, multure
-function lordSold(s,g,w,q,v){if(g==='grain'&&q>0){const T=lordTally(s,w);if(T){T.out+=q;T.coin+=v;}}} // sold, or eaten at his own table: what he eats saves him its price
+function lordSold(s,g,w,q,v){if(g==='wool'&&w?.kind==='abbey'&&q>0){w.woolSold=(w.woolSold||0)+q;w.woolReceipts=(w.woolReceipts||0)+v;}if(g==='grain'&&q>0){const T=lordTally(s,w);if(T){T.out+=q;T.coin+=v;}}} // sold, or eaten at his own table: what he eats saves him its price
 function lordRot(s,g,w,q){if(g==='grain'&&q>0){const T=lordTally(s,w);if(T)T.rot+=q;}} // spoiled in store (the commodity ledger's spoilage, by owner)
 function lordYield(s,who){const T=s._lgL&&s._lgL.get(who),n=T?T.out+T.rot:0;return n>0?T.coin/n:null;} // what each measure of his grain that left his barns last year brought him: its price where sold or eaten, nothing where it rotted
 function yearPrice(s,g){const Y=s._pxY;return Y&&Y[g]>0?Y[g]:price(s,g);} // the place's price the year round, not the day's
 function tenShare(f){return f.ten==='villein'&&f.svc==='money'?TEN_SHARE.free:TEN_SHARE[f.ten]||0.6;} // a commuted villein keeps a free man's share and pays his week-work in coin
-function stripLord(f,s){return f.lord>=0?houseAcct(f.lord):lordAcct(s);}
+function stripLord(f,s){return f.alms!=null&&typeof abbeyField==='function'&&abbeyField(f)|| (f.lord>=0?houseAcct(f.lord):lordAcct(s));}
 function stripRent(s,f,p){return f.ten==='villein'&&f.svc==='money'?f.qrent:(f._lqL||0)*p;} // a holding's yearly rent: its money rent, or the lord's share of last year's crop at the price
 function manorYear(s,T){const full=s._lg0!=null&&day()-s._lg0>=360;s._lgL=full?s._lg||new Map():null;s._lg=new Map();s._lg0=day(); // the year's crop of each strip and the lord's part of it, and what his grain brought him, closed: a whole year's, else none (the first reckoning finds only part of one, and a rent fixed on it would be fixed for good)
   for(const f of T){f._cyL=full?f._cy||0:0;f._lqL=full?f._lq||0:0;f._cy=0;f._lq=0;}}
@@ -15468,7 +15600,7 @@ function tickTenure(){
   W.settlements.forEach((s,si)=>{if(!due[si])return;s._ltY=s._lt||0;s._lt=0;s._marketTollY=s._marketToll||0;s._marketToll=0;s._marketTollDay=day();chooseLandUse(s,si,PM); // what the lord drew from it these twelve months; and each strip to corn, hay or profitable freehold grazing
     const heads=headsOf(s),size=new Map();for(const p of s.folk||[]){const h=householdHead(p);size.set(h,(size.get(h)||0)+1);}
     for(const h of heads){h._strips=0;h._crop=0;h._ha=0;h._owned=0;if(h.w===undefined)h.w=0;}
-    const T=tilledOf(s,si),held=T.map(f=>f.ten+'|'+f.own+'|'+f.wk),gpx=yearPrice(s,'grain');manorYear(s,T);
+    const T=tilledOf(s,si).filter(f=>f.alms==null),held=T.map(f=>f.ten+'|'+f.own+'|'+f.wk),gpx=yearPrice(s,'grain');manorYear(s,T);
     for(const f of T){if(!f.ten)continue;const was=courtHolding(f); // the dead and the gone: an heir takes their place, or the strip falls back to the lord
       if(f.own>=0){const p=PM.get(f.own);if(!p||p.dead){const h=heirOf(f.own,f,kids,spouse,si);f.own=h?h.id:-1;if(h)f._ent=h.id;}}
       if(f.wk>=0){const p=PM.get(f.wk);if(!p||p.dead||p.si!==si){const h=heirOf(f.wk,f,kids,spouse,si);f.wk=h&&h.si===si?h.id:-1;}}
@@ -15550,7 +15682,7 @@ function repay(h,v,reckoning){ // a debtor pays back what he can, the oldest deb
   if(!(h._debt>0))return 0;let paid=0,old=null,debt=0;const O=h._owe||[];while(O.length&&v>0.01){const e=O[0],x=Math.min(e[1],v),y=transfer(h,e[0],x,'loans'); /* a dead lender's due goes to his heir */if(!(y>0))break;unearned(e[0],y);e[1]-=y;v-=y;paid+=y;if(e[1]<=0.01){e[1]=0;O.shift();}}
   for(const e of O){debt+=e[1];if(!old&&e[1]>0.01&&Number.isFinite(e[2])&&day()-e[2]>=360)old=e;}h._debt=Math.max(0,debt);if(old)courtLoanPlead(h,old,reckoning);return paid;}
 function inDebt(h){return (h._debt||0)>Math.max(0,h.w||0);} // owes more than his purse holds
-function parishOf(s){return s.buildings.find(b=>b.arch==='temple'&&b.state==='sound'&&!b.removed&&!b.castle&&!b.friary)||s.buildings.find(b=>b.arch==='temple'&&b.state==='sound'&&!b.removed)||null;}
+function parishOf(s){return s.buildings.find(b=>b.arch==='temple'&&b.state==='sound'&&!b.removed&&!b.castle&&!b.friary&&!b.abbey)||s.buildings.find(b=>b.arch==='temple'&&b.state==='sound'&&!b.removed&&!b.abbey)||null;}
 const LORD_ARCH=new Set(['keep','hall','mill','windmill','granary','warehouse','toll','quarry','barn']),CHURCH_ARCH=new Set(['temple','hospital','friary']),TOWN_ARCH=new Set(['guildhall','wharf','bath','market']);
 function ownerOf(b,s){ // who owns this building: decided once (lazily), then kept until it is sold, inherited or pulled down
   if(b.ownerId!==undefined)return b.ownerId;s=s||b.s;
@@ -16149,6 +16281,7 @@ function simTick(){
   simPart('tickTravel',()=>tickTravel());
   simPart('tickMigration',()=>tickMigration());
   simPart('peoplePrepare',()=>peoplePrepare());
+  simPart('tickAbbeyWork',()=>tickAbbeyWork());
   // Rights and physical supplies, then carriage under cover before loss is reckoned.
   simPart('tickLand',()=>tickLand());
   simPart('tickTenure',()=>tickTenure());
@@ -16161,6 +16294,7 @@ function simTick(){
   simPart('tickSpoilage',()=>tickSpoilage());
   // Provisioning precedes meals; household choices see the resulting hunger and purses.
   simPart('tickMarket',()=>tickMarket());
+  simPart('tickAbbeyMeals',()=>tickAbbeyMeals());
   simPart('tickPopulation',()=>tickPopulation());
   simPart('tickHouseholds',()=>tickHouseholds());
   // Work uses today's remaining stock. New domestic departures wait for it to finish.
@@ -16190,6 +16324,7 @@ function simTick(){
   simPart('tickEnvoys',()=>tickEnvoys());
   simPart('tickTitles',()=>tickTitles());
   simPart('tickUpkeep',()=>tickUpkeep());
+  simPart('tickAbbeys',()=>tickAbbeys());
   simPart('tickStorageInvestment',()=>tickStorageInvestment());
   simPart('tickVictory',()=>tickVictory());
   if(day()%360===0&&!REPLAYING&&!W.prehistory&&!MODEL_ONLY)setTimeout(autosave,0);
@@ -16255,6 +16390,7 @@ function nameLinker(){ // the small existing annals cache; full household/proper
   W.settlements.forEach((s,i)=>referenceAdd(map,s.name,'s'+i));W.houses.forEach((h,i)=>referenceAdd(map,h.name,'h'+i));
   for(const n of livingNotables()){referenceAdd(map,fullTitle(n),'n'+n.id);referenceAdd(map,n.name,'n'+n.id);}
   for(const a of W.armies||[])referenceAdd(map,a.name,'a'+a.id);
+  for(const a of W.abbeys||[])if(!a.gone)referenceAdd(map,a.name,a.storageOwnerId);
   return G._nl={world:W,k,map,re:referenceRegex(map)};
 }
 function referenceMap(html,scope){ // transient candidates from the places actually mentioned; no simulation index or writes
@@ -16331,6 +16467,7 @@ function referenceInfoHTML(){
   return '<p>No current record.</p>';
 }
 function referenceTarget(code){const [kind,si,bi]=code.split(':'),s=W.settlements[+si];
+  if(kind==='abbey'){const a=corpOf(code);return a?{pick:{type:'abbey',abbey:a,s:W.settlements[a.si]},label:a.name,town:W.settlements[a.si]}:null;}
   if(kind==='court')return s?{pick:{type:'court',s},label:'Hallmote of '+s.name,town:s}:null;
   if(kind==='graveyard'){const parts=code.split(':'),b=s?.buildings.find(b=>b.x===+bi&&b.z===+parts[3]&&b._graveyard&&!b._graveyard.removed);return b?{pick:{type:'churchyard',s,b,yard:b._graveyard},label:'Graveyard of '+(b.nm||'the parish church'),town:s}:null;}
   if(kind==='building'){const parts=code.split(':'),b=s?.buildings.find(b=>b.x===+bi&&b.z===+parts[3]&&b.arch===parts[4]);return b?{pick:{type:'building',b},label:b.nm||ARCH[b.arch][4],town:s}:null;}
@@ -17208,6 +17345,7 @@ function lordPanelHTML(){
     if(!mine){x+=cbtn('lord','aid','Send men and silver to the crown',500,cd('l_aid'),'+12 standing; the royal host grows');
       x+=cbtn('lord','declare','Declare for the rebels',0,'','your levies join the rising; the crown will not forget');}
   }
+  x+=`<div class="dhead">Religious foundations</div>`+abbeyOrdersHTML(seat,hi);
   x+=`<div class="dhead">Works and largesse</div>`;
   const fc=150+own.length*60;
   x+=cbtn('lord','feast','Keep open table',fc,cd('l_feast'),'−10 unrest, +2 prosperity in all your towns');
@@ -17372,6 +17510,7 @@ function crownPanelHTML(){
       'Seize their lands. Legitimacy −6; on failure they rise in arms');
     h+=`</div></div>`;
   });
+  h+=`<div class="dhead">Religious foundations</div>`+abbeyOrdersHTML(W.capital,0);
   h+=`<div class="dhead">Ambitions</div>`;
   for(const a of AMBITIONS)h+=`<div class="amb${P.amb[a[0]]?' done':''}">${a[1]} <span class="tag">+${a[2]}</span></div>`;
   h+=`<button class="wbtn" data-cmd="sov-off" style="margin-top:10px">Lay down the crown</button>`;
@@ -17419,6 +17558,7 @@ function runCmd(cmd,arg){
     case 's-manage':{const s=W.settlements[+arg];if(s&&sovOn()&&s.owner===plyH()){showInspect({type:'settlement',s});setInspectorView('orders');contextExpand(true);}break;}
     case 'storage-pick':storagePick(+arg);break;
     case 'storage-commission':storagePlayerCommission(arg);break;
+    case 'abbey-found':abbeyPlayerFound(arg);break;
     case 's-work':{const[a,b]=arg.split(':');settlementWork(+a,b);break;}
     case 's-relief':case 's-garrison':case 's-callout':case 's-levy':case 's-walls':case 's-seal':case 's-suppress':settlementCmd(cmd.slice(2),+arg);break;
     case 's-justice':justiceCmd(arg);break;
@@ -19267,6 +19407,7 @@ function workerPresentation(bootstrap=false){
   const S=bootstrap||!P.sent?(P.sent=visualSent()):P.sent;let moved=false; // moved: something the foreground's structures, details or roads draw from is new to it
   P.speed=speedIdx;P.petitions=W.petitions.length;
   const out={protocol:1,revision:++P.revision,day:day(),speed:speedIdx,mod:{...MOD},world:visualRecord(W,'clock weather comet war feuds player vic reignNum stats'),houses:W.houses.map(h=>visualRecord(h,'sigilHue charge grudges pacts at journey')),monarch:visualRecord(W.monarch,'traits heirs'),settlements:W.settlements.map((s,i)=>{const m=visualMemo(S.settlement,i),r=visualSettlement(s,structures,m);moved=moved||m.sent;return r;}),capital:W.settlements.indexOf(W.capital),events:P.events.splice(0),commands:JOURNAL.reduce((n,e)=>e.k==='settle'?n:n+1,0),entries:entryCount,storageStatus:STORAGE_OUTCOMES.status()};
+  out.world.abbeys=(W.abbeys||[]).map(a=>({id:a.id,kind:'abbey',storageOwnerId:a.storageOwnerId,name:a.name,si:a.si,order:a.order,sex:a.sex,gone:!!a.gone,religious:a.religious||0,layBrothers:a.layBrothers||0}));
   if(P.endgame){out.endgame=P.endgame;P.endgame=null;}if(P.profileDirty){out.profile=visualGeometry(P.profile);P.profileDirty=false;}
   out.petitions=W.petitions.map(p=>({key:p.key,title:p.title,pos:visualGeometry(p.pos),due:p.due}));
   const V=VISUAL_ENTITY,id=o=>o.id;out.armies=visualList(S,'armies',W.armies,id,(a,i,m)=>V.army(a,m),true);out.caravans=visualList(S,'caravans',W.caravans||[],visualCaravanKey,(c,i,m)=>V.caravan(c,i,m),true);
@@ -19291,9 +19432,9 @@ function workerPresentation(bootstrap=false){
   if(bootstrap||G.tracksDirty){const t=workerTrackSegments(),plan=visualGeometry(W.trackBridgePlan||[]),k=visualKey([t,plan]);if(bootstrap||S.tracks!==k){out.tracks=t;out.trackBridgePlan=plan;}S.tracks=k;}
   if(bootstrap||G.fenceDirty){const f=workerFenceSegments(),k=visualKey(f);if(bootstrap||S.fences!==k)out.fences=f;S.fences=k;}
   if(G.treesDirty?.size)out.trees=[...G.treesDirty].map(t=>({kind:t.k,index:t.i,cut:!!t.cut}));
-  out.dirty={structures:bootstrap||structures&&moved,buildings:bootstrap||newBuildings,walls,details:bootstrap||details&&moved,roads:bootstrap||roads&&moved,labels:bootstrap||newTowns,herds:bootstrap||G.herdsDirty,orders:bootstrap||G.ordersDirty,armies:bootstrap||G.armyFlagsDirty};
+  out.dirty={structures:bootstrap||structures&&moved,buildings:bootstrap||newBuildings,walls,details:bootstrap||details&&moved,roads:bootstrap||roads&&moved,labels:bootstrap||newTowns,herds:bootstrap||G.herdsDirty,orders:bootstrap||G.ordersDirty,hydraulics:!!G.hydraulicsDirty,armies:bootstrap||G.armyFlagsDirty};
   P.buildingCount=W.bldList.length;P.towns=W.settlements.length;P.started=true;
-  for(const k of ['structuresDirty','roadsDirty','wallsDirty','detDirty','buildingsDirty','tracksDirty','fenceDirty','landMaskDirty','herdsDirty','ordersDirty','armyFlagsDirty'])G[k]=false;G.buildingDirty?.clear();G.landDirty?.clear();G.treesDirty?.clear();return out;
+  for(const k of ['structuresDirty','roadsDirty','wallsDirty','detDirty','buildingsDirty','tracksDirty','fenceDirty','landMaskDirty','herdsDirty','ordersDirty','hydraulicsDirty','armyFlagsDirty'])G[k]=false;G.buildingDirty?.clear();G.landDirty?.clear();G.treesDirty?.clear();return out;
 }
 // What the screen must learn at once, whatever the cadence: a speed it did not ask for, a petition, the campaign's end.
 function workerPresentationUrgent(){const P=WORKER_PRESENTATION;return P.started&&(speedIdx!==P.speed||(W.petitions?.length||0)!==P.petitions||!!P.endgame);}
@@ -19330,7 +19471,7 @@ function installPresentation(packet){
     if(packet.dragon){if(!W.dragon||W.dragon.name!==packet.dragon.name){if(W.dragon)W.dragon.gone=true;W.dragon={};}Object.assign(W.dragon,packet.dragon);}else{if(W.dragon)W.dragon.gone=true;W.dragon=null;}if(packet.memorials)W.memorials=packet.memorials;if(packet.roads){W.roads=reconcileVisualList(W.roads||[],packet.roads,'renderKey');W.bridges=packet.bridges;}W.projects=packet.projects;
     if(packet.tracks){W.renderTracks=packet.tracks;W.trackBridgePlan=packet.trackBridgePlan;G.tracksDirty=true;}if(packet.fences){W.renderFences=packet.fences;G.fenceDirty=true;}
     for(const q of packet.trees||[]){const t=W.treeSpots[q.kind]?.[q.index];if(t){t.cut=q.cut;(G.treesDirty||(G.treesDirty=new Set())).add(t);}}
-    for(const [k,v]of Object.entries(packet.dirty))if(v)G[{structures:'structuresDirty',buildings:'buildingsDirty',walls:'wallsDirty',details:'detDirty',roads:'roadsDirty',labels:'labelsDirty',herds:'herdsDirty',orders:'ordersDirty',armies:'armyFlagsDirty'}[k]]=true;
+    for(const [k,v]of Object.entries(packet.dirty))if(v)G[{structures:'structuresDirty',buildings:'buildingsDirty',walls:'wallsDirty',details:'detDirty',roads:'roadsDirty',labels:'labelsDirty',herds:'herdsDirty',orders:'ordersDirty',hydraulics:'hydraulicsDirty',armies:'armyFlagsDirty'}[k]]=true;
     G.campMeshesDirty=true;G.cairnDirty=true;G.clockFrac=W.clock.frac||0;if(packet.revision>(G.speedRevision||0))setSpeed(packet.speed);
     if(packet.endgame)presentEndgame(workerHTML(packet.endgame));
     if(packet.profile)try{const key='annals-best-'+SEED;if(packet.profile.best>(+localStorage.getItem(key)||0))localStorage.setItem(key,String(packet.profile.best));const earned=JSON.parse(localStorage.getItem('furlong-ach')||'{}');for(const [id,date]of Object.entries(packet.profile.achievements))if(!earned[id])earned[id]=date;localStorage.setItem('furlong-ach',JSON.stringify(earned));}catch(_){}
@@ -19733,6 +19874,7 @@ function workerCommandTarget(e){
       if(c==='pause-toggle')return 'worker';
       if(c==='camp-len'){if(!['100','200','400'].includes(a))throw Error('Invalid camp length');return 'worker';}
       if(c==='storage-commission'){workerCommandStorageArg(a);return 'worker';}
+      if(c==='abbey-found'){const [si,order,sex,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!Object.hasOwn(ABBEY_ORDERS,order)||!['m','f'].includes(sex)||!sovOn()||W.settlements[+si].owner!==plyH())throw Error('Invalid abbey foundation');return 'worker';}
       if(['notable','army','s-manage','storage-pick'].includes(c))return 'main';
       if(c==='s-work'){
         const [si,k,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!WORKS.some(w=>w[0]===k))throw Error('Invalid works command');return 'worker';
@@ -20550,6 +20692,7 @@ const ADV={muted:false,
     {name:'game:plan',kind:'verb',label:'Plan works with the brush (when you rule): the surveyors’ price for a stroke, and with commit:true the commission',args:{kind:'street, square, wall, stopup or raze',points:'[{x,z},…]: a line, or a loop for a square or wall',commit:'true to commission it'}},
     {name:'game:advise',kind:'verb',label:'Whether the player wants counsel unasked (the player can silence the advisor in the Advisor dialog)'}],
   entities(){const E=[],at=p=>p&&{x:Math.round(p.x),z:Math.round(p.z)};W.settlements.forEach((s,i)=>E.push({name:s.name,kind:s.kind,code:'s'+i,at:at(s.pos)}));W.houses.forEach((h,i)=>{if(!h.extinct)E.push({name:h.name,kind:'house',code:'h'+i});});
+    for(const c of W.abbeys||[])if(!c.gone)E.push({name:c.name,kind:'abbey',code:c.storageOwnerId,at:at(W.settlements[c.si]?.pos)});
     for(const n of W.notables||[])if(n.alive)E.push({name:fullTitle(n),kind:'person',code:'n'+n.id});
     for(const a of W.armies)if(!a.gone){let p=null;try{p=at(armySimPos(a));}catch(_){}E.push({name:a.name,kind:'host',code:'a'+a.id,at:p});}return E;},
   byName(name){const t=String(name||'').toLowerCase(),E=ADV.entities();return E.find(e=>e.name.toLowerCase()===t)||E.find(e=>e.name.toLowerCase().includes(t))||null;},
@@ -20590,6 +20733,8 @@ const ADV={muted:false,
     if(k==='settlements')return W.settlements.map((s,i)=>({name:s.name,code:'s'+i,kind:s.kind,at:{x:Math.round(s.pos.x),z:Math.round(s.pos.z)},lord:W.houses[s.owner]?.name,people:Math.round(detailPopulation(s)),unrest:Math.round(s.unrest),hunger:+(s.hunger||0).toFixed(2),besieged:!!s.siegeBy}));
     if(k==='settlement'){const e=ADV.byName(arg);return e&&e.code[0]==='s'?ADV.place(W.settlements[+e.code.slice(1)]):{error:'no such place: '+arg};}
     if(k==='technology')return technologyState();
+    if(k==='abbeys')return(W.abbeys||[]).filter(a=>!a.gone).map(abbeySummary);
+    if(k==='abbey'){const a=(W.abbeys||[]).find(a=>!a.gone&&(a.name===arg||a.storageOwnerId===arg));return a?abbeySummary(a):{error:'no such abbey: '+arg};}
     if(k==='houses')return W.houses.map(ADV.house);
     if(k==='house'){const e=ADV.byName(arg);return e&&e.code[0]==='h'?ADV.house(W.houses[+e.code.slice(1)]):{error:'no such house: '+arg};}
     if(k==='monarch')return ADV.safe(W.monarch,1);
