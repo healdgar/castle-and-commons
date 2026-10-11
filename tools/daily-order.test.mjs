@@ -64,7 +64,7 @@ test('daily quarry production keeps the former monthly physical rate and respect
 });
 test('remaining stone demand is refreshed daily without producing another stone batch',()=>{
   const s={stores:{stone:8},buildings:[],res:{},kind:'village',pop:100},q={type:'pave',r:{a:0,len:100},done:.25},castle={type:'castle',si:0,stone:5,stoneInstalled:2,timber:8,timberInstalled:1};
-  const c=vm.createContext({W:{settlements:[s],projects:[q,castle]},AD:()=>850,storageMaterialDemand:()=>2});
+  const c=vm.createContext({W:{settlements:[s],projects:[q,castle]},AD:()=>850,storageMaterialDemand:()=>2,compoundMaterialDemand:()=>0,fabricMaterialDemand:()=>0,fabricPending:()=>false});
   vm.runInContext(constructionMethods+'\n'+constructionCapability+'\n'+fn('castleFoundationDemand')+'\n'+fn('tickStone'),c);vm.runInContext('tickStone()',c);near(s._stoneWant,14);near(s._timberWant,7);
   q.done=.75;vm.runInContext('tickStone()',c);near(s._stoneWant,8);near(s.stores.stone,8);
   castle.stoneInstalled=5;castle.timberInstalled=8;vm.runInContext('tickStone()',c);near(s._stoneWant,5);near(s._timberWant,0);
@@ -77,7 +77,7 @@ test('ward incorporation hands its fields over before later allocation',()=>{
 });
 test('person preparation replaces an invalidated opening roll without a second census',()=>{
   const fresh=new Map([[9,{id:9}]]),W={_pm:new Map([[1,{id:1}]])};let calls=0;
-  const c=vm.createContext({W,folkIndex:()=>{calls++;return fresh;}});vm.runInContext(fn('peoplePrepare'),c);vm.runInContext('peoplePrepare()',c);
+  const c=vm.createContext({W,freedomPrepare(){},folkIndex:()=>{calls++;return fresh;}});vm.runInContext(fn('peoplePrepare'),c);vm.runInContext('peoplePrepare()',c);
   assert.equal(W._pm,fresh);assert.equal(calls,1);assert.equal(W._pm.has(1),false);
 });
 test('a funded ward purchase posts its named accounts at the ward and hands over the fields',()=>{

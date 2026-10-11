@@ -66,6 +66,7 @@
         "tickProjects",
         "tickGrowth",
         "tickStreets",
+        "tickInstitutionFoundations",
         "tickChurches",
         "tickCastles",
         "tickCourts",
@@ -1046,6 +1047,36 @@
       "before": "tickAbbeys",
       "after": "tickEstateProjects",
       "reason": "Endowed corporate title and ordinary gifts precede private estate proposals."
+    },
+    {
+      "before": "tickStreets",
+      "after": "tickInstitutionFoundations",
+      "reason": "A newly commissioned nave or wharf retains actual current reachable public frontage."
+    },
+    {
+      "before": "tickInstitutionFoundations",
+      "after": "tickChurches",
+      "reason": "Paid parish/friary proposals enter the retained project queue before current parish/Church closing decisions; no immediate completed nave."
+    },
+    {
+      "before": "tickGrowth",
+      "after": "tickInstitutionFoundations",
+      "reason": "Prospective institutional fit protects native current housing and occupied lots."
+    },
+    {
+      "before": "tickProjects",
+      "after": "tickInstitutionFoundations",
+      "reason": "Existing work/material installation precedes new retained foundation proposals; new projects start tomorrow."
+    },
+    {
+      "before": "tickEconomy",
+      "after": "tickInstitutionFoundations",
+      "reason": "Daily eligibility uses current paid productive supply and current market quantities."
+    },
+    {
+      "before": "tickInstitutionFoundations",
+      "after": "tickStone",
+      "reason": "Remaining material forecasts include current commissioned institutional foundations before new departures."
     }
   ],
   "splits": [
@@ -2551,7 +2582,8 @@
       "tickAbbeyMeals": "Actual corporate held/sale food into existing member/corrody household pantries, before one native meal.",
       "tickAbbeys": "Actual grants, endowments, admission, charity, saved compound commissions and due order visits after upkeep; new work starts next day.",
       "tickEstateWork": "Current titled fields/live ecology and actual paid keepers, before production/storage; no meat/fish or skill from a display read.",
-      "tickEstateProjects": "Current actual receipts, costs, adopted methods, retained public access and native titled ground; paid compound commissions start next day."
+      "tickEstateProjects": "Current actual receipts, costs, adopted methods, retained public access and native titled ground; paid compound commissions start next day.",
+      "tickInstitutionFoundations": "Actual current worship/harbor/rock demand, adopted methods, named payer, public frontage, native title and paid retained footprint; commissions create saved work, not completed buildings."
     },
     "pending": "Combined native speed/save/worker/conservation/drawing validation.",
     "integration_source": "Current isolated batch based on 00c7f14; native release gates pending"
