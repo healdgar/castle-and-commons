@@ -49,3 +49,15 @@ test('a completed paid roof repair cancels a queued vacant-house fall',()=>{cons
   delete b.ch;b.arch='house';b.ownerId='lord';
   b._fallAt=2;s._falling=[b];q=fabricProjectCommission(s,b,{work:'repair',payer:'crown',labour:10,days:1,timber:4,stone:0});fabricProjectTick(q);now=2;tickFalling(s);
 `);assert.equal(r.eval('b.state'),'sound');near(r.eval('s.ruinCount'),0);near(r.eval('s._falling.length'),0);assert.equal(r.eval('q.status'),'completed');});
+test('a paid change of use keeps the existing architecture and occupants until actual work completes',()=>{const r=setup();r.eval(`
+  delete b.ch;b.arch='house';ARCH.smithy=[8,10,5,0,'smithy'];b.hh=[H[0]];H[0].bh=b;
+  q=fabricProjectCommission(s,b,{work:'use',payer:'crown',arch:'smithy',home0:'house',labour:10,days:2,timber:4,stone:0});fabricProjectTick(q);
+`);assert.equal(r.eval('b.arch'),'house');near(r.eval('q.done'),0.5);r.eval('fabricProjectTick(q)');assert.equal(r.eval('b.arch'),'smithy');assert.equal(r.eval('b.hh[0]===H[0]'),true);assert.equal(r.eval('q.status'),'completed');});
+function infill(){const r=setup();vm.runInContext(['segDist','obbCorners','inPolyXZ','graveyardInsideParcel','storageGroundClaim','storageGroundPay'].map(fn).join('\n'),r.C);r.eval(`
+  delete b.ch;b.arch='house';b.lot=[{x:-40,z:-40},{x:40,z:-40},{x:40,z:40},{x:-40,z:40}];const RESID=new Set(['house']),lerp=(a,b,t)=>a+(b-a)*t;let groundMarked=0;
+  compoundGround=()=>({polys:[],cells:[1,2]});occupiedGroundFields=()=>new Set();occupiedGroundAreas=()=>new Map();markOccupiedGround=()=>{groundMarked++};
+  s._lay.live.compoundSite=(site,mode,ownerId)=>{if(!valid)return null;if(mode!=='complete')return site;const nb={...site.f,arch:site.arch,tier:site.tier,ownerId,s,state:'sound',hh:[],inst:false};s.buildings.push(nb);return nb;};
+  const infillPlan={work:'foundation',payer:'crown',ownerId:'lord',extension:true,land:0,site:{arch:'house',tier:0,inst:false,f:{x:20,z:0,w:6,d:8,rot:0},path:[{x:20,z:4},{x:20,z:10}]},labour:10,days:2,timber:4,stone:0};
+`);return r;}
+test('a private cottage stays inside its native parent toft and enters canonical buildings only after payment',()=>{const r=infill();r.eval('q=fabricProjectCommission(s,b,infillPlan);fabricProjectTick(q)');near(r.W.bldList.length,1);near(r.eval('groundMarked'),0);r.eval('fabricProjectTick(q)');near(r.W.bldList.length,2);near(r.eval('groundMarked'),1);assert.equal(r.eval('W.bldList[1].s===s'),true);assert.equal(r.eval('ownerAcct(W.bldList[1],s)'),'crown');assert.equal(r.eval('q.status'),'completed');});
+test('a prospective cottage outside the actual private plot cannot commission or charge a purse',()=>{const r=infill(),before=r.W.treasury;r.eval('infillPlan.site.f.x=45;q=fabricProjectCommission(s,b,infillPlan)');assert.equal(r.eval('q'),null);near(r.W.treasury,before);near(r.W.bldList.length,1);});
