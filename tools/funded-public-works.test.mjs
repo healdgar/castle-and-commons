@@ -10,7 +10,7 @@ function setup(){const r=realm({grain:0,fish:0,cash:0,crown:1000,households:2});
   const ARCH={house:[7,8,6,0,'house'],temple:[8,14,12,0,'church']};let now=1;day=()=>now;W.prehistory=true;W.projects=[];W.bldList=[];s.streets=[];s.history=[];let legal=true,crew=true,installed=0,occupied=0;
   H[0].tr='mason';H[1].tr='carter';s.stores.timber=20;s.px.timber=1;offer(s,'timber',H[1],20);s.px.stone=1;
   const hungryHands=()=>[],nativeWorkers=workers_;workers_=(town,pred)=>crew?nativeWorkers(town,pred):[];consumeOwnStock=()=>0;
-  compoundGround=()=>({polys:[],cells:[1,2]});occupiedGroundAreas=()=>new Map();occupiedGroundFields=()=>new Set();polyLen=P=>P.reduce((n,p,k)=>k?n+Math.hypot(p.x-P[k-1].x,p.z-P[k-1].z):0,0);riverAt=()=>false;
+  compoundGround=()=>({polys:[],cells:[1,2]});compoundPolys=site=>compoundGround(site).polys;occupiedGroundAreas=()=>new Map();occupiedGroundFields=()=>new Set();polyLen=P=>P.reduce((n,p,k)=>k?n+Math.hypot(p.x-P[k-1].x,p.z-P[k-1].z):0,0);riverAt=()=>false;
   syncLive=()=>{};markOccupiedGround=()=>{occupied++};campHouse=()=>-1;emit=()=>{};planComp=()=>20;const plan={ok:true,kind:'street',si:0,pts:[{x:0,z:0},{x:20,z:0}],hw:3,hit:[],works:10,days:2,title:'A real paid lane'};
   s._lay={queue:()=>[],live:{planStreet:(P,hid,hw,preview)=>{if(!preview)throw Error('commission must not add native streets');return{pts:P.map(p=>({...p})),hw,kind:'lane',hidden:true,planQ:true};},planSite:(q,mode)=>legal?q:null,planOpen:st=>{installed++;s.streets.push(st);st.hidden=false;st.planQ=false;return st;}}};let q;
 `);return r;}

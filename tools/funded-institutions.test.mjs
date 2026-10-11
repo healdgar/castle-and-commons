@@ -15,7 +15,7 @@ function setup(kind='parish'){const r=realm({grain:0,fish:0,cash:0,crown:1000,ho
   hAt=(x,z)=>z>20?-5:10;cIdx=()=>0;toCell=()=>0;inB=()=>true;slopeAt=()=>.1;constructionCapability=()=>({available:true});streetAccessAt=()=>access;armyObstacle=()=>false;armySegmentClear=()=>access;
   graveyardLandClear=()=>yard;graveyardPolygonsOverlap=()=>false;institutionFoundationFootprint=()=>valid;
   bindPropertyRights=()=>{};settleParcels=()=>{};updateBuildingInstance=()=>{};rehouse=()=>{};syncLive=()=>{};markOccupiedGround=()=>{marked++};
-  compoundGround=()=>({polys:[],cells:[0]});planGroundQuote=()=>0;storageGroundClaim=()=>({ok:true,recipients:[],cells:[0],key:'native-ground'});storageGroundPay=q=>{q.landPaid=true;return{ok:true,paid:0}};
+  compoundGround=()=>({polys:[],cells:[0]});compoundPolys=site=>compoundGround(site).polys;planGroundQuote=()=>0;storageGroundClaim=()=>({ok:true,recipients:[],cells:[0],key:'native-ground'});storageGroundPay=q=>{q.landPaid=true;return{ok:true,paid:0}};
   emit=(...a)=>events.push(a);awayNow=()=>false;
   const quay={kind:'quay',serviceLinked:true,hw:2,pts:[{x:-30,z:0},{x:30,z:0}]};s.streets=[quay];
   s._lay={fits:()=>valid,placed:{near:()=>[]},live:{planStreet:P=>{const st={pts:P,kind:'lane',hw:1.3};s.streets.push(st);return st;}},place:(arch,tier,f,district,hm,extra)=>{placed++;const b={...f,arch,tier,s,state:'sound',hh:[],h:3,...extra};s.buildings.push(b);return b;}};

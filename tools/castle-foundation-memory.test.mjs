@@ -20,7 +20,7 @@ const READS=NATIVE_LINE.match(/\(\{(.*?)\}\)/)[1].split(',').filter(n=>!['planCe
 const HELPERS=['const lerp=','const clamp=','const dist2d=','const cIdx=','const inB=','const cellX=','const cellZ=','const toCell=','const planCellOK='];
 const sha=s=>createHash('sha256').update(s).digest('hex').slice(0,16);
 // Repin only after reviewing the full writer list in CASTLE-FOUNDATION-DEPENDENCIES.md.
-const PINNED={"castleFoundationSite":"05903383fd214825","castleFoundationCentersPossible":"97f734a95ed5fce1","castleFoundationSurveyRead":"924af993dcba3853","castleFoundationLandOK":"1c1323d61765ed95","castleFoundationGround":"dba79eab8b76f97a","castleFoundationBoxMayHit":"da187f1e51c3f18c","castleFoundationSegmentMayHitBox":"c1ff83639ad0c277","slopeAt":"f04f3db9f54bcfa6","hAt":"f459c5ff2804ca09","riverAt":"c4bda44c2b489b2e","lakeAt":"6a14ce0b475936f4","furlongAt":"aca164d39bde3f54","compoundGround":"47f9f0a2ecab463c","occupiedGroundCells":"e4195f51df13de4f","occupiedGroundFields":"2ba9dbf41d8bc2ee","computeFurlongPoly":"605c31b180f2da7f","graveyardPolygonsOverlap":"65258af15a0c47a1","inPoly":"abebffb4a9abafff","inPolyXZ":"641dd4b3ae9a6dad","fortContains":"9f6ca02fc957e17d","fortCircuits":"e77dd39eccb4abc1","fortCenter":"70fbd07bf1bf54a1","casRing":"a6921fd1103e167c","wallRadAt":"fbbec3db03bd0ce6","circuitLen":"9deb244c96e6486c","placeFitRadii":"8a45384e2759f058","placeR":"63335d5f5f19eb27","placeHit":"62746e6b8c8200de","serviceDoor":"a4312db07cdce77e","locW":"833ae0c87356ca4b","obbCorners":"490b7d06b8d4a63f","obbOverlap":"5267c37bd7733324","streetFootprintOverlap":"ba1725bce82e34ce","segDist":"01b34b3baef31aff","segSegDist":"debb34048a0acf69","resample":"a590253bb5bcd7f5","lerpPt":"f218c11d09086fc4","makeHash":"b1d9816147e072f3","helpers":"626d791b92980e90"};
+const PINNED={"castleFoundationSite":"ce087589da4f9c8f","castleFoundationCentersPossible":"97f734a95ed5fce1","castleFoundationSurveyRead":"924af993dcba3853","castleFoundationLandOK":"1c1323d61765ed95","castleFoundationGround":"dba79eab8b76f97a","castleFoundationBoxMayHit":"da187f1e51c3f18c","castleFoundationSegmentMayHitBox":"c1ff83639ad0c277","slopeAt":"f04f3db9f54bcfa6","hAt":"f459c5ff2804ca09","riverAt":"c4bda44c2b489b2e","lakeAt":"6a14ce0b475936f4","furlongAt":"aca164d39bde3f54","compoundGround":"800cfe4973552f94","occupiedGroundCells":"e4195f51df13de4f","occupiedGroundFields":"2ba9dbf41d8bc2ee","computeFurlongPoly":"605c31b180f2da7f","graveyardPolygonsOverlap":"65258af15a0c47a1","inPoly":"abebffb4a9abafff","inPolyXZ":"641dd4b3ae9a6dad","fortContains":"9f6ca02fc957e17d","fortCircuits":"e77dd39eccb4abc1","fortCenter":"70fbd07bf1bf54a1","casRing":"a6921fd1103e167c","wallRadAt":"fbbec3db03bd0ce6","circuitLen":"9deb244c96e6486c","placeFitRadii":"8a45384e2759f058","placeR":"63335d5f5f19eb27","placeHit":"62746e6b8c8200de","serviceDoor":"a4312db07cdce77e","locW":"833ae0c87356ca4b","obbCorners":"490b7d06b8d4a63f","obbOverlap":"5267c37bd7733324","streetFootprintOverlap":"ba1725bce82e34ce","segDist":"01b34b3baef31aff","segSegDist":"debb34048a0acf69","resample":"a590253bb5bcd7f5","lerpPt":"f218c11d09086fc4","makeHash":"b1d9816147e072f3","helpers":"626d791b92980e90","compoundPolys":"2059f5631f5d5e48"};
 test('the certified survey still reads the reviewed native helpers',()=>{
   assert.deepEqual(Object.fromEntries([...READS.map(n=>[n,sha(fn(n))]),['helpers',sha(HELPERS.map(line).join('\n'))]]),PINNED,
     'Survey dependency changed: audit the writer certificate and private hash stamps before repinning.');
@@ -119,8 +119,27 @@ test('operation-local pending polygon reuse preserves fresh answers and hash sta
     assert.equal(run(on,'castleFoundationSite(town,spec)'),null);
     assert.equal(run(on,'graph()'),run(off,'graph()'),'same full native graph and original private hash query count');
   }
-  assert.equal(run(on,'rasterReads'),3,'one exact pending raster per authoritative survey, never retained across operations');
+  assert.equal(run(on,'rasterReads'),0,'pending reservation polygons do not need the native raster at all');
   assert.ok(run(off,'rasterReads')>30,'control path recomputes the native raster for each clear probe');
+});
+
+test('the pure ordered polygon builder leaves raster authority to actual ground consumers',()=>{
+  const c=realm(false);run(c,`const explicit=[{x:0,z:0},{x:4,z:0},{x:4,z:4}],yard=[{x:5,z:0},{x:9,z:0},{x:9,z:4}],hydraulic=[{x:0,z:5},{x:4,z:5},{x:4,z:9}];
+    const site={polys:[explicit],yard:{poly:yard},poly:hydraulic,f:{x:0,z:0,w:12,d:14,rot:.2},ring:{x:0,z:0,r:22},paths:[[{x:0,z:0},{x:0,z:30},{x:30,z:30}],[{x:30,z:30},{x:40,z:40}]],pathWidth:3};
+    const before=JSON.stringify(site),nativeRaster=occupiedGroundCells;let rasters=0;occupiedGroundCells=P=>{rasters++;return nativeRaster(P)};globalThis.parts=compoundPolys(site);`);
+  assert.equal(run(c,'rasters'),0);assert.equal(run(c,'parts.length'),8);
+  assert.equal(run(c,'parts[0]===explicit&&parts[1]===yard&&parts[2]===hydraulic'),true,'explicit native polygon order/references are preserved');
+  assert.equal(run(c,'parts[3].length'),4);assert.equal(run(c,'parts[4].length'),64);
+  run(c,'globalThis.ground=compoundGround(site);');assert.equal(run(c,'rasters'),8,'the rights consumer intersects every actual polygon with native mask cells');
+  assert.equal(run(c,'JSON.stringify(parts)'),run(c,'JSON.stringify(ground.polys)'));assert.ok(run(c,'ground.cells.length')>0);assert.equal(run(c,'JSON.stringify(site)'),run(c,'before'));
+});
+
+test('native pending-fit reservations use polygons without performing a ground raster or mutating native records',()=>{
+  const c=realm(false);vm.runInContext(fn('castleFoundationReserved'),c);run(c,`occupiedGroundCells=()=>{throw Error('reservation must not rasterize rights')};
+    const q={type:'compound',si:0,site:{f:{x:0,z:0,w:10,d:10,rot:0}}};W.projects=[q];const foot={x:0,z:0,w:4,d:4,rot:0};`);
+  const before=run(c,'graph()');assert.equal(run(c,'castleFoundationReserved(town,foot)'),true);assert.equal(run(c,'castleFoundationReserved(town,foot,q)'),false);assert.equal(run(c,'graph()'),before);
+  run(c,'q.site.f.x=100;');assert.equal(run(c,'castleFoundationReserved(town,foot)'),false,'a same-count move is freshly checked');
+  run(c,'q.site.path=[{x:-20,z:0},{x:20,z:0}];');assert.equal(run(c,'castleFoundationReserved(town,foot)'),true,'the real retained public approach is protected too');
 });
 
 test('operation-local bounds preserve successful and retained-site geometry with remote pending projects',()=>{

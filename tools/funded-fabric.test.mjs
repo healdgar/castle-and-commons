@@ -39,7 +39,7 @@ test('a commissioned owner project keeps the canonical household account when it
 `);assert.ok(r.eval('q'));});
 test('a fully paid native footprint licence survives parcel succession without a second land charge',()=>{const r=setup();vm.runInContext(['storageGroundClaim','storageGroundPay'].map(fn).join('\n'),r.C);r.eval(`
   const F={k:'native-field',title:{own:propertyRightsResolve(H[1].id),work:{owner:-1}},lord:0};W.land={mask:new Uint8Array(16)};let cells=[1,2];
-  compoundGround=()=>({cells:cells.slice()});occupiedGroundFields=()=>new Set([F]);occupiedGroundAreas=()=>new Map([[F,100]]);
+  compoundGround=()=>({cells:cells.slice()});compoundPolys=site=>compoundGround(site).polys;occupiedGroundFields=()=>new Set([F]);occupiedGroundAreas=()=>new Map([[F,100]]);
   transfer('crown',H[0],100,'real savings for land',s);q={site:{f:{}},land:20,paid:0};const payer=accountOwner(H[0]),claim=storageGroundClaim(s,q,payer);const result=storageGroundPay(q,s,payer,claim);
   if(!result.ok||result.paid!==20)throw Error('full actual receipts required');const before=means(payer);
   F.title.own=propertyRightsResolve(H[0].id);const inherited=storageGroundClaim(s,q,payer);if(!inherited.ok||inherited.recipients.length)throw Error('lawful successor takes the parcel subject to paid licence');
