@@ -54,7 +54,7 @@ test('occupancy, due falls and structural decisions run in dependency order ever
 function occupancyHarness({heads,roof,dayValue=4}){
   const draws=[];
   const c=vm.createContext({
-    W:{settlements:[]},
+    W:{settlements:[],schools:[]},HOUSEHOLD:5,
     day:()=>c.today,
     heads_:(s,pred)=>(s.heads||[]).filter(h=>!pred||pred(h)),
     capOf:()=>1,workOf:()=>({x:0,z:0}),homeScore:()=>1,
@@ -68,7 +68,7 @@ function occupancyHarness({heads,roof,dayValue=4}){
     wpick:()=>{draws.push('wpick');throw Error('occupancy/falls must not draw RNG');},
     today:dayValue,updated:[],draws
   });
-  const snippets=[declaration('RESID'),declaration('VACANT_RESIDENTIALS'),fn('vacantResidentials'),fn('vacantResidentialChanged'),fn('moveIn'),fn('tickFalling'),growthWrapper];
+  const snippets=[declaration('RESID'),declaration('VACANT_RESIDENTIALS'),fn('vacantResidentials'),fn('vacantResidentialChanged'),...['housingEligible','housingSlots','learningLodgingUsed','learningHouseholdSlots','learningPerson'].map(fn),fn('moveIn'),fn('tickFalling'),growthWrapper];
   assert.ok(snippets.every(Boolean),'occupancy test needs current production helpers');
   vm.runInContext(snippets.join('\n'),c);
   const s={folk:heads.length?heads:[{}],heads,buildings:[roof],_falling:[roof],ruinCount:0};

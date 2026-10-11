@@ -62,7 +62,7 @@ function realm(html,kind){
   const bodies=['homeScore','houseFolk','moveIn','houseBuyer','ownerOf'].map(name=>declaration(html,name));
   // The current housing model reserves actual scholar board; these ordinary
   // fixture homes have no boarders, so the original selection remains comparable.
-  for(const name of ['learningHouseholdSlots','learningLodgingUsed'])if(source.includes('function '+name+'('))bodies.unshift(declaration(source,name));
+  for(const name of ['housingEligible','housingSlots','learningHouseholdSlots','learningLodgingUsed','learningPerson'])if(source.includes('function '+name+'('))bodies.unshift(declaration(source,name));
   const householdSize=source.match(/^const HOUSEHOLD=[^\n]*/m)?.[0];
   const readBody=html.includes('function lvReadNative(')?declaration(html,'lvReadNative'):'';
   const code=[prelude,householdSize,...bodies,nativeRead(html),readBody,';globalThis.api={houseFolk,moveIn,houseBuyer,ownerOf,homeScore,lvReadNative};'].join('\n');

@@ -6,9 +6,10 @@ import vm from 'node:vm';
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const fn=(name)=>source.match(new RegExp(`^function ${name}\\b[\\s\\S]*?(?=^function |^const |$(?![\\s\\S]))`,'m'))?.[0];
 function harness(){
-  const c=vm.createContext({});
+  const c=vm.createContext({W:{schools:[]},HOUSEHOLD:5});
   const resid=source.match(/^const RESID=.*?;/m)?.[0];
-  vm.runInContext(`${resid}\n${source.match(/^const VACANT_RESIDENTIALS=.*?;/m)?.[0]}\n${fn('vacantResidentials')}\n${fn('resetVacantResidentials')}\n${fn('vacantResidentialChanged')}\nfunction capOf(){return 1}\nfunction heads_(){return heads}\nfunction workOf(){return {x:0,z:0}}\nfunction homeScore(h,s,x){return x}\n${fn('moveIn')}\nlet heads=[];`,c);
+  const housing=['housingEligible','housingSlots','learningLodgingUsed','learningHouseholdSlots','learningPerson'].map(fn);assert.ok(housing.every(Boolean),'native housing and actual board-slot readers');
+  vm.runInContext(`${resid}\n${source.match(/^const VACANT_RESIDENTIALS=.*?;/m)?.[0]}\n${fn('vacantResidentials')}\n${fn('resetVacantResidentials')}\n${fn('vacantResidentialChanged')}\n${housing.join('\n')}\nfunction capOf(){return 1}\nfunction heads_(){return heads}\nfunction workOf(){return {x:0,z:0}}\nfunction homeScore(h,s,x){return x}\n${fn('moveIn')}\nlet heads=[];`,c);
   return {c,run:s=>vm.runInContext(s,c)};
 }
 
@@ -54,7 +55,9 @@ test('warm vacancy cache follows house-to-guildhall-to-house architecture change
 
 test('a moveIn pass keeps its initial vacancy snapshot; next pass sees newly emptied homes',()=>{
   const r=harness();
-  r.run(`const old={arch:'house',state:'sound',hh:[]},first={arch:'house',state:'sound',x:1,hh:[]};const s={buildings:[old,first]};const h1={w:10,bh:old},h2={w:9};old.hh=[h1];heads=[h1,h2];capOf=()=>0`);
+  // The Abbey member must leave an ineligible ordinary roof for its actual
+  // one-slot Abbey roof. Both destinations retain positive native capacity.
+  r.run(`const old={arch:'house',state:'sound',hh:[]},first={arch:'house',state:'sound',abbey:'abbey:0',x:1,hh:[]};const s={buildings:[old,first]};const h1={w:10,bh:old,abbey:0},h2={w:9};old.hh=[h1];heads=[h1,h2]`);
   r.run('moveIn(s)');
   assert.equal(r.run('h1.bh===first'),true);
   assert.equal(r.run('h2.bh===undefined'),true);
