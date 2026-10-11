@@ -9,7 +9,7 @@ import vm from 'node:vm';
 
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const fn=name=>{const hit=source.match(new RegExp(`^function ${name}\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))`,'m'));assert.ok(hit,`missing ${name}`);return hit[0];};
-const REAL=['armyRaftAt','armyBridgeAt','armyObstacle','armySegmentClear','armyDetour','armyLandPath','armyReach','armyReaches','armyReachClosed','armyReachFrom','armyReachCovers','serviceRoadPlan'];
+const REAL=['armyRaftAt','armyBridgeAt','armyObstacle','compoundPointObstacle','compoundCourtGeometry','armySegmentClear','armyDetour','armyLandPath','armyReach','armyReaches','armyReachClosed','armyReachFrom','armyReachCovers','serviceRoadPlan'];
 // serviceRoadPlan exactly as released before the flood: every target gets its full search.
 const LEGACY=`function legacyServiceRoadPlan(s,p,placed,skip,hw=1.3){
   const candidates=[];

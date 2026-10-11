@@ -78,6 +78,8 @@ function fixture({lots=[],owners=[],sites=[{ok:true,cost:100}],grainPrice=10,lan
     storageCommission:q=>{commissions.push(q);const p={...q,type:'storage',si:0,dead:false};projects.push(p);return p;},
     emit:()=>{}
   });
+  // Load the actual new fit readers before capturing their immutable identities.
+  vm.runInContext(['compoundCourtStreetCompatible','compoundPointObstacle','compoundCourtGeometry'].map(declaration).join('\n')+'\nObject.assign(STORAGE_INVESTMENT_NATIVE,{compoundCourtStreetCompatible,compoundPointObstacle,compoundCourtGeometry});',context);
   vm.runInContext('STORAGE_TITLE_OUTCOME=storageOutcome=()=>{};',context);
   vm.runInContext(sitesSource+'\n'+sharedSource+'\n'+investmentSource+'\nSTORAGE_INVESTMENT_NATIVE.sites=storageInvestmentSites;',context);
   const run=nextDay=>{now=nextDay;context.storageInvestment(s);};

@@ -181,7 +181,7 @@ test('quay access detours along the dry bank with lane-width clearance, without 
   const C=planRuntime({W:{rivHash:{},settlements:[]},SIZE:2000,CELL:10,SEA_SURFACE:0,hAt:()=>10,
     riverAt:(x,z,pad=0)=>x>4-pad&&x<10+pad&&Math.abs(z)<3+pad?{hw:3,y:9}:null,
     paidRoadAt:()=>false,toCell:()=>0,inB:()=>false,fortCircuits:()=>[]});
-  vm.runInContext(fn('armyObstacle'),C);
+  vm.runInContext(['armyObstacle','compoundPointObstacle','compoundCourtGeometry'].map(fn).join('\n'),C);
   const s={owner:0,streets:[street('road',[{x:18,z:-10},{x:18,z:10}])]},p={x:0,z:0},plan=C.serviceRoadPlan(s,p,null,null,1.6);
   assert.ok(plan);assert.ok(plan.path.some(q=>Math.abs(q.z)>=5.6));
   for(let k=1;k<plan.path.length;k++){const a=plan.path[k-1],b=plan.path[k],n=Math.ceil(distance(a.x,a.z,b.x,b.z));

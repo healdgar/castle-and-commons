@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
-const names=['onRoad','paidRoadAt','armyRaftAt','buildArmyRaft','armyBridgeAt','armyObstacle','armySegmentClear','armyDetour','armyLandPath','armyDestination','armyRouteBlocked','armyMarchPath','armyShore','armyCauseway','walkedRoadAt','roadWalkedBounds','roadBounds'];
+const names=['onRoad','paidRoadAt','armyRaftAt','buildArmyRaft','armyBridgeAt','armyObstacle','compoundPointObstacle','compoundCourtGeometry','armySegmentClear','armyDetour','armyLandPath','armyDestination','armyRouteBlocked','armyMarchPath','armyShore','armyCauseway','walkedRoadAt','roadWalkedBounds','roadBounds'];
 const extract=name=>html.match(new RegExp('^function '+name+'\\b[\\s\\S]*?(?=^function |^/\\*|$(?![\\s\\S]))','m'))[0];
 function fixture(){const W={settlements:[],rivHash:{},roads:[],dom:new Int16Array(400).fill(0)},G={rivHash:{},bridgeSpans:[]};
  const c=vm.createContext({W,G,ARMY_ROUTES:{on:false},SIZE:2000,CELL:10,SEA_SURFACE:.5, // stub ground: the route memory (army-route-memory.test) needs the real raster
