@@ -116,6 +116,8 @@ daily forecast, separate from the quantity produced by quarries.
 | Streets, courtyards, infill, settlers | Streets, purchased courtyard housing, infill and speculative landlord roofs have daily paid proposals | Geometry, rights and paid construction control new native maps. `tickCourts` is courtyard housing, separate from judicial `tickJustice`. |
 | Folk, households | Monthly reconciliation/annual aging by place; annual family/career/housing pass | Due birthdays, life hazards and actor eligibility need daily rates/queues. Household choices must be split from annual rent, clothing, wine, winter-hay and pannage quantities. |
 | Livestock, migration | Monthly herd/feed reckoning and opportunity pass | Convert production/feed quantities and stochastic hazards to daily rates; keep seasonal slaughter events. Cache grazing/opportunity inputs by their actual writers. |
+| New government and foreign staffing | Ordinary charters, funded mayor service/replacement, overdue collector eligibility and actual foreign enlistment daily | Reserve real farm dues and use the current actual service budget; a foreign recruit receives only the actual advance to the next payroll date. Court/assessment/payment dates remain dated. |
+| Legacy native military | Household hosts and local watch recruitment monthly; emergency militia decisions every other day | Existing per-visit recruitment/release quantities need deliberate conversion. These paths remain cadence debt; the new-institution conversion does not claim all older decisions are daily. |
 | Tenure, justice, domains, ways | Contracts and assessments mixed with admission/recruitment/investment decisions | Keep genuine rent, quarter-day farms, court sittings and tax/upkeep dates. Separate vacancies, profitable offices, hosts, toll-house and route choices. |
 | Market, metro | Monthly market; monthly pooling/annual amalgamation | Market cadence can be a world rule, but the current monthly horizon is not yet a chosen market-day design. Split pooling and ownership opportunities from dated services; use stock/price/topology changes for candidate invalidation. |
 | Storage investment | Daily, from current exposed custody and funds | Native profitability and nearby-street bounds precede full site surveys; ordered proposals share only one synchronous pass. Eligible surveys start with fresh graphs. Cross-day reuse needs a complete geometry certificate ([audit](SIMULATION-CACHE-INPUTS.md)). Construction advances only by actual paid work, including fractional days. |
@@ -137,7 +139,7 @@ intervening purchases/transfers. Preserve actual transfer limits at execution.
 
 ### Reuse within an operation, 10 October 2026
 
-The next exact kernel batch leaves the 52 phases and their cadence unchanged.
+The operation-local kernel batch retained its then-current 52 phases and their cadence.
 `tickTrade` owns a private, lazy candidate map lasting only for that synchronous
 pass. Its first query visits `householdsOf` in canonical order and separates
 dealers, carters and boatmen. Later selections reread purses and driver absence;
@@ -198,7 +200,7 @@ Estate keeper hiring/paid biological harvest runs after the current actor roll i
 
 Learning, local adoption and craft contracts run in that order at the start of `tickEconomy`. The actual actor roll, household identities, early abbey/Church staffing and estate work precede them. A teacher, current keeper, monk, apprentice or paid employee is unavailable for a second full ordinary job; an independent craft master remains a native construction candidate. Current net work receipts, rather than an occupational label, support skill and output.
 
-Within `tickGovernment`, lord journeys and dated credit settlement precede bench, assembly-of-estates and native local sessions. `tickChurchBodies` closes the parish/Church side after actual receipts; separately funded appointments first work on the following day. These are data dependencies, not new artificial monthly eligibility throttles.
+Within `tickGovernment`, lord journeys and dated credit settlement precede bench and assembly-of-estates work. Overdue unassessed grants reconsider an actual collector daily until their genuine expiry. Each place then funds current mayor service/replacement before annual farm payment, daily commune eligibility and due quarter-day recoveries. Monthly hundred/shire sittings close the visit. `tickChurchBodies` closes the parish/Church side after actual receipts; separately funded appointments first work on the following day. These are data dependencies, not new artificial monthly eligibility throttles.
 
 Native manor and royal officer selection now checks current presence, literacy,
 matching office identity and conflicting institutional duties. Quotes remain
@@ -209,15 +211,37 @@ the changed staffing affects tomorrow's ordinary production.
 Current institutional details are recorded in the JSON `institution_integration` contract. Paid machinery completes in `tickProjects` after today's ordinary production, so its effect starts tomorrow. Abbey dairy/wool/ordinary crop shares are allocated once; its self-worked area is excluded from the ordinary tillers' grain. Church inheritance evidence follows actual creditor recovery. Foreign holdings and funded voyages update inside `tickKnighthood`, before domestic military work; actors aboard remain absent from home. No screen read makes equipment, advances an institution, changes a title or pays an account.
 
 The own-use abbey industry adapter preserves the 59 top-level phases. Early
-`tickAbbeyWork` releases covered-day tanning bookings and assigns today's real
-qualified operators before calculating field and flock hands. `tickLivestock`
+`tickAbbeyWork` first checks actual Church service, then refreshes membership
+and due annual counters,
+releases invalid or covered-day industry bookings, pays/recruits current staff,
+and binds the resulting actual operators before calculating field and flock
+hands. `tickLivestock`
 creates skins only from actual lawful native slaughter; later `tickMarket`
 butcher slaughter supplies subsequent production days. Inside `tickEconomy`,
 public grinding and the abbey crop share one native mill workday; only public
 work creates multure claims. The actual owned hide/timber recipe and finite
-footwear wear follow crop/fish output. Paid retained mill/tannery completion
+footwear wear follow crop/fish output and precede smith/weaver processing, paper
+production and ordinary nonfood use. Paid retained mill/tannery completion
 follows production, and closing `tickAbbeys` commissions first work tomorrow.
 Actual additional hydraulic geometry crosses the draw boundary; operator jobs,
 refusal reasons and annual/lifetime counters remain worker state and detached
 inspector output. This intentionally adds the accepted own-use mechanics and
 changes affected histories; same-speed/history/save discipline still applies.
+
+The assembled source review at `2d81f11` confirms the 59 phases and 200 edges,
+and all 39 own-use-industry function hashes match their exact AST declaration
+slices. The existing pins remain unchanged. The recognized legacy search
+inventory contains 410 sites: 187 building, 70 street, 49 folk and 16 owner
+collection scans; 35 `heads_`, 22 `workers_`, 16 `headsOf` helper calls and 15
+unscoped entries. These are syntactic candidates, not measured costs or defects.
+The JSON records the source digest and this bounded review separately from the
+original survey and the pending native release gates.
+
+Foreign population/food and current recruitment run first inside
+`tickExpeditions`, before that phase's actual campaign combat. Recruitment is
+daily and consumes one actual tool plus treasury wages advanced only to the
+next twentieth-day payday; that payroll and the actual harvest stay dated.
+Daily `tickGrowth` grants an eligible village's market charter after current
+paid project completions and before housing and late commune choices. The
+annual history visit still maintains its native peak/queue/aftermath work, but
+no longer gates that charter.

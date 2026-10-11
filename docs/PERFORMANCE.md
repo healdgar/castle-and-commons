@@ -6,12 +6,12 @@ The app remains a single HTML file with no build step.
 
 ## Exact fast forward (current priority, 2026-10-10)
 
-The 11 October institution batch is still being assembled and gated. Its frozen
+The 11 October institution batch is assembled and being gated. Its frozen
 `d36bf93` correctness suite finished 196 files with 1,916 passes and two fixture
 failures: 2,683.46 aggregate child CPU seconds, 1,704.25 wall seconds, load
 0.004→1.00. Those are test-runner costs, not game throughput. The reviewed
-fixture repairs and missing own-use abbey processing form the next coupled
-batch. Earlier exact-reuse diagnostics and failures are retained in
+fixture repairs, operative own-use abbey processing and the remaining daily
+institution eligibility decisions form the coupled `2d81f11` batch. Earlier exact-reuse diagnostics and failures are retained in
 [HANDOFF.md](HANDOFF.md); they are not a final 150-day or shipping speed result.
 
 The current institution integration uses daily housing, road, castle and

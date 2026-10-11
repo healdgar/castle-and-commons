@@ -1251,7 +1251,8 @@
         "tickEconomy -> commoditySettleAll: all changes must enter daily storage journal after day mutators."
       ],
       "cache_or_preparation": "Potential bounded read prep: a same-day settlement-index schedule mask and simple environmental scalars. Storage route/facility helpers already maintain private reusable route/index caches; a day-start inventory snapshot is unsafe because purchases, consumption and arrivals alter live availability in canonical order.",
-      "uncertainty": null
+      "uncertainty": null,
+      "current_cadence": "Daily learning, technology, craft contracts and equipment decisions precede current ordinary crop grinding/production, own-use abbey crop/fish/industries, native smith/weaver/paper processing and nonfood use. Existing annual workshop/vine accounting and autumn vintage quantities remain; arrivals, imports, carriage, spoilage, export/trade and upkeep are separate ordered phases."
     },
     {
       "name": "tickPopulation",
@@ -1428,7 +1429,7 @@
       ],
       "cache_or_preparation": null,
       "uncertainty": "No complete static closure over every geometry/parcel helper; see source citations and dependency narrative in map-audit.md.",
-      "current_cadence": "Daily occupancy, due falls, funded housing/widening/refit/fabric and public street proposals. Physical wear uses elapsed vacancy and a daily rate; native saved paid work controls completion.",
+      "current_cadence": "Daily occupancy, due falls, eligible village market charter, funded housing/widening/refit/fabric and public street proposals. Physical wear uses elapsed vacancy and a daily rate; native saved paid work controls completion.",
       "current_property_inputs": "live full scalar/ordered geometry certificate in a private sidecar; security/walls and population live; no annual town-worth authority; query-only memo on cache misses"
     },
     {
@@ -1526,7 +1527,7 @@
       ],
       "cache_or_preparation": null,
       "uncertainty": "Project-type helper effects are heterogeneous; each type must be followed for any narrower reordering.",
-      "current_cadence": "Daily native castle and storage material/paid work; retained-site validation before any castle payment; new proposals start next day.",
+      "current_cadence": "Daily retained paid equipment, fabric, compound, plan, castle, storage and road/paving progress. Current authority, native target/site, actual owned materials and net paid work govern completion; proposals commissioned later first progress tomorrow.",
       "current_castle_inputs": "Current patron/title/seat/capital/role/exile/siege, fixed geometry, terrain/water, local live buildings/lots/places/circuits/roads/tracks and pending reservations, exact agricultural mask cells; actual owner stock, live sellers/prices/purse and named workers.",
       "current_castle_outputs": "Installed materials, actual wages and fractional working days; project stall/removal/annals; canonical keep/ward/access, rights/parcel/route state and agricultural mask/field area at completion.",
       "current_castle_rng": "No proposal/site randomness; completion place() consumes the retained settlement layoutRng stream.",
@@ -2348,7 +2349,8 @@
         "Calls into other settlements for quarry demand and town layout; independent per-settlement schedules are not fully disjoint. Shared sim RNG and cross-place queries prevent arbitrary reorder."
       ],
       "cache_or_preparation": "The date guard partitions which settlement gets its yearly turn, but no proved safe parallel group: all settlements query shared stone demand and owner/capital state; RS.sim, global building/caches and market/purse effects remain ordered. Adjacent dates with no local turn still execute other daily phases and cannot be collapsed.",
-      "uncertainty": "L.live is generated per settlement and has stateful closures (reuse/promote/wall/stoneWall/parish/friary/neustadt/citadel/quarry/wharf/backyards/lanes/siege); preserve closure captures and every callback order."
+      "uncertainty": "L.live is generated per settlement and has stateful closures (reuse/promote/wall/stoneWall/parish/friary/neustadt/citadel/quarry/wharf/backyards/lanes/siege); preserve closure captures and every callback order.",
+      "current_cadence": "The annual native history/peak/vacancy-queue/siege-aftermath visit remains. Market-charter eligibility moved to daily tickGrowth; public lane and town-wall proposals also have independent daily consumers. The original cadence_at_survey is historical."
     },
     {
       "name": "tickVictory",
@@ -2550,11 +2552,11 @@
     "At the survey commit Ships precedes Metro; current order preserves this so imports can be pooled.",
     "At the survey commit Market follows Population; redesigned Market precedes Population to provision before meals.",
     "Weather feeds military/land/hazards; Economy directly reads season and W.drought, not the other tickWeather outputs.",
-    "Growth day%6===0 and Land day%30===15 are disjoint in the fixed 30/360 calendar. No RNG-order edge between adjacent inactive guards is needed.",
+    "At the original survey, Growth day%6===0 and Land day%30===15 were disjoint in the fixed 30/360 calendar. No RNG-order edge between adjacent inactive guards is needed.",
     "tickCourts means courtyard redevelopment, not judicial hearings.",
-    "casNext itself has no direct random draw; construction/layout helpers may draw. Existing castle yearly gate is an artificial decision throttle awaiting duration/eligibility redesign.",
+    "casNext itself has no direct random draw; construction/layout helpers may draw. The surveyed yearly castle gate was an artificial decision throttle; current foundations and upgrades use daily eligibility and saved paid duration.",
     "storageInvestment\u2019s former monthly index stagger was an artificial decision throttle. It is now daily, using current custody/economics and bounded within-pass survey reuse; physical construction retains paid working days.",
-    "The growth audit found annual widening/vacancy unreachable except at settlement indexes divisible by six. The bounded batch now makes occupancy/due falls daily and the annual stagger independent; housing/fabric physical-rate conversion remains pending. Property inputs are certified live, as recorded in SIMULATION-GROWTH-INPUTS.md.",
+    "The growth audit found annual widening/vacancy unreachable except at settlement indexes divisible by six. The first bounded batch made occupancy/due falls daily and the annual stagger independent; current paid housing, widening, vacancy/refit and fabric proposals are all daily with actual materials and saved paid duration. Property inputs are certified live, as recorded in SIMULATION-GROWTH-INPUTS.md.",
     "Ward transfers become effective within Metro; syncOwner establishes the old owner and updates field lord/title state before downstream consumers.",
     "Closing stone forecast covers completed current work; storage commissions created after financial close first enter work/forecast tomorrow.",
     "Earlier household/army journeys may require lazy route preparation before the closing routingPrepare; this batch does not claim one graph build per day.",
@@ -2596,12 +2598,26 @@
           "benchSession",
           "tickEstates"
         ],
-        "reads": "Current real whereabouts, dated claims, actual consent and funded officers; credit settlements precede current judicial recovery."
+        "reads": "Current real whereabouts, dated claims, actual consent and funded officers; credit settlement precedes judicial recovery. Overdue unassessed grants retry current collector eligibility daily until their genuine expiry. Actual delegated profit and current town funds pay daily mayor service after reserving the annual farm; replacement updates only the matching former office. Annual farm dues and quarter-day arrears remain dated. Closing offices affect tomorrow\u2019s ordinary work.",
+        "per_settlement": [
+          "communeDaily",
+          "communeDue",
+          "daily eligible communeCharter",
+          "dated subsidyRecover"
+        ],
+        "closing": "Due monthly hundred/shire sittings; the sheriff tourn remains half-yearly."
       },
       {
         "phase": "tickAbbeyWork",
         "first": "churchWork",
-        "reads": "Today\u2019s actual bishop/chapter/vicar service precedes crop and marriage/estate use; unsupported service gives no appropriation."
+        "reads": "Current paid bishop/chapter service precedes all abbey work. The first industry preparation releases invalid or covered-day bookings; staffing then pays or hires actual qualified operators, and the second preparation binds those actual jobs before field capacity. Assigned industry operators cannot also supply a full field/flock workday. Canonical workArea/workRatio and settlement _abbeyArea feed later native crop production.",
+        "per_abbey": [
+          "abbeyYear",
+          "abbeyIndustryPrepare",
+          "abbeyStaff",
+          "abbeyIndustryPrepare",
+          "abbeyWork"
+        ]
       },
       {
         "phase": "tickChurches",
@@ -2680,30 +2696,41 @@
         "reads": "A completed wet chamber has its real title holder and current paid exclusive keeper. Later native barge departures book finite passage service or retain actual boatman portage/time. Native crop and processing share finite current mill operator time."
       },
       {
-        "phase": "tickAbbeyWork",
-        "first": [
-          "abbeyYear",
-          "abbeyIndustryPrepare",
-          "abbeyStaff",
-          "abbeyIndustryPrepare"
+        "phase": "tickEconomy",
+        "after": "Native grain grinding, fish/timber/ore output and made allocation",
+        "then": [
+          "abbeyCrop",
+          "abbeyFish",
+          "abbeyIndustries"
         ],
-        "then": "abbeyWork",
-        "reads": "Current actual qualified lay/paid operators and required inputs book finite own-use work. Covered-day tanning releases before native field/flock capacity; assigned operators cannot also supply another complete native workday."
+        "reads": "Ordinary grain excludes actual self-worked abbey area. The abbey crop first uses its own actual powered/qualified mill, then public mills; all processing shares each native poweredDay. Only externally processed crop incurs multure and only retained public work creates pending service claims. Actual owned hides from prior or current lawful slaughter and bark-equivalent timber produce finite leather; actual covered mouths consume footwear wear once. tickLivestock precedes this production; later tickMarket butcher skins enter subsequent days.",
+        "before": "Native smith/weaver processing, technologyPaperMill and ordinary nonfood consumption"
       },
       {
-        "phase": "tickEconomy",
-        "after": [
-          "native crop grinding",
-          "native physical production",
-          "abbeyCrop",
-          "abbeyFish"
+        "phase": "tickGrowth",
+        "first": [
+          "moveIn",
+          "tickFalling",
+          "villageMarketCharter",
+          "tickGrowthHousing",
+          "tickGrowthWiden",
+          "tickGrowthVacancy",
+          "tickGrowthFabric",
+          "newTownStreetProposal",
+          "publicLaneProposal",
+          "townWallProposal",
+          "tickTownReuse"
         ],
-        "then": "abbeyIndustries",
-        "reads": "Actual owned grange crop shares native poweredDay with public grinding. Only external work creates pending multure claims; real slaughter skins and bark-equivalent timber are consumed into finite leather, then actual covered mouths consume footwear wear. Native tickLivestock slaughter precedes production; later tickMarket butcher skins enter subsequent days."
+        "reads": "Completed paid projects, current occupation, trade, funds and native public access precede current map proposals. Village market-charter eligibility is daily, before housing and later commune decisions; annual history no longer controls that eligibility. Wear/repair quantities and saved paid construction duration remain distinct from daily decisions."
+      },
+      {
+        "phase": "tickExpeditions",
+        "first": "tickForeignWorld",
+        "reads": "Existing bounded foreign people eat and undergo daily mortality/births before dated harvest, actual payroll and current recruitment. Daily recruits are existing eligible adults with a full real tool and an actual treasury advance prorated to the next twentieth-day payroll; recruitment is independent of that wage date. This staffing precedes same-phase expedition combat; no invasion generates replacement actors."
       }
     ],
     "new_phase_sources": {
-      "tickAbbeyWork": "Current canonical membership, actual paid staff, fed hands and self-worked area; no duplicate ordinary crop allocation.",
+      "tickAbbeyWork": "Current Church service and canonical membership; invalid/covered industry bookings release before actual paid staff and qualified industry assignments. Remaining fed field/flock hands establish self-worked area; no duplicate crop or full second workday.",
       "tickAbbeyMeals": "Actual corporate held/sale food into existing member/corrody household pantries, before one native meal.",
       "tickAbbeys": "Actual grants, endowments, admission, charity, saved compound commissions and due order visits after upkeep; new work starts next day.",
       "tickEstateWork": "Current titled fields/live ecology and actual paid keepers, before production/storage; no meat/fish or skill from a display read.",
@@ -2762,6 +2789,55 @@
       "intended_history_change": true,
       "conservation": "Zero opening skins/leather and zero ordinary household NEED. Actual lawful cattle/sheep slaughter credits the actual slaughterer once; native purchases/held stocks fund conserved hide+timber-to-leather and finite own-use wear. No stock or persons from a label.",
       "operative_checks": "One focused native-source file passes 25 checks. Full generated-world industries, save, history, worker/draw and conservation remain serialized root gates."
+    },
+    "current_cadence": {
+      "ordinary_clients": "Daily actual foundation/admission/staffing, commune/market-charter, learning, credit proposal, knightly service choice, estate investment, machinery, castle and paid housing eligibility. Idempotence and unchanged-input guards do not schedule an arbitrary later day.",
+      "dated_world_obligations": "Court sittings, annual/quarterly rents and assessments, company/foreign payroll, feudal calls and forty-day service, chivalric dues, school terms/Sunday rest, harvest/biology and order chapters retain actual dates. Overdue subsidy eligibility is daily.",
+      "legacy_military_debt": [
+        {
+          "function": "tickDomains -> ensureHosts",
+          "guard": "day()%30===20",
+          "effect": "Existing native household-host formation/recruitment and release quantities remain monthly."
+        },
+        {
+          "function": "tickGarrisons",
+          "guard": "day()%30===11",
+          "effect": "Existing native watch recruitment quantities remain monthly."
+        },
+        {
+          "function": "tickCallToArms",
+          "guard": "day()%2===0",
+          "effect": "Existing native emergency militia proximity/call/release remains every other day; lastSiegeDay is still written daily."
+        }
+      ],
+      "scope": "These legacy quantity/cadence debts remain outside the new-institution conversion. The full older simulation is not claimed to make every ordinary decision daily."
+    },
+    "assembled_source_review": {
+      "commit": "2d81f11",
+      "index_sha256": "cc172f2ce341ae801825504195710b070037d957958402fedcce4584d184965b",
+      "top_level_phases": 59,
+      "prerequisite_edges": 200,
+      "own_use_hashes": {
+        "reviewed": 39,
+        "exact_matches": 39,
+        "scope": "Acorn FunctionDeclaration source.slice(start,end), exact UTF-8 SHA-256; all existing reviewed_function_sha256 entries retained unchanged."
+      },
+      "recognized_legacy_search_inventory": {
+        "sites": 410,
+        "reported_functions_with_direct_or_transitive_searches": 1394,
+        "patterns": {
+          "collection:folk": 49,
+          "collection:buildings": 187,
+          "collection:streets": 70,
+          "collection:_owners": 16,
+          "helper:workers_": 22,
+          "helper:heads_": 35,
+          "helper:headsOf": 16,
+          "unscoped-entries": 15
+        },
+        "scope": "Actual tools/legacy-search-audit.mjs syntactic inventory, not runtime cost or a prohibition of necessary one-pass traversals."
+      },
+      "validation_scope": "Read-only AST/source/hash inventory only. No tests, native worlds or release-gate claim."
     }
   }
 }
