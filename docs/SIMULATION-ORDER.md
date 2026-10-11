@@ -99,6 +99,35 @@ record/ID allocation and ordered journal callbacks prevent treating towns as
 independent mutable jobs. The schedule is serial. Immutable preparation can be
 shared only across consumers whose inputs have not changed.
 
+## What can hold up the next day
+
+`simTick` completes one authoritative day before another begins. The closing
+`tickAbbeys`, `tickEstateProjects` and `tickStorageInvestment` may inspect sites,
+find approaches and commission projects. Their accepted decisions change current
+cash, goods, reserved ground and records; tomorrow must see those changes, and
+`commoditySettleAll(true)` must follow the last stock writer. Moving a costly
+phase earlier does not remove that dependency or reduce its total work.
+
+The fresh source `61896d3` still reaches the original 120-second deadline in
+partial day 50 after 49 clean closed days. Its live profile places almost all
+sampled work in `serviceRoadPlan` and the ghost-free exhaustive `armyReach`
+flood. This is a measured planning blocker, not evidence that every closing
+phase is expensive. The flood supplies only a reachability rejection; accepted
+routes still come from the ordered bounded path searches and full current
+footprint, terrain and permission checks.
+
+There is also an explicit persistence barrier: `storageOutcomeReady()` can
+return false before incrementing the day while the asynchronous raw journal has
+backpressure or a fault. Browser storage already runs asynchronously; buffering
+allows simulation to proceed until that barrier is necessary. Rendering, reports
+and detached presentation packets can lag without changing canonical history.
+
+Yielding a search between event-loop turns can improve responsiveness but does
+not reduce CPU. Parallel preparation would require immutable inputs, current
+input validation and a fixed serial decision/commit order. Shared actor purses,
+rights, RNG and record allocation are not independent mutable jobs. A partial
+day is neither a closed save boundary nor a valid next-day starting state.
+
 ## Daily work and remaining cadence changes
 
 Daily trade now considers every origin. Its former every-fourth-day visit was
