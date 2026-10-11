@@ -2763,7 +2763,7 @@
         "herdTake": "ba7669bf3022d2a6819791abd648aebb407375b09bd54ffa43513ef875f6194b",
         "abbeyCompoundValidate": "b487e1f6d76ad61aedf9bf7d095e70d2bd3bf0c3792869e48479218ddea188a4",
         "abbeyCompoundComplete": "57984ff13c3c47b505ec202ff386f75a8714d5fb36676b46f2f098ae87dca466",
-        "abbeySitePlan": "34c65da0e8eb4d1b04b537365f4f09fd19ec8dc8c370315c22c1de6da35972ee",
+        "abbeySitePlan": "730949464ba5cda7e6a36105f64d908d752381ca7b52e40c06e4b77fd23cabc5",
         "abbeyCommission": "ffc083ef4afc27a39973f70417a1ea348bd36c694ff82d7805c507fd910f0c8f",
         "abbeyYear": "3e53350f13860299736ac8de8a409aab10064bba5368cb93b6c8fbfd7d19d08c",
         "abbeyAdmit": "312aec1480453ddf38ae95e3910b83ffaa028bfeceeb0c78134f97aa632bedb8",
@@ -2774,7 +2774,7 @@
         "abbeyIndustryOperator": "381bb80a70ed77926f7654410322a7fd337e6d6a8073354a22a14745425997fc",
         "abbeyIndustryPrepare": "f6181744cd8bebee4486414fae9a435305cca1607ec1c56174ac331ffffdcba5",
         "abbeyMillPower": "a87ce3a013885c3f66fa9c9dc93e5c3a204f7049163d51d9736c1498f0863108",
-        "abbeyMillPlan": "2e3e66642dd6322bc103f977bf6bc859afb44a33dfabf00e9cbb5835382765b4",
+        "abbeyMillPlan": "25c505d9ffa034cd57db5edd8b42f22f975666ff2e6eb29f3eb59bf1f3fc619f",
         "abbeyLeatherMouths": "d0d62e97e2a1b4e65aa803f54bceeb16e7242c06ae42d4f67fee4e07f5bd5061",
         "abbeyTanningTarget": "eb74aef07a4831ab54421db7292143e643346c0dbb33267f3bc31341cb5fdde0",
         "abbeyTanneryPlan": "2361ae2b80954c1b3ce51c6b9b66950aa026863131313832c2a85c22dbcefe95",
@@ -2817,6 +2817,15 @@
           "abbeySummary"
         ],
         "scope": "Reviewed rural building-grant/approach separation, fixed endpoint and obstruction/licence validation, separately quoted and paid approach before completion, actual recruited household arrival before paid staffing, and detached scalar recruitment reports. These eight exact AST-body pins change; the other 31 remain exact. The earlier isolated own-use checks above remain historical evidence, not a gate of this source."
+      },
+      "survey_review_update": {
+        "commit": "cd8217867c9249909d7d4ced6be4fcf08f7e42e6",
+        "index_sha256": "fc6caef1eac3b29054a2b3d4b15f939dbe5f43c7e67bf1a1f22dce8d54271b2f",
+        "changed_functions": [
+          "abbeySitePlan",
+          "abbeyMillPlan"
+        ],
+        "scope": "Only these two existing own-use AST-body pins change in the synchronous rural survey optimization; the other 37 remain exact. The previous rural implementation review remains historical evidence. Full native gates of this source remain root work."
       }
     },
     "current_cadence": {
@@ -2842,19 +2851,19 @@
       "scope": "These legacy quantity/cadence debts remain outside the new-institution conversion. The full older simulation is not claimed to make every ordinary decision daily."
     },
     "assembled_source_review": {
-      "commit": "e2fa455dc8bd1a9ae1702f7024742cf6f21e7aff",
-      "index_sha256": "ad7d07b894de80a0aeded5ea95043b576b6ee46c7e32830bee52575deea3dd32",
+      "commit": "cd8217867c9249909d7d4ced6be4fcf08f7e42e6",
+      "index_sha256": "fc6caef1eac3b29054a2b3d4b15f939dbe5f43c7e67bf1a1f22dce8d54271b2f",
       "top_level_phases": 59,
       "prerequisite_edges": 200,
       "own_use_hashes": {
         "reviewed": 39,
         "exact_matches": 39,
-        "scope": "Acorn FunctionDeclaration source.slice(start,end), exact UTF-8 SHA-256. Eight reviewed rural/arrival/report bodies change from the prior 9000cf0 review; 31 remain exact. All 39 current pins match this source."
+        "scope": "Acorn FunctionDeclaration source.slice(start,end), exact UTF-8 SHA-256. Only abbeySitePlan and abbeyMillPlan change from the e2fa455 review; the other 37 remain exact. All 39 current pins match this source."
       },
       "native_fault_repairs": {
         "reviewed_function_sha256": {
           "abbeyFounder": "f36a7e633fc157a775b9cdaad7812dcfcc53b60b9f7d6619ddef3831154b61e4",
-          "abbeyFoundPlan": "c18d39986a19f01deb7868602819ea87c72bc6e305b5577cd6c4e7b1c7114636",
+          "abbeyFoundPlan": "639f028dea779e69fd0616d356e36d6e5af1722de02aa45a6564b7d2e93e4b28",
           "abbeyEndowLease": "411491c2e43cca6332f40c6370d78e39cdb8b7642f3086bd6030b5300b035ab7",
           "abbeySitePoses": "1ef5d4518f7b2263ac6f8749df561e90f7a26e8c8f824156797d579185716bbd",
           "learningUniversityQuote": "13e23d56ab5369f05f247ccad651bcd348d5109ecd46ac51e9abd672f582d46b",
@@ -2866,19 +2875,19 @@
         "reason": "Resolve the actual Crown founder; reject unavailable university masters before pricing and readonly equipment queries; bounded eight-pose windmill sites retain native ground, public approach, power, qualification and payment constraints. Public windmill proposal, retained validation and readonly button all exclude private abbey mills; standing public mills still veto. The current founding quote separates the unheld free-alms building grant from a lawful paid/donated approach and includes its current actual permission cost in the named founder endowment."
       },
       "recognized_legacy_search_inventory": {
-        "sites": 413,
-        "reported_functions_with_direct_or_transitive_searches": 1419,
+        "sites": 417,
+        "reported_functions_with_direct_or_transitive_searches": 1422,
         "patterns": {
           "collection:folk": 49,
-          "collection:buildings": 189,
+          "collection:buildings": 191,
           "unscoped-entries": 15,
-          "collection:streets": 71,
+          "collection:streets": 73,
           "helper:workers_": 22,
           "collection:_owners": 16,
           "helper:heads_": 35,
           "helper:headsOf": 16
         },
-        "scope": "Actual tools/legacy-search-audit.mjs syntactic inventory, not runtime cost or a prohibition of necessary one-pass traversals. The three added physical-access/room proposal traversals are explicitly reviewed in tools/legacy-search-inventory.json; no other count is renewed."
+        "scope": "Actual tools/legacy-search-audit.mjs syntactic inventory, not runtime cost. Four additional recognized occurrences are explicitly reviewed: ordered operation-local building geometry, lazy public strips, cached building traversal beside the exact fallback, and public-street observation on a rejected physical grant. Existing counters remain unchanged except those four additions; no transaction-search permission or century-scale performance claim follows."
       },
       "validation_scope": "Frozen972a01f combined1977/1978 with one30-second serialization deadline; original-deadline final8file serial82/82. Two newpublic/private regressions+4founder diagnostics=1984 unique verified across batch and focused reruns, not onefull1984pass. Freshc205150day fullgraph/allRNG/sevenspeed/906raw and37→150 exactsave/replay678raw pass. Abbeycoordinatorabortday626 proves gaps69–71; changedsource native completion and finalgates pending.",
       "petition_checkpoint": {
@@ -2909,7 +2918,48 @@
         "canonical_ownership": "Whole living households set movingTo before departure, suppressing native household splitting. Their actual H/assets/member identities remain one account; native arriveHousehold moves existing goods after all living arrivals. Returning survivors use another real journey. Shared board receipts prevent repeated meals; native profession and service checks occur only after actual arrival and ordinary canonical room assignment.",
         "search_scope": "Qualification rosters use eight nearest native craft indexes and at most twelve current qualified candidates per place/job; current rights, exclusive jobs, purses, rooms, project/physical service and income gain are rechecked. The private WeakMap is rebuilt after loading; offer records hold plain observations plus canonical person/household/member references, not callbacks or duplicate goods."
       },
-      "current_source_validation_scope": "Static review only at e2fa455. Current source native/history/save/worker/conservation gates remain serialized root work. The earlier-source results above and focused petition/recruitment/approach checks do not establish a full release pass of this source."
+      "current_source_validation_scope": "Static review only at cd82178. Current source native/history/save/worker/conservation gates remain serialized root work. Earlier-source results and focused survey/codec/recruitment checks do not establish a full release pass of this source.",
+      "survey_optimization": {
+        "commit": "cd8217867c9249909d7d4ced6be4fcf08f7e42e6",
+        "index_sha256": "fc6caef1eac3b29054a2b3d4b15f939dbe5f43c7e67bf1a1f22dce8d54271b2f",
+        "reviewed_function_sha256": {
+          "layoutSettlement": "87674eaf0466cb9cd9b47228a320686ed8fb182118abed25ad66704631a3b147",
+          "compoundProjectCommission": "1646de1d076746bc39bad35d79637a09addcc1b29048539b3f1d22fa5737734d",
+          "compoundProjectTick": "f54bc14162e5c48078bb917f49e1be871860eae935852730fb8f0aadb9b26160",
+          "abbeySurveyBounds": "b4d1f6f1fd6362a2ac97f79fa68b5c8b821ab8490dcc8c9526e623ec2174efdc",
+          "abbeySurveyBoxesMayHit": "e4cb661ed636e90886a52a7fb0fb48f56e459022f7248cb518991bf248d698e6",
+          "abbeyApproachSurveyNative": "cccbf33200a571f8adc6c253eb0362fa5e625d5a5b1f00d0af931fde97f77502",
+          "abbeyApproachSurvey": "8960451e223f6bc06d073e8acde74bf9434cf3f82f954cb0787bf50af220f7fa",
+          "abbeySurveyReserved": "b74e28c46275fea9041febf083a213d8ff6753a6229d728fce2fbe9d0f0000b0",
+          "abbeySurveyPublic": "296726f1a811cb6d6d847aa75fdf76db2853471b2ee5f9289e2d83739be11c37",
+          "abbeyApproachPrivate": "70b91009aea0e12fe92988da390781ff2a6aec0de1021c4d9e6ebdcb75191548",
+          "abbeyApproachClear": "5f44e4d6a99a11c68e08bc6bad1027b9dca905dd79189cb03af368436e4d4f86",
+          "abbeyApproachPlan": "0cccd94e3d1577aae490080b79ffeffebd0d71f2b654935756e6f50d06c7dd9b",
+          "abbeySitePlan": "730949464ba5cda7e6a36105f64d908d752381ca7b52e40c06e4b77fd23cabc5",
+          "abbeyFoundPlan": "639f028dea779e69fd0616d356e36d6e5af1722de02aa45a6564b7d2e93e4b28",
+          "abbeyMillPlan": "25c505d9ffa034cd57db5edd8b42f22f975666ff2e6eb29f3eb59bf1f3fc619f"
+        },
+        "reviewed_variable_declaration_sha256": {
+          "ABBEY_APPROACH_SURVEY_CURRENT": "35f911d97483c8345049ecca3dc58742f273c708f40c5009161c2733c3e067a7",
+          "ABBEY_APPROACH_SURVEY_NATIVE": "633c65227d8b3af820b2f5c487a1550a62553a72f8f8c18383fb11339fa23ef3"
+        },
+        "hash_scope": "Exact Acorn FunctionDeclaration slices for the nine changed and six new top-level bodies; exact complete VariableDeclaration slices for the two new helper-identity certificate declarations. Only abbeySitePlan, abbeyMillPlan and abbeyFoundPlan also replace an existing pin; no unrelated pin is renewed.",
+        "top_level_phases": 59,
+        "prerequisite_edges": 200,
+        "dispatch_scope": "simTick is byte-identical to the parent candidate. The AST order validator confirms all 59 direct phases and 200 existing edges; no daily boundary or cadence changes.",
+        "proposal_lifetime": "abbeyApproachSurvey snapshots native ordered active project geometry and all nonremoved nongone buildings once per synchronous proposal. abbeyFoundPlan shares it across the same twelve fields and eight poses; abbeySitePlan and abbeyMillPlan share it only within their current native ordered candidates. Public-strip geometry is initialized lazily in that same context. No commission, building mutation, payment or await occurs between reused poses.",
+        "geometry_dependencies": "Project type/si/dead/site plus compound footprint/paths and castle ward/path; native building x/z/w/d/rotation/state/removal and active graveyard polygon; current local public street pts/hw/flags/retained endpoint and incident W.roads open-or-path. The native helper identity certificate falls back to the original complete traversals when a listed predicate is replaced, including for an already-created context. No actor, title, permission, purse, power or price result is cached.",
+        "broad_phase": "Invalid bounds or padding conservatively request the exact predicate. Polygon boxes retain the native 0.01 edge-distance tolerance plus 1e-6; subtraction skips only axis-separated polygons with 1e-6 slack. Building corridor checks retain sqrt(2)*(1.3+0.3) plus 1e-6 for the rotated local footprint expansion, then run native streetFootprintOverlap. Native project selection/order, graveyard tests and offset armySegmentClear remain authoritative.",
+        "query_order": [
+          "Native direct institutionFoundationAccess runs first. The pure building/hydraulic grant/power preflight then rejects illegal poses before remote serviceRoadPlan, retaining the deliberate native public-street observations on rejection.",
+          "A candidate endpoint and actual approach clearance now precede public-strip subtraction, rasterized private ground, current landPrice and actual fixed-footprint rights/recipients. This legal/clearance order is an authorized model/query-order change.",
+          "Water-mill wheel and feeder polygons enter the base site before grant preflight. After routing, actual grant/power and current affordability/throughput checks still run before an ordinary paid commission.",
+          "Every retained project commission/work/completion rechecks current native endpoint, obstruction, grant and separately paid approach permissions; the proposal context is discarded. Optional site access guards only make the two common dispatcher queries safe for plans without a site."
+        ],
+        "save_boundary": "The context, part boxes/public strips and synchronous groundLegal callback are local stack records, never written into W, retained site/project, layout history roots or presentation DTOs. The static frozen helper-reference certificate also enters no history/save root.",
+        "land_value_initialization": "Early clearance or grant rejection can skip landPrice and therefore delay landValue lazy initialization of the static LANDV coefficient table. LANDV is outside HISTORY.roots() and worldSaveEncode extras; subsequent landValue fills the same fixed coefficients. This intentionally changed query timing is recorded, not normalized away or presented as old-model full-graph identity.",
+        "validation_scope": "Static dependency/source-pin/search review plus the focused inventory gate only. No original-candidate 150-day identity assertion applies to the authorized query-order change; same-source speed/save/conservation/native completion remain serialized root release gates."
+      }
     }
   }
 }

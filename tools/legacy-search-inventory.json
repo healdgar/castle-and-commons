@@ -330,8 +330,11 @@
     "millWheelBuildings|collection:buildings": 1,
     "abbeyIndustryCandidate|helper:workers_": 1,
     "abbeyApproachPrivate|collection:streets": 1,
-    "abbeyApproachClear|collection:buildings": 1,
-    "abbeySkilledRoom|collection:buildings": 1
+    "abbeyApproachClear|collection:buildings": 2,
+    "abbeySkilledRoom|collection:buildings": 1,
+    "abbeyApproachSurvey|collection:buildings": 1,
+    "abbeySurveyPublic|collection:streets": 1,
+    "abbeyApproachPlan|collection:streets": 1
   },
   "review": "Worker cutover: inspectorCard replaces showInspect scans; visualSettlement transports building IDs only on layout change; installPresentation reattaches display objects; groundPick scans projected churchyards on click; refreshOverlayNow sorts numeric property-value results. Court grazing: one owner pass only when the existing monthly livestock reckoning finds overstocking, plus one holding pass; no per-family search, persistent index or new daily census. Assize receipts use payCrafts' existing payee loop.",
   "reviewedMoves": [
@@ -529,5 +532,38 @@
       }
     ],
     "scope": "Only these three actual new proposal/physical validation sites are added. Existing entries and limits remain; this is not approval of repeated transaction searches or a century-scale performance claim."
+  },
+  "reviewedSurveyAdditions": {
+    "sourceCommit": "cd8217867c9249909d7d4ced6be4fcf08f7e42e6",
+    "indexSHA256": "fc6caef1eac3b29054a2b3d4b15f939dbe5f43c7e67bf1a1f22dce8d54271b2f",
+    "sites": [
+      {
+        "key": "abbeyApproachSurvey|collection:buildings",
+        "prior": 0,
+        "current": 1,
+        "reason": "One ordered all-world building/graveyard geometry snapshot for the current synchronous rural proposal; native checks later reuse it across candidate poses, never between mutations or days."
+      },
+      {
+        "key": "abbeySurveyPublic|collection:streets",
+        "prior": 0,
+        "current": 1,
+        "reason": "Lazy single native-order public-strip discovery inside the same proposal context; subtracts actual reachable public access before quoting the remaining private footprint."
+      },
+      {
+        "key": "abbeyApproachClear|collection:buildings",
+        "prior": 1,
+        "current": 2,
+        "reason": "The new cached geometry traversal is syntactically visible beside the preserved complete native fallback. Conservative axis filters precede exact building/churchyard checks; the two branches are mutually exclusive."
+      },
+      {
+        "key": "abbeyApproachPlan|collection:streets",
+        "prior": 0,
+        "current": 1,
+        "reason": "An actually rejected physical building/hydraulic grant retains native public-street observations after direct access, then returns before remote pathfinding. This authorized query-order branch is not a transaction-wide scan."
+      }
+    ],
+    "recognizedSites": 417,
+    "reportedFunctionsWithDirectOrTransitiveSearches": 1422,
+    "scope": "Only these four additional recognized occurrences are inventoried. Existing key order and all unrelated limits are retained; no broad regeneration, cross-day permission cache or measured performance/old-model identity claim."
   }
 }

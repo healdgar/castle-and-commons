@@ -228,14 +228,37 @@ refusal reasons and annual/lifetime counters remain worker state and detached
 inspector output. This intentionally adds the accepted own-use mechanics and
 changes affected histories; same-speed/history/save discipline still applies.
 
-The assembled source review at `2d81f11` confirms the 59 phases and 200 edges,
-and all 39 own-use-industry function hashes match their exact AST declaration
-slices. The existing pins remain unchanged. The recognized legacy search
-inventory contains 410 sites: 187 building, 70 street, 49 folk and 16 owner
-collection scans; 35 `heads_`, 22 `workers_`, 16 `headsOf` helper calls and 15
-unscoped entries. These are syntactic candidates, not measured costs or defects.
-The JSON records the source digest and this bounded review separately from the
-original survey and the pending native release gates.
+The assembled static review at `cd82178` retains 59 phases and 200 edges;
+`simTick` is byte-identical to its parent candidate. All 39 own-use-industry pins
+match exact AST declaration slices. This survey change renews only the existing
+`abbeySitePlan`, `abbeyMillPlan` and founding-quote pins, and separately records
+the nine changed and six new survey/dispatcher/layout bodies. The recognized
+legacy search inventory contains 417 sites across 1422 reported functions:
+191 building, 73 street, 49 folk and 16 owner collection scans; 35 `heads_`,
+22 `workers_`, 16 `headsOf` helper calls and 15 unscoped entries. Four additional
+recognized occurrences cover the ordered geometry snapshot, public strips,
+cached-building traversal beside its mutually exclusive native fallback, and
+street observations on a rejected grant. These are syntactic counts, not
+measured costs or a centuries-per-minute result.
+
+Rural abbey surveys share native ordered building/project geometry only within
+one synchronous proposal, across its existing candidate fields and poses.
+Public strips are discovered lazily in that context. Conservative axis bounds
+retain native tolerance and rotated-footprint clearance before the exact
+predicates; changed helper identities select the original full traversal.
+Every retained project's validation, payment and completion still read current
+obstructions, endpoints, title permissions and grant. The local context and
+legal callback enter neither saved world/layout roots nor presentation data.
+
+Direct access still runs first. Physical building/hydraulic grant and power
+checks can now reject before remote routing; candidate clearance runs before
+private-strip subtraction and land pricing. Wheel/feeder ground is included
+before this preflight. This authorized query order can delay initialization of
+the static `LANDV` coefficient table by skipping `landPrice`; that table is
+outside history/save roots and later fills the same fixed coefficients.
+These changes carry no old-model 150-day identity claim. The JSON records the
+exact source and dependency review separately from historical evidence and
+the current source's pending native speed/save/conservation gates.
 
 Foreign population/food and current recruitment run first inside
 `tickExpeditions`, before that phase's actual campaign combat. Recruitment is
