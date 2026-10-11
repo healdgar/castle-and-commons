@@ -70,6 +70,21 @@ as achieved merely because the feature inventory is implemented.
 
 ## Current integration and remaining gates
 
+The frozen lifecycle source `99f14a5` (HTML SHA256
+`7aeb74e34ba6d54ac414df12ee60fc44079b9b67537486f07ec2fdc4653d599f`)
+passes the fresh same-model 150-day comparison against the original exact
+reservation predicate: complete authoritative graph, every RNG stream, all
+seven speeds and 906 raw outcomes, including journaled patron gifts. Its day-37
+save reloads/resaves exactly and reproduces 113 continued days/678 raw outcomes.
+Cash/goods/fault checks are clean. Child CPU is `2060.356567` seconds at load
+`0.240723→1.489746`; audited step CPU is `393.477312` reference / `320.822024`
+candidate, not browser throughput. The source-specific record is in ignored
+`institutions-lifecycle-20261011`. The combined full suite is running; completed
+native Abbey core/industries, current worker/drawing, multi-era and publication
+gates remain pending. Finite daily attendance (#80), active damaged castle
+upgrades (#81) and permanent non-parent prerequisite loss (#82) remain explicit
+limits of this frozen source. Held next-phase repairs are not part of its proof.
+
 **Lifecycle continuation:** private-purpose housing, the complete corporate Abbey fabric quote, exact closed-school room release and shared paid compound recovery are integrated. Retained castle/Abbey ruins use actual title, rubble, access, material, labour and reserve checks. A partly paid connected wing can wait for same-index parent rebuilding and resume its original contract; permanent parent loss abandons the contract without refund or rebinding. New Abbey layout preferences become authoritative only on paid completion against the current owned church. The earlier six-file inventory verifies 92 unique checks across two runs, not one combined pass; the isolated new Abbey lifecycle fixture verifies ten checks. Final operation-local recovery cache guards and the common recovery fixture are being assembled before the coupled suite and fresh source-specific native/save/worker gates. No free repair, new actor or duplicate account is added. Finite daily construction crews (#80) and damaged targets of active castle upgrades (#81) and permanent loss of non-parent prerequisites (#82) remain explicit continuation dependencies. Earlier closed-day-60 and day-720 evidence stays frozen under its own source.
 
 **Frozen connected-layout prefix (`55b32a9`):** HTML `4a8eed633cde8de3bf1813d2de43b8040996aa3e200258e9086fc7fe6fafd1bc` was deliberately stopped at compared audited closed day 60, with 366 accepted raw outcomes, two abbeys, and clean cash/goods/faults. Reference and bounded-reservation runs match the complete graph and every RNG stream through that boundary; this is not a 150-day proof. The source-matched checkpoint reload/resave is exact (`179b5881fc8d825cae6019642d01cfc74a124eb62c24d28286a26f9cc7c4b73e`). Total child CPU was `613.785417` / wall `567.454874`, load `0.058594→1.313965`, RSS `1852884` KB. Audited step CPU `113.900951` reference / `96.385633` candidate is partial same-model evidence, not browser throughput. The initial merged 43-check fixture batch failed during helper initialization; actual imports are repaired, with the final assembled rerun pending. The continuation audit confirmed a private-purpose housing/refit bypass and an incomplete Abbey church-fabric quote. Church growth already runs through `tickChurches→tickChurchBodies→abbeyFabric`; its budget omits timber and technology-adjusted costs. The earlier claim of a missing caller was incorrect. Those two repairs are being assembled before the next native batch. Frozen source, original checks/deadlines, marker and closed-save evidence remain in ignored `institutions-connected-20261011`; none is retagged as the new phase.
