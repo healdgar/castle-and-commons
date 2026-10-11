@@ -3,7 +3,7 @@
 This is the completion contract for the user's 2026-10-10 continuation of Castle
 and Commons. It brings the recorded systems into the running simulation, rather
 than treating the presence of an account kind or a visual building as completion.
-`SYSTEMS.md` records the institutions; its twelve accepted decisions take
+`docs/SYSTEMS.md` records the institutions; its twelve accepted decisions take
 precedence over its earlier alternatives. `SIMULATION-ORDER.md` and its machine
 contract remain the daily dependency authority.
 
@@ -68,12 +68,23 @@ historical detail and the century-per-minute performance target remain explicit
 limits where measurement has not established them. They must not be described
 as achieved merely because the feature inventory is implemented.
 
-## Current assignment
+## Current integration and remaining gates
 
-At commit `318811d`, first castle foundations and storage use actual material and
-wage work; annual castle/church upgrades, general compounds, abbeys and the
-remaining institutions above are not complete. Four isolated implementation
-lanes cover compounds/castle upgrades, Cistercian abbeys, government/courts and
-technology. The coordinator owns opening frontage, storage ground payment and
-the serialized integration/release lane. Finished lanes take the remaining
-dependent systems in the order above.
+The published baseline is `318811d`. The root integration checkout includes the
+construction, government, abbey, credit, knightly, learning, craft, personal
+status, Church and productive-estate implementations described above. Focused
+source fixtures cover real payment, ownership, failure and completion boundaries;
+these are not substitutes for generated-world operability.
+
+Four isolated lanes are completing paid institutional foundation migrations,
+installed machinery and paper/printing, funded foreign war and military orders,
+and daily monastic investment. Root combines their commits, maintains daily
+order and worker projection discipline, and runs all expensive gates serially.
+The obsolete `00c7f14` full-suite attempt was stopped on a measured castle-survey
+performance regression; it is not recorded as a pass. The final suite and native
+history/save/worker, actual paid abbey and conservation gates remain pending.
+
+Native opening frontage #61 is still partial. Additional hydraulic forms,
+species-specific food categories and detailed economic calibration remain
+explicit limits. The active contract does not count a pictured building,
+unused method name or an unfunded obligation as a completed institution.

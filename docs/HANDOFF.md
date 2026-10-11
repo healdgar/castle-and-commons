@@ -1,6 +1,23 @@
 # Handoff: state of work
 
-Updated 2026-10-11 in the cloud checkout for Castle and Commons, integrated opening-capacity completion and its serialized release gates. Whoever carries the work keeps this file current: what is true now, what is next, what waits on the user.
+Updated 2026-10-11. Continue the user's full institution contract; publish each
+operable batch and continue until its required behavior is implemented.
+
+## Current continuation
+
+- The game is **Castle and Commons**. Play: https://healdgar.github.io/furlong-kingdom-annals/. Repository: https://github.com/healdgar/furlong-kingdom-annals. Last published game commit is `318811d`; screenshots are native Spring 4, AD 1068 views. Current institution work has not yet passed the release gates or been published.
+- The completion authority is [SIMULATION-COMPLETION.md](SIMULATION-COMPLETION.md), with accepted decisions in [SYSTEMS.md](SYSTEMS.md). Daily dependencies are recorded in [SIMULATION-ORDER.md](SIMULATION-ORDER.md) and its JSON contract. Ordinary decisions are daily; actual court, lease, harvest, study and journey dates remain dated obligations. Intended model changes are authorized; speeds, worker/reference and save continuation must still produce the same history.
+- The root integration checkout `/workspace/castle-commons-integration` contains shared native compounds and paid castle upgrades; actual entitled ground receipts and canonical corporate owners; Cistercian, Benedictine, Augustinian and female-house policy; separate Church accounts, paid order visitation and contested ecclesiastical cases; schools, universities, colleges and tutors; craft employment, apprenticeship and funded guilds; credit, forwards and coin; knights, service, companies and tournaments; productive estate enclosures, live stocks and paid keepers; and paid carriage to actual covered barns. Parish, friary, quarry and wharf foundations now use paid retained projects. Presence in this checkout is implementation status, not native operability evidence.
+- Remaining active lane work: actual installed machinery and paper/printing, funded foreign expeditions and military religious orders, paid citadel/new-town clients, daily abbey flock investment and measured castle-survey reuse. Four isolated agents own these lanes. Root owns integration, native operability, dependency/projection records, all heavy checks and publication. Heavy jobs are batched and serialized; agents run only single light fixtures/syntax.
+- The assembled-source dependency checker now rejects duplicate top-level functions. It exposed a pre-existing `trackAt` collision: screen walker interpolation overwrote the native track-clearance predicate. The screen function is now `walkTrackAt`; a full-assembled-source regression checks both independently. This intentionally restores track constraints to rural site decisions and changes affected histories.
+- The frozen `00c7f14` full-suite run was stopped after roughly 52 minutes because four short native-world fixtures were spending almost all sampled CPU in castle placement. A live five-second profile measured 99.6% of samples in `castleFoundationSite`, mainly pending-project `compoundGround`/occupied-cell rasterization repeated per terrain probe. Recorded partial output and profile are in ignored `tools/soak-results/institutions-completion-20261011/`. That run is **not a passing gate**. Operation-local reuse is being prepared before a final combined run.
+- Focused integrated institution checks pass after fixture dependency repairs; native generation, actual paid abbey completion/save, full suite, history/RNG/raw outcomes, worker projection and short multi-era conservation still gate the assembled release. Do not claim the century-per-minute target or economic calibration complete.
+- Opening frontage #61 remains partial. The isolated Bourport street seed is native and paid ground recipients are real, but its measured housing capacity remains below the household count. [DIRECT-ERA-CAPACITY.md](DIRECT-ERA-CAPACITY.md) and [ISOLATED-TOWN-OPENING-STREET-DESIGN.md](ISOLATED-TOWN-OPENING-STREET-DESIGN.md) record actual evidence and limits.
+
+## Earlier release and diagnostic history
+
+The following entries are chronological evidence. Their descriptions of pending
+work apply to the named historical build, not the current integration checkout.
 
 ## Where things stand
 
