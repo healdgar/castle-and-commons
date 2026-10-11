@@ -12,6 +12,8 @@ Domestic chests appear once in `accountBalances` and the native soak money censu
 
 ## Real dated payments
 
+Journaled compound patron gifts enter the actual recipient chest as **compound patron endowment**. The named donor pays the full amount, and native `unearned` removes the receipt from operating income; the capital label also remains excluded from ecclesiastical assessments. No order or diocese receives an implied share of that gift.
+
 Each parish's customary annual diocesan assessment uses its closed previous-year cash receipts. Capital gifts, profession gifts, corrodies, loan advances, refunds and inheritance are excluded. Unpaid assessment remains an actual arrear; payment uses only existing parish money above its small poor-food reserve. A real share transfers onward to the separate cathedral chapter. The chapter can fund actual cathedral fabric from its spare purse.
 
 Peter's Pence is collected on the native August 1 date by an actual funded bishop. Only actual households with a year's bread remaining pay. A household without the penny creates neither debt nor money. The initial currency conversion is an explicit game calibration: one twelfth of a day's bread is the customary penny in the game's units, rather than a claim that gold units equal historical pennies.

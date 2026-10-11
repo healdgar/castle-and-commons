@@ -147,10 +147,12 @@ the connected-cloister requirement itself is the scope of this implementation.
 
 ## First operable implementation
 
-`compoundLayoutPoses` and `compoundConnectionPlan` are common services. The Abbey
+`compoundLayoutPoses` and `compoundConnectionPlan` are common services. The
+shared [patron-gift service](COMPOUND-PATRONAGE.md) transfers real donor silver
+to each compound's actual native owner account; the compound keeps no purse. The Abbey
 adapter anchors to an actually completed, entitled church and tries two mirrored
 sides and 14 m or 10 m inner court widths. It keeps the chosen arrangement only
-when a real component project is commissioned. Dormitory, chapter and refectory
+when the first connected component actually completes. Dormitory, chapter and refectory
 candidates have at most three nearby positions; each exact footprint and retained
 path still passes native terrain, titles, standing geometry and pending
 reservations. A preference for an unbuilt wing grants, occupies and reserves no

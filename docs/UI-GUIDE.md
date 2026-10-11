@@ -176,6 +176,14 @@ then click a town, an enemy host to attack, or open ground to camp.
   must be known and adopted there. A date or a visible button alone does not
   guarantee a foundation. After the endowment, the house pays for its own
   buildings, staff, food and expansion.
+- **Give to a religious house:** while ruling, use **Give 100 g**, **Give 500 g**
+  or **Give 1000 g** on its card or under **Religious foundations**. Your live
+  purse appears beside the controls; a gift you cannot pay is disabled with its
+  reason. The Crown may give to any realm house. A lord may give to its own
+  foundation or one in its current manor. The named ruler pays the whole amount
+  into that house's actual chest, and the exact order is recorded for replay.
+  The house then buys available materials and pays real workers as before;
+  patronage alone supplies neither goods nor completed buildings.
 - **Reach rural buildings:** each building needs granted ground and a lawful
   approach to a public road or street. The approach has its own land
   permissions; an occupied tenant holding can cause a route to be refused.
