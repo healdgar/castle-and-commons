@@ -58,3 +58,17 @@ replacing this helper bypasses failed-survey reuse. Only the Cells/Fields body
 pins and new Box pin change; the other 38 fixture pins remain exact. No world
 field, memory lifetime or daily retry cadence changes. The current serialized
 native gates remain separate from this source/dependency review.
+
+The `d016a6a` follow-up changes only `occupiedGroundCells` in this fixture's
+reviewed reader bodies. Native plain dense polygon arrays with own-data finite
+points and unchanged Array/some/iterator and geometry-reader identities use
+conservative row-strip x-extrema. Each strip expands the native cell row by one
+metre before ascending column bounds; near-horizontal edges retain both full
+endpoint x-extrema. The old corner/vertex/.01-metre segment hit predicates and
+`cIdx` output order remain exact. Nonfinite, oversized, sparse, accessor, custom
+array/prototype or replaced-reader inputs retain the original rectangle scan.
+`OCCUPIED_GROUND_NATIVE` captures that native support at script initialization;
+no field/title/mask writer, permission, private hash stamp or cache lifetime is
+added. The castle certificate stays at 49 readers. Only the Cells source pin
+changes in this follow-up; Fields, Box and the other 38 pins remain exact.
+Current-source native/history/save/performance release gates remain root work.

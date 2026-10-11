@@ -108,19 +108,32 @@ cash, goods, reserved ground and records; tomorrow must see those changes, and
 `commoditySettleAll(true)` must follow the last stock writer. Moving a costly
 phase earlier does not remove that dependency or reduce its total work.
 
-The fresh source `61896d3` still reaches the original 120-second deadline in
-partial day 50 after 49 clean closed days. Its live profile places almost all
-sampled work in `serviceRoadPlan` and the ghost-free exhaustive `armyReach`
-flood. This is a measured planning blocker, not evidence that every closing
-phase is expensive. The flood supplies only a reachability rejection; accepted
-routes still come from the ordered bounded path searches and full current
-footprint, terrain and permission checks.
+Frozen `219b90e` exceeded the original 120-second deadline in partial day
+50 after 49 closed days. Its later 5.396-second live CPU sample put 99.27% in
+`serviceRoadPlan`, 97.2% in `armyLandPath` and 90.3% in full-corridor world
+clearance; the exhaustive flood had already been removed. This measured the
+remaining site-planning work, rather than every closing phase. A read-only
+revisit of that same frozen partial state found all 43 remaining yield-eligible
+field/order combinations unaffordable even at an optimistic direct-distance
+gift. That diagnosis is not a completed native day or a current-source pass.
+
+The assembled repair uses conservative raster row strips, necessary endpoint
+rejection, directed ghost-free span reuse, one native context across consecutive
+failed orders and a funding floor before costly footprint/approach work.
+Frozen `04614a7` then completed 60 fresh audited days, including two actual
+abbey foundations and 186 projects, with clean goods/fault checks and maximum
+cash residual 1.78e-10. Day 50 including audits took 1.905215 child CPU seconds;
+aggregate 172.793065 CPU/162.645695 wall seconds also includes generation,
+audits and saves, so it is not browser throughput. The final `d016a6a` adds one
+narrow approach-certificate guard. Its native 150-day speed/history/save/raw
+and full release gates remain pending; the earlier feasibility result belongs
+to `04614a7` only.
 
 There is also an explicit persistence barrier: `storageOutcomeReady()` can
 return false before incrementing the day while the asynchronous raw journal has
 backpressure or a fault. Browser storage already runs asynchronously; buffering
-allows simulation to proceed until that barrier is necessary. Rendering, reports
-and detached presentation packets can lag without changing canonical history.
+allows simulation to proceed until that barrier is necessary; ordinary days do
+not wait for a disk flush. Rendering, reports and detached presentation packets can lag without changing canonical history.
 
 Yielding a search between event-loop turns can improve responsiveness but does
 not reduce CPU. Parallel preparation would require immutable inputs, current
@@ -257,21 +270,22 @@ refusal reasons and annual/lifetime counters remain worker state and detached
 inspector output. This intentionally adds the accepted own-use mechanics and
 changes affected histories; same-speed/history/save discipline still applies.
 
-The assembled static review at `219b90e` retains 59 phases and 200 edges;
-`simTick` is byte-identical to `f7ff0f7`. All 39 own-use-industry pins
-remain exact. The current bundle reviews eight changed bodies and one new pure raster
-helper plus two changed certificate declarations; unchanged pins are preserved.
-The recognized legacy search inventory contains 418 sites across 1429 reported
-functions: 192 building, 73 street, 49 folk and 16 owner collection scans;
-35 `heads_`, 22 `workers_`, 16 `headsOf` helper calls and 15 unscoped entries.
-No recognized occurrence is new in this bundle; the prior full ordered
-building/graveyard fallback in `abbeyCorridorWorldClear` remains recorded.
-The actual new incident-road index loop is explicit in the JSON helper inventory;
-roads are outside the legacy scanner collection vocabulary. These are syntactic counts, not measured costs or a
-centuries-per-minute result.
+The assembled static review at `d016a6a` retains 59 phases and 200 edges;
+`simTick` is byte-identical to `219b90e`. All 39 own-use-industry pins remain
+exact. This follow-up reviews six changed bodies, three new helpers and four
+new declarations; unchanged pins are preserved. The recognized legacy search
+inventory still contains 418 sites, now across 1430 reported functions:
+192 building, 73 street, 49 folk and 16 owner collection scans; 35 `heads_`,
+22 `workers_`, 16 `headsOf` helper calls and 15 unscoped entries. No recognized
+occurrence or count key is new. Indexed funding-floor scans of local streets
+and incident roads are explicit in the JSON helper inventory because they
+fall outside the scanner vocabulary. These are syntactic counts, not measured
+costs or a centuries-per-minute result.
 
-Rural abbey surveys share native ordered building/project geometry only within
-one synchronous proposal, across its existing candidate fields and poses.
+Rural abbey surveys share native ordered building/project geometry within one
+synchronous proposal, across its existing candidate fields and poses. Daily
+founding also shares one lazy context across consecutive failed preferred-order
+attempts for the same founder and place, under registered native provenance.
 Public strips are discovered lazily in that context. Conservative axis bounds
 retain native tolerance and rotated-footprint clearance before the exact
 predicates; changed helper identities select the original full traversal.
@@ -295,7 +309,9 @@ identity certificate and current world/place/owner/day/size/cell/placed checks
 guard reuse. Each candidate pose keeps a fresh ghost-edge memo; its current
 ghost still uses the native interpolation and strict rotated footprint test.
 First ghost rejection keeps the original paid-road query prefix, while signed
-zero, off-lattice or long spans use the original segment loop. Floods speak for
+zero and unsupported spans keep their native cold path. Supported finite
+directed corridor spans additionally reuse ghost-free clearance within the
+current scope; the current ghost test still runs on every cached true. Floods speak for
 another door only after native closure, first-step and search-box certificates.
 Changed inputs supply neither shared terrain nor shared banks. The separate
 full-width corridor also checks actual necessary title/work rights within the
@@ -343,9 +359,9 @@ may reuse the exact native ground computed for the same site. Ordinary and cold
 calls still survey it afresh; current title/work rights, recipients, licence
 amounts, paid receipts and payment writers are unchanged. Both proposal entry
 points require the exact settlement/excluded-project identity before sharing
-geometry. The first-castle failed-survey certificate now includes this bound
-helper: 49 identities, with only Cells/Fields and the new Box fixture pins
-changed. The other 38 castle pins remain exact.
+geometry. The first-castle failed-survey certificate contains 49 identities, including
+the bound helper. This follow-up changes only the `occupiedGroundCells`
+fixture pin; its other 40 pins remain exact.
 
 A current certified Abbey corridor now skips the exhaustive ghost-free reach
 flood. It still tries the native ordered targets through bounded path searches
@@ -353,6 +369,40 @@ and current physical, ghost, rights and acceptance checks. Ordinary, cold or
 uncertified contexts keep the original flood/bank branch. This changes only
 proposal work inside its existing phase; the entire day still closes before
 tomorrow begins, and no partial search becomes a commit or save boundary.
+
+For native plain dense polygons, `occupiedGroundCells` computes conservative
+boundary x-extrema in each raster row expanded by one metre, then visits only
+that ascending column subset. Original corner, vertex and .01-metre segment
+checks still decide each hit and preserve cell order. Exact native readers and
+Array/some/iterator identities, finite geometry and own-data points guard this
+path; custom, accessor, sparse or replaced inputs keep the rectangle scan.
+
+`serviceRoadPlan` can reject a selected endpoint strictly inside a standing
+footprint expanded by the corridor clearance. It still records that attempt
+before rejecting it, preserving target order, unique street/road accounting and
+the twelve-attempt cap. Uncertain boundaries take the full native route path.
+
+Native layout creation and load register the exact real compound-site closure,
+layout/live/private fit and both spatial hash identities in an external
+WeakMap. No callback is trusted on first use. The current route and approach
+certificates plus 65 additional actual reader identities guard cross-order
+sharing. Changes to world/day/owner/layout/project key/helpers or the real
+actor-binding revision close the holder; it is discarded before `abbeyFound`
+performs its independent current re-quote. Failed contexts enter no save or
+draw root and have no cross-day lifetime.
+
+After the original yield check, the certified funding floor measures the
+minimum of all eight church faces to a superset of current local street and
+incident highway segments. It subtracts the native .1-metre endpoint tolerance
+and one metre of rounding slack, then prices that optimistic length using the
+actual labour/material recipe and current timber price. Private ground and
+detours can only add cost. Only a finite floor exceeding the founder's current
+available purse rejects before `fits`; every survivor retains full route,
+grant, licence and final gift checks. Unknown or cold inputs retain complete
+queries. Avoided fits and hash stamps are an authorized query-work baseline
+change, with no invented construction or payment and no old-model identity
+claim. The static lazy `LANDV` table may also remain uninitialized until a real
+price query; it later receives the same fixed coefficients.
 
 Only these new indirect plans retain plain `site.access.corridorFrom=2`.
 Current validation checks that marker and the exact landing; existing plans
@@ -372,7 +422,7 @@ Full corridor width, actual work rights and incident highway targets
 intentionally affect route selection and founding outcomes. This carries no old-model 150-day identity claim; the
 current model must still produce identical history at every speed and after
 save/load. Earlier failed native diagnostics establish no clearance of
-`219b90e`. The certified reject-only flood omission has its own current
+`d016a6a`. The certified reject-only flood omission has its own current
 source gates; prior-source evidence is not retagged. Current-source native performance and release gates remain
 coordinator work.
 
