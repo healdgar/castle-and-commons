@@ -11,11 +11,11 @@ const source=inlineGameScript(fs.readFileSync(process.env.FURLONG_TEST_SOURCE||n
 for(const n of ast.body)if(n.type==='FunctionDeclaration')F.set(n.id.name,n);else if(n.type==='VariableDeclaration')for(const d of n.declarations)if(d.id.type==='Identifier')V.set(d.id.name,{kind:n.kind,node:d});
 const fn=n=>{const d=F.get(n);assert.ok(d,'native '+n);return source.slice(d.start,d.end);},constant=n=>{const d=V.get(n);assert.ok(d,'native '+n);return d.kind+' '+source.slice(d.node.start,d.node.end)+';';};
 const names=['corpFound','compoundEnsure','compoundOf','compoundPatronRecipient','compoundPatronQuote','compoundPatronGift','abbeyFounder','notableById','purseAcct','sovOn','plyH','abbeyGiftQuote','abbeyPlayerGift','abbeyGiftHTML','abbeyOrdersHTML','abbeyCard','abbeyPeople','abbeyBuildings','abbeyField','abbeyOrderMother','abbeyPreferredOrders','abbeyOrderAvailable','esc','detailNumber','book','churchReceipt','backgroundUserRequest','workerCommandIsLocal','workerCommandString','workerCommandTarget','workerCommandValidate','workerCommandApply','workerCommandApplyClick','runCmd','replayEntry','jot','emit','projectEvent'];
-function setup({commodity=false,crown=2500,house=2000}={}){
+function setup({commodity=false,crown=2500,house=2000,modelOnly=true}={}){
  const r=realm({commodity,crown,cash:20,grain:30,fish:20,pop:1,transformSource:p=>p.replace('const isHouse=x=>x&&W.houses.includes(x);',constant('isHouse'))});
  r.eval(source.slice(source.indexOf('const NOTABLE_INDEXES='),source.indexOf('let NID=1;'))+'\n'+names.map(fn).join('\n')+'\n'+['ABBEY_ORDERS','ARCH','abbeyLay'].map(constant).join('\n'));
  const journal=source.match(/^let JOURNAL=.*$/m)?.[0];assert.ok(journal);r.eval(journal);
- r.eval(`const MODEL_ONLY=true;const HISTORY={events:[],event(kind,value){this.events.push({kind,value})}};const WORKER_PRESENTATION={started:false};let allLines=[],entryCount=0;const dateStr=d=>'day '+d;
+ r.eval(`const MODEL_ONLY=${modelOnly};let uiDownAt=99;const uiRefresh=[];const refreshCrownPanel=()=>uiRefresh.push('crown'),refreshInspect=()=>uiRefresh.push('inspect'),updateHUD=()=>uiRefresh.push('hud'),renderPetition=()=>uiRefresh.push('petition');const HISTORY={events:[],event(kind,value){this.events.push({kind,value})}};const WORKER_PRESENTATION={started:false};let allLines=[],entryCount=0;const dateStr=d=>'day '+d;
    W.notables=[{id:900,name:'Queen Joan',alive:true,traits:[]},{id:901,name:'Lord Robert',alive:true,traits:[]},{id:902,name:'Lady Alice',alive:true,traits:[]}];W.monarch=W.notables[0];
    W.houses=[{name:'Royal house',crown:true,seat:0},{name:'House One',seat:0,head:901,gold:${house}},{name:'House Two',seat:1,head:902,gold:700}];notableIndexRebuild();W.player={on:true,house:0};W.capital=s;
    const other={name:'Far manor',owner:2,pop:0,folk:[],buildings:[],streets:[],pos:{x:100,z:100}};W.settlements.push(other);s.owner=1;s.streets=[];s.history=[];W.land={F:[]};W.projects=[{type:'compound',worked:3,paid:7,timberInstalled:2,stoneInstalled:0,done:.1}];
@@ -81,4 +81,10 @@ test('worker validation binds the named payer and journals the exact gift once; 
 test('the same exact decimal gift command ignores render speed and pays in full, without clamping to a preset',()=>{
  let first;for(const speed of[0,.5,2,8,30,360,1/1800]){const r=setup();r.C.speed=speed;r.eval("workerCommandApply({k:'c',c:'abbey-gift',a:'0:0:750.25'})");near(r.eval('A.gold'),750.25);const got=r.json('({treasury:W.treasury,recipient:A,journal:JOURNAL,events:HISTORY.events})');if(first)assert.deepEqual(got,first);else first=got;}
  const r=setup({crown:100});assert.equal(r.eval("abbeyPlayerGift('0:0:100')"),true);near(r.W.treasury,0);near(r.eval('A.gold'),100);
+});
+
+
+test('foreground gift dispatch reaches the common live-control refresh before returning its actual result',()=>{
+ const r=setup({modelOnly:false});assert.equal(r.eval("runCmd('abbey-gift','0:0:100')"),true);assert.deepEqual(r.json('uiRefresh'),['crown','inspect','hud','petition']);assert.equal(r.eval('uiDownAt'),0);near(r.eval('A.gold'),100);
+ r.eval('uiRefresh.length=0');assert.equal(r.eval("runCmd('abbey-gift','0:0:99999')"),false);assert.deepEqual(r.json('uiRefresh'),['crown','inspect','hud','petition']);near(r.eval('A.gold'),100,'a stale insufficient command refreshes without a clipped payment');
 });

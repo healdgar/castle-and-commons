@@ -19291,7 +19291,7 @@ function uiConfirmShow(root){ // an armed button says so; the rest say what they
     else if(!on&&b.dataset.unconfirmed!==undefined){text.textContent=b.dataset.unconfirmed;delete b.dataset.unconfirmed;}}}
 function runCmd(cmd,arg){
   if(backgroundUserRequest()&&!workerCommandIsLocal(cmd,arg))return workerSubmitCommand({k:'c',c:cmd,a:arg});
-  switch(cmd){
+  let result;switch(cmd){
     case 'sov-on':setSovereign(true,0);break;
     case 'sov-house':setSovereign(true,+arg);break;
     case 'lord':lordCmd(arg.split(':')[0],arg.split(':')[1]);break;
@@ -19306,7 +19306,7 @@ function runCmd(cmd,arg){
     case 'storage-pick':storagePick(+arg);break;
     case 'storage-commission':storagePlayerCommission(arg);break;
     case 'abbey-found':abbeyPlayerFound(arg);break;
-    case 'abbey-gift':return abbeyPlayerGift(arg);
+    case 'abbey-gift':result=abbeyPlayerGift(arg);break;
     case 'church-appeal':{const [ai,id]=String(arg).split(':').map(Number),a=W.churchBodies?.[ai],q=a?.cases?.find(q=>q.id===id);if(sovOn()&&q&&W.settlements[q.si]?.owner===plyH())churchCaseAppeal(a,id);}break;
     case 'church-tenth':{const [si,rate,terms]=String(arg).split(':').map(Number);if(sovOn()&&plyH()===0)churchTenthCall(si,rate,terms);}break;
     case 's-work':{const[a,b]=arg.split(':');settlementWork(+a,b);break;}
@@ -19333,6 +19333,7 @@ function runCmd(cmd,arg){
     case 'a-order':case 'a-road':case 'a-raft':case 'a-objective':case 'a-hold':case 'a-release':case 'a-disband':case 'a-split':case 'a-merge':case 'a-garrison':armyCmd(cmd.slice(2),arg);break;
   }
   if(!MODEL_ONLY){uiDownAt=0;refreshCrownPanel();refreshInspect();updateHUD();renderPetition();}
+  return result;
 }
 /* =========================================================================
    CONTROL PANEL & HUD

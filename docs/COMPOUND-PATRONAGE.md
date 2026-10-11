@@ -35,6 +35,6 @@ industry and unfinished-save criteria as the unassisted gate. The original
 frozen `af07d28` underfunded day720 outcome remains recorded as such.
 
 The single light native-source fixture `tools/compound-patron-gifts.test.mjs`
-passes nine checks. Generated-world command/save, worker and construction
+passes ten checks. Generated-world command/save, worker and construction
 continuation gates belong to the serialized release runner. No daily phase,
 realm people scan, new stored account or presentation authority object is added.
