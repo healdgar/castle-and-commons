@@ -1,6 +1,6 @@
 # Missing institutions: design notes
 
-Status: institution design and accepted decisions. Customary income and manor/eyre justice are implemented; the remaining systems are under the full continuation contract in [SIMULATION-COMPLETION.md](SIMULATION-COMPLETION.md). These notes cover #35–#43 in `docs/ISSUES.md`, and tie them to #20–#23, technology (#44), the wider Church (#46) and foreign war (#47). The accepted decisions at the end override earlier alternatives.
+Status: institution design and accepted decisions. Native implementations are integrated in the current unpublished continuation; final generated-world and release gates remain pending under the full continuation contract in [SIMULATION-COMPLETION.md](SIMULATION-COMPLETION.md). These notes cover #35–#43 in `docs/ISSUES.md`, and tie them to #20–#23, technology (#44), the wider Church (#46) and foreign war (#47). The accepted decisions at the end override earlier alternatives.
 
 ## Why now
 
@@ -63,12 +63,11 @@ These rules apply to all nine.
   - The named people are household heads holding an office: a new `office` field on the head (steward, clerk, bailiff, moneyer, collector, master, warden). Being a head, each still eats, marries and dies. Great officers (abbot, justice) are notables made by `mkNotable` with a new role.
     - Built: `p.office` is a key of `OFFICES` (the seven, and the notes' cellarer, mayor and lender; `master` reads "schoolmaster"). `p.officeFor` is whom he serves: a house index (0 the crown), an abbey's or guild's key, or none for his place's own office.
     - `officeHeld(p)` is null once he is dead. `officeTitle(p)` reads "steward of House Gamsburg", shown on the person card.
-  - Monks, nuns and scholars away from home are counted on their institution, not kept as people, once they leave their household. The leaving is a real event in that household.
-- **Hooks, not loops.**
-  - Every new act happens inside a pass that already runs: `tickTenure` (each place's yearly day, `dueOn(si,360,37)`), `tickHouseholds` (`dueOn(si,360,29)`), `tickMarket` and `shareOutput` (monthly, `dueOn(si,30,11)`), `tickDomains` (the 20th of each month), `tickEconomy` (the crown's monthly reckoning), `tickChurches` (each place's own day), and the single events `inherit`, `marryHouseholds`, `borrow`, `repay`, `ladeIn` and `tickShips`.
-  - A court session is a new place-day of its own, `dueOn(si,90,salt)`.
-  - Events append to short, bounded lists on the place, which the next session reads. Nothing scans all places against all places.
-    - Built: `rollOf(holder,key)` makes `{rows,over}` on its first record. `rollAdd(roll,rec,n)` keeps the last `n` rows (`ROLL_N`, 12, what a card shows; a court passes 64) and counts the dropped by `kind` in `over`. `rollTake` hands a session the roll and clears it.
+  - Current implementation: monks, nuns, conversi and scholars remain actual native people. Religious admission changes their canonical household and residence; temporary scholars retain their original family. Institutions do not create a second population or another meal.
+- **Daily order and dated obligations.**
+  - Current ordinary decisions are daily inside the recorded source phases. Actual rent, farm quarters, tax assessment, harvest, feasts, court sessions, study and journey dates remain world obligations. The earlier monthly/annual integration sketch is superseded by [SIMULATION-ORDER.md](SIMULATION-ORDER.md) and its JSON dependencies.
+  - Native events append bounded evidence to the appropriate owner/place. Current purse and custody are checked again when payments execute; a shared daily snapshot cannot authorize later transfers.
+  - `rollOf(holder,key)`, `rollAdd` and `rollTake` retain bounded evidence and folded counts. A folded count never invents liability, money or a claimant.
 - **Quantities and customs.**
   - Each decision compares two quantities that exist in the state.
   - A rate that was historically a custom or a decree is held on the place, the house or the crown, set in the world, and named in a comment as the allowed exception. Examples: an heir's entry fine, merchet, a toll, the rate of a lay subsidy, a usury ban, an amercement cap. The player may change it by a journaled command.

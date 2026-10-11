@@ -76,13 +76,9 @@ status, Church and productive-estate implementations described above. Focused
 source fixtures cover real payment, ownership, failure and completion boundaries;
 these are not substitutes for generated-world operability.
 
-Four isolated lanes are completing paid institutional foundation migrations,
-installed machinery and paper/printing, funded foreign war and military orders,
-and daily monastic investment. Root combines their commits, maintains daily
-order and worker projection discipline, and runs all expensive gates serially.
-The obsolete `00c7f14` full-suite attempt was stopped on a measured castle-survey
-performance regression; it is not recorded as a pass. The final suite and native
-history/save/worker, actual paid abbey and conservation gates remain pending.
+Installed native machinery and paper/printing, actual grinding and paid windmills, finite funded foreign war and religious military orders, daily monastic investment, paid institutional foundations and noble marriage/dubbing/feudal aids are integrated. Funded canal locks, guild resistance and native citadel aperture agreement are the remaining active client work. Root maintains daily dependency/projection discipline and runs all expensive gates serially.
+
+The obsolete `00c7f14` full-suite attempt was stopped on a measured castle-survey performance regression; it is not recorded as a pass. The current native exact-reuse check compares actual full graphs, RNG and raw outcomes against the earlier real generated checkpoint. Initial ten-day simulation CPU is 54.4 seconds before and 22.3 seconds after; this is a partial diagnostic, not a final performance or release result. The final suite and native history/save/worker, actual paid abbey and conservation gates remain pending.
 
 Native opening frontage #61 is still partial. Additional hydraulic forms,
 species-specific food categories and detailed economic calibration remain

@@ -2608,6 +2608,7 @@
         "phase": "tickMilitary",
         "first": "tickKnighthood",
         "then": [
+          "native daily noble marriage/dubbing/aid incidents",
           "knightDues",
           "funded service/scutage and service expiration",
           "tickTourneys",
@@ -2617,6 +2618,18 @@
           "tickMilitaryOrders"
         ],
         "reads": "Actual living holders, current court consent and chests fund obligations; foreign opening holdings and voyages update before domestic native combat. Expedition participants remain actual absent people and physical goods/coin cross a registered boundary only. Equipment completed later today affects tomorrow\u2019s combat."
+      },
+      {
+        "phase": "tickCaravans",
+        "first": "portHealthPrepare",
+        "arrival_before_custody": "portQuarantine",
+        "reads": "Actual departure SIR observation and native transit cargo; current adopted port authority pays a named attendant and merchant pays actual crew delay. Held cargo does not arrive, pay freight, confer contact or seed an arrival outbreak before the dated supported term releases it. Transit spoilage and wages have once-per-day guards."
+      },
+      {
+        "phase": "tickTrade",
+        "after": "native ladeOut purchase and cargo creation",
+        "then": "portPlagueDeparture",
+        "reads": "Only actual coastal consignments observe departure outbreak state. Anonymous foreign merchant ships have no modeled crew exposure. The separate existing gate-closure decree remains unchanged."
       }
     ],
     "new_phase_sources": {
