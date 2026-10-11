@@ -31,7 +31,7 @@ const DRIFT_ALLOWED={
 };
 // Object-valued names of drawn things that stay in the worker, with why. Anything else object-valued must cross.
 const WORKER_ONLY={
-  settlement:{stores:'goods: overlays and inspectors ask the worker',storage:'storage ledger',storageReport:'storage ledger',households:'household accounts',
+  settlement:{technology:'knowledge/adoption/support: Learning and adviser queries run in worker',stores:'goods: overlays and inspectors ask the worker',storage:'storage ledger',storageReport:'storage ledger',households:'household accounts',
     mkt:'markets',rsv:'reserved stock',px:'prices',res:'resources',frt:'freight rates',hm:'herd management (herds come from actor plans)',
     history:'inspector text',cashY:'annual cash totals: reports ask the worker',cashPrev:'previous annual cash totals: reports ask the worker',oldWalls:'inspector count',dead:'the dead, for inspector links',growSlots:'building planner',roadSpoke:'layout planner',
     joinOut:'layout planner',landing:'shore landing for boats',burns:'generation burn scars',mill:'crosses as millId',

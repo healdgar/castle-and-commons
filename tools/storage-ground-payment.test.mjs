@@ -52,3 +52,10 @@ test('an unfunded or ownerless quote is never reported as paid',()=>{
   r.eval(`W.land=null;const ownerless=storageGroundClaim(s,q,'crown')`);
   assert.equal(r.eval('ownerless.ok'),false);near(r.eval('q.paid'),0);
 });
+
+
+test('a retained compound footprint pays only for newly occupied ground',()=>{
+  const r=fixture(),before=r.coins();
+  r.eval(`W.land.mask=new Uint8Array(12);W.land.mask[2]=255;q.site={f:{x:9,z:7,w:3,d:5,rot:0.7}};let surveyed;compoundGround=site=>(surveyed=site,{cells:[0,1,2]});const g=storageGroundClaim(s,q,'crown');storageGroundPay(q,s,'crown',g);`);
+  assert.equal(r.eval('surveyed===q.site'),true);near(r.H[0].w,100);near(r.H[1].w,115);near(r.H[2].w,115);near(r.coins(),before);
+});

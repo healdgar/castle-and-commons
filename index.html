@@ -5145,8 +5145,9 @@ function compoundMaterialDemand(s,g){const si=W.settlements.indexOf(s);let n=0;f
 
 function storageGroundClaim(s,q,payer){ // exact native ground titles, not a list of unrelated ploughmen
   if(!W.land)return {ok:!(q.land>0),key:null,recipients:[],reason:'ground-title'};
-  const f={x:q.x,z:q.z,w:ARCH[q.arch][0],d:ARCH[q.arch][1],rot:0},ground=compoundGround({f}),fields=new Map(),recipients=new Map(),areas=occupiedGroundAreas(ground.cells);
-  for(const F of [...occupiedGroundFields(ground.cells)].sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0))fields.set(F,Math.max(1,areas.get(F)||0));
+  const ground=compoundGround(q.site||{f:{x:q.x,z:q.z,w:ARCH[q.arch][0],d:ARCH[q.arch][1],rot:0}}),cells=ground.cells.filter(c=>!W.land.mask||W.land.mask[c*4+2]!==255),fields=new Map(),recipients=new Map(),areas=occupiedGroundAreas(cells);
+  if(!cells.length)return {ok:true,key:null,recipients:[]}; // existing occupied fabric creates no new agricultural claim
+  for(const F of [...occupiedGroundFields(cells)].sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0))fields.set(F,Math.max(1,areas.get(F)||0));
   if(!fields.size)return {ok:!(q.land>0),key:null,recipients:[],reason:'ground-title'};
   const claims=[];let weight=0;
   for(const [F,n]of fields){const own=F.title?.own||propertyRightsResolve(F.own),work=F.title?.work||propertyRightsResolve(F.wk);
