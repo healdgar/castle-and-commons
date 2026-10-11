@@ -2,7 +2,7 @@
   "schema": 1,
   "survey_commit": "39d929e",
   "survey_game_sha256": "274cfbc8d238ec34db88924eaef4ebd04ff3a8f82f4045c56a7c9da2832c7fd2",
-  "date": "2026-10-10",
+  "date": "2026-10-11",
   "policy": "New history is authorized. The chosen serial order is canonical at every speed. Calendar obligations keep their due dates; ordinary decisions should become daily as mixed quantities/durations are separated and input-revision paths made cheap.",
   "limitations": "Human boundary/helper/alias survey plus source-call inventory, not a formal complete interprocedural proof. Dynamic callbacks, property accessors, class methods and conditional effects require review. Observed old-order edges below are evidence, not constraints on the redesigned simulation.",
   "stages": [
@@ -35,6 +35,7 @@
       "name": "Rights, supplies and protection",
       "data": "Current rights, herds, workshops and imports; put goods under cover before spoilage.",
       "phases": [
+        "tickAbbeyWork",
         "tickLand",
         "tickTenure",
         "tickLivestock",
@@ -51,6 +52,7 @@
       "data": "Opening family sizes for the market; supplied meals before demographic and household choices.",
       "phases": [
         "tickMarket",
+        "tickAbbeyMeals",
         "tickPopulation",
         "tickHouseholds"
       ]
@@ -95,6 +97,7 @@
         "tickEnvoys",
         "tickTitles",
         "tickUpkeep",
+        "tickAbbeys",
         "tickStorageInvestment",
         "tickVictory",
         "commoditySettleAll"
@@ -941,6 +944,71 @@
       "before": "tickWallWorks",
       "after": "tickShipDepartures",
       "reason": "Current building work uses available stock before foreign export loading."
+    },
+    {
+      "before": "ownershipTick",
+      "after": "tickAbbeyWork",
+      "reason": "Corporate and household aliases precede actual institutional wage and crop rights."
+    },
+    {
+      "before": "peoplePrepare",
+      "after": "tickAbbeyWork",
+      "reason": "Arrivals and the current native actor roll determine real living workers."
+    },
+    {
+      "before": "tickAbbeyWork",
+      "after": "tickLand",
+      "reason": "Actual paid servants and living conversi determine the self-worked area before land decisions."
+    },
+    {
+      "before": "tickAbbeyWork",
+      "after": "tickTenure",
+      "reason": "Canonical endowed title and work exclusion precede current native tenure obligations."
+    },
+    {
+      "before": "tickAbbeyWork",
+      "after": "tickLivestock",
+      "reason": "Current care and actual paid shepherds constrain owned flock output."
+    },
+    {
+      "before": "tickAbbeyWork",
+      "after": "tickEconomy",
+      "reason": "Self-worked area is excluded from generic crop output; the corporate producer emits once."
+    },
+    {
+      "before": "tickMarket",
+      "after": "tickAbbeyMeals",
+      "reason": "Due purchases supply the existing corporate pantry before native meals are allocated."
+    },
+    {
+      "before": "tickAbbeyMeals",
+      "after": "tickPopulation",
+      "reason": "Member and corrody food changes custody before the single household meal/demography pass."
+    },
+    {
+      "before": "tickUpkeep",
+      "after": "tickAbbeys",
+      "reason": "Foundation, grants and hospitality use closed actual wages and purses."
+    },
+    {
+      "before": "tickAbbeys",
+      "after": "tickStorageInvestment",
+      "reason": "Current institutional commissions reserve ground before later storage choices."
+    },
+    {
+      "before": "tickAbbeys",
+      "after": "commoditySettleAll",
+      "reason": "All actual grants/gifts/admissions and their goods/title effects settle before the day closes."
+    },
+    {
+      "before": "tickAbbeyWork",
+      "after": "commoditySettleAll",
+      "reason": "Institutional supply and wage writers precede the daily close."
+    },
+    {
+      "before": "tickAbbeyMeals",
+      "after": "commoditySettleAll",
+      "reason": "Actual pantry title gifts precede the daily close."
     }
   ],
   "splits": [
@@ -2392,5 +2460,36 @@
     "Closing stone forecast covers completed current work; storage commissions created after financial close first enter work/forecast tomorrow.",
     "Earlier household/army journeys may require lazy route preparation before the closing routingPrepare; this batch does not claim one graph build per day.",
     "The funded ward-purchase branch referred to undefined st for both account locations. Both postings now use the ward a; a focused funded purchase checks real buyer/seller amounts and field handover."
-  ]
+  ],
+  "institution_integration": {
+    "base_commit": "318811d",
+    "intended_history_change": true,
+    "internal_order": [
+      {
+        "phase": "tickEconomy",
+        "first": "tickTechnology",
+        "reads": "Prior staffing/paid support, current arrivals/contacts, canonical purses and land; discovery/local adoption precede current production."
+      },
+      {
+        "phase": "tickJustice",
+        "first": [
+          "tickGovernment",
+          "tickFreedom"
+        ],
+        "reads": "Current transaction evidence and closed production/meal/work purses; actual government duties precede personal claims and due native manor/eyre sittings."
+      },
+      {
+        "phase": "peoplePrepare",
+        "after": "folkIndex",
+        "then": "freedomPrepare",
+        "reads": "Only unknown actual people receive personal status; prior personal bonds remain independent of current tenure."
+      }
+    ],
+    "new_phase_sources": {
+      "tickAbbeyWork": "Current canonical membership, actual paid staff, fed hands and self-worked area; no duplicate ordinary crop allocation.",
+      "tickAbbeyMeals": "Actual corporate held/sale food into existing member/corrody household pantries, before one native meal.",
+      "tickAbbeys": "Actual grants, endowments, admission, charity, saved compound commissions and due order visits after upkeep; new work starts next day."
+    },
+    "pending": "Combined native speed/save/worker/conservation/drawing validation."
+  }
 }

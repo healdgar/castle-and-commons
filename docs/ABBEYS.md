@@ -33,3 +33,7 @@ Charity gives only actual grain above the institution's annual food reserve. Cor
 Distinct Benedictine/Augustinian land/rent/tithe policies and valid earlier institutions, wider Church holders/courts/payments, funded schooling, forward contracts, order discipline/mother-daughter obligations beyond the funded journey, and additional pond/fishery forms are subsequent planned slices. This first slice does not claim those systems complete. In particular, one canonical reservoir per settlement is the existing hydraulic limit; it does not fabricate multiple decorative ponds.
 
 The focused `tools/abbeys.test.mjs` checks actual native accounts, titles, stocks, mouth/population conservation, admission, paid work, pond stocking and delay, wool sales, charity, corrodies and observational projection. Full native founding/site generation, worker history/save and multi-year integration tests are serialized by the root agent.
+
+Personal status integration: native abbey admission rejects an actual unfree
+person until the origin claimant has released that person through #42. A
+religious role does not erase a personal bond or create a free second identity.
