@@ -153,10 +153,10 @@ const HARNESS=`(()=>{if(window.__soak)return 'ok';
   S.inventory={enabled:${Number(A.inventory||0)>0},first:null,checks:0};const checkInventory=${inventoryAudit.toString()};
   const auditInventory=()=>{if(!S.inventory.enabled||S.inventory.first)return;const issue=checkInventory(W.settlements,S.inventory,BEASTS,typeof STORAGE_GOODS==='undefined'?{}:STORAGE_GOODS);if(issue)S.inventory.first={day:day(),...issue};};
   const gap=${moneyFlowGap.toString()};
-  const money=()=>{let bad=0;const coin=v=>{if(v!==undefined&&!Number.isFinite(v))bad++;return v??0;};const by={crown:coin(W.treasury),houses:0,folk:0,church:0,murage:0,pool:0,hoard:coin(W.dragon?.hoard),escrow:0,abbeys:0,guilds:0},seen=new Set(),P=p=>{if(!p||p.merc||W.households&&p._hh)return;if(seen.has(p))return;seen.add(p);by.folk+=coin(p.w);}; // folk in a household are counted with it: skip them before the set
+  const money=()=>{let bad=0;const coin=v=>{if(v!==undefined&&!Number.isFinite(v))bad++;return v??0;};const by={crown:coin(W.treasury),houses:0,folk:0,church:0,murage:0,pool:0,hoard:coin(W.dragon?.hoard),escrow:0,abbeys:0,guilds:0,churchBodies:0},seen=new Set(),P=p=>{if(!p||p.merc||W.households&&p._hh)return;if(seen.has(p))return;seen.add(p);by.folk+=coin(p.w);}; // folk in a household are counted with it: skip them before the set
     if(W.households)for(const h of W.households.values())by.folk+=coin(h.assets.w);
     for(let i=1;i<W.houses.length;i++)if(W.houses[i])by.houses+=coin(W.houses[i].gold);
-    for(const c of W.abbeys||[])by.abbeys+=coin(c.gold);for(const c of W.guilds||[])by.guilds+=coin(c.gold); // each abbey's and guild's chest, once (#35, #43)
+    for(const c of W.abbeys||[])by.abbeys+=coin(c.gold);for(const c of W.guilds||[])by.guilds+=coin(c.gold);for(const c of W.churchBodies||[])if(!c.foreign)by.churchBodies+=coin(c.gold); // each abbey's and guild's chest, once (#35, #43)
     for(const s of W.settlements){for(const p of s.folk||[])P(p);by.murage+=coin(s.murage);by.pool+=coin(s._poolCash);for(const v of Object.values(s._poolBy||{}))by.pool+=coin(v);}
     for(const a of W.armies||[])for(const p of a.men||[])P(p);for(const t of W.travellers||[])P(t&&t.p?t.p:t);for(const l of W.levies||[])P(l&&l.p?l.p:l);
     const chs=new Set();for(const b of W.bldList)if(b&&b.ch&&!chs.has(b.ch)){chs.add(b.ch);by.church+=coin(b.ch.fund);}

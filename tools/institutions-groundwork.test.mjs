@@ -23,7 +23,7 @@ function realm(){
   vm.runInContext('"use strict";\nconst day=()=>D,year=()=>Math.floor(D/360)+1;\n'+PROGRAM,C);
   const household={household:true,id:7,assets:{w:50}};C.household=household;W.households=new Map([[7,household]]);
   const run=s=>vm.runInContext(s,C);
-  const purses=()=>W.treasury+W.houses.reduce((t,h)=>t+(h.gold||0),0)+household.assets.w+[...(W.abbeys||[]),...(W.guilds||[])].reduce((t,c)=>t+c.gold,0);
+  const purses=()=>W.treasury+W.houses.reduce((t,h)=>t+(h.gold||0),0)+household.assets.w+[...(W.abbeys||[]),...(W.guilds||[]),...(W.churchBodies||[]).filter(c=>!c.foreign)].reduce((t,c)=>t+c.gold,0);
   return {W,C,run,household,purses};
 }
 

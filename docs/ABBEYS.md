@@ -8,6 +8,8 @@ An abbey is one `corpFound('abbey', ...)` account in `W.abbeys`, identified by `
 
 Members are actual named people retained on the native population roll. Admission needs an actual roof, one year's food, a personal entry gift and no existing assigned land or work. A dependent splits from the existing household; the parents' estate is retained. Personal movable goods transfer through native ownership. Death, hunger and age apply to the same people. Professed members do not marry or reproduce. No institutional `_hallN`, abstract religious cohort, opening cash, food or generated people is added.
 
+After profession, a movable legacy to a member passes to the actual abbey account. Native land succession excludes professed members as personal holders; it retains the other heirs' actual customary rights. The parent integration additionally requires actual villein release before admission and excludes active institutional jobs.
+
 Daily wages go to real native household heads. Hired servants retain their families, mortality and household pantries; their exclusive institutional work replaces ordinary producer/trade activity. Hiring uses the real household's bread cost and past earnings. Insufficient funding, siege or absence releases the job. A cellarer is an actual living member, with `officeFor:'abbey:N'`.
 
 ## Daily dependencies
@@ -17,6 +19,8 @@ Daily wages go to real native household heads. Hired servants retain their famil
 - `tickAbbeys`, after `tickUpkeep`, checks founding, admission, clearing, charity, corrodies and further compound commissions from today's actual balances. New paid construction starts at tomorrow's projects phase. Late admission refreshes the native household roll and does not supply a second meal.
 
 Real customary dates retain their cadence: the settlement market day handles sheep/hay purchases, and September 14 handles a funded annual order journey. A named leader travels on the native errand path to an older house or a port for the General Chapter; the home and visited house keep separate purses, with actual board/fare payments and explicit flows abroad. No guessed order income or automatic percentage tithe funds the journey.
+
+The wider Church continuation runs `churchWork` inside early `tickAbbeyWork`, so existing clergy receive today's real wages before production and family decisions. `tickChurchBodies`, inside late `tickChurches`, handles closed-receipt assessments, actual remittances, appointments, ecclesiastical records, and paid church fabric. See [CHURCH.md](CHURCH.md).
 
 ## Native compound and water operations
 
@@ -30,11 +34,13 @@ Sheep are actual purchased beasts in the abbey's native owner ledger, subject to
 
 Charity gives only actual grain above the institution's annual food reserve. Corrodies transfer a named elderly household's real up-front consideration for board for life; they create no population. The school component has a native paid classroom plan and completion reference `a.school={building,ownerId}`. The schooling system owns teacher employment, pupil enrolment, tuition, stipends and board and may add `schoolId`; no pupils or learning are inferred from the building label.
 
+Benedictine and Augustinian houses may appropriate a parish only when the real patron holds its native title, an actual funded bishop assents, and the abbey can hire an actual available vicar. Native parish funds remain separate. The vicar's portion stays with the parish; the abbey receives only actual newly produced great-tithe grain. Loss of today's vicar service suspends the abbey's share. Cistercians cannot use this adapter. Abbey church upgrades commission native paid fabric projects; they do not alter the building instantly.
+
 ## Remaining continuation
 
-Parish tithe appropriation, wider Church holders/courts/payments, funded schooling, forward contracts, order discipline/mother-daughter obligations beyond the funded journey, and additional pond/fishery forms are subsequent planned slices. This first slice does not claim those systems complete. In particular, one canonical reservoir per settlement is the existing hydraulic limit; it does not fabricate multiple decorative ponds.
+Funded schooling and forward contracts have separate agents and integration gates. Order discipline/mother-daughter obligations beyond the funded journey, contested ecclesiastical cases beyond native marriage and estate records, and additional pond/fishery forms remain subsequent slices. One canonical reservoir per settlement is the existing hydraulic limit; this adapter does not create additional decorative ponds.
 
-The focused `tools/abbeys.test.mjs` additionally verifies the earlier order dates and that a manorial house receives only the actual native landlord crop share while the actual tenant retains the remainder. It checks actual native accounts, titles, stocks, mouth/population conservation, admission, paid work, pond stocking and delay, wool sales, charity, corrodies and observational projection. Full native founding/site generation, worker history/save and multi-year integration tests are serialized by the root agent.
+The focused `tools/abbeys.test.mjs` verifies earlier order dates, adopted rotation, the actual landlord/tenant crop split, Church money conservation and foreign flows, paid clergy, real tithe ownership, customary remittances, kin rules, authored soul portions and professed inheritance. It also checks native accounts, titles, stocks, mouth/population conservation, admission, paid work, pond stocking and delay, wool sales, charity, corrodies and observational projection. Full native founding/site generation, worker history/save and multi-year integration tests are serialized by the root agent.
 
 Personal status integration: native abbey admission rejects an actual unfree
 person until the origin claimant has released that person through #42. A
