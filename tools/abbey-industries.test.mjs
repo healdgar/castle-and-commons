@@ -206,3 +206,84 @@ test('own mill preflight carries actual wheel ground and rejects lost grant or p
  r.eval('grantOK=true;waterOK=false;const dry=abbeyMillPlan(a,s)');assert.equal(r.eval('dry'),null);assert.equal(r.eval('routeCalls'),0);
  r.eval('waterOK=true;const powered=abbeyMillPlan(a,s)');assert.ok(r.eval('powered&&powered.site.millWater===bank.millWater&&powered.site.polys.length===1&&routeCalls>0'));assert.ok(r.eval("powered.site.arch==='mill'&&powered.ownerId===a.storageOwnerId&&powered.requires.join(',')==='church,grange'"));
 });
+
+
+function routeSetup(beforeCapture=''){const r=ruralSetup();const readers=['armyLandPath','armyDetour','armyReach','armyReaches','armyReachClosed','armyReachFrom','armyReachCovers','armySegmentClear','armyObstacle','armyBridgeAt','armyRaftAt','armyCauseway','hAt','riverAt','onRoad','paidRoadAt','walkedRoadAt','roadWalkedBounds','roadBounds','fortGround','fortSurface','motteSurface','fortCircuits','casRing','fortCenter','wallRadAt','wallKindAt','wallBuilt','wallProg','wallDmgAt','fortGateAngles','wallGates','citadelBarrier','citadelLocal','citadelBastion','citadelFootprintAt','citadelTownCut','hostileTo','atWar','inRevolt','inPoly','makeHash'];
+ r.eval([constant('sstep'),constant('cIdx'),constant('inB'),constant('toCell'),...readers.map(fn)].join('\n'));
+ r.eval(`HASH_STAMP=0;const SEA_SURFACE=.5,BACKGROUND=null,MOTTEH=9;W.h=new Float32Array(GRID*GRID).fill(10);W.dom=new Int16Array(GRID*GRID);W.roads=[];W.feuds=[];W.clock={day:now};W.rivHash=makeHash(40);s._lay.placed=makeHash(16);
+  const nativeHeight=hAt;let heightCalls=0;hAt=(...args)=>{heightCalls++;return nativeHeight(...args)};`);
+ if(beforeCapture)r.eval(beforeCapture);r.eval(constant('ABBEY_ROUTE_SURVEY_NATIVE'));return r;}
+
+test('shared native world edges retain exact directions, signed zeros and independent ghost samples',()=>{
+ const r=routeSetup();r.eval(`const terrain=abbeyRouteTerrain(s),routes=[
+   [{x:-20,z:20},{x:-18,z:20}],[{x:-18,z:20},{x:-20,z:20}],[{x:-20,z:20},{x:-18,z:22}],
+   [{x:0,z:0},{x:2,z:0}],[{x:-0,z:0},{x:2,z:0}],[{x:0,z:-0},{x:2,z:0}],
+   [{x:-19.5,z:20},{x:-18,z:20}],[{x:278,z:0},{x:280,z:0}]],ghosts=[null,
+   {x:100,z:100,w:4,d:4,rot:0},{x:-19,z:20,w:4,d:4,rot:Math.PI/4},
+   {x:-19,z:21.6,w:4,d:2,rot:0},{x:-19,z:21.6-1e-12,w:4,d:2,rot:0},{x:-19,z:21.6+1e-12,w:4,d:2,rot:0}];
+  const comparisons=[];for(const ghost of ghosts)for(const [p,q]of routes){const ordinary={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3,ghost};comparisons.push([armySegmentClear({...ordinary,_em:abbeyRouteMemo(terrain)},p,q),armySegmentClear(ordinary,p,q)]);}
+  const forward=armySegmentClear({house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3,_em:abbeyRouteMemo(terrain)},routes[0][0],routes[0][1]);
+  const currencies=[W.treasury,a.gold,...W.households.values()].map(v=>typeof v==='object'?v.assets.w:v);`);
+ assert.ok(r.eval('terrain&&comparisons.every(([shared,cold])=>shared===cold)&&forward'));
+ assert.ok(r.eval('terrain.memo.size>0&&terrain.memo.scopes.size>0&&terrain.memo.circuits.size>0'));
+ assert.equal(r.eval('W.projects.length'),0);assert.equal(r.eval('W.bldList.length'),0);
+});
+
+test('shared native terrain avoids repeated world reads and refuses stale walker or replaced helper inputs',t=>{
+ const r=routeSetup();r.eval(`const terrain=abbeyRouteTerrain(s),p={x:-20,z:20},q={x:-18,z:22},ordinary={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3};
+  heightCalls=0;for(let k=0;k<100;k++)armySegmentClear(ordinary,p,q);const cold=heightCalls;
+  heightCalls=0;for(let k=0;k<100;k++)armySegmentClear({...ordinary,ghost:{x:80+k,z:80,w:6,d:6,rot:k*.03},_em:abbeyRouteMemo(terrain)},p,q);const shared=heightCalls;
+  const cached=terrain.memo.size;const replacement=hAt;hAt=(x,z)=>x< -18.5?10:50;const replaced=armySegmentClear({...ordinary,_em:abbeyRouteMemo(terrain)},p,q),freshReplaced=armySegmentClear(ordinary,p,q);hAt=replacement;
+  const badClearance={...ordinary,waterClearance:3.7,_em:abbeyRouteMemo(terrain)},differentHouse={...ordinary,house:2,_em:abbeyRouteMemo(terrain)};
+  const clearance=armySegmentClear(badClearance,p,q),freshClearance=armySegmentClear({...badClearance,_em:undefined},p,q),house=armySegmentClear(differentHouse,p,q),freshHouse=armySegmentClear({...differentHouse,_em:undefined},p,q);
+  now++;const stale=abbeyRouteMemo(terrain),current=abbeyRouteTerrain(s);
+  const building={x:-18,z:22,w:4,d:4,rot:0,state:'sound',arch:'house'};s.buildings.push(building);s._lay.placed.add(building,3);const next=abbeyRouteTerrain(s),newObstruction=armySegmentClear({...ordinary,_em:abbeyRouteMemo(next)},p,q);`);
+ t.diagnostic(JSON.stringify(r.eval('({cold,shared,cached})')));assert.ok(r.eval('cold>0&&shared<cold/20&&cached>0'));assert.equal(r.eval('replaced'),r.eval('freshReplaced'));assert.equal(r.eval('replaced'),false);
+ assert.equal(r.eval('clearance'),r.eval('freshClearance'));assert.equal(r.eval('house'),r.eval('freshHouse'));assert.equal(r.eval('stale'),undefined);
+ assert.equal(r.eval('newObstruction'),false);assert.ok(r.eval('current!==terrain&&next!==terrain'));
+});
+
+test('native paid crossing bounds are first read normally and stay identical on shared world-edge recall',()=>{
+ const r=routeSetup();r.eval(`const water={a:{x:0,z:-100},b:{x:0,z:100},hw:2,y:10,x:0,z:0};W.rivHash.add(water,103);const road={a:0,b:1,path:[{x:-12,z:20},{x:12,z:20}]};W.roads.push(road);
+  const terrain=abbeyRouteTerrain(s),p={x:-2,z:20},q={x:0,z:20},ordinary={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3};
+  const firstGhost=armySegmentClear({...ordinary,ghost:{x:0,z:20,w:4,d:4,rot:0},_em:abbeyRouteMemo(terrain)},p,q),ghostBounds=JSON.stringify(road._bb),ghostCached=terrain.memo.size;
+  const first=armySegmentClear({...ordinary,_em:abbeyRouteMemo(terrain)},p,q),bounds=JSON.stringify(road._bb),reach=onRoad.reach;
+  const next=armySegmentClear({...ordinary,_em:abbeyRouteMemo(terrain)},p,q),retainedBounds=JSON.stringify(road._bb),retainedReach=onRoad.reach;
+  const cold=armySegmentClear(ordinary,p,q);`);
+ assert.ok(r.eval('first&&next&&cold'));assert.equal(r.eval('bounds'),r.eval('retainedBounds'));assert.equal(r.eval('reach'),r.eval('retainedReach'));
+ assert.equal(r.eval('firstGhost'),false);assert.equal(r.eval('ghostCached'),0);assert.equal(r.eval('ghostBounds'),r.eval('bounds'),'first obstructing ghost retains original native paid-road read prefix');
+ assert.equal(r.eval('HASH_STAMP'),0,'native river/building cell reads do not advance a discarded query stamp');
+});
+
+
+test('actual native service detours retain route choices when different poses share ghost-free terrain',()=>{
+ const r=routeSetup();r.eval(`const building={x:10,z:0,w:6,d:8,rot:.2,state:'sound',arch:'house'};s.buildings.push(building);s._lay.placed.add(building,6);
+  s.streets=[{kind:'road',pts:[{x:26,z:-10},{x:26,z:10}],hw:3}];const terrain=abbeyRouteTerrain(s),ghosts=[
+   {x:-15,z:-6,w:6,d:8,rot:0},{x:-12,z:0,w:6,d:8,rot:.4},{x:2,z:8,w:6,d:6,rot:-.5}],out=[];
+  for(const ghost of ghosts){const p={x:-20,z:0},shared=serviceRoadPlan(s,p,s._lay.placed,null,1.3,abbeyRouteMemo(terrain),ghost,terrain.banks),cold=serviceRoadPlan(s,p,s._lay.placed,null,1.3,undefined,ghost);
+   out.push([JSON.stringify(shared?.path),JSON.stringify(cold?.path),shared?.street===cold?.street,shared?.path.length||0]);}
+  const worldLeaks=Reflect.ownKeys(W).filter(k=>k==='terrain'||k==='abbeyTerrain'||k==='banks'||k==='memo');`);
+ assert.ok(r.eval('out.every(([shared,cold,street,len])=>shared===cold&&street&&len>2)'));
+ assert.equal(r.eval('worldLeaks.length'),0);assert.equal(r.eval('W.projects.length'),0);
+});
+
+test('rural native planner discards both segment memo and flood banks when proposal inputs change',()=>{
+ const mutations=['','s.owner=2','s._lay.placed=makeHash(16)','terrain.world={}','terrain.day--','terrain.size--','terrain.cell--','armyReach=(...args)=>capturedReach(...args)'];
+ for(const mutation of mutations){const r=routeSetup(`const originalService=serviceRoadPlan,capturedReach=armyReach;let supplied;
+   serviceRoadPlan=(...args)=>{supplied={memo:args[5],banks:args[7]};return originalService(...args)};`);
+  r.eval(`const terrain=abbeyRouteTerrain(s),survey={s,native:false,terrain},before=JSON.stringify(s.stores),gold=a.gold;
+   ${mutation};const quoted=abbeyApproachPlan(s,base,a.storageOwnerId,undefined,survey);`);
+  assert.ok(r.eval('quoted&&abbeyApproachClear(s,quoted)&&quoted.access.endpoint.ref===0'),mutation||'unchanged');
+  assert.equal(r.eval('!!supplied.memo'),!mutation,`${mutation||'unchanged'} memo`);assert.equal(r.eval('!!supplied.banks'),!mutation,`${mutation||'unchanged'} banks`);
+  assert.equal(r.eval('JSON.stringify(s.stores)'),r.eval('before'));near(r.eval('a.gold'),r.eval('gold'));assert.equal(r.eval('W.projects.length'),0);
+ }
+});
+
+test('native certified flood banks retain an unreachable result for a second actual door',()=>{
+ const r=routeSetup();r.eval(`W.h.fill(0);for(const xs of [[5,6],[10,11]])for(const i of xs)for(const j of [7,8,9])W.h[cIdx(i,j)]=10;
+  s.streets=[{kind:'road',pts:[{x:100,z:5},{x:100,z:15}],hw:3},{kind:'road',pts:[{x:100,z:25},{x:100,z:35}],hw:3}];
+  const terrain=abbeyRouteTerrain(s),out=[];for(const x of [-100,-96]){const p={x,z:20},ghost={x,z:0,w:8,d:8,rot:0},shared=serviceRoadPlan(s,p,s._lay.placed,null,1.3,abbeyRouteMemo(terrain),ghost,terrain.banks),cold=serviceRoadPlan(s,p,s._lay.placed,null,1.3,undefined,ghost);out.push([shared,cold]);}
+  const certified=terrain.banks.floods.every(R=>armyReachClosed(R,{house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3,_em:terrain.memo}));`);
+ assert.ok(r.eval('out.every(([shared,cold])=>shared===null&&cold===null)'));assert.ok(r.eval('terrain.banks.floods.length>0&&certified'));
+ assert.equal(r.eval('W.projects.length'),0);assert.equal(r.eval('HASH_STAMP'),0);
+});
