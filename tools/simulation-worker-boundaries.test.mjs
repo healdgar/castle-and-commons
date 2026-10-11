@@ -15,6 +15,7 @@ const technologyRotation=extract('function technologyRotation(s){','function tec
 // Presentation carries the detached health report, never the canonical paid
 // isolation contract. Load its actual pure projectors alongside the packet seam.
 const portHealthReports=extract('function portQuarantineSummary(c){','function portHealthHTML(s){');
+const grindingReceipt=extract('function technologyGrindingReceipt(s,grain){','function technologyMultureOffer(s,R,grain){');
 const presentation=extract('function visualScalars(', 'function installPresentation(packet){');
 const installProjection=extract('function installPresentation(packet){', '/*\n * Ephemeral renderer DTO builders');
 const renderPlans=extract('/*\n * Ephemeral renderer DTO builders', '/* Foreground adapters submit intent');
@@ -114,6 +115,31 @@ test('paid harbor and institutional reports cross without contracts, people or a
   vm.runInContext('packet.settlements[0].portHealthReport.roll[0].wages=99;packet.caravans[0].portHealthReport.served=99',c);
   assert.equal(vm.runInContext('W.settlements[0].portHealth.roll[0].wages',c),15);
   assert.equal(vm.runInContext('W.caravans[0].portQuarantine.served',c),4);
+});
+
+test('native grinding receipts stay in the worker while changed mill geometry still crosses',()=>{
+  const c=context();new vm.Script(grindingReceipt,{filename:'index.html native grinding receipt'}).runInContext(c);
+  vm.runInContext(`
+    const operator={id:8,household:{gold:91}},holder={kind:'church',id:1,gold:30};
+    const mill={idx:0,arch:'mill',state:'sound',x:1,z:2,w:6,d:6,rot:0,millWater:{x:2,z:3},grindingClaims:[{operator,holder,quantity:2}],grindingPending:2};
+    const house={idx:1,arch:'house',state:'sound',x:9,z:8,w:4,d:5,rot:0};
+    const s={name:'Milltown',pos:{x:0,z:0},mill,buildings:[mill,house],fires:[],furl:[],streets:[],places:[],folk:[]};
+    mill.s=house.s=s;W.bldList=s.buildings;W.settlements=[s];W.capital=s;
+  `,c);
+  const boot=vm.runInContext('workerPresentation(true)',c);auditDTO(boot);
+  const claims=vm.runInContext('W.bldList[0].grindingClaims',c);
+  const receipt=vm.runInContext(`(()=>{const R=technologyGrindingReceipt(W.settlements[0],2),b=W.bldList[0];b.grindingWorked=7;b.grindingOperator=8;b.multureWorked=1;b.grindingCash=3;b.paperMade=.5;b.quarryWages=1;b.lockPassages=1;return R;})()`,c);
+  assert.equal(receipt.worked,2);assert.equal(receipt.rows[0].operator,claims[0].operator);assert.equal(receipt.rows[0].holder,claims[0].holder);
+  assert.equal(vm.runInContext('W.bldList[0].grindingPending',c),0,'the native earned claim was actually collected');
+  const quiet=vm.runInContext('workerPresentation(false)',c);
+  assert.equal(quiet.buildings,undefined);assert.equal(quiet.dirty.structures,false);assert.equal(quiet.dirty.details,false);
+  const fresh=vm.runInContext('workerPresentation(true)',c);auditDTO(fresh);
+  assert.deepEqual(JSON.parse(JSON.stringify(fresh.buildings)),JSON.parse(JSON.stringify(boot.buildings)),'fresh and held bodies agree without publishing native work/payment counters');
+  vm.runInContext('W.bldList[0].millWater.x=4;G.buildingDirty.add(W.bldList[0])',c);
+  const changed=vm.runInContext('workerPresentation(false)',c);auditDTO(changed);
+  assert.equal(changed.buildings.length,1);assert.equal(changed.buildings[0].millWater.x,4);
+  assert.equal(changed.settlements[0].millId,0);assert.equal(vm.runInContext('W.bldList[0].grindingCash',c),3,'projection does not alter native receipts');
+  assert.equal(vm.runInContext('W.bldList[0].grindingClaims.length',c),0);
 });
 
 test('production citizen-plan adapter calls canonical walker helpers, scales elapsed days, and leaves RNG alone',()=>{
@@ -226,6 +252,8 @@ test('a content key reads what a copy would carry: scratch, links and accounts d
   assert.notEqual(k[3],k[4],'a changed name');assert.notEqual(k[3],k[5],'a new name');assert.ok(Number.isFinite(k[6]),'a cycle ends');assert.notEqual(k[7],k[8],'typed arrays count');
   const copy=vm.runInContext(`JSON.stringify([visualGeometry(Array.from({length:12},(_,i)=>({x:i,z:i*2}))),visualGeometry(Array.from({length:12},(_,i)=>({x:i,z:i*2,nb:-1}))).slice(0,2),visualGeometry([{x:1,z:2,_t:5,s:{a:1},c:{d:2}}])])`,c);
   const [line,withNb,one]=JSON.parse(copy);assert.equal(line.length,12);assert.deepEqual(line[3],{x:3,z:6});assert.deepEqual(withNb[1],{x:1,z:2,nb:-1},'a point with more than x and z keeps what it has');assert.deepEqual(one,[{x:1,z:2,c:{d:2}}],'cut names stay cut');
+  const privateScalars=JSON.parse(vm.runInContext(`JSON.stringify((()=>{const a={x:1,z:2},k=visualKey(a);a.quarryWages=2;a.grindingPending=3;a.lockPaidDay=4;a.paperMade=5;a.cashY={payments:{private:6}};const same=visualKey(a)===k,copy=visualGeometry(a),scalars=visualScalars(a);a.x=2;return{same,copy,scalars,moved:visualKey(a)!==k};})())`,c));
+  assert.deepEqual(privateScalars,{same:true,copy:{x:1,z:2},scalars:{x:1,z:2},moved:true},'private scalar and fiscal changes are absent from both projection paths and their content keys');
 });
 
 test('install keeps the geometry a packet leaves out, and maps a town\'s buildings only when its list crossed',()=>{

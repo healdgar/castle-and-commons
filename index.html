@@ -20615,7 +20615,7 @@ function beginChronicle(){
    These records are disposable. The worker retains W, RNG and journals. */
 let BACKGROUND=null,backgroundApplying=false;
 const WORKER_PRESENTATION={events:[],camera:null,started:false,revision:0,buildingCount:0,towns:0,profile:null,profileDirty:false,endgame:null};
-function visualScalars(o){const out={};if(!o)return out;for(const k of visualDataNames(o)){const v=o[k];if(v===null||typeof v==='number'||typeof v==='string'||typeof v==='boolean')out[k]=v;}return out;}
+function visualScalars(o){const out={};if(!o)return out;for(const k of visualDataNames(o)){if(VISUAL_PRIVATE.has(k))continue;const v=o[k];if(v===null||typeof v==='number'||typeof v==='string'||typeof v==='boolean')out[k]=v;}return out;}
 // The names of an object that hold plain data (not accessors, which are never read here), found with a descriptor each only when its names change (and now and then again).
 const VISUAL_SHAPES=new WeakMap();
 function visualDataNames(o){
@@ -20628,7 +20628,7 @@ function visualDataNames(o){
 // town, a churchyard's church, a person or a crew). A link is cut; the same name holding a number (a tree's size
 // s, say) is plain geometry and crosses.
 // (cands: a street's frontage candidates, the layout planner's own scratch: a point every 2.2 m along both sides, most of the bytes of a town and nothing that is drawn.)
-const VISUAL_PRIVATE=new Set(['storage','ledger','holdings','account','ownerAccount','beneficiary','cands','groundClaim','quarryPaidDay','quarryHands','quarryWages','marriageLeave','knighted','marriagePardon','lockSource','riverPlan','lockPayments','boardReceipt','guildWriting']),VISUAL_LINKS=new Set(['s','churchyardOf','title','head','p','men','riders','crew','expedition','vessel']);
+const VISUAL_PRIVATE=new Set(['storage','ledger','holdings','account','ownerAccount','beneficiary','cashY','cashPrev','cands','groundClaim','quarryPaidDay','quarryHands','quarryWages','grindingWorked','grindingOperator','grindingPending','multureWorked','grindingCash','poweredWork','paperMade','lockKeeper','lockWage','lockPaidDay','lockWages','lockPassages','lockReceipts','marriageLeave','knighted','marriagePardon','lockSource','riverPlan','lockPayments','boardReceipt','guildWriting']),VISUAL_LINKS=new Set(['s','churchyardOf','title','head','p','men','riders','crew','expedition','vessel']);
 function visualGeometry(value,seen=new Set()){
   if(value===null||['number','string','boolean'].includes(typeof value))return value;
   if(!value||typeof value!=='object'||value instanceof Map||value instanceof Set||value.household||value._hh||seen.has(value))return undefined;
@@ -20670,7 +20670,7 @@ function visualKeyWalk(v,d){ // what visualGeometry would copy: data under names
   VISUAL_KEY_UP[d]=v;
   if(Array.isArray(v)||ArrayBuffer.isView(v)){visualKeyMix(v.length+23);for(let i=0;i<v.length;i++)visualKeyWalk(v[i],d+1);}
   else if(v instanceof Map||v instanceof Set||v.household||v._hh)visualKeyMix(31);
-  else for(const k in v){if(k.charCodeAt(0)===95)continue;const x=v[k];if(x!==null&&typeof x==='object'&&(VISUAL_PRIVATE.has(k)||VISUAL_LINKS.has(k)))continue;visualKeyMix(k.length*131+k.charCodeAt(0));visualKeyWalk(x,d+1);}
+  else for(const k in v){if(k.charCodeAt(0)===95||VISUAL_PRIVATE.has(k))continue;const x=v[k];if(x!==null&&typeof x==='object'&&VISUAL_LINKS.has(k))continue;visualKeyMix(k.length*131+k.charCodeAt(0));visualKeyWalk(x,d+1);}
 }
 function visualKey(v){VISUAL_KEY_A=0x811c9dc5|0;VISUAL_KEY_B=0x9e3779b9|0;visualKeyWalk(v,0);return(VISUAL_KEY_A>>>0)*1048576+(VISUAL_KEY_B>>>12);}
 // A channel is the memory of one kind of record: persist (a Map by key) for those the display keeps for good, else old and now for lists the display

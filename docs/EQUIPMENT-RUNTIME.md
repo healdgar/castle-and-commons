@@ -86,6 +86,17 @@ must stay out of visual DTOs. Worker queries return scalar receipts, method
 names and native IDs. Existing native project progress/title can be reported
 without these graphs.
 
+Private machinery quantities also stay in the worker: grinding work, pending
+earned claims, operator IDs, multure and cash totals, paper output, quarry work
+and wages, and lock staff, paid days, wages, passages and receipts. Both scalar
+projection and nested geometry copying honor the same private-name set; content
+keys ignore those names as well. Actual mill intake, dam and lock chamber
+geometry still crosses. This corrects a native daily/Reel projection failure
+where crop allocation wrote zero pending claims on otherwise unchanged buildings
+and fresh packets acquired work/payment fields absent from the held display.
+No work, account, RNG or dirty-building rule changes. The drift comparison and
+its deadlines remain unchanged; the root runner owns the full native gate.
+
 Paid post-windmills require adopted knowledge (1185), a real qualified native
 miller, an exposed actual retained site, paid land/access and a fixed timber
 recipe through native foundation work. Daily weather and actual terrain exposure
