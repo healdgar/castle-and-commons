@@ -153,8 +153,10 @@ Years are the period's diffusion in north-western Europe. Effects say which exis
   backwards-compatible alias. Augustinian adoption starts AD 1100 and Cistercian
   granges AD 1128. Accepted Cistercian-first founding remains the abbey adapter's
   policy, separate from capability.
-- Guild resistance awaits real guild ordinances and quantities in #43; there is
-  no invented scalar suppressing methods in the meantime.
+- Guild resistance uses actual sold-work claims and chest-funded named writing
+  and authority licence receipts before a finite local ordinance delays new
+  machines. Existing paid equipment keeps operating; knowledge and prices do
+  not change.
 
 See [TECHNOLOGY-RUNTIME.md](TECHNOLOGY-RUNTIME.md) for the source contracts,
 phase order, equipment/payment requirements and exact remaining consumer list.

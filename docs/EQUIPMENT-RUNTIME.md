@@ -110,7 +110,43 @@ new equipment commissions (see [CRAFT-RUNTIME.md](CRAFT-RUNTIME.md)). Existing
 paid machines and commissioned recipes continue; knowledge and prices do not
 change.
 
-Limits: explicit port quarantine and real canal locks still require native clients.
+Pound locks now have a paid native client at a real existing pond/weir on a
+drainage-connected barge route. It needs adopted1373 knowledge, actual upper and
+lower wet reaches, a lift0.3–4.5m, a clear6×24m chamber, lawful ground/approach,
+24timber/40stone and180working days before it opens. The chamber and bank keeper
+house are real native fabric; projection receives only chamber geometry and
+leaves a real opening in the dam. No new dry canal or cross-watershed connection
+is generated. Larger lifts remain outside the single-chamber client.
+
+`technologyRiverPassage(pr)` uses the actual weir and present wage-paid named
+keeper. A keeper supplies eight two-hour passages per day; paid lock service
+replaces measured unload/reload portage on that reach. A missing, ruined,
+unaffordable or fully booked lock retains the boatman's portage time/work fee.
+Actual merchants pay the title holder for served passages; daily keeper wages
+come from that real title-holder purse. The merchant's goods reserve includes
+actual lock outlay. Automatic investment must repay real capital and keeper
+wages from observed native barge traffic; `s-lock` may fund an eligible site
+from an owned house purse. It does not grant a free operation. These lock and
+portage changes intentionally revise the previous free passage through weirs.
+
+The global `_lockIndex` maps actual wet weir rows to native routes/local places
+once daily and is invalidated on actual paid pond completion. Each place's
+craft index retains native lock houses; current operators, titles, funds and
+booked passages are always validated. The machinery phase staffs actual locks
+and proposes paid work; construction completes in the native fabric phase;
+trade quotes/bookings consume these actual operations after routing.
+
+Additional worker-only state is `W._lockIndex`; native building `lockSource`,
+`lockKeeper`, `lockWage`, `lockPaidDay`, `lockWages`, `lockDay`, `lockPassages`,
+`lockReceipts`; person `lockJob`; native river-pair `lockTraffic`; consignment
+`riverLeg`, `riverPlan`, `lockPaid` and `lockPayments`. These retain actual actor,
+route and receipt graphs. `lockWater` is only numeric retained chamber geometry
+and upper/lower water levels, permitted in the building visual DTO.
+
+Explicit port quarantine is supplied by its separate native port-health client.
+The lock client does not model a new inland canal network, continuous chamber
+water volume, dredging or lock breakdown wear; it operates existing native wet
+pond/weir reaches and their paid transport work.
 Army splits partition actual individual holders and divide their paid recipe
 provenance; one siege engine remains in the original army unless explicitly
 moved. Its method and generic engine alias share the same canonical record.
@@ -123,7 +159,7 @@ Equipment has no separate wear stock; native site/owner/operator loss already
 stops its use. No simulation-century throughput or economy calibration claim
 follows from these focused fixtures.
 
-Light evidence: extracted inline JavaScript syntax and twenty-two focused cases in
+Light evidence: extracted inline JavaScript syntax and twenty-five focused cases in
 `tools/equipment.test.mjs`, covering both native commodity ledgers, material and
 coin conservation, paid completion, actual exclusivity and current wages,
 finite mill work, held animal teams, paid paper/printing, native army holders,
@@ -135,3 +171,9 @@ trade group, validating current power, operator and title on each transaction.
 It does not rediscover every building for every family bread payment. Actual
 paid fabric completion invalidates work-room discovery immediately; a newly
 opened mill or repaired work room can recruit a master on the next daily phase.
+
+Shop room title reads resolve actual canonical accounts. Symbolic `lord`,
+`town` and `church` property names cannot be passed as payment recipients;
+unresolved account strings are rejected. Pure room/equipment cards never
+change the native title to perform this read. Paid room rents reach the actual
+local house, town, church, household or corporate purse.

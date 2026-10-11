@@ -144,7 +144,8 @@ Local adoption alone changes none of these quantities.
 | Crossbow, longbow, plate, ram, trebuchet, cannon | Paid actual army recipe and recorded living holders; `technologyArmyEquipmentFactor` is the battle/siege adapter contract |
 | Post windmill | Paid native retained exposed site/approach, real timber and crew; present native master grinding shares finite mill time, actual earned multure and cash service receipts |
 | Numerals, bills, double entry | Finance clients must use actual clerk/merchant claims; no simulated accounting errors or free remote payments |
-| Quarantine, canal lock | Still require actual port closure or paid native canal/lock operations |
+| Quarantine | The port-health client requires actual exposure evidence, paid native attendants and finite consignment holds |
+| Pound lock | Paid native wet pond/weir chamber and keeper house; real exclusive keeper wages, finite served passages, actual merchant receipts and boatman portage fallback |
 
 `technologyEffect(s,key,operation)` returns one unless the method is available
 **and** the operation records `techEquipment[key].installed === true` (or the matching native

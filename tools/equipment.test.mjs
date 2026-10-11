@@ -14,7 +14,7 @@ function fixture(commodity=false){
   f.eval('H.forEach(householdAccount);householdsOf(s)');f.W._pm=new Map(f.H.map(p=>[p.id,p]));f.s._job={weaver:{sum:10000,n:1},miller:{sum:10000,n:1},carpenter:{sum:10000,n:1},smith:{sum:10000,n:1},merchant:{sum:10000,n:1}};
   Object.assign(f.C,{day:()=>d,year:()=>0,AD:()=>1600,TRADE_W:{weaver:1,smith:1},TILLERS:new Set(['ploughman']),TRADE_ARCH:{weaver:'burgher',smith:'smithy'},KL:0,KR:1,KS:2,KLaw:3,KA:4,KRi:5,KCr:7,GW:0,GD:2,trait:()=>0,
     price0:(s,g)=>s.px?.[g]??1,technologyKey:k=>k,technologyCapability:(s,key)=>({available:s.denied!==key}),waterMill:s=>!!(s.mill&&s.river&&s.mill.state==='sound'),institutionalCapability:()=>({available:true}),marketTradeIndexInvalidate:()=>{},sovOn:()=>true,plyH:()=>0,rentDue:()=>0,chestReserve:()=>0,esc:String,LS:{TILLED:1},ARABLE:new Set([1]),G:{ordersDirty:false},emit:()=>{},constructionCapability:(s,key)=>({available:s.denied!==key}),hAt:()=>10,houseAtWar:()=>false,notableById:()=>null,generalship:()=>1,menQuality:()=>1,horseShare:()=>0,rand:()=>.5});
-  const names=['resolveClash','siegeEngines','learningHead','learningPayer','learningFamilySize','learningPerson','learningSpare','learningTeacherCost','tradeIncome','corpFound','workers_','millHolder','technologyEffect'];
+  const names=['segDist','awayNow','resolveClash','siegeEngines','learningHead','learningPayer','learningFamilySize','learningPerson','learningSpare','learningTeacherCost','tradeIncome','corpFound','workers_','millHolder','technologyEffect'];
   vm.runInContext(rules+'\n'+names.map(fn).join('\n')+'\n'+craft,f.C);
   for(const g of ['timber','tools','stone','cloth','ore','wool','paper']){f.s.stores[g]=100;f.eval(`offer(s,'${g}','crown',100)`);}return{...f,rooms,setDay:x=>d=x};
 }
@@ -130,4 +130,21 @@ test('guild resistance requires sold work, a real funded writer and authority re
 
 test('a sovereign machine permission repeals only its actual local purchased ordinance',()=>{
   const f=fixture(),g={id:0,trade:'weaver',members:[],gold:0,ordinances:{machines:{loom:{until:30,authority:0,licence:5}}}};f.W.guilds=[g];f.s.guildIds=[0];assert.ok(f.eval('craftMachineRestriction(s,"loom")'));const coins=f.coins();assert.equal(f.eval('craftMachineCmd("0:loom:allow")'),true);assert.equal(f.eval('craftMachineRestriction(s,"loom")'),null);near(f.coins(),coins);assert.equal(f.eval('craftMachineCmd("0:loom:ban")'),false);
+});
+
+
+test('an existing weir needs an actual paid staffed lock to change native barge passage and its operator day is finite',()=>{
+  const f=fixture(),coins=f.coins();f.H[5].tr='boatman';delete f.s._craftIndex;f.s.lake={y:10,dam:{x:0,z:0,a:0,w:20,lo:-10,hi:10}};const pr={a:0,b:0,route:{len:1000,poly:[{x:-500,z:0},{x:500,z:0}]}};f.W.riverPairs=[pr];Object.assign(f.C,{CELL:10,TRADE_LOAD:{river:180},riverAt:()=>({y:8,hw:6}),lakeAt:(s,x,z)=>x>=0});f.C.pr=pr;assert.equal(f.eval('technologyRiverPassage(pr).days'),4);
+  const b={idx:3,arch:'toll',w:6,d:6,state:'sound',ownerId:'lord',s:f.s,lockSource:f.s.lake,lockWater:{f:{x:0,z:0,w:6,d:24,rot:Math.PI/2},upper:10,lower:8},techEquipment:{canalLock:{installed:true}}};f.rooms.push(b);delete f.s._craftIndex;f.C.lock=b;assert.equal(f.eval('technologyRiverPassage(pr).days'),4,'the paid chamber alone has no operator');f.eval('technologyLockStaff(s,lock)');assert.ok(b.lockKeeper!=null);assert.ok(b.lockWages>0);near(f.coins(),coins);assert.equal(f.eval('technologyRiverPassage(pr).days'),.125);const keeper=f.H.find(p=>p.id===b.lockKeeper);assert.equal(keeper.role,'lockkeeper');assert.equal(f.eval('institutionalJobHeld(learningPerson(lock.lockKeeper))'),true);
+  for(let i=0;i<8;i++){f.C.trip={qty:180,arriveDay:5,riverPlan:f.eval('technologyRiverPassage(pr)')};assert.ok(f.eval('technologyRiverPassagePay(trip,H[0])')>0);}assert.equal(b.lockPassages,8);assert.equal(f.eval('technologyRiverPassage(pr).days'),4);near(f.coins(),coins);b.state='ruin';f.setDay(2);f.eval('technologyLockStaff(s,lock)');assert.equal(keeper.role,null);assert.equal(keeper.lockJob,undefined);assert.equal(f.eval('technologyRiverPassage(pr).days'),4);
+});
+
+test('lock capability cannot fabricate a wet reach, chamber, staff or passage',()=>{
+  const f=fixture();Object.assign(f.C,{CELL:10,TRADE_LOAD:{river:180},riverAt:()=>null,lakeAt:()=>false});f.s.lake={y:10,dam:{x:0,z:0,a:0,w:20}};f.W.riverPairs=[];assert.equal(f.eval('technologyLockBarrier(s)'),null);assert.equal(f.eval('technologyLockProposal(s,true)'),null);assert.equal(f.s.buildings.filter(b=>b.lockWater).length,0);f.s.denied='canalLock';assert.equal(f.eval('technologyLockProposal(s,true)'),null);
+});
+
+
+test('a symbolic lord workshop title pays actual shop rent to its canonical purse without changing the title',()=>{
+  const f=fixture(),coins=f.coins();f.rooms[0].title={owner:'lord',beneficiary:null};f.rooms[0].ownerId='lord';f.rooms[0]._rent=120;delete f.H[0].bh;const title=f.rooms[0].title,crown=f.W.treasury;const owner=f.eval('craftRoomOwner(s,W.bldList[0])');assert.equal(owner,'crown');f.C.Q=f.eval('craftRoomQuote(s,H[0],"weaver")');assert.ok(f.C.Q.rent>0);f.eval('transfer(H[0],Q.owner,Q.rent,"shop rent",s)');assert.ok(f.W.treasury>crown);assert.equal(f.rooms[0].title,title);assert.equal(f.rooms[0].title.owner,'lord');near(f.coins(),coins);
+  f.W.houses[1]={name:'native lord',gold:1000};f.s.owner=1;assert.equal(f.eval('craftRoomOwner(s,W.bldList[0])'),f.W.houses[1]);f.rooms[0].title={owner:'unresolved'};assert.equal(f.eval('craftRoomOwner(s,W.bldList[0])'),null);
 });

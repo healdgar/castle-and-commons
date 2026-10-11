@@ -68,7 +68,7 @@ test('a load pays at every toll house on its way, the custom of each place on it
 
 test('freight\'s reckoning includes the tolls on the way: a thin margin the tolls eat is not sent',()=>{
   const PROGRAM=[line('GOODS'),line('GOODBASE'),line('LU'),line('NEED'),line('TRADE_LOAD'),CUSTOMS,line('TOLL_HOMES'),
-    ...['customOf','tollStands','tollKeeper','wayToll','frtRate','freight','tradeOnTheWay','tradeWant','tradeSpare','tradeRoom','tickTrade'].map(fn)].join('\n');
+    ...['customOf','tollStands','tollKeeper','wayToll','frtRate','freight','tradeOnTheWay','tradeWant','tradeSpare','tradeRoom','technologyLockBarrier','technologyRiverLockIndex','technologyRiverPassage','tickTrade'].map(fn)].join('\n');
   const send=toll=>{
     const place=o=>({name:o.name,pop:0,infected:0,storage:{},stores:{...o.stores},px:{grain:2,...o.px},_dAvg:{grain:100},carters:1,dealers:1,pos:o.pos||{x:0,z:0},custom:{toll}});
     const S=[place({name:'Market',stores:{grain:200}}),place({name:'Town',px:{grain:2.5},pos:{x:1000,z:0}})],keeper={},keeper2={},b={arch:'toll',state:'sound',s:S[1],x:0,z:0,hh:[keeper]};keeper.bh=b;
