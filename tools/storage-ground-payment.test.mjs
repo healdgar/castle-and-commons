@@ -42,7 +42,7 @@ test('a different working tenant and changed titles stop new site payments',()=>
   const r=fixture();r.eval(`F[1].title.work.owner=accountOwner(H[2]);const blocked=storageGroundClaim(s,q,'crown');`);
   assert.equal(r.eval('blocked.ok'),false);assert.equal(r.eval('blocked.reason'),'occupied-holding');
   near(r.eval('q.paid'),0);near(r.W.treasury,100);
-  r.eval(`F[1].title.work.owner=F[1].title.own.owner;storageGroundPay(q,s,'crown',storageGroundClaim(s,q,'crown'));F[1].title.own.owner=accountOwner(H[2]);F[1].title.work.owner=accountOwner(H[2]);const changed=storageGroundClaim(s,q,'crown')`);
+  r.eval(`F[1].title.work.owner=F[1].title.own.owner;q.groundClaim={key:storageGroundClaim(s,q,'crown').key};F[1].title.own.owner=accountOwner(H[2]);F[1].title.work.owner=accountOwner(H[2]);const changed=storageGroundClaim(s,q,'crown')`);
   assert.equal(r.eval('changed.ok'),false);assert.equal(r.eval('changed.reason'),'ground-title-changed');
 });
 
@@ -58,4 +58,11 @@ test('a retained compound footprint pays only for newly occupied ground',()=>{
   const r=fixture(),before=r.coins();
   r.eval(`W.land.mask=new Uint8Array(12);W.land.mask[2]=255;q.site={f:{x:9,z:7,w:3,d:5,rot:0.7}};let surveyed;compoundGround=site=>(surveyed=site,{cells:[0,1,2]});const g=storageGroundClaim(s,q,'crown');storageGroundPay(q,s,'crown',g);`);
   assert.equal(r.eval('surveyed===q.site'),true);near(r.H[0].w,100);near(r.H[1].w,115);near(r.H[2].w,115);near(r.coins(),before);
+});
+
+
+test('paid fixed ground permission survives parcel succession and preserves the actual receipt',()=>{
+  const r=fixture(),before=r.coins();r.eval(`storageGroundPay(q,s,'crown',storageGroundClaim(s,q,'crown'));const receipt=JSON.stringify(q.groundClaim);F[1].title.own.owner=accountOwner(H[2]);F[1].title.work.owner=accountOwner(H[2]);const current=storageGroundClaim(s,q,'crown');storageGroundPay(q,s,'crown',current)`);
+  assert.equal(r.eval('current.ok'),true);assert.equal(r.eval('JSON.stringify(q.groundClaim)'),r.eval('receipt'));near(r.coins(),before);near(r.W.treasury,70);
+  r.eval(`compoundGround=()=>({cells:[0,1,3]});const moved=storageGroundClaim(s,q,'crown')`);assert.equal(r.eval('moved.ok'),false);assert.equal(r.eval('moved.reason'),'ground-footprint-changed');
 });

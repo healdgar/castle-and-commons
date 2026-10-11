@@ -5173,6 +5173,7 @@ function storageGroundClaim(s,q,payer){ // exact native ground titles, not a lis
   return {ok:true,key,cells:fullCells,recipients:R};
 }
 function storageGroundPay(q,s,payer,ground){ // a saved receipt is the actual transfer; use of one's own ground carries no cash
+  if(!ground?.ok)return{ok:false,paid:0};if(q.landPaid)return{ok:true,paid:0}; // retain the original named receipts after the fixed licence is paid
   const payments=q.landPayments||{},remaining=r=>Math.max(0,r.due-(payments[r.id]||0)),due=ground.recipients.reduce((v,r)=>v+remaining(r),0);
   if(due>means(payer))return {ok:false,paid:0};let paid=0;
   for(const r of ground.recipients){const v=remaining(r);if(!(v>0))continue;const actual=transfer(payer,r.owner,v,'land',s)||0;payments[r.id]=(payments[r.id]||0)+actual;paid+=actual;}
