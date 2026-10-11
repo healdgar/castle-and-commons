@@ -86,3 +86,5 @@ Native opening frontage #61 is still partial. Additional hydraulic forms,
 species-specific food categories and detailed economic calibration remain
 explicit limits. The active contract does not count a pictured building,
 unused method name or an unfunded obligation as a completed institution.
+
+The repaired source `c2059ac` passes the current coupled check inventory: the 198-file frozen batch passes 1,977/1,978, with only a 30-second graph serialization deadline failure. The complete eight-file serial affected/source/boundary rerun passes 82/82 with original assertions and deadlines. Two new public/private windmill regressions bring the verified unique inventory to 1,980 across that batch and rerun. Actual native industries, fresh current-source history/save, worker, conservation and drawing remain pending; the old native pass below belongs to `2d81f11`.
