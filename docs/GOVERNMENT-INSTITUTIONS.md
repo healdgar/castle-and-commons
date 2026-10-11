@@ -31,11 +31,15 @@ capability seam. Heavy release validation is the coordinator's next gate.
   the debtor's surplus to the real creditor, reduces the original loan, and
   pays a living justice. Unfunded hearings adjourn; no personal debt is
   invented or assigned to an unrelated heir.
-- `benchLandPlead` accepts an explicit claimant, adverse account, witnessed
-  evidence and real disputed amount for subsequent pledge/title proceedings.
-  Existing consensual land sales and inheritances do not manufacture disputes.
-  The hook does not yet represent a contested land-title adjudication or move
-  a parcel; the corresponding actual pledge/title mechanism must call it.
+- Registered land pledges reach `creditJudgement` at their actual maturity.
+  A funded local court pays its named officials, conveys the secured parcel's
+  ownership, pays any value above the debt to its actual owner, and reduces
+  the same registered claims. The parcel's native working right is retained.
+- `benchLandPlead` receives recoverable registered rent-charge arrears with an
+  explicit claimant, adverse account, contract evidence and actual amount.
+  A funded monthly bench sitting recovers real surplus and updates that same
+  charge. General disputes between competing land titles remain additional
+  historical detail; consensual sales and inheritances create no such plea.
 
 Court staffing uses the same native employment eligibility as the later
 government offices. New and retained officers must be present, lettered heads
