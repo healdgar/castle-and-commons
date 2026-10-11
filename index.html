@@ -8094,7 +8094,9 @@ function castleFoundationReserved(s,f,ownProject){ // paid native proposals hold
   }return false;
 }
 function castleFoundationBoxMayHit(x,z,b,pad=0){ // conservative point-to-AABB broad phase; exact geometry remains authoritative
-  if(!b||![x,z,b.minX,b.maxX,b.minZ,b.maxZ,pad].every(Number.isFinite))return true;const dx=Math.max(b.minX-x,0,x-b.maxX),dz=Math.max(b.minZ-z,0,z-b.maxZ);return Math.hypot(dx,dz)<=pad+1e-6;
+  if(!b||![x,z,b.minX,b.maxX,b.minZ,b.maxZ,pad].every(Number.isFinite))return true;const dx=Math.max(b.minX-x,0,x-b.maxX),dz=Math.max(b.minZ-z,0,z-b.maxZ),limit=pad+1e-6;
+  if(dx>limit||dz>limit)return false; // native two-term hypot cannot be below either nonnegative axis
+  return Math.hypot(dx,dz)<=limit;
 }
 function castleFoundationSegmentMayHitBox(a,b,box,pad=0){ // rotated OBB padding grows a corner by up to sqrt(2)*pad in world axes
   if(!box||![a?.x,a?.z,b?.x,b?.z,box.minX,box.maxX,box.minZ,box.maxZ,pad].every(Number.isFinite))return true;const d=Math.SQRT2*pad+1e-6;return !(Math.max(a.x,b.x)+d<box.minX||Math.min(a.x,b.x)-d>box.maxX||Math.max(a.z,b.z)+d<box.minZ||Math.min(a.z,b.z)-d>box.maxZ);

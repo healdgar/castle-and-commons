@@ -119,6 +119,37 @@ test('the AABB broad phase remains conservative at and just inside exact-distanc
   assert.equal(C.castleFoundationBoxMayHit(NaN,1.5,b,1),true,'invalid bounds defer to exact logic');
 });
 
+test('axis rejection exactly preserves the former box predicate under native deterministic hypot',()=>{
+  const start=source.indexOf('  function hypot(x,y){'),end=source.indexOf('\n  return Object.freeze(',start);
+  assert.ok(start>=0&&end>start,'the actual native deterministic hypot is extracted');
+  const hypot=vm.runInNewContext(source.slice(start,end)+'\nhypot',{Math});let calls=0;
+  const math=Object.create(Math);math.hypot=(x,z)=>{calls++;return hypot(x,z);};
+  const current=vm.runInNewContext(fn('castleFoundationBoxMayHit')+'\ncastleFoundationBoxMayHit',{Math:math});
+  const prior=(x,z,b,pad=0)=>{if(!b||![x,z,b.minX,b.maxX,b.minZ,b.maxZ,pad].every(Number.isFinite))return true;
+    const dx=Math.max(b.minX-x,0,x-b.maxX),dz=Math.max(b.minZ-z,0,z-b.maxZ);return hypot(dx,dz)<=pad+1e-6;};
+  const compare=(x,z,b,pad)=>assert.equal(current(x,z,b,pad),prior(x,z,b,pad),JSON.stringify([x,z,b,pad]));
+  const buf=new ArrayBuffer(8),f=new Float64Array(buf),u=new BigUint64Array(buf),next=n=>{
+    if(n===Infinity)return n;if(n===0)return Number.MIN_VALUE;f[0]=n;u[0]+=n>0?1n:-1n;return f[0];};
+  const point={minX:0,maxX:0,minZ:0,maxZ:0},box={minX:-2,maxX:3,minZ:4,maxZ:5};
+  const pads=[-Number.MAX_VALUE,-1,-next(1e-6),-1e-6,next(-1e-6),-Number.MIN_VALUE,-0,0,Number.MIN_VALUE,1e-6,.5,1,1000,2**52,1e200,Number.MAX_VALUE];
+  for(const pad of pads){const limit=pad+1e-6;
+    for(const axis of[0,Number.MIN_VALUE,Math.abs(limit),next(Math.abs(limit)),-next(-Math.abs(limit))])
+      for(const other of[0,Number.MIN_VALUE,axis*.5,axis])for(const sign of[-1,1]){
+        compare(sign*axis,other,point,pad);compare(other,sign*axis,point,pad);
+        assert.ok(hypot(axis,other)>=Math.max(axis,other),'native hypot never falls below its largest finite axis');
+      }
+  }
+  for(const invalid of[undefined,null,NaN,Infinity,-Infinity,'1']){compare(invalid,0,box,1);compare(0,invalid,box,1);compare(0,0,box,invalid);
+    for(const k of['minX','maxX','minZ','maxZ'])compare(0,0,{...box,[k]:invalid},1);}
+  for(const b of[null,undefined,{},box,{minX:3,maxX:-2,minZ:5,maxZ:4},{minX:-Number.MAX_VALUE,maxX:-Number.MAX_VALUE,minZ:Number.MAX_VALUE,maxZ:Number.MAX_VALUE}])
+    for(const x of[0,-0,Number.MIN_VALUE,-Number.MAX_VALUE,Number.MAX_VALUE])for(const z of[0,Number.MIN_VALUE,-Number.MAX_VALUE,Number.MAX_VALUE])for(const pad of pads)compare(x,z,b,pad);
+  let state=0x315cd57b;const draw=()=>{state^=state<<13;state^=state>>>17;state^=state<<5;return(state>>>0)/4294967296;};
+  for(let k=0;k<4000;k++){const scale=Math.pow(2,k%2097-1074),x=(draw()*2-1)*scale,z=(draw()*2-1)*scale,pad=(draw()*2-.5)*scale;
+    compare(x,z,{minX:-scale*.25,maxX:scale*.3,minZ:-scale*.1,maxZ:scale*.4},pad);}
+  calls=0;assert.equal(current(100,0,point,1),false);assert.equal(current(0,100,point,1),false);assert.equal(calls,0,'distant single axes skip hypot');
+  assert.equal(current(.75,.75,point,1),false);assert.equal(calls,1,'near-box corners keep the exact original hypot predicate');
+});
+
 
 test('OBB broad phase keeps the diagonal corners of its rectangular padding',()=>{
   const C=runtime().C,pad=1,f={x:0,z:0,w:10,d:10,rot:0},box=(()=>{const P=C.obbCorners(f.x,f.z,f.w,f.d,f.rot);return{minX:Math.min(...P.map(p=>p.x)),maxX:Math.max(...P.map(p=>p.x)),minZ:Math.min(...P.map(p=>p.z)),maxZ:Math.max(...P.map(p=>p.z))};})(),x=5+0.9*pad,z=5+0.9*pad;
