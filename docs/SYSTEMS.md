@@ -57,10 +57,10 @@ These rules apply to all nine.
     - `acct` and `means` reckon its `gold` as a house's. `isHouse` now means "keeps a book", so `transfer` and the market's sales book its side too.
     - The year's books close for abbeys and guilds with the houses'. The accounts panel and the soak's money census count each chest once.
   - Every payment goes through `transfer(from,to,v,why)`. A house's side is booked with `book()` under a new label. `transfer` already pays only what the payer has; what it cannot pay is kept as an arrear on a named record, never coined.
-  - The crown keeps no labelled book today (`economy-probe --probe crown` reads its flows from outside). Giving it one adds fields to `W`, so it lands with #36 or #39, whose agent owns the revenue labels.
+  - The current Crown has labelled annual cash receipts and payments in `W.crownBook`, recorded by `cashRecord` at actual transfers; the economy probe also reads its border flows.
 - **Records, not crowds.**
   - An institution is one owner with a purse, land, stores, a building and a few named people.
-  - The named people are household heads holding an office: a new `office` field on the head (steward, clerk, bailiff, moneyer, collector, master, warden). Being a head, each still eats, marries and dies. Great officers (abbot, justice) are notables made by `mkNotable` with a new role.
+  - Paid civil officers are actual native household heads holding an `office` (steward, clerk, bailiff, moneyer, collector, master, warden), with their existing families and mortality. An abbot or abbess is selected from actual professed members; a justice is recruited from eligible native people. Appointments create no additional notable or household.
     - Built: `p.office` is a key of `OFFICES` (the seven, and the notes' cellarer, mayor and lender; `master` reads "schoolmaster"). `p.officeFor` is whom he serves: a house index (0 the crown), an abbey's or guild's key, or none for his place's own office.
     - `officeHeld(p)` is null once he is dead. `officeTitle(p)` reads "steward of House Gamsburg", shown on the person card.
   - Current implementation: monks, nuns, conversi and scholars remain actual native people. Religious admission changes their canonical household and residence; temporary scholars retain their original family. Institutions do not create a second population or another meal.
@@ -218,7 +218,9 @@ These rules apply to all nine.
 
 ## 2. #35 Monasteries, abbeys and nunneries
 
-**Current visual scope.** The implemented core church, residential range and grange are separately placed functional building models. Recognizable cloister architecture and a finished claustral ensemble are not implemented yet; the design below describes their intended historical setting. The frozen `61dd0bb` native core run was deliberately stopped at audited closed day660, with four abbeys and at least one completed Benedictine church. Its church-only draw preserves the exact saved/source graph and every RNG stream, with all textures ready and no errors; it is not a full-core or industry pass.
+**Current visual scope.** The unpublished candidate implements church-relative dormitory, chapter and refectory ranges, four paid roofed cloister walks and a seasonal open court through the shared compound engine. Physical titles, access, funding and actual materials/wages gate each stage. Generated-world completion, current-source drawing and release gates remain pending; geometry in the source does not establish a finished native ensemble. The frozen `61dd0bb` run and its verified church-only image predate this connected layout and remain evidence only of that predecessor's paid church. See [COMPOUND-LAYOUT-PHASE.md](COMPOUND-LAYOUT-PHASE.md).
+
+The actors and hooks below retain the original design sketch. The current native adapter uses actual named members and household pantries, daily founding/admission decisions and ordinary person mortality; it creates neither a religious cohort nor `hallN` mouths. Its operative dependencies and distinct order policies are recorded in [ABBEYS.md](ABBEYS.md).
 
 **1. History.**
 - Benedictine houses were refounded from the 10th century (Cluny 910; the English reform c. 960). The Cistercians, from 1098 (England 1128), farmed granges with lay brothers and sold wool forward to Flemish and Italian merchants; Pegolotti's list of c. 1320 names some 200 English houses.
@@ -664,10 +666,11 @@ Sessions and their rulings:
 - Bishops, kings and lords paid stipends and founded colleges.
 
 **2. Actors and state.**
-- **Existing:**
+- **Original gap, before the funded learning adapter:**
   - `eduPlace(s)` grants a church, cathedral, school or grammar school by era and size.
   - `educate()` raises letters, reckoning, scripture and law (`KL`, `KR`, `KS`, `KLaw`).
   - Nobody teaches and nobody is paid: schooling without a schoolmaster.
+- **Current candidate:** native rooms employ actual qualified masters; daily delivered tuition and stipends fund lessons. Actual pupils and travelling scholars retain native family identities. Ordinary era-derived teaching is restricted to opening calibration. See [LEARNING-RUNTIME.md](LEARNING-RUNTIME.md) for the operative hooks and pending generated-world gates.
 - **New schools:** a school is a schoolmaster (a head with office `master`) at a place with a church, cathedral or abbey, and a roll of pupils (person ids).
 - **New, the university:** a record at a town {masters, scholars (count and family links), halls, patrons' stipends}.
 - **New, a scholar away:** a named person with `p.away` at the university town, as travellers are now. He is still a member of his household, which pays his keep.

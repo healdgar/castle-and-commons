@@ -10,6 +10,8 @@ Domestic chests appear once in `accountBalances` and the native soak money censu
 
 `tickChurchBodies`, at the end of late native `tickChurches`, handles assessments, household remittances, appointments, records and church fabric from actual balances. It does not add a new top-level simulation phase. Native marriage authorization reads today's paid service; probate runs after the deceased household repays its creditors. Native crop tithe allocation reads today's paid actual abbey vicar. Building changes remain native paid projects and become effective through the existing projects and map synchronization phases.
 
+Sound castle chapels participate in ordinary `tickChurches`; Abbey churches use its `tickChurchBodies` → `abbeyFabric` continuation. The current Abbey fabric quote pays from the canonical corporate chest, budgets the complete technology-adjusted material and labour bill, and protects the actual food reserve and retained entrance. These growth callers require a sound church; their existence does not establish ruin recovery. Integrated native construction, continuation and drawing gates remain pending.
+
 ## Real dated payments
 
 Journaled compound patron gifts enter the actual recipient chest as **compound patron endowment**. The named donor pays the full amount, and native `unearned` removes the receipt from operating income; the capital label also remains excluded from ecclesiastical assessments. No order or diocese receives an implied share of that gift.
