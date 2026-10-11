@@ -1,0 +1,107 @@
+# Government institutions
+
+This behaviour phase adds native government business at the existing justice
+boundary. The model changes history intentionally. It uses simulation days,
+real accounts, named existing officials and the shared learning/adoption
+capability seam. Heavy release validation is the coordinator's next gate.
+
+## Jurisdiction and business
+
+- A hundred is a market town and its nearest villages. Its monthly sitting
+  reviews native pending loan business and asks the existing manor courts to
+  hear real pleas. A living lettered local head serves as bailiff. His service
+  is paid from the actual local courts' receipts, reducing their net receipts.
+  No sitting creates a debt or salary merely because its date arrives.
+- The shire sheriff hears existing road-duty neglect monthly, and existing
+  unpursued robbery presentments at the twice-yearly tourn. Detailed cases
+  clear only after their actual ruling; felony evidence remains for the eyre.
+  A real lettered household holds the office and earns funded service fees.
+  Unfilled funded clerk/sheriff/bench demand is recorded as a native vacancy
+  for the learning/schooling system; no proficient worker is fabricated.
+- Once a closed year provides actual net sheriff receipts, a funded willing
+  officer may farm that stream for its observed yield. His household receives
+  the subsequent actual court receipts and owes the customary farm annually.
+  Payment preserves the family's subsistence; unpaid farm remains an arrear.
+  A merger follows the existing household account. An extinct farmer's debt
+  is discharged and recorded rather than charged to an unrelated replacement.
+- The capital bench receives an actual recoverable old native loan only when
+  the creditor's expected recovery exceeds the writ, travel and board. The
+  plaintiff buys a writ, travels along a real native route, remains through
+  the next monthly sitting and buys actual capital board. The court transfers
+  the debtor's surplus to the real creditor, reduces the original loan, and
+  pays a living justice. Unfunded hearings adjourn; no personal debt is
+  invented or assigned to an unrelated heir.
+- `benchLandPlead` accepts an explicit claimant, adverse account, witnessed
+  evidence and real disputed amount for subsequent pledge/title proceedings.
+  Existing consensual land sales and inheritances do not manufacture disputes.
+  The hook does not yet represent a contested land-title adjudication or move
+  a parcel; the corresponding actual pledge/title mechanism must call it.
+
+## Attendance and consent
+
+An estate summons sets a notice period and a three-week sitting. Lord
+attendance weighs the actual royal obligation shortfall, local threat,
+confidence and travel cost, or follows the player's journaled attend/decline
+policy. A lord uses the exact existing notable (or its existing `fp` alias),
+never a new resident. Native traveller records carry an explicit lord actor
+kind and NID. They set `h.at` only on simulation arrival and retain the actual
+return journey. Death cancels the same actor. No resident population is added.
+A destination banner reads only projected residence; its drawing moves no coin.
+
+Boroughs pay named resident burgesses' actual customary attendance wages from
+their own chest when they can fund the whole commitment. The member travels
+and buys actual bread and craft service at the capital. Visiting lords buy
+board from their own house purse; the next hall budget deducts those actual
+board bills. Their seat's servants remain at the seat.
+
+Before parliament is learned/adopted, the ruler can order a subsidy. Once it
+is available, the weighted deterministic votes of actual attending lords and
+burgesses decide. A refusal or a sitting with no eligible attendees creates
+no tax grant. Votes weigh threat, war, loyalty/legitimacy, the requested rate,
+recent grants, hunger and unrest. No dice decide consent.
+
+## Tax assessment and obligation books
+
+A grant records its requested rural rate (towns one half more, the customary
+fifteenth/tenth relationship), real place due dates and a one-year assessment
+term. Each place is assessed once at its next annual tenure day, by a named
+collector. Actual household coin, owned animals and held/sale goods are valued
+at local prices. Coin collection preserves a family's next month's bread and
+rent. The shortfall remains a real named household obligation; collection
+fees come from coin actually received.
+
+The persistent obligation map is created by assessments, not a polling census.
+Quarter-day recoveries follow native single-household mergers. Extinct estates
+are discharged explicitly. Thus assessed wealth reconciles to collected coin,
+remaining arrears and recorded discharges. Completed grant books do not assess
+again. Only twelve recent grant books remain; older totals are aggregated and
+unpaid references coalesce without dropping their principal. Session and
+judgement rolls use the existing bounded roll mechanism.
+
+## Charters
+
+A commune purchases the actual delegated market-toll and local court-profit
+stream, not other owners' rents, grain or private debts. Its farm is the last
+closed observed delegated yield. The town offers an entry year's farm only
+when its current actual receipts project a yield exceeding that farm and the
+entry cost, and its real chest can fund the entry. The lord accepts a useful
+fixed farm plus entry, or the player orders the offer. Tolls, local court fines
+and court fees then reach the native town chest; original private creditors
+and due principals retain their accounts. Annual farm payments go to the town's
+actual current lord. Unpaid amounts remain in its contract and bounded roll.
+
+## Controls and reads
+
+Journaled commands are `c-estates`, `c-subsidy-rate`, `s-charter`, `h-attend` and
+`h-stay`. Ruler ownership checks remain authoritative in the simulation. The
+worker builds the government accounts, consent and charter views. Advisor
+`state: estates` reads a bounded stored report. Read-only views appoint no
+people, populate no person index and change no financial state.
+
+Light fixtures cover cash conservation, actual movables, one-time assessment,
+true due dates, denied/no-attendee consent, household merger/extinction,
+existing-notable travel/arrival/return/death, real charter finance, native loan
+writ/recovery, sheriff service/farm and read-only accounts. Full native
+speed/RNG, worker, world-save and goods conservation gates remain the serialized
+release runner's responsibility. The 15 light fixtures pass in 0.8953 child CPU
+seconds, load 0.111/0.072/0.038 before and 0.263/0.104/0.049 after (cloud host).
