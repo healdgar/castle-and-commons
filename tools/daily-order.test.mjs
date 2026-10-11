@@ -66,10 +66,10 @@ test('daily quarry production needs actual available paid workers and cannot run
   P.forEach(p=>delete p.job);payer.w=0;today++;vm.runInContext('tickQuarries()',c);assert.equal(offers.length,worked,'unpaid days produce no stone');
 });
 test('remaining stone demand is refreshed daily without producing another stone batch',()=>{
-  const s={stores:{stone:8},buildings:[],res:{},kind:'village',pop:100},q={type:'pave',r:{a:0,len:100},done:.25},castle={type:'castle',si:0,stone:5,stoneInstalled:2,timber:8,timberInstalled:1};
+  const s={stores:{stone:8},buildings:[],res:{},kind:'village',pop:100},q={type:'pave',r:{a:0,len:100},si:0,stone:12,stoneInstalled:3,done:.25},castle={type:'castle',si:0,stone:5,stoneInstalled:2,timber:8,timberInstalled:1};
   const c=vm.createContext({W:{settlements:[s],projects:[q,castle]},AD:()=>850,storageMaterialDemand:()=>2,compoundMaterialDemand:()=>0,fabricMaterialDemand:()=>0,fabricPending:()=>false});
-  vm.runInContext(constructionMethods+'\n'+constructionCapability+'\n'+fn('castleFoundationDemand')+'\n'+fn('tickStone'),c);vm.runInContext('tickStone()',c);near(s._stoneWant,14);near(s._timberWant,7);
-  q.done=.75;vm.runInContext('tickStone()',c);near(s._stoneWant,8);near(s.stores.stone,8);
+  vm.runInContext(constructionMethods+'\n'+constructionCapability+'\n'+fn('castleFoundationDemand')+'\n'+fn('fabricMaterialDemand')+'\n'+fn('tickStone'),c);vm.runInContext('tickStone()',c);near(s._stoneWant,14);near(s._timberWant,7);
+  q.done=.75;q.stoneInstalled=9;vm.runInContext('tickStone()',c);near(s._stoneWant,8);near(s.stores.stone,8);
   castle.stoneInstalled=5;castle.timberInstalled=8;vm.runInContext('tickStone()',c);near(s._stoneWant,5);near(s._timberWant,0);
 });
 test('ward incorporation hands its fields over before later allocation',()=>{
