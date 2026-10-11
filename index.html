@@ -4053,6 +4053,7 @@ function learningSchoolCommission(Q){
 function learningEnrol(S,p){if(!p||p.study&&!p.study.closed)return false;p.study={school:S.id,entered:day(),paid:0,lessons:0,closed:false,graduated:false};S.pupils.push(p.id);life(p,`Enrolled with ${S.masterName} at ${W.settlements[S.si].name}`);return true;}
 function learningSchoolClose(S,why){
   if(S.gone)return;S.gone=true;S.closed=day();S.reason=why;S.contract.active=false;const s=W.settlements[S.si],p=learningPerson(S.master);
+  const a=S.ownerId&&corpOf(S.ownerId);if(a?.storageOwnerId===S.ownerId&&a.school?.ownerId===S.ownerId&&a.school.building===S.building.idx&&a.school.schoolId===S.id)delete a.school.schoolId;
   for(const p of learningStaff(S)){const prior=S.previousStaff?.[p.id]||S.previous;delete p.schoolMaster;delete p.schoolTrade;if(p.office==='master'){p.tr=prior.tr;p.office=prior.office;p.officeFor=prior.officeFor;}}
   for(const id of S.pupils){const q=learningPerson(id);if(q?.study?.school===S.id){if(q.study.journey)learningScholarReturn(q,why);q.study.closed=true;}}S.pupils=[];if(s.school===S)delete s.school;delete s._learningIndex;technologyActorsDirty(s);householdHeadsChanged(s);emit('trade',2,s.pos,`The school of ${S.masterName} at ${s.name} closes: ${why}.`);
 }

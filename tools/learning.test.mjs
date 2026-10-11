@@ -9,7 +9,8 @@ const constructionRules=source.match(/^const CONSTRUCTION_METHODS=.*$/m)?.[0]||'
 const learning=source.slice(source.indexOf('/* LEARNING (#40):'),source.indexOf('/* the rank-and-file notables share'));
 function fn(n){return source.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))','m'))?.[0]||'';}
 function fixture(households=4){
-  const f=realm({crown:1000,cash:500,households,pop:households});let d=1;const [master,parent,kid,other]=f.H;
+  const geometry=source.match(/^const lerp=.*$/m)?.[0]+'\n'+['compoundPolygonDifference','obbCorners','wallRadAt','graveyardPolygonsOverlap','inPolyXZ','segSegDist','segDist'].map(fn).join('\n');
+  const f=realm({crown:1000,cash:500,households,pop:households,bootstrap:geometry});let d=1;const [master,parent,kid,other]=f.H;
   Object.assign(master,{tr:'priest',age:35,sk:new Float32Array([1,1,1,1,0,0,0,0,0])});
   Object.assign(parent,{tr:'ploughman',age:35,sk:new Float32Array(9)});
   Object.assign(kid,{tr:'ploughman',age:10,ma:parent,sk:new Float32Array(9)});Object.assign(other,{tr:'ploughman',age:12,ma:parent,sk:new Float32Array(9)});
@@ -23,6 +24,46 @@ function fixture(households=4){
   vm.runInContext(constructionRules+'\n'+technologyRules+'\n'+['constructionCapability','technologyKey','technologyCapability','technologyEffect','tradeIncome','capOf'].map(fn).join('\n')+'\n'+learning,f.C);
   return {...f,master,parent,kid,other,room,setDay:x=>d=x};
 }
+
+function abbeySchoolFixture(households=4){
+  const f=fixture(households);vm.runInContext(fn('corpFound'),f.C);const a=f.eval('corpFound("abbey",{si:0,name:"The endowed house",schoolAllowance:1})');f.C.a=a;
+  f.room.arch='hall';f.room.ownerId=a.storageOwnerId;a.school={building:f.room.idx,ownerId:a.storageOwnerId};const coins=f.coins();f.eval('transfer("crown",a,100,"abbey endowment",s)');near(f.coins()+a.gold,coins);
+  return {...f,a,allCoins:()=>f.coins()+f.W.abbeys.reduce((n,a)=>n+a.gold,0)};
+}
+
+test('an abbey school releases its closed binding and reopens only for actual funded qualified teaching',()=>{
+  const f=abbeySchoolFixture(),coins=f.allCoins(),capacity=f.eval('learningRoomCapacity(s.buildings[0])');f.eval('tickLearning()');const S=f.W.schools[0];
+  assert.equal(f.a.school.schoolId,S.id);assert.equal(S.master,f.master.id);assert.ok(S.contract.paid>0);assert.ok(S.stipends>0);near(f.allCoins(),coins);
+  f.master.away={until:10,why:'errand'};const receipts=S.fees+S.stipends,skill=f.kid.sk[0];f.setDay(2);f.eval('tickLearning()');
+  assert.equal(S.gone,true);assert.equal(S.contract.active,false);assert.equal(f.a.school.schoolId,undefined);assert.equal(f.a.school.building,f.room.idx);assert.equal(f.a.school.ownerId,f.a.storageOwnerId);
+  assert.equal(f.master.schoolMaster,undefined);assert.equal(f.master.tr,'priest');assert.equal(f.master.office,undefined);assert.equal(f.kid.study.closed,true);assert.equal(f.other.study.closed,true);assert.equal(S.pupils.length,0);near(S.fees+S.stipends,receipts);near(f.allCoins(),coins);
+  f.setDay(3);f.eval('tickLearning()');assert.equal(f.W.schools.length,1,'the absent native teacher cannot reopen the bound hall');assert.equal(f.a.school.schoolId,undefined);assert.equal(f.kid.sk[0],skill);near(f.allCoins(),coins);
+  delete f.master.away;f.setDay(4);const before=f.eval('JSON.stringify([W.schools,a.school,H.map(p=>[p.office,p.schoolMaster,p.study])])');assert.ok(f.eval('learningRoomQuote(s,s.buildings[0],a.storageOwnerId,true)'));assert.equal(f.eval('JSON.stringify([W.schools,a.school,H.map(p=>[p.office,p.schoolMaster,p.study])])'),before);near(f.allCoins(),coins);
+  const chest=f.a.gold,family=f.eval('means(H[1])'),teacher=f.eval('means(H[0])');f.eval('tickLearning()');const reopened=f.W.schools[1];assert.ok(reopened&&!reopened.gone);assert.equal(f.a.school.schoolId,reopened.id);assert.equal(reopened.building,f.room);assert.equal(reopened.capacity,capacity);assert.equal(reopened.master,f.master.id);assert.equal(f.master.schoolMaster,reopened.id);assert.equal(f.master.officeFor,f.a.storageOwnerId);
+  assert.ok(reopened.fees>0&&reopened.stipends>0);near(f.a.gold,chest-reopened.stipends);near(f.eval('means(H[1])'),family-reopened.fees);near(f.eval('means(H[0])'),teacher+reopened.fees+reopened.stipends);near(f.allCoins(),coins);assert.equal(f.kid.study.school,reopened.id);assert.ok(f.kid.sk[0]>skill);
+  const paid=reopened.contract.paid;f.eval('tickLearning()');near(reopened.contract.paid,paid);near(f.allCoins(),coins);
+});
+
+test('school closure preserves a corporation binding for another owner, room or school',()=>{
+  for(const change of ['a.school.ownerId="abbey:1"','a.school.building=1','a.school.schoolId=99','W.schools[0].ownerId="abbey:00"']){
+    const f=abbeySchoolFixture();f.eval('tickLearning()');f.eval(change);const binding=JSON.stringify(f.a.school),coins=f.allCoins();f.eval('learningSchoolClose(W.schools[0],"the master is absent")');
+    assert.equal(JSON.stringify(f.a.school),binding,change);assert.equal(f.W.schools[0].gone,true);assert.equal(f.master.schoolMaster,undefined);assert.equal(f.kid.study.closed,true);near(f.allCoins(),coins);f.eval('learningSchoolClose(W.schools[0],"again")');assert.equal(JSON.stringify(f.a.school),binding);near(f.allCoins(),coins);
+  }
+});
+
+test('closing one actual school cannot release a corporate binding to another live paid school',()=>{
+  const f=abbeySchoolFixture(5);f.room.w=3;f.room.d=3;f.eval('tickLearning()');const closed=f.W.schools[0];assert.equal(closed.pupils.length,1);
+  const room={idx:1,arch:'temple',state:'sound',w:18,d:20};f.s.buildings.push(room);f.W.bldList.push(room);f.C.otherRoom=room;
+  const Q=f.eval('learningRoomQuote(s,otherRoom)');assert.ok(Q);assert.equal(Q.master.id,f.H[4].id);const live=f.eval('learningSchoolCommission(learningRoomQuote(s,otherRoom))');f.C.live=live;f.eval('learningSchoolTick(live)');assert.ok(live.contract.paid>0);assert.equal(live.gone,false);
+  f.a.school.schoolId=live.id;const coins=f.allCoins(),paid=live.contract.paid;f.eval('learningSchoolClose(W.schools[0],"the first room closes")');assert.equal(closed.gone,true);assert.equal(f.a.school.schoolId,live.id);assert.equal(live.gone,false);assert.equal(f.H[4].schoolMaster,live.id);assert.equal(f.H[4].office,'master');near(live.contract.paid,paid);near(f.allCoins(),coins);
+});
+
+test('a released abbey room still refuses missing qualifications, fees, fabric or teaching capacity without read mutations',()=>{
+  for(const change of ['H[0].sk[0]=0','H[1].w=0;a.gold=0','s.buildings[0].state="ruin"','s.buildings[0].w=1;s.buildings[0].d=1']){
+    const f=abbeySchoolFixture();f.eval('tickLearning();learningSchoolClose(W.schools[0],"closed")');f.eval(change);const truth=f.eval('JSON.stringify([W.schools,a,H.map(p=>[p.w,p.office,p.schoolMaster,p.study,Array.from(p.sk)])])'),coins=f.allCoins();
+    assert.equal(f.eval('learningRoomQuote(s,s.buildings[0],a.storageOwnerId,true)'),null,change);assert.equal(f.eval('JSON.stringify([W.schools,a,H.map(p=>[p.w,p.office,p.schoolMaster,p.study,Array.from(p.sk)])])'),truth);assert.equal(f.a.school.schoolId,undefined);near(f.allCoins(),coins);
+  }
+});
 
 test('a real room and native teacher need profitable pupils and actual family surplus before opening',()=>{
   const f=fixture(),coins=f.coins(),Q=f.eval('learningRoomQuote(s,s.buildings[0])');assert.ok(Q);assert.equal(Q.master.id,f.master.id);assert.equal(Q.pupils.length,2);near(f.coins(),coins);
