@@ -70,6 +70,18 @@ as achieved merely because the feature inventory is implemented.
 
 ## Current integration and remaining gates
 
+The current-source castle image has now been captured from the exact native
+day150 checkpoint, with unchanged graph/RNG and textured drawing checks; see
+[SCREENSHOTS.md](SCREENSHOTS.md). Its appearance-only profile makes no individual
+title or payment claim. A fresh completed Abbey compound image remains pending.
+The original current-source paid campaign logged clean cash/goods/fault progress
+through day720 and a monthly call at day750 before external SIGKILL terminated
+the runner without an active/core checkpoint. It is interrupted evidence, not a
+core pass or a saved day750 world; [HANDOFF.md](HANDOFF.md) records its scope and
+missing timing data. Closed-day checkpointing is required before repeating a
+long campaign. Subsequent README/advisor embedding changes outer HTML only; the
+frozen game script remains byte-identical. The browser worker gate is running.
+
 The frozen lifecycle source `99f14a5` (HTML SHA256
 `7aeb74e34ba6d54ac414df12ee60fc44079b9b67537486f07ec2fdc4653d599f`)
 passes the fresh same-model 150-day comparison against the original exact

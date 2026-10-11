@@ -5,6 +5,54 @@ operable batch and continue until its required behavior is implemented.
 
 ## Current continuation
 
+**Current image correction (11 October):** the user's old-image report is valid.
+The fresh current-source castle capture passes and is now tracked as
+`assets/screenshots/castle-1200.png`; [SCREENSHOTS.md](SCREENSHOTS.md) records its
+exact source/save, unchanged graph/RNG and appearance-only scope. It shows the
+existing keep and stone hill curtain, not a completed castle hall/chapel.
+README/advisor text changed the outer HTML to
+`d5d487afeb36831a3dfff80bcf5f92ddb7947bed4ac4c439991344620a75411d`, while the
+game script remains the frozen `99f14a5` script
+`a985ada765e6f339ffabab500c4ed0969a606e90fb03daf0e8b925720408b109`.
+The six advisor-context checks pass. Earlier HTML proofs keep their original
+outer hashes; the finished Abbey image is still pending.
+
+**Interrupted current-source Abbey campaign:** the original bounded player-funded
+Cistercian campaign restarted from native day150, with actual journaled Crown
+gifts and cash/goods/fault auditing. It logged clean progress through closed
+day720 (570 continued checks, maximum cash residual `3.2076741263153963e-10`)
+and a monthly campaign call at day750, then the Node process and wrapper were
+killed before emitting completion/time metadata. Kernel exit status is SIGKILL;
+the cause is not established, and no simulation assertion was reported. Native
+process CPU is `1234.36` seconds from kernel counters; starting load was
+`0.058594/0.440918/0.970215`. Exact termination wall time, wrapper CPU and end
+load are unavailable. No paid-active or completed-core save was emitted; these
+logs are not a retained day750 checkpoint or a completed core/industry pass.
+The log, direct-field live diagnostics and interruption record remain in ignored
+`institutions-lifecycle-20261011`, without overwriting predecessor evidence.
+Before another long campaign, add distinct closed-day resumable checkpoints and
+preserve the original absolute horizons, actual actors, payments and predicates.
+
+Direct-field diagnosis at live day549 found one completed Benedictine church
+with a connected residence being paid, and the Cistercian church with
+`10.831089/40.869015` actual timber installed for `554.523659` gold. This is
+material-stage progress, not paid church attendance. Real monthly Crown gifts
+began at day360; no automatic top-up or stock edit occurred. Merchant delivery
+requires destination price to cover purchase, freight, tax and risk. Failed
+requests reach native demand/repricing, but repeated requests for the same
+backlog inflate monthly demand; quote discovery and capital remain calibration
+limits. The restarted campaign's weighted hunger `0.3641604` and famine
+population share `0.5342948` through day720 do not close #12/#23.
+
+**Held next batch:** #81/#82 commit `2d641c5`, followed by finite first-slice
+attendance `b902f70` and resident-cache follow-up `bc15442`, remain isolated and
+outside the frozen current model. The actual-person fractional budget spans the
+existing 59 phases and has no W/DTO/save fields; one focused file passes 16
+checks. Source metadata and intentional-model fixture rebasing are being
+prepared, not passed as a full native/speed/save gate. #80 stays open for legacy
+instant effects, aggregate staff and scheduled service contracts. The concrete
+next-service dependency audit is [DAILY-SERVICE-CONTRACTS.md](DAILY-SERVICE-CONTRACTS.md).
+
 **Lifecycle continuation:** private-purpose housing, the complete corporate Abbey fabric quote, exact closed-school room release and shared paid compound recovery are integrated. Retained castle/Abbey ruins use actual title, rubble, access, material, labour and reserve checks. A partly paid connected wing can wait for same-index parent rebuilding and resume its original contract; permanent parent loss abandons the contract without refund or rebinding. New Abbey layout preferences become authoritative only on paid completion against the current owned church. The earlier six-file inventory verifies 92 unique checks across two runs, not one combined pass; the isolated new Abbey lifecycle fixture verifies ten checks. Final operation-local recovery cache guards and the common recovery fixture are being assembled before the coupled suite and fresh source-specific native/save/worker gates. No free repair, new actor or duplicate account is added. The finite daily construction crew budget is recorded separately as #80 in DAILY-LABOUR.md; damaged targets of already active castle upgrades remain #81 for the next lifecycle phase; permanent loss of non-parent prerequisites is #82. Earlier closed-day-60 and day-720 evidence stays frozen under its own source.
 
 **Frozen connected-layout prefix (`55b32a9`):** HTML `4a8eed633cde8de3bf1813d2de43b8040996aa3e200258e9086fc7fe6fafd1bc` was deliberately stopped at compared audited closed day 60, with 366 accepted raw outcomes, two abbeys, and clean cash/goods/faults. Reference and bounded-reservation runs match the complete graph and every RNG stream through that boundary; this is not a 150-day proof. The source-matched checkpoint reload/resave is exact (`179b5881fc8d825cae6019642d01cfc74a124eb62c24d28286a26f9cc7c4b73e`). Total child CPU was `613.785417` / wall `567.454874`, load `0.058594→1.313965`, RSS `1852884` KB. Audited step CPU `113.900951` reference / `96.385633` candidate is partial same-model evidence, not browser throughput. The initial merged 43-check fixture batch failed during helper initialization; actual imports are repaired, with the final assembled rerun pending. The continuation audit confirmed a private-purpose housing/refit bypass and an incomplete Abbey church-fabric quote. Church growth already runs through `tickChurches→tickChurchBodies→abbeyFabric`; its budget omits timber and technology-adjusted costs. The earlier claim of a missing caller was incorrect. Those two repairs are being assembled before the next native batch. Frozen source, original checks/deadlines, marker and closed-save evidence remain in ignored `institutions-connected-20261011`; none is retagged as the new phase.
