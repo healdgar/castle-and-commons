@@ -1,6 +1,6 @@
 # Compound buildings: shared model and dependency record
 
-Status: design record, updated 2026-10-11. No shared compound framework or abbey system is implemented by this proposal. The current first-castle foundation is an operable but deliberately narrow implementation slice; see [CASTLE-FOUNDATIONS.md](CASTLE-FOUNDATIONS.md). This record scopes the next architectural work across castles, abbeys and other institutions without inventing an abbey's assets or revenue.
+Status: shared runtime foundation implemented in the current working batch, updated 2026-10-11. Native-world, checkpoint, worker and conservation gates are pending the coordinator’s serialized batch. The abbey institution is a separate adapter being integrated; this record does not claim its endowments or outputs before that integration. The current first-castle foundation is an operable but deliberately narrow implementation slice; see [CASTLE-FOUNDATIONS.md](CASTLE-FOUNDATIONS.md). This record scopes the next architectural work across castles, abbeys and other institutions without inventing an abbey's assets or revenue.
 
 ## Decision
 
@@ -12,17 +12,17 @@ The compound layer provides common site, component, connection, project and capa
 
 ## What exists now
 
-Issue #60's castle foundation operation uses existing ruler authority, seat/fort/border relevance, purse and reserve, town worth and threat, castle benefit criteria, live terrain and road geometry, agricultural land rights and foregone field value, native timber/stone prices and inventories, named builders/workers, a saved daily project, remaining construction demand, and the existing fortification/worker/rendering model. The foundation is one canonical keep plus a palisaded yard and connected approach. The yard is needed because `fortOf` grants circuit defense; a lone keep gives no circuit benefit. Current first towers are timber before AD 1070 and stone thereafter. The site and works are rechecked; paid materials and labor persist. Existing later castle upgrades still use their separate annual instant-operation path.
+Issue #60's castle foundation operation uses existing ruler authority, seat/fort/border relevance, purse and reserve, town worth and threat, castle benefit criteria, live terrain and road geometry, agricultural land rights and foregone field value, native timber/stone prices and inventories, named builders/workers, a saved daily project, remaining construction demand, and the existing fortification/worker/rendering model. The foundation is one canonical keep plus a palisaded yard and connected approach. The yard is needed because `fortOf` grants circuit defense; a lone keep gives no circuit benefit. Current first towers are timber before AD 1070 and stone thereafter. The site and works are rechecked; paid materials and labor persist. Later castle upgrades now commission saved paid daily projects through the shared compound service. No unpaid annual upgrade is installed by `tickCastles`.
 
-This is not yet a general castle precinct editor, component graph, or multi-building phased compound. It does not provide a general residential/service range, abbey, universal plan, terrain-fitted motte, or town circuit. The keep and yard are deliberately modest, not a complete castle. The shared paid-project slice now factors stock installation and daily work advancement for this castle foundation and existing storage construction. Each client retains its own eligibility, site/access validation, economics, payer and native completion. The service records only actually installed materials and actual cash delivered through named wages. The storage change corrects its prior behavior of advancing a full day whenever `buildWorks` was called, even when no wage was paid.
+This is not yet a general castle precinct editor or a universal multi-building plan. `s.compounds` now stores stable, plain references to native buildings and circuits, and projects carry physical prerequisites and a component key. It does not provide a general residential/service range, abbey, universal plan, terrain-fitted motte, or town circuit. The keep and yard are deliberately modest, not a complete castle. The shared paid-project slice now factors stock installation and daily work advancement for this castle foundation and existing storage construction. Each client retains its own eligibility, site/access validation, economics, payer and native completion. The service records only actually installed materials and actual cash delivered through named wages. The storage change corrects its prior behavior of advancing a full day whenever `buildWorks` was called, even when no wage was paid.
 
 Storage's existing land-compensation client policy remains separate: it can add the quoted land amount to `paid` even if no tiller receives it (#63). The shared service's actual-payment guarantee concerns material purchase cash and paid labor; it does not certify that legacy land field.
 
-Abbeys are not implemented: #35 is planned in `docs/ISSUES.md`; `docs/SYSTEMS.md` specifies future actors and money flows. Current code has generic corporate-account groundwork (`corpFound`, `corpOf`, `ownerAcct`, commodity-ledger owner IDs), but no actual abbey founding, income, land grants, church, staffing, or abbey building decision. Do not create one as a castle-shaped purchaser with assumed cashflow.
+The abbey institution adapter is being implemented separately: #35 is planned in `docs/ISSUES.md`; `docs/SYSTEMS.md` specifies future actors and money flows. Current code has generic corporate-account groundwork (`corpFound`, `corpOf`, `ownerAcct`, commodity-ledger owner IDs), but no actual abbey founding, income, land grants, church, staffing, or abbey building decision. Do not create one as a castle-shaped purchaser with assumed cashflow.
 
 ## Canonical records and responsibilities
 
-A future shared record should remain small and refer to native state:
+The shared runtime record remains small and refers to native state:
 
 - **Site / ground:** settlement/place identity; coordinate and local terrain reference; explicit boundary and exact affected ground cells; ownership/title/occupation checks; allowed public and private access connections; occupancy/reservation links; a geometry certificate only if every relevant input writer is enumerated. Keep the existing land mask and furlong/title model authoritative. A castle may use its ruler's eligible unheld demesne; an abbey may build only on land actually held/granted to the abbey under its institution rules. A public approach may meet a street, but does not silently transfer the title of fields the path crosses. Record foregone yield over the exact union of affected cells once. This is an opportunity cost, not cash transferred to oneself.
 - **Compound:** stable ID, settlement, institution owner reference, site ID, connected component references and stage. It owns no independent purse, store, title or output quantity. Component/edge identities must be deterministic and saveable.
@@ -82,7 +82,7 @@ Abbey order/date constraints are institution rules, not construction technology:
 
 ## Refactor and dependency sequence
 
-1. **Keep the castle slice operable and bounded.** Retain its real defense/value/site/economy gates and saved paid work. Treat current annual instant castle upgrades as a separate known debt; do not fold them into this change by assumption.
+1. **Keep the castle slice operable and bounded.** Retain its real defense/value/site/economy gates and saved paid work. Castle upgrades are deliberately migrated to daily paid projects in this batch; migration changes development histories and requires the combined gates.
 2. **Extract native ground/access and component identity.** Formalize exact occupied ground, ownership/title/access checks and reusable native component references. The first extraction must leave the current keep/ward/site behavior and projections equivalent. Include multiple-purpose memberships from the start so the model cannot encode exclusive building roles.
 3. **Extract a reusable funded project service.** Use the castle foundation and existing storage construction as the first clients. Generalize material stock, purchase/installation, actual `buildWorks` payout, fractional paid days, stall/abandon, demand, save/load and completion boundaries. Keep eligibility, value criteria, site survey, payer and recipients as client inputs/adapters. Verify that both existing paths retain their own economics and geometry while sharing only the construction mechanics.
 4. **Build an explicit component/dependency description.** Represent connected access, compound circuits, construction stages, canonical native buildings, and future-compatible capabilities. Implement downstream readers against native buildings/circuits, not copies in a shadow graph. Preserve deterministic IDs and renderer/worker projection.
@@ -107,3 +107,52 @@ Correctness gates precede performance claims: account conservation, actual selle
 - Abbey economics can be overclaimed if endowed rents are treated as realm growth or its account receives projected wool/tithe before the assets and market operation exist. #35 must first transfer title/output through native owners and record all costs, food and labor.
 - Multiple purposes can compete for room, access, labor, feedstock or occupant capacity. Resolve conflicts in the relevant simulation system and preserve canonical ownership/output; never solve them by disabling a purpose enum or double-booking the same physical area.
 - The current castle code's annual instant upgrades, existing town growth/instant building paths, and proposed abbey church growth have different progress models. The shared project service should be introduced through deliberate migrations, not an assumption that all construction already behaves as saved paid work.
+
+## Shared runtime interface (working batch)
+
+`compoundEnsure(s,kind,ownerId)` establishes a deterministic site-bound record.
+`compoundBindBuilding` stores one native `idx`; `compoundBindCircuit` stores one
+`fortCircuitKey`. Purposes are memberships over that same object. They do not
+add housing, income, output or defense: native systems remain authoritative. A
+keep is not in `RESID` and the compound does not invent occupants for it.
+
+`compoundProjectCommission(s,C,plan)` accepts a source-selected adapter, fixed
+geometry, physical component prerequisites, named payer, timber/stone quantities,
+positive labor bill and working days. One active project per compound prevents
+duplicate ordering; its deterministic ID uses the compound’s saved sequence.
+The shared tick validates authority/site/prerequisites before stock or wages,
+installs only actual stock, and advances by the native named wage payout. Saved
+work survives stalls; loss of legal authority abandons sunk work without refund.
+A final validation precedes the institution adapter’s canonical completion.
+Adapter functions are source globals, never saved closures.
+
+The abbey contract is `abbeyCompoundValidate(q,s,C)` returning `{ok,reason,abandon}`
+and `abbeyCompoundComplete(q,s,C)` returning truthy only after actual installation,
+rights, mask and layout updates. `live.compoundSite` surveys a native footprint
+and a reachable public connector at most 32 metres from its service door. It
+rechecks the retained footprint and path each work day; completion does not move
+paid work. The institution must validate the exact union from `compoundGround`,
+including the approach’s 2.6 metre width, against its actual granted title.
+
+Castles retain canonical keep identity during rebuilding. Clear wards fit live
+terrain and frontage; new wards, enlarged towers, chapels and outer curtains
+reject uncompensated houses, lots or household title. Tower/gate/curtain effects
+remain on the native circuit and its castle record. Repairs remove only damage
+quoted at commission, preserving damage suffered during construction. Costs
+include current-priced real material and labor; larger keeps and curtains use
+the chosen footprint/perimeter. The current calendar capability seam names
+stone curtain, round tower, barbican and outer curtain methods until #44’s real
+knowledge/adoption adapter is integrated. Technology labor reductions consume
+quoted tool timber where that adapter provides a recipe.
+
+New paid components carry the scalar `exactGround` policy: clearing and
+`markSettlementBuilt` use the native rotated footprint instead of the legacy
+bounding-circle buffer. Completion marks the footprint/approach union once
+through the idempotent native mask. The same flag is reusable by paid storage;
+there is no duplicate stored footprint or shadow land ledger.
+
+Eight focused fixture checks verify actual native material seller payments,
+named native wages and cash conservation, no-crew stalls, lost-title abandonment,
+prerequisites, partial saved progress, single canonical completion and multiple
+purposes without duplicate identity. These are source-level controlled fixtures,
+not native generation, replay, worker, world-save or performance proof.

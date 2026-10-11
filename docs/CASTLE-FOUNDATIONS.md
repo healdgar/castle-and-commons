@@ -29,8 +29,8 @@ compound development remain further work.
    church changes. Require the actual capital, current lord's seat or explicit
    seat/fort/border role, no existing keep/ring and no pending foundation. Owning
    an ordinary village is insufficient. Apply purse and defence/value bounds
-   before a site survey. Existing castle upgrades retain their annual cadence
-   until their own decision/paid-progress conversion.
+   before a site survey. Existing castle upgrades now use daily eligibility and saved paid progress
+   through the shared compound service; see `COMPOUND-BUILDINGS.md`.
 4. Rank street-front candidates with stable canonical ties and fully survey at most 24. Fit a ward around its
    tower using live terrain, water/rivers/lakes, street/road widths, standing
    footprints and lots, greens/markets, walls, tracks and pending works. Use
@@ -113,8 +113,9 @@ ground and connected access; same-count terrain/road/building/title edits;
 partial purchases, zero crew and paid-day stalls; single canonical completion;
 outstanding demand and real money/inventory reconciliation; mid-project world
 save/continuation; worker projection purity and identical history at all speeds.
-This deliberately changes eligible settlements' histories. Century-scale
-throughput and daily paid conversion of existing upgrades/housing are not claimed.
+This deliberately changes eligible settlements' histories. Daily paid conversion of existing castle upgrades is implemented in the working
+batch; its serialized native gates are pending. Century-scale throughput and
+paid housing conversion are not claimed.
 
 ## Historical references and next construction phases
 
