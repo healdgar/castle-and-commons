@@ -7841,8 +7841,12 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
     for(const r of t.remnants||[])if(near(r.x,r.z,r.r))protectedGround.push({circle:r});
     if(t.burgRing&&near(t.burgRing.x,t.burgRing.z,t.burgRing.r))protectedGround.push({ring:t.burgRing});
     for(const P of t.relicWalls||[])for(let k=0;k<P.length;k++)if(segDist(s.pos.x,s.pos.z,P[k],P[(k+1)%P.length])<reach+10)protectedGround.push({a:P[k],b:P[(k+1)%P.length]});}
-  const projects=(W.projects||[]).filter(q=>!q.dead&&q.site!==retained);
+  const projects=(W.projects||[]).filter(q=>!q.dead&&q.site!==retained),projectGround=new Map();
   const bounds=P=>{if(!P?.length||P.some(q=>!Number.isFinite(q.x)||!Number.isFinite(q.z)))return null;let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;for(const q of P){minX=Math.min(minX,q.x);maxX=Math.max(maxX,q.x);minZ=Math.min(minZ,q.z);maxZ=Math.max(maxZ,q.z);}return{minX,maxX,minZ,maxZ};};
+  const reservedPolys=q=>{ // immutable during this synchronous survey; no cross-operation geometry permission
+    if(CASTLE_FOUNDATION_SURVEYS.work===false)return compoundGround(q.site).polys.map(P=>({P,box:null}));
+    let parts=projectGround.get(q);if(!parts){parts=compoundGround(q.site).polys.map(P=>({P,box:bounds(P)}));projectGround.set(q,parts);}return parts;
+  };
   const addBlock=b=>{const r=Math.max(Math.hypot(b.w||0,b.d||0)/2,...[b.poly,b.lot].flatMap(p=>p?.map(q=>dist2d(b.x,b.z,q.x,q.z))||[]));
     if(dist2d(b.x,b.z,s.pos.x,s.pos.z)>reach+r)return;const copy={...b},polys=[bounds(b.poly),bounds(b.lot)],parts=[bounds(obbCorners(b.x,b.z,b.w||0,b.d||0,b.rot||0)),...polys].filter(Boolean),box=parts.length?{minX:Math.min(...parts.map(q=>q.minX)),maxX:Math.max(...parts.map(q=>q.maxX)),minZ:Math.min(...parts.map(q=>q.minZ)),maxZ:Math.max(...parts.map(q=>q.maxZ))}:null;blockBounds.set(copy,{box,polys});B.add(copy,r+3);};
   const addLine=(a,b,hw,st,pending=false)=>{if(segDist(s.pos.x,s.pos.z,a,b)>reach+hw)return;H.add({a,b,hw,st,pending,x:(a.x+b.x)/2,z:(a.z+b.z)/2,minX:Math.min(a.x,b.x),maxX:Math.max(a.x,b.x),minZ:Math.min(a.z,b.z),maxZ:Math.max(a.z,b.z)},dist2d(a.x,a.z,b.x,b.z)/2+hw+3);};
@@ -7864,7 +7868,7 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
     for(const p of protectedGround){if(p.place&&placeHit(p.place,x,z,pad+1)||p.circle&&dist2d(x,z,p.circle.x,p.circle.z)<p.circle.r+pad+1||p.ring&&Math.abs(dist2d(x,z,p.ring.x,p.ring.z)-p.ring.r)<pad+3.5||p.a&&segDist(x,z,p.a,p.b)<pad+3.5)return false;}
     for(const R of circuits){const C=fortCenter(R),d=dist2d(x,z,C.x,C.z),r=wallRadAt(R,Math.atan2(z-C.z,x-C.x));if(Math.abs(d-r)<pad+7)return false;}
     for(const q of projects){if(q.type==='castle'&&q.site){if(dist2d(x,z,q.site.ward.x,q.site.ward.z)<q.site.ward.r+pad+2)return false;for(let k=1;k<q.site.path.length;k++)if(segDist(x,z,q.site.path[k-1],q.site.path[k])<pad+2)return false;}
-      if((q.type==='compound'||q.type==='fabric')&&q.site){if(compoundGround(q.site).polys.some(P=>inPoly(P,x,z)||P.some((p,k)=>segDist(x,z,p,P[(k+1)%P.length])<pad+2)))return false;}
+      if((q.type==='compound'||q.type==='fabric')&&q.site){if(reservedPolys(q).some(({P,box})=>castleFoundationBoxMayHit(x,z,box,pad+2)&&(inPoly(P,x,z)||P.some((p,k)=>segDist(x,z,p,P[(k+1)%P.length])<pad+2))))return false;}
       if(q.type==='storage'&&dist2d(x,z,q.x,q.z)<Math.hypot(...ARCH[q.arch].slice(0,2))/2+pad+2)return false;
       if(q.type==='clear'&&dist2d(x,z,q.x,q.z)<q.r+pad+2)return false;
       if(q.type==='plan'){if(q.kind==='square'&&placeHit(q.place,x,z,pad+1))return false;
@@ -8068,7 +8072,7 @@ function drawCourt(b,put){
 const planCellOK=(x,z)=>{const ci=toCell(x),cj=toCell(z);if(!inB(ci,cj))return false;const i=cIdx(ci,cj);return !W.water[i]&&slopeAt(ci,cj)<0.35&&W.h[i]>1;}; // the same test the town's own builders use
 const CASTLE_FOUNDATION_SURVEY_CURRENT=()=>({castleFoundationSite,castleFoundationCentersPossible,castleFoundationSurveyRead,castleFoundationLandOK,castleFoundationGround,castleFoundationBoxMayHit,castleFoundationSegmentMayHitBox,planCellOK,slopeAt,hAt,riverAt,lakeAt,furlongAt,compoundGround,occupiedGroundCells,occupiedGroundFields,computeFurlongPoly,graveyardPolygonsOverlap,inPoly,inPolyXZ,fortContains,fortCircuits,fortCenter,casRing,wallRadAt,circuitLen,placeFitRadii,placeR,placeHit,serviceDoor,locW,obbCorners,obbOverlap,streetFootprintOverlap,dist2d,segDist,segSegDist,resample,lerpPt,lerp,clamp,toCell,cIdx,inB,cellX,cellZ,makeHash});
 const CASTLE_FOUNDATION_SURVEY_NATIVE=Object.freeze(CASTLE_FOUNDATION_SURVEY_CURRENT());
-const CASTLE_FOUNDATION_SURVEYS={on:true,verify:false,memory:new WeakMap(),world:null,read:null,scratch:[],token:null,hits:0,misses:0,reads:0}; // derived only; exact null answers plus private hash-query count, never saved
+const CASTLE_FOUNDATION_SURVEYS={on:true,verify:false,work:true,memory:new WeakMap(),world:null,read:null,scratch:[],token:null,hits:0,misses:0,reads:0}; // derived only; exact null answers plus private hash-query count, never saved
 const PLAN_YP=25; // years' purchase of a house's rent
 let planUI=null;
 const PLANB={street:{c:0xe0c070,loop:false,n:'Street'},square:{c:0x9ad0e0,loop:true,n:'Square'},wall:{c:0xd08a6a,loop:true,n:'Wall'},stopup:{c:0xb0a8a0,loop:false,n:'Stop up a street'},raze:{c:0xc07060,loop:false,n:'Pull down'}}; // (the old 'new quarter' grid is retired: streets are drawn one by one)

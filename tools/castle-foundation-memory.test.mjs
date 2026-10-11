@@ -20,7 +20,7 @@ const READS=NATIVE_LINE.match(/\(\{(.*?)\}\)/)[1].split(',').filter(n=>!['planCe
 const HELPERS=['const lerp=','const clamp=','const dist2d=','const cIdx=','const inB=','const cellX=','const cellZ=','const toCell=','const planCellOK='];
 const sha=s=>createHash('sha256').update(s).digest('hex').slice(0,16);
 // Repin only after reviewing the full writer list in CASTLE-FOUNDATION-DEPENDENCIES.md.
-const PINNED={"castleFoundationSite":"e6276a6674476911","castleFoundationCentersPossible":"97f734a95ed5fce1","castleFoundationSurveyRead":"924af993dcba3853","castleFoundationLandOK":"1c1323d61765ed95","castleFoundationGround":"dba79eab8b76f97a","castleFoundationBoxMayHit":"da187f1e51c3f18c","castleFoundationSegmentMayHitBox":"c1ff83639ad0c277","slopeAt":"f04f3db9f54bcfa6","hAt":"f459c5ff2804ca09","riverAt":"c4bda44c2b489b2e","lakeAt":"6a14ce0b475936f4","furlongAt":"aca164d39bde3f54","compoundGround":"47f9f0a2ecab463c","occupiedGroundCells":"e4195f51df13de4f","occupiedGroundFields":"2ba9dbf41d8bc2ee","computeFurlongPoly":"605c31b180f2da7f","graveyardPolygonsOverlap":"65258af15a0c47a1","inPoly":"abebffb4a9abafff","inPolyXZ":"641dd4b3ae9a6dad","fortContains":"9f6ca02fc957e17d","fortCircuits":"e77dd39eccb4abc1","fortCenter":"70fbd07bf1bf54a1","casRing":"a6921fd1103e167c","wallRadAt":"fbbec3db03bd0ce6","circuitLen":"9deb244c96e6486c","placeFitRadii":"8a45384e2759f058","placeR":"63335d5f5f19eb27","placeHit":"62746e6b8c8200de","serviceDoor":"a4312db07cdce77e","locW":"833ae0c87356ca4b","obbCorners":"490b7d06b8d4a63f","obbOverlap":"5267c37bd7733324","streetFootprintOverlap":"ba1725bce82e34ce","segDist":"01b34b3baef31aff","segSegDist":"debb34048a0acf69","resample":"a590253bb5bcd7f5","lerpPt":"f218c11d09086fc4","makeHash":"b1d9816147e072f3","helpers":"626d791b92980e90"};
+const PINNED={"castleFoundationSite":"05903383fd214825","castleFoundationCentersPossible":"97f734a95ed5fce1","castleFoundationSurveyRead":"924af993dcba3853","castleFoundationLandOK":"1c1323d61765ed95","castleFoundationGround":"dba79eab8b76f97a","castleFoundationBoxMayHit":"da187f1e51c3f18c","castleFoundationSegmentMayHitBox":"c1ff83639ad0c277","slopeAt":"f04f3db9f54bcfa6","hAt":"f459c5ff2804ca09","riverAt":"c4bda44c2b489b2e","lakeAt":"6a14ce0b475936f4","furlongAt":"aca164d39bde3f54","compoundGround":"47f9f0a2ecab463c","occupiedGroundCells":"e4195f51df13de4f","occupiedGroundFields":"2ba9dbf41d8bc2ee","computeFurlongPoly":"605c31b180f2da7f","graveyardPolygonsOverlap":"65258af15a0c47a1","inPoly":"abebffb4a9abafff","inPolyXZ":"641dd4b3ae9a6dad","fortContains":"9f6ca02fc957e17d","fortCircuits":"e77dd39eccb4abc1","fortCenter":"70fbd07bf1bf54a1","casRing":"a6921fd1103e167c","wallRadAt":"fbbec3db03bd0ce6","circuitLen":"9deb244c96e6486c","placeFitRadii":"8a45384e2759f058","placeR":"63335d5f5f19eb27","placeHit":"62746e6b8c8200de","serviceDoor":"a4312db07cdce77e","locW":"833ae0c87356ca4b","obbCorners":"490b7d06b8d4a63f","obbOverlap":"5267c37bd7733324","streetFootprintOverlap":"ba1725bce82e34ce","segDist":"01b34b3baef31aff","segSegDist":"debb34048a0acf69","resample":"a590253bb5bcd7f5","lerpPt":"f218c11d09086fc4","makeHash":"b1d9816147e072f3","helpers":"626d791b92980e90"};
 test('the certified survey still reads the reviewed native helpers',()=>{
   assert.deepEqual(Object.fromEntries([...READS.map(n=>[n,sha(fn(n))]),['helpers',sha(HELPERS.map(line).join('\n'))]]),PINNED,
     'Survey dependency changed: audit the writer certificate and private hash stamps before repinning.');
@@ -106,4 +106,32 @@ test('a completed obstruction can unlock a genuine site immediately and successf
   const c=realm();assert.equal(run(c,'ask()'),null);run(c,'town.buildings[0].removed=true;');assert.ok(run(c,'ask()'),'current native geometry can admit a site on the same day');
   const misses=stats(c).misses;assert.ok(run(c,'ask()'));assert.equal(stats(c).misses,misses+1,'positive survey must be run afresh');
   run(c,'CASTLE_FOUNDATION_SURVEYS.verify=true;town.buildings[0].removed=false;');assert.equal(run(c,'ask()'),null);assert.equal(run(c,'ask()'),null,'verify checks cached failure against a real fresh survey');
+});
+
+test('operation-local pending polygon reuse preserves fresh answers and hash stamps without repeated raster work',()=>{
+  const off=realm(false),on=realm(false);
+  for(const c of[off,on])run(c,`town.buildings=[];W.projects=[{type:'compound',site:{f:{x:0,z:0,w:340,d:340,rot:0},path:[{x:0,z:0},{x:0,z:190}]}}];
+    const groundNative=compoundGround;let rasterReads=0;compoundGround=site=>{rasterReads++;return groundNative(site)};`);
+  run(off,'CASTLE_FOUNDATION_SURVEYS.work=false;');
+  for(let d=0;d<3;d++){
+    for(const c of[off,on])run(c,`W.clock.day=${d};W.projects[0].site.f.rot=${d*.01};`);
+    assert.equal(run(off,'castleFoundationSite(town,spec)'),null);
+    assert.equal(run(on,'castleFoundationSite(town,spec)'),null);
+    assert.equal(run(on,'graph()'),run(off,'graph()'),'same full native graph and original private hash query count');
+  }
+  assert.equal(run(on,'rasterReads'),3,'one exact pending raster per authoritative survey, never retained across operations');
+  assert.ok(run(off,'rasterReads')>30,'control path recomputes the native raster for each clear probe');
+});
+
+test('operation-local bounds preserve successful and retained-site geometry with remote pending projects',()=>{
+  const off=realm(false),on=realm(false);
+  for(const c of[off,on])run(c,`town.buildings=[];W.projects=[{type:'fabric',site:{f:{x:350,z:350,w:12,d:15,rot:.3},path:[{x:350,z:350},{x:350,z:380}]}}];`);
+  run(off,'CASTLE_FOUNDATION_SURVEYS.work=false;');
+  for(const c of[off,on])run(c,'globalThis.fixed=castleFoundationSite(town,spec);');
+  assert.ok(run(on,'fixed'),'the current native world admits a site');
+  assert.equal(run(on,'JSON.stringify(fixed)'),run(off,'JSON.stringify(fixed)'),'same successful native candidate');
+  assert.equal(run(on,'graph()'),run(off,'graph()'),'same original private hash queries');
+  for(const c of[off,on])run(c,'globalThis.retained=castleFoundationSite(town,spec,fixed);');
+  assert.ok(run(on,'retained'));assert.equal(run(on,'JSON.stringify(retained)'),run(off,'JSON.stringify(retained)'));
+  assert.equal(run(on,'graph()'),run(off,'graph()'),'retained authority uses the same hash-query count');
 });
