@@ -1428,7 +1428,7 @@
       ],
       "cache_or_preparation": null,
       "uncertainty": "No complete static closure over every geometry/parcel helper; see source citations and dependency narrative in map-audit.md.",
-      "current_cadence": "daily occupancy and due falls; independent exact annual widening/vacancy stagger; six-day housing/fabric throttle remains pending paid progress design",
+      "current_cadence": "Daily occupancy, due falls, funded housing/widening/refit/fabric and public street proposals. Physical wear uses elapsed vacancy and a daily rate; native saved paid work controls completion.",
       "current_property_inputs": "live full scalar/ordered geometry certificate in a private sidecar; security/walls and population live; no annual town-worth authority; query-only memo on cache misses"
     },
     {
@@ -1664,7 +1664,7 @@
       ],
       "cache_or_preparation": null,
       "uncertainty": "Current castle offset is church offset +20, so the two annual bodies do not overlap on a same day.",
-      "current_cadence": "Daily first-foundation decisions for actual capital/lord seat or explicit seat/fort/border role; existing castle upgrades retain annual stagger and instant work pending paid conversion.",
+      "current_cadence": "Daily native first-foundation and upgrade decisions, using actual authority, local adoption, retained terrain and saved paid material/work. Completion, not proposal, supplies capacity and defensive circuits.",
       "current_foundation_inputs": "Current role/owner/actual seat/capital/exile/siege, absent keep/ring/pending project, purse, threat/worth, live prices; lower minimum bill before at most 24 deterministic complete site surveys; exact new mask cells and title/foregone field value.",
       "current_foundation_outputs": "One plain saved castle project, order dirty and commissioning annal; no structural work or material payment at proposal."
     },

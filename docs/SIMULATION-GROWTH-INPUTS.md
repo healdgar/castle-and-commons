@@ -2,7 +2,7 @@
 
 Recorded 2026-10-10 after two read-only Luna audits of `tickGrowth`, `lvField`
 and `townWorth`, based on `8d92a4f` plus the daily storage conversion. Growth is
-partially converted in the bounded implementation recorded below; funded housing/fabric progress remains next. The original audit is retained as the pre-implementation record.
+now converted to daily paid native proposals and saved material/work progress. The original audit below is retained as the pre-implementation record; the current construction contract is in CASTLE-FOUNDATIONS.md and SIMULATION-ORDER.md.
 
 ## Cadence defect in the audited source and separate operations
 
@@ -168,5 +168,6 @@ and every accepted storage outcome. Both one-year browser worlds conserve money
 and inventory and have no simulation faults. The broad gate verifies 1,517
 checks; its only parallel VM capture timeout passes unchanged in isolation.
 Final browser/save/release evidence and source hashes are recorded in HANDOFF.md.
-These checks cover the bounded implementation; daily paid housing/fabric
-progress and first-castle foundations remain further work.
+These checks cover that historical bounded implementation. Daily paid
+housing/fabric progress and native first-castle foundations are now integrated;
+the current assembled release gates are recorded in HANDOFF.md.
