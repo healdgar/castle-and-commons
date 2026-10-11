@@ -2813,8 +2813,8 @@
       "scope": "These legacy quantity/cadence debts remain outside the new-institution conversion. The full older simulation is not claimed to make every ordinary decision daily."
     },
     "assembled_source_review": {
-      "commit": "6140286",
-      "index_sha256": "f942b98851f5732c562c4fc5639a29c48a011044393168d24ae70c490800cde8",
+      "commit": "9000cf0",
+      "index_sha256": "a9ce7dfc2507823ed92203262267b94d61d04e78adb4bb054bfc84dd1e3445da",
       "top_level_phases": 59,
       "prerequisite_edges": 200,
       "own_use_hashes": {
@@ -2829,10 +2829,12 @@
           "abbeyEndowLease": "411491c2e43cca6332f40c6370d78e39cdb8b7642f3086bd6030b5300b035ab7",
           "abbeySitePoses": "1ef5d4518f7b2263ac6f8749df561e90f7a26e8c8f824156797d579185716bbd",
           "learningUniversityQuote": "13e23d56ab5369f05f247ccad651bcd348d5109ecd46ac51e9abd672f582d46b",
-          "technologyEquipmentCandidates": "625985f7e17bca430b2a9fe5030726e478b69f104bffa71187c269b92b7d689e"
+          "technologyEquipmentCandidates": "625985f7e17bca430b2a9fe5030726e478b69f104bffa71187c269b92b7d689e",
+          "technologyWindmillValidate": "9cd09e936027ed36f00203e5eac3dbb914d9aaa4cc19ec9632e594a5f9bbbfb9",
+          "technologyEquipmentHTML": "343a3f865fa10ea84879d9113bd8555b56f74d7a411c76d635db932af7a5f47a"
         },
         "intended_history_change": true,
-        "reason": "Resolve the actual Crown founder; reject unavailable university masters before pricing and readonly equipment queries; bounded eight-pose windmill sites retain native ground, public approach, power, qualification and payment constraints."
+        "reason": "Resolve the actual Crown founder; reject unavailable university masters before pricing and readonly equipment queries; bounded eight-pose windmill sites retain native ground, public approach, power, qualification and payment constraints. Public windmill proposal, retained validation and readonly button all exclude private abbey mills; standing public mills still veto."
       },
       "recognized_legacy_search_inventory": {
         "sites": 410,
@@ -2849,7 +2851,7 @@
         },
         "scope": "Actual tools/legacy-search-audit.mjs syntactic inventory, not runtime cost or a prohibition of necessary one-pass traversals."
       },
-      "validation_scope": "Read-only AST/source/hash inventory; source repairs have focused regressions. Combined and native release gates pending."
+      "validation_scope": "Full frozen972a01f suite:1977/1978, one 30-second graph-serialization deadline failure. Final two public-mill predicates, player guide/embed and serial affected/source/boundary rerun pending; all original deadlines retained."
     }
   }
 }
