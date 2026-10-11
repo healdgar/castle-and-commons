@@ -287,3 +287,31 @@ test('native certified flood banks retain an unreachable result for a second act
  assert.ok(r.eval('out.every(([shared,cold])=>shared===null&&cold===null)'));assert.ok(r.eval('terrain.banks.floods.length>0&&certified'));
  assert.equal(r.eval('W.projects.length'),0);assert.equal(r.eval('HASH_STAMP'),0);
 });
+
+test('conservative spatial buckets preserve source order, touching tolerance and unknown bounds',()=>{
+ const r=ruralSetup();r.eval(`const rows=Array.from({length:24},(_,k)=>({k})),boxes=rows.map(({k})=>abbeySurveyBounds(obbCorners((k-12)*128,0,10,10,k*.13)));
+  boxes[3]=null;boxes[7]={minX:-1e20,maxX:1e20,minZ:-1e20,maxZ:1e20};const index=abbeySurveyIndex(rows,boxes,new Set([15]));`);
+ for(const x of [-256.010002,-256.01,-256,-128.000001,-128,0,128,256,1e20])for(const pad of [0,.01,Math.SQRT2*1.6]){r.C.queryX=x;r.C.queryPad=pad;r.eval(`var query=abbeySurveyBounds(obbCorners(queryX,0,10,10,.2)),picked=abbeySurveyIndexRows(index,query,queryPad),eligible=rows.filter((row,k)=>!boxes[k]||k===15||abbeySurveyBoxesMayHit(query,boxes[k],queryPad));`);
+  assert.ok(r.eval('eligible.every(row=>picked.includes(row))&&picked.every((row,k)=>!k||picked[k-1].k<row.k)'),`${x}/${pad}`);
+ }
+ assert.equal(r.eval('abbeySurveyIndexRows(index,null).length'),24);assert.equal(r.eval('abbeySurveyIndexRows(index,{minX:NaN,maxX:0,minZ:0,maxZ:0}).length'),24);
+});
+
+test('spatial native clearance preserves declines while sparing distant building and project row reads',()=>{
+ const r=ruralSetup();r.eval(`const site=abbeyApproachPlan(s,base,a.storageOwnerId);for(let k=0;k<240;k++){s.buildings.push({x:1700+k*3,z:1900,w:8,d:12,rot:k*.1,state:'sound'});W.projects.push({type:'compound',si:0,site:{f:{x:1700+k*3,z:-1900,w:8,d:12,rot:k*.1}}});}
+  const context=abbeyApproachSurvey(s);let reads=0;const count=rows=>new Proxy(rows,{get(target,key,receiver){if(typeof key==='string'&&/^\\d+$/.test(key))reads++;return Reflect.get(target,key,receiver)}});
+  context.buildings=context.buildingIndex.rows=count(context.buildings);context.projects=context.projectIndex.rows=count(context.projects);
+  const indexed=abbeyApproachClear(s,site,undefined,context),fast=reads;reads=0;context.buildingIndex=context.projectIndex=null;const linear=abbeyApproachClear(s,site,undefined,context),slow=reads;
+  const obstacle={x:100,z:12.2,w:8,d:8,rot:.2,state:'sound'};s.buildings.push(obstacle);const current=abbeyApproachSurvey(s),declined=abbeyApproachClear(s,site,undefined,current);current.buildingIndex=current.projectIndex=null;const coldDeclined=abbeyApproachClear(s,site,undefined,current);`);
+ assert.ok(r.eval('indexed&&linear&&slow>900&&fast<slow/20'));assert.equal(r.eval('declined'),false);assert.equal(r.eval('declined'),r.eval('coldDeclined'));assert.equal(r.eval('W.projects.length'),240);
+});
+
+test('uninterrupted native detour certifies once and restores its scope at actual entry boundaries',()=>{
+ const r=routeSetup();r.eval(`const nativeCert=abbeyRouteSurveyNative;let certCalls=0;abbeyRouteSurveyNative=()=>{certCalls++;return nativeCert()};
+  const building={x:10,z:0,w:6,d:8,rot:.2,state:'sound',arch:'house'};s.buildings.push(building);s._lay.placed.add(building,6);
+  const terrain=abbeyRouteTerrain(s),walker={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3,ghost:{x:-15,z:-6,w:6,d:8,rot:0},_em:abbeyRouteMemo(terrain)},p={x:-20,z:0},q={x:26,z:0};certCalls=0;
+  const shared=armyLandPath(walker,[p,q]),checks=certCalls,cold=armyLandPath({...walker,_em:undefined},[p,q]),leftover=walker._em.abbeyRouteGuard;
+  const retained=walker._em,originalHeight=hAt;hAt=()=>0;const stale=armyLandPath(walker,[p,q]),fresh=armyLandPath({...walker,_em:undefined},[p,q]);hAt=originalHeight;`);
+ assert.ok(r.eval('shared.length>2&&JSON.stringify(shared)===JSON.stringify(cold)&&checks===1'));assert.equal(r.eval('leftover'),undefined);
+ assert.equal(r.eval('stale'),r.eval('fresh'));assert.equal(r.eval('stale'),null);assert.equal(r.eval('walker._em===retained'),true);assert.equal(r.eval('walker._em.abbeyRouteGuard'),undefined);
+});
