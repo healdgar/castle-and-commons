@@ -919,6 +919,7 @@ function constructionCapability(s,method,ad=AD()){
 /* TECHNOLOGY: information belongs to the realm; work, property and equipment
    still belong to their real owners. A known method never creates its building. */
 const TECH_RULES=Object.freeze({
+  timberPalisade:{name:'Timber palisade',year:550,needs:[],kind:'war',gain:0.1},
   watermill:{name:'Water mill',year:850,needs:[],kind:'mill',gain:0.2},
   moneyer:{name:'Moneyer and mint administration',year:850,needs:[],kind:'law',gain:0.1},
   heavyPlough:{name:'Heavy mouldboard plough',year:850,needs:[],kind:'farm',gain:0.2},
@@ -1017,8 +1018,8 @@ function technologyActors(s){
 function technologySchoolMaster(s,p){
   if(p.office!=='master')return false;
   const a=typeof p.officeFor==='string'?corpOf(p.officeFor):null,binding=a?.school||s.school,school=binding?.schoolId!==undefined?W.schools?.[binding.schoolId]:p.schoolMaster!==undefined?W.schools?.[p.schoolMaster]:binding||(W.schools||[]).find(x=>!x.gone&&x.si===p.si&&x.master===p.id);
-  if(!school||school.gone||school.master!==p.id||!school.building||school.building.removed||school.building.state!=='sound')return false;
-  return !!(school.contract&&school.contract.master===p.id&&school.contract.active!==false&&school.contract.paid>0&&school.contract.lastPaidDay>=day()-1);
+  if(!school||school.gone||school.master!==p.id&&!school.staff?.includes(p.id)||!school.building||school.building.removed||school.building.state!=='sound')return false;
+  const contract=school.contracts?.[p.id]||school.contract;return !!(contract&&contract.master===p.id&&contract.active!==false&&contract.paid>0&&contract.lastPaidDay>=day()-1);
 }
 function technologyTeacher(s,p){
   if(!p||p.dead||p.outlawCampId||W.settlements[p.si]!==s||p.away&&day()<p.away.until||ageYrs(p)<16||!p.sk)return false;
@@ -3922,8 +3923,9 @@ function learningHead(p){return p?._hh?.head&&!p._hh.head.dead?p._hh.head:p;}
 function learningPayer(p){return p?.gn!==undefined&&!p.merc?p._hh||null:p;}
 function learningFamilySize(s,p){const A=learningPayer(p);return A?.household?A.population?.get(s)||[...A.members].filter(q=>!q.dead&&W.settlements[q.si]===s).length:1;}
 function learningRoster(s){
-  const I={masters:[],pupils:[]};for(const p of s.folk||[]){if(p.dead||p.outlawCampId)continue;const a=ageYrs(p);
+  const I={masters:[],pupils:[],scholars:[]};for(const p of s.folk||[]){if(p.dead||p.outlawCampId||p.estateOffice)continue;const a=ageYrs(p);
     if(a>=18&&a<70&&p.sk?.[KL]>=0.2&&learningHead(p)===p&&learningPayer(p))I.masters.push(p);
+    if(a>=14&&a<30&&!p.office&&!p.sp&&p.schoolMaster===undefined&&p.sk?.[KL]>=0.15)I.scholars.push(p);
     if(a>=7&&a<24&&!p.office&&!p.sp&&p.schoolMaster===undefined&&!(p.sk?.[KL]>=0.45))I.pupils.push(p);}return I;
 }
 function learningIndex(s){
@@ -3931,7 +3933,7 @@ function learningIndex(s){
   return s._learningIndex={revision,year:y,...learningRoster(s)};
 }
 function learningPerson(id){return (W._pm||W._folkIndex)?.get(id)||null;}
-function learningPresent(s,p){return !!p&&!p.dead&&!p.outlawCampId&&W.settlements[p.si]===s&&!(p.away&&day()<p.away.until);}
+function learningPresent(s,p){return !!p&&!p.dead&&!p.outlawCampId&&learningAt(p)===s&&(!(p.away&&day()<p.away.until)||p.away.why==='scholar'&&p.study?.journey&&day()>=p.study.journey.arrive&&day()<p.study.journey.leave);}
 function learningSpare(s,payer){
   const A=learningPayer(payer);if(!A||A==='out')return 0;const hi=A==='crown'?0:W.houses.indexOf(A);if(hi>=0)return Math.max(0,means(A)-chestReserve(hi));if(A.household){const h=A.head,n=Math.max(1,learningFamilySize(s,h));return Math.max(0,means(A)-n*foodYr()/12-(h?rentDue(s,h):0));}
   if(typeof payer==='number')return Math.max(0,purse(payer)-chestReserve(payer));return Math.max(0,means(A));
@@ -3940,11 +3942,11 @@ function learningTeacherCost(s,p){const family=Math.max(1,learningFamilySize(s,p
 function learningIncome(s,p){
   let best=Math.max(tradeIncome(s,'merchant',s._tc||{}),tradeIncome(s,'reeve',s._tc||{}));for(const q of s.governmentVacancies||[])if(['clerk','steward','sheriff','benchJustice','justice','collector'].includes(q.office)&&q.fee>0)best=Math.max(best,q.fee*360/(q.cadenceDays||(['collector'].includes(q.office)?360:30)));return best;
 }
-function learningPupilQuote(s,p,teacher,fee){
-  if(!learningPresent(s,p)||p.office||p.sp||p.schoolMaster!==undefined||p.study?.graduated||ageYrs(p)<7||ageYrs(p)>=24||!(teacher.sk?.[KL]>(p.sk?.[KL]||0)))return null;
+function learningPupilQuote(s,p,teacher,fee,advanced=false){
+  if(!learningPresent(s,p)||p.office||p.estateOffice||p.sp||p.schoolMaster!==undefined||p.study?.graduated&&!advanced||ageYrs(p)<7||ageYrs(p)>=(advanced?35:24)||!(teacher.sk?.[KL]>(p.sk?.[KL]||0)))return null;
   const head=learningHead(p),payer=learningPayer(head);if(!payer||payer===learningPayer(teacher))return null;
   const foregone=Math.max(0,tradeIncome(s,head.tr||'labourer',s._tc||{}))/Math.max(1,learningFamilySize(s,head)),years=Math.max(1,Math.min(7,18-ageYrs(p))),gain=Math.max(0,learningIncome(s,p)-foregone)*6,cost=fee*360*years;
-  return gain>cost&&learningSpare(s,payer)>=fee?{p,payer,fee,gain,cost}:null;
+  return gain>cost&&learningSpare(W.settlements[p.si]||s,payer)>=fee?{p,payer,fee,gain,cost}:null;
 }
 function learningRoomCapacity(b){return b&&!b.removed&&b.state==='sound'?Math.max(0,Math.floor((b.w||0)*(b.d||0)*0.35/3)):0;} // one surveyed teaching room, with worship/circulation still occupying the rest
 function learningRooms(s){return (s.buildings||[]).filter(b=>!b.removed&&b.state==='sound'&&b.arch==='temple'&&!b.castle&&!b.friary).sort((a,b)=>(a.idx??0)-(b.idx??0));}
@@ -3972,8 +3974,8 @@ function learningSchoolCommission(Q){
 function learningEnrol(S,p){if(!p||p.study&&!p.study.closed)return false;p.study={school:S.id,entered:day(),paid:0,lessons:0,closed:false,graduated:false};S.pupils.push(p.id);life(p,`Enrolled with ${S.masterName} at ${W.settlements[S.si].name}`);return true;}
 function learningSchoolClose(S,why){
   if(S.gone)return;S.gone=true;S.closed=day();S.reason=why;S.contract.active=false;const s=W.settlements[S.si],p=learningPerson(S.master);
-  if(p&&p.schoolMaster===S.id){delete p.schoolMaster;delete p.schoolTrade;if(p.office==='master'){p.tr=S.previous.tr;p.office=S.previous.office;p.officeFor=S.previous.officeFor;}}
-  for(const id of S.pupils){const q=learningPerson(id);if(q?.study?.school===S.id)q.study.closed=true;}S.pupils=[];if(s.school===S)delete s.school;delete s._learningIndex;technologyActorsDirty(s);householdHeadsChanged(s);emit('trade',2,s.pos,`The school of ${S.masterName} at ${s.name} closes: ${why}.`);
+  for(const p of learningStaff(S)){const prior=S.previousStaff?.[p.id]||S.previous;delete p.schoolMaster;delete p.schoolTrade;if(p.office==='master'){p.tr=prior.tr;p.office=prior.office;p.officeFor=prior.officeFor;}}
+  for(const id of S.pupils){const q=learningPerson(id);if(q?.study?.school===S.id){if(q.study.journey)learningScholarReturn(q,why);q.study.closed=true;}}S.pupils=[];if(s.school===S)delete s.school;delete s._learningIndex;technologyActorsDirty(s);householdHeadsChanged(s);emit('trade',2,s.pos,`The school of ${S.masterName} at ${s.name} closes: ${why}.`);
 }
 function learningLesson(S,p,master,fraction){
   if(!(fraction>0)||!learningPresent(W.settlements[S.si],p)||!learningPresent(W.settlements[S.si],master))return false;
@@ -3982,30 +3984,97 @@ function learningLesson(S,p,master,fraction){
   p.study.lastLessonDay=day();p.study.lessons+=fraction;S.lessons+=fraction;return true;
 }
 function learningGraduate(S,p){
-  if(!p.study||p.study.graduated||ageYrs(p)<16||!(p.sk[KL]>=Math.min(0.4,(learningPerson(S.master)?.sk?.[KL]||0)*0.9)))return false;
-  p.study.graduated=true;p.study.closed=true;p.study.graduatedDay=day();p.study.qualifications={letters:p.sk[KL],reckoning:p.sk[KR],scripture:p.sk[KS],law:p.sk[KLaw]};S.graduates++;life(p,`Completed schooling with ${S.masterName}; qualified for lettered work`);emit('trade',2,W.settlements[S.si].pos,`${folkName(p)} completes schooling at ${W.settlements[S.si].name}.`);return true;
+  if(!p.study||p.study.graduated||ageYrs(p)<16||!(p.sk[KL]>=Math.min(p.study.advanced?0.7:0.4,(learningPerson(S.master)?.sk?.[KL]||0)*0.9)))return false;
+  p.study.graduated=true;p.study.closed=true;p.study.graduatedDay=day();p.study.qualifications={letters:p.sk[KL],reckoning:p.sk[KR],scripture:p.sk[KS],law:p.sk[KLaw]};S.graduates++;if(S.university!==undefined)W.universities[S.university].graduates++;if(p.study.journey)learningScholarReturn(p,'completed the course');delete W.settlements[p.si]._learningIndex;life(p,`Completed schooling with ${S.masterName}; qualified for lettered work`);emit('trade',2,W.settlements[S.si].pos,`${folkName(p)} completes schooling at ${W.settlements[S.si].name}.`);return true;
 }
 function learningSchoolTick(S){
-  if(S.gone)return;const s=W.settlements[S.si],master=learningPerson(S.master);if(!s||!learningPresent(s,master)||master.schoolMaster!==S.id||master.office!=='master'||S.building.removed||S.building.state!=='sound'){learningSchoolClose(S,'the master or room is unavailable');return;}
-  if(s.siegeBy)return;const present=[],active=[];for(const id of S.pupils){const p=learningPerson(id);if(!p||p.dead||p.study?.school!==S.id||p.study.closed)continue;if(ageYrs(p)>=24){p.study.closed=true;continue;}active.push(p.id);if(learningPresent(s,p))present.push(p);}S.pupils=active;
-  const allowance=S.ownerId?Math.max(0,corpOf(S.ownerId)?.schoolAllowance||0):Math.max(0,s.schoolAllowance||0),patron=S.ownerId?corpOf(S.ownerId):houseAcct(s.owner),grant=Math.min(allowance/360,learningSpare(s,patron)),wage=learningTeacherCost(s,master),fee=Math.max(0,wage-grant)/Math.max(1,Math.min(S.capacity,present.length||S.capacity))*1.05;S.fee=fee;S.minimum=wage;
-  const spare=new Map(),can=[];for(const p of present){const Q=learningPupilQuote(s,p,master,fee);if(!Q)continue;const cash=spare.has(Q.payer)?spare.get(Q.payer):learningSpare(s,Q.payer);if(cash+1e-9<fee)continue;spare.set(Q.payer,cash-fee);can.push(Q);}
-  for(const p of learningIndex(s).pupils){if(can.length>=S.capacity)break;if(p.study&&!p.study.closed||p.study?.graduated||present.includes(p))continue;const Q=learningPupilQuote(s,p,master,fee);if(!Q)continue;const cash=spare.has(Q.payer)?spare.get(Q.payer):learningSpare(s,Q.payer);if(cash+1e-9<fee)continue;spare.set(Q.payer,cash-fee);learningEnrol(S,p);can.push(Q);}
-  const possible=can.length*fee+grant;if(!(possible>0)||possible+1e-9<wage){learningSchoolClose(S,'tuition and stipends no longer cover the master’s bread');return;}
-  let paid=0;for(const Q of can){const receipt=transfer(Q.payer,master,Q.fee,'schooling',s);Q.p.study.paid+=receipt;S.fees+=receipt;Q.receipt=receipt;paid+=receipt;}
-  const stipend=grant>0?transfer(patron,master,grant,'school stipend',s):0;paid+=stipend;S.stipends+=stipend;S.contract.paid+=paid;S.contract.lastPaidDay=paid>0?day():S.contract.lastPaidDay;technologyRecordTeaching(s,master,paid);
-  const delivered=Math.min(1,paid/Math.max(1e-9,wage));if(day()%7!==0)for(const Q of can){const fraction=Q.fee>0?Math.min(delivered,Q.receipt/Q.fee):delivered;if(learningLesson(S,Q.p,master,fraction))learningGraduate(S,Q.p);}S.pupils=S.pupils.filter(id=>!learningPerson(id)?.study?.closed);
+  if(S.gone)return;const s=W.settlements[S.si],master=learningPerson(S.master),staff=learningStaff(S).filter(p=>learningPresent(s,p)&&p.office==='master');if(!s||!learningPresent(s,master)||master.schoolMaster!==S.id||master.office!=='master'||S.building.removed||S.building.state!=='sound'||S.university!==undefined&&staff.length<4){learningSchoolClose(S,'the master or room is unavailable');return;}
+  if(s.siegeBy)return;const present=[],active=[];for(const id of S.pupils){const p=learningPerson(id);if(!p||p.dead||p.study?.school!==S.id||p.study.closed)continue;if(ageYrs(p)>=(S.university!==undefined?35:24)){p.study.closed=true;continue;}active.push(p.id);if(learningPresent(s,p)&&learningScholarBoard(S,p))present.push(p);}S.pupils=active;
+  const allowance=S.ownerId?Math.max(0,corpOf(S.ownerId)?.schoolAllowance||0):Math.max(0,s.schoolAllowance||0),patron=S.ownerId?corpOf(S.ownerId):houseAcct(s.owner),grant=Math.min(allowance/360,learningSpare(s,patron)),wages=staff.map(p=>learningTeacherCost(s,p)),wage=wages.reduce((t,v)=>t+v,0),fee=Math.max(0,wage-grant)/Math.max(1,Math.min(S.capacity,present.length||S.capacity))*1.05;S.fee=fee;S.minimum=wage;
+  const spare=new Map(),can=[];for(const p of present){const Q=learningPupilQuote(s,p,master,fee,S.university!==undefined);if(!Q)continue;const cash=spare.has(Q.payer)?spare.get(Q.payer):learningSpare(W.settlements[p.si],Q.payer);if(cash+1e-9<fee)continue;spare.set(Q.payer,cash-fee);can.push(Q);}
+  for(const p of learningIndex(s).pupils){if(can.length>=S.capacity)break;if(p.study&&!p.study.closed||p.study?.graduated&&S.university===undefined||present.includes(p))continue;const Q=learningPupilQuote(s,p,master,fee,S.university!==undefined);if(!Q)continue;const cash=spare.has(Q.payer)?spare.get(Q.payer):learningSpare(s,Q.payer);if(cash+1e-9<fee)continue;spare.set(Q.payer,cash-fee);learningEnrol(S,p);p.study.advanced=S.university!==undefined;can.push(Q);}
+  const possible=can.length*fee+grant;if(!(possible>0)||possible+1e-9<wage){learningSchoolClose(S,'tuition and stipends no longer cover the masters’ bread');return;}
+  let paid=0;const receipts=new Array(staff.length).fill(0);for(const Q of can){let got=0;for(let i=0;i<staff.length;i++){const receipt=transfer(Q.payer,staff[i],Q.fee*wages[i]/wage,'schooling',s);receipts[i]+=receipt;got+=receipt;}Q.p.study.paid+=got;S.fees+=got;Q.receipt=got;paid+=got;}
+  let stipend=0;for(let i=0;i<staff.length;i++){const receipt=grant>0?transfer(patron,staff[i],grant*wages[i]/wage,'school stipend',s):0;receipts[i]+=receipt;stipend+=receipt;const contract=S.contracts?.[staff[i].id]||S.contract;contract.paid+=receipts[i];if(receipts[i]>0)contract.lastPaidDay=day();technologyRecordTeaching(s,staff[i],receipts[i]);}paid+=stipend;S.stipends+=stipend;
+  if(S.contracts){S.contract.paid+=paid;if(paid>0)S.contract.lastPaidDay=day();const U=W.universities[S.university];U.fees+=can.reduce((t,Q)=>t+Q.receipt,0);U.stipends+=stipend;const was=U.active;U.active=staff.length>=4&&receipts.every(v=>v>0);if(U.active&&!was&&!U.announced){U.announced=true;emit('trade',3,s.pos,`Four supported masters gather at ${s.name}; their company is called a university.`);}}
+  const delivered=Math.min(1,paid/Math.max(1e-9,wage));if(day()%7!==0)for(const Q of can){const family=Q.fee>0?Math.min(delivered,Q.receipt/Q.fee):delivered;let taught=false;for(let i=0;i<staff.length;i++){const fraction=Math.min(family,receipts[i]/Math.max(1e-9,wages[i]))/staff.length;if(learningLesson(S,Q.p,staff[i],fraction))taught=true;}if(taught)learningGraduate(S,Q.p);}S.pupils=S.pupils.filter(id=>!learningPerson(id)?.study?.closed);
 }
 function tickLearning(){
   if(W._learningDay===day())return;W._learningDay=day();
   for(const s of W.settlements){if(!s.folk?.length||s.siegeBy)continue;for(const b of learningRooms(s)){const Q=learningRoomQuote(s,b);if(Q)learningSchoolCommission(Q);}}
   for(const a of W.abbeys||[]){if(a.gone||a.school?.building===undefined||a.school.schoolId!==undefined)continue;const s=W.settlements[a.si],b=W.bldList?.[a.school.building],Q=learningRoomQuote(s,b,a.storageOwnerId);if(Q)learningSchoolCommission(Q);}
-  for(const S of W.schools||[])learningSchoolTick(S);
+  tickUniversities();for(const S of W.schools||[])learningSchoolTick(S);
 }
+/* A university is a company of paid masters, not a new population. Visiting
+   scholars stay on their family's roll and pay for the actual room and board. */
+function learningStaff(S){return(S.staff||[S.master]).map(learningPerson).filter(p=>p&&!p.dead&&p.schoolMaster===S.id);}
+function learningAt(p){const J=p?.study?.journey;return J&&day()>=J.arrive&&day()<J.leave?W.settlements[J.to]:W.settlements[p?.si];}
+function learningUniversityQuote(s){
+  if(s.university!==undefined&&!W.schools?.[W.universities?.[s.university]?.school]?.gone||s.siegeBy||!institutionalCapability(s,'university').available)return null;
+  const S=(s.schoolIds||[]).map(id=>W.schools?.[id]).find(S=>S&&!S.gone&&S.contract.paid>0&&S.capacity>=4);if(!S)return null;
+  const master=learningPerson(S.master),extra=learningIndex(s).masters.filter(p=>learningPresent(s,p)&&p!==master&&!p.office&&!p.role&&p.schoolMaster===undefined&&p.sk?.[KL]>=0.3).sort((a,b)=>b.sk[KL]-a.sk[KL]||a.id-b.id).slice(0,3);if(extra.length!==3)return null;
+  const staff=[master,...extra],wage=staff.reduce((t,p)=>t+learningTeacherCost(s,p),0),patron=S.ownerId?corpOf(S.ownerId):houseAcct(s.owner),allowance=S.ownerId?corpOf(S.ownerId)?.schoolAllowance:s.schoolAllowance,grant=Math.min(Math.max(0,allowance||0)/360,learningSpare(s,patron));
+  const pupils=S.pupils.map(learningPerson).filter(p=>p&&ageYrs(p)>=14&&!p.study.closed),fee=Math.max(0,wage-grant)/Math.max(1,pupils.length)*1.05,budget=new Map();
+  const can=[];for(const p of pupils){const Q=learningPupilQuote(s,p,master,fee,true);if(!Q)continue;const cash=budget.has(Q.payer)?budget.get(Q.payer):learningSpare(W.settlements[p.si],Q.payer);if(cash+1e-9<fee)continue;budget.set(Q.payer,cash-fee);can.push(p);}
+  return can.length&&can.length*fee+grant+1e-9>=wage?{s,S,staff,wage,fee,pupils:can}:null;
+}
+function learningUniversityCommission(Q){
+  if(!Q)return null;const L=W.universities||(W.universities=[]),S=Q.S,U={id:L.length,si:S.si,school:S.id,masters:Q.staff.map(p=>p.id),formed:day(),fees:0,stipends:0,board:0,lodging:0,graduates:0,active:false};L.push(U);Q.s.university=U.id;S.university=U.id;S.kind='university';S.staff=U.masters.slice();S.contracts={};S.previousStaff={};
+  for(const p of Q.staff){S.previousStaff[p.id]=p===learningPerson(S.master)?S.previous:{tr:p.tr,office:p.office,officeFor:p.officeFor};if(p.schoolMaster!==S.id){p.schoolTrade=p.tr;p.tr='schoolmaster';p.office='master';p.officeFor=S.ownerId||'school:'+S.id;p.schoolMaster=S.id;}S.contracts[p.id]={master:p.id,paid:0,lastPaidDay:-1,active:true};}
+  for(const id of S.pupils){const p=learningPerson(id);if(p?.study)p.study.advanced=ageYrs(p)>=14;}delete Q.s._learningIndex;technologyActorsDirty(Q.s);householdHeadsChanged(Q.s);return U;
+}
+function learningLodgingUsed(b){let n=0;for(const id of b.schoolBoarders||[]){const p=learningPerson(id),J=p?.study?.journey;if(p&&!p.dead&&!p.study.closed&&J&&J.lodging===b.idx&&day()<J.leave)n++;}return n;}
+function learningHouseholdSlots(b){return Math.ceil(learningLodgingUsed(b)/HOUSEHOLD);}
+function learningLodgingQuote(s,p){
+  if(s.siegeBy)return null;for(const b of s.buildings||[]){if(b.removed||b.state!=='sound'||!RESID.has(b.arch)||!['inn','hospital'].includes(b.arch)||String(b.ownerId||'').startsWith('abbey:'))continue;
+    const occupied=(b.hh||[]).filter(h=>!h.dead&&h.bh===b).length*HOUSEHOLD;if(occupied+learningLodgingUsed(b)>=capOf(b)*HOUSEHOLD)continue;
+    const host=(b.hh||[]).find(h=>!h.dead&&h.bh===b&&W.settlements[h.si]===s),owner=b.title?.owner||(!b.ownerId&&host?learningPayer(host):b.ownerId==='lord'?houseAcct(s.owner):b.ownerId==='town'?s:typeof b.ownerId==='number'?learningPayer(learningPerson(b.ownerId)):null);if(!owner||owner==='out')continue;
+    const annual=b._rent!==undefined?Math.max(0,b._rent)*(W._pl||1):b.rural?foodYr()*0.4:Math.max(0,lotRentAt(s,b.x,b.z,b.st)*4),rent=annual/Math.max(1,capOf(b)*HOUSEHOLD)/360;
+    return{b,host,owner,rent,meal:host&&['cook','brewer','baker'].includes(host.tr)?Math.max(0,tradeIncome(s,host.tr,s._tc||{}))/Math.max(1,learningFamilySize(s,host))/360:0};}return null;
+}
+function learningScholarQuote(U,p){
+  const s=W.settlements[U.si],home=W.settlements[p?.si],S=W.schools?.[U.school],master=learningPerson(S?.master);if(!U.active||!s||!home||s===home||!learningPresent(home,p)||ageYrs(p)<14||ageYrs(p)>=30||p.sp||p.office||p.estateOffice||p.schoolMaster!==undefined||p.study&&!p.study.closed||!(master?.sk?.[KL]>(p.sk?.[KL]||0)))return null;
+  if(typeof personalStatus==='function'&&!personalStatus(p).free)return null;
+  const A=learningPayer(learningHead(p)),minimum=(S.fee+FOOD*Math.min(...FOODS.map(g=>price(s,g))))*90;if(!A||learningSpare(home,A)<minimum)return null;
+  const room=learningLodgingQuote(s,p),r=room&&route(p.si,U.si);if(!room||!r||!(r.len>=0)||S.pupils.length>=S.capacity)return null;
+  const payer=learningPayer(learningHead(p)),fee=S.fee,board=FOOD*Math.min(...FOODS.map(g=>price(s,g)))+room.rent+room.meal,go=Math.max(1,Math.ceil(r.len/WALK_MPD)),term=90;
+  const foregone=Math.max(0,tradeIncome(home,learningHead(p).tr||'labourer',home._tc||{}))/Math.max(1,learningFamilySize(home,p)),gain=Math.max(0,learningIncome(s,p)-foregone)*6,cost=(fee+board)*360*4+foregone*go*2/360;
+  return payer&&gain>cost&&learningSpare(home,payer)>=(fee+board)*term?{U,S,p,payer,room,r,go,term}:null;
+}
+function learningScholarCommission(Q){
+  if(!Q)return false;const{p,S,U,room,r,go,term}=Q,from=p.si,to=U.si,arrive=day()+go,leave=arrive+term,back=leave+go;
+  p.study={school:S.id,university:U.id,advanced:true,entered:day(),paid:0,lessons:0,closed:false,graduated:false,journey:{from,to,arrive,leave,back,lodging:room.b.idx,rent:room.rent,meal:room.meal,owner:room.owner,host:room.host?.id,board:0,lodgingPaid:0}};S.pupils.push(p.id);(room.b.schoolBoarders||(room.b.schoolBoarders=[])).push(p.id);const rooms=W.schoolLodgings||(W.schoolLodgings=[]);if(!rooms.includes(room.b.idx))rooms.push(room.b.idx);p.away={until:back,why:'scholar',to};
+  (W.travellers||(W.travellers=[])).push({p,from,to,why:'scholar',errand:true,poly:r.poly,len:r.len,depart:day(),arrive},{p,from:to,to:from,why:'scholar',errand:true,home:true,poly:[...r.poly].reverse(),len:r.len,depart:leave,arrive:back});life(p,`Set out to study at ${W.settlements[to].name}`);return true;
+}
+function learningScholarReturn(p,why){
+  const J=p.study?.journey;if(!J||J.returning)return;J.returning=true;const s=W.settlements[J.to],home=W.settlements[J.from],r=route(J.to,J.from);p.study.closed=true;
+  W.travellers=(W.travellers||[]).filter(t=>t.p!==p||t.why!=='scholar');if(day()>=J.arrive&&r&&home){J.leave=day();J.back=day()+Math.max(1,Math.ceil(r.len/WALK_MPD));p.away={until:J.back,why:'scholar',to:J.from};W.travellers.push({p,from:J.to,to:J.from,why:'scholar',errand:true,home:true,poly:r.poly,len:r.len,depart:day(),arrive:J.back});}else{J.leave=day();J.back=day();delete p.away;}
+  life(p,`Returned from study: ${why}`);
+}
+function learningScholarBoard(S,p){
+  const J=p.study?.journey;if(!J)return true;if(day()<J.arrive||day()>=J.leave)return false;
+  const s=W.settlements[J.to],home=W.settlements[J.from],b=W.bldList?.[J.lodging],payer=learningPayer(learningHead(p));if(!b||b.removed||b.state!=='sound'||!RESID.has(b.arch)||s.siegeBy||(b.hh||[]).filter(h=>!h.dead&&h.bh===b).length*HOUSEHOLD+learningLodgingUsed(b)>capOf(b)*HOUSEHOLD){learningScholarReturn(p,'the lodging is unavailable');return false;}
+  const g=FOODS.slice().sort((a,b)=>price(s,a)-price(s,b)).find(g=>avail(s,g,price(s,g))>=FOOD),host=learningPerson(J.host),service=host&&!host.dead&&host.si===J.to&&host.bh===b?J.meal:0,need=FOOD;
+  if(!g||learningSpare(home,payer)<need*price(s,g)+J.rent+service+S.fee){learningScholarReturn(p,'board and tuition are no longer affordable');return false;}
+  const board=purchase(s,g,payer,need),got=purchase.got;commodityCreditPurchase(s,payer,g,got);const eaten=consumeOwned(s,payer,g,got);
+  const rent=transfer(payer,J.owner,J.rent,'scholar lodging',s),meal=service>0?transfer(payer,host,service,'scholar board',s):0;J.board+=board+meal;J.lodgingPaid+=rent;J.boardedDay=day();J.boarded=Math.min(1,eaten/Math.max(1e-9,need));const U=W.universities[S.university];U.board+=board+meal;U.lodging+=rent;
+  if(!J.contacted){technologyContact(home,s);J.contacted=true;}return J.boarded>0;
+}
+function learningHomeAbsence(s,h){let n=0;for(const p of h.members||[]){const J=p.study?.journey;if(p.dead||!J||W.settlements[J.from]!==s||day()<J.arrive||day()>=J.leave||J.boardedDay!==day())continue;n+=J.boarded||0;}return n;}
+function tickUniversities(){
+  const active=[];for(const s of W.settlements){const Q=learningUniversityQuote(s);if(Q)learningUniversityCommission(Q);}
+  for(const U of W.universities||[]){const S=W.schools?.[U.school],staff=S&&!S.gone?learningStaff(S):[];U.masters=staff.map(p=>p.id);U.active=staff.length>=4&&staff.every(p=>S.contracts?.[p.id]?.lastPaidDay>=day()-1);if(U.active)active.push(U);}
+  // A home considers its own indexed young scholars, at the nearest actual supported university.
+  for(const home of W.settlements){let U=null,d=Infinity;for(const u of active){const s=W.settlements[u.si];if(s===home)continue;const r=dist2d(home.pos.x,home.pos.z,s.pos.x,s.pos.z);if(r<d){d=r;U=u;}}if(!U)continue;const S=W.schools[U.school];for(const p of learningIndex(home).scholars){if(S.pupils.length>=S.capacity)break;const Q=learningScholarQuote(U,p);if(Q)learningScholarCommission(Q);}}
+  for(const S of W.schools||[])for(const id of S.pupils){const p=learningPerson(id),J=p?.study?.journey;if(!J)continue;if(p.dead||day()>=J.leave&&!J.returning)learningScholarReturn(p,p.dead?'death':'the academic term ended');}
+  W.schoolLodgings=(W.schoolLodgings||[]).filter(idx=>{const b=W.bldList[idx];if(!b)return false;b.schoolBoarders=(b.schoolBoarders||[]).filter(id=>{const p=learningPerson(id);return p&&!p.dead&&p.study?.journey&&day()<p.study.journey.leave;});return b.schoolBoarders.length>0;});
+}
+
 function learningCmd(arg){const[si,value,...rest]=String(arg).split(':'),s=W.settlements[+si],annual=+value;if(rest.length||!s||!sovOn()||s.owner!==plyH()||!Number.isFinite(annual)||annual<0)return false;s.schoolAllowance=annual;G.ordersDirty=true;return true;}
-function learningState(){return{schools:(W.schools||[]).map(S=>({id:S.id,si:S.si,kind:S.kind,ownerId:S.ownerId,building:S.building.idx,master:S.master,masterName:S.masterName,capacity:S.capacity,pupils:S.pupils.slice(),fees:S.fees,stipends:S.stipends,lessons:S.lessons,graduates:S.graduates,opened:S.opened,closed:S.closed,reason:S.reason,gone:S.gone})),universities:(W.universities||[]).map(U=>({...U}))};}
+function learningState(){return{schools:(W.schools||[]).map(S=>({id:S.id,si:S.si,kind:S.kind,ownerId:S.ownerId,building:S.building.idx,master:S.master,masterName:S.masterName,capacity:S.capacity,pupils:S.pupils.slice(),fees:S.fees,stipends:S.stipends,lessons:S.lessons,graduates:S.graduates,opened:S.opened,closed:S.closed,reason:S.reason,gone:S.gone})),universities:(W.universities||[]).map(U=>({id:U.id,si:U.si,school:U.school,masters:U.masters.slice(),formed:U.formed,active:U.active,fees:U.fees,stipends:U.stipends,board:U.board,lodging:U.lodging,graduates:U.graduates}))};}
 function learningPlaceHTML(s){return(s.schoolIds||[]).map(id=>W.schools?.[id]).filter(S=>S&&!S.gone).map(S=>`${esc(S.masterName)} · ${S.pupils.length} pupils · ${S.graduates} graduates · ${S.fees.toFixed(1)} tuition received`).join('; ');}
 function learningSchoolsHTML(){const T=learningState();let h='<div class="dhead">Funded schools</div>';for(const S of T.schools)h+=`<div class="note">${esc(W.settlements[S.si].name)} · ${esc(S.masterName)} · ${S.gone?'closed: '+esc(S.reason):S.pupils.length+' pupils'} · ${S.fees.toFixed(1)} tuition / ${S.stipends.toFixed(1)} stipends received · ${S.graduates} graduates</div>`;
+  for(const U of T.universities)h+=`<div class="note">University at ${esc(W.settlements[U.si].name)} · ${U.active?U.masters.length+' paid masters':'teaching suspended'} · ${U.board.toFixed(1)} board / ${U.lodging.toFixed(1)} lodging paid locally · ${U.graduates} graduates</div>`;
   if(sovOn())for(const [si,s]of W.settlements.entries()){if(s.owner!==plyH())continue;h+=`<div class="note">${esc(s.name)} · ${(s.schoolAllowance||0).toFixed(1)} gold a year to actual schoolmasters</div><div class="pbrow">`;for(const[v,label]of[[0,'Stop'],[foodYr()*5,'Support'],[foodYr()*15,'Endow']])h+=`<button class="cbtn" data-cmd="s-school" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;h+='</div>';}return h;}
 
 /* the rank-and-file notables share the folk's make-up */
@@ -5459,7 +5528,7 @@ function ownersRetire(){if(!W.households)return;let road=null;
       s.storage.forget(h);}
     OWNERS_RETIRED.add(h);}}
 function houseFolk(s){
-  const homes=(s.buildings||[]).filter(b=>RESID.has(b.arch)&&b.state==='sound'&&!b.removed),cap=new Map();for(const b of homes){cap.set(b,capOf(b));b.hh=[];}
+  const homes=(s.buildings||[]).filter(b=>RESID.has(b.arch)&&b.state==='sound'&&!b.removed),cap=new Map();for(const b of homes){cap.set(b,Math.max(0,capOf(b)-learningHouseholdSlots(b)));b.hh=[];}
   const heads=new Set();for(const p of s.folk||[])heads.add(householdHead(p));
   const eligible=(b,h)=>b.abbey?b.abbey===((h.abbey!=null||h.corrodian!=null)?'abbey:'+(h.abbey??h.corrodian):null):h.abbey==null;
   const later=[];for(const h of heads){const b=h.bh;if(b&&cap.get(b)>0&&eligible(b,h)){cap.set(b,cap.get(b)-1);b.hh.push(h);}else later.push(h);}
@@ -13093,7 +13162,7 @@ function eatFood(s,o,need){if(o?.abbey!=null){let got=consumeOwned(s,o,'fish',ne
   const m=L.meat||0;if(got<need&&m>0)got+=consumeOwned(s,o,'meat',(need-got)*m/(m+(L.grain||0)));
   got+=consumeOwned(s,o,'grain',need-got);if(got<need&&(L.meat||0)>0)got+=consumeOwned(s,o,'meat',need-got);return got;}
 function eatHouseholds(s,PM){initOwnership(s);if(typeof HUNGRY_HANDS!=='undefined')HUNGRY_HANDS.meal++; /* hunger is reckoned anew */const H=householdsOf(s),heads=[],producers=[];for(const h of H){const p=h.head;if(p&&!p.dead){heads.push(p);if(s.folk&&!p.role)producers.push(p);}}shareOutput(s,W.settlements.indexOf(s),PM,producers,true);reconcile(s,heads,FOODS);topUpFood(s,0,PM,true);let hungry=0,total=0,homeDay=0;
-  for(const h of H){const n=h.population.get(s)||0,Hd=h.assets.herd||{},home=0,full=Math.max(0,n*FOOD-home),need=full; // a family eats its need from what it has: what it bought less of at a dear price (provision) it goes short of when that runs out
+  for(const h of H){const n=h.population.get(s)||0,Hd=h.assets.herd||{},home=0,full=Math.max(0,(n-Math.min(n,learningHomeAbsence(s,h)))*FOOD-home),need=full; // a family eats its need from what it has: what it bought less of at a dear price (provision) it goes short of when that runs out
     const got=eatFood(s,h,need);
     h.hunger=full>0?clamp(1-got/full,0,1):0;h.assets._fill=1-h.hunger;hungry+=h.hunger*n;total+=n;homeDay+=home;}
   for(const[o,x]of s._owners){if(o&&o.household)continue;const n=o&&o._hallN||0;if(n>0)eatFood(s,o,n*FOOD);} // the lords' halls
