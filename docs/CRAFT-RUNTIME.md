@@ -70,3 +70,16 @@ entry/dilution, paid quality searches, exclusivity and pure reads. Root alone
 runs the combined source, projection, replay and economic gates. Trade history
 changes intentionally from the old instant trade switch and foreign-master
 premium; it remains independent of browser speed and rendering.
+
+Daily apprenticeship recruitment now prepares one ephemeral ordered roster of
+actual working masters. Working-day, room, guild and existing slot checks are
+reused during that one decision; each actual commission immediately consumes
+its native slot. Each candidate's head and available purse are read once while
+its alternatives are quoted. Trade incomes are reused only within the same
+synchronous decision; teacher cost is refreshed if the native trade-count
+record is first initialized. The roster is never saved or used across phases.
+Native trade/master/pupil order and comparisons are unchanged. The focused
+reference-loop fixture verifies the same contracts and transfers with a filled
+guild slot and fewer master-working calculations. Root owns the whole-history
+identity proof and actual CPU measurement; this local evidence claims no
+century-per-minute throughput.
