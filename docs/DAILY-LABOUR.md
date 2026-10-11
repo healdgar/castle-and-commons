@@ -74,3 +74,57 @@ independent masters remain potential concurrent users.
 No new daily phase is required solely to provide a shared ledger. Any phase/order
 change must be justified by the resolved work/payment dependency and recorded in
 `SIMULATION-ORDER.md` and its machine contract before implementation.
+
+## Native units and immediate effects
+
+The second read-only audit used `d0f17e4`; the relevant consumer bodies retain
+the behavior described above. These are existing units, not implemented finite
+attendance or an adopted universal wage.
+
+| Consumer | Native quantity and saved remainder |
+|---|---|
+| Common construction | `labour/days` gold per nominal workday; `worked`, `done` and `paid` persist. Technology scales labour and duration together, so its factor does not define a crew size. |
+| Equipment | Recipe `work`, trade set, goods and days; household-holder scale applies to labour/materials, with rounded duration. Installed goods and paid work persist. |
+| Quarry | Up to three actual present quarrymen; output uses each person's existing `_fill` strength. Its family-sized wage does not turn one quarryman into several worker-days. |
+| Tournament lists | Named carpenter IDs, timber, `workDays`, required wages and paid wages. Each present carpenter receives the existing day wage; unfinished preparation delays the meeting. |
+| Grange clearing | Actual furlong `abbeyClear` stores cost and paid work; its daily request is the remaining bill bounded by `cost/90`. |
+| Estate upkeep | Daily cost is `components.length*foodYr()/360`; condition responds to paid/requested work. Unperformed maintenance currently becomes deterioration, not a carried debt. |
+| Road upkeep | An annual bill based on length; condition/neglect respond to actual payment. It has no attendance duration or unfinished maintenance order. |
+
+`foodYr()/360` already prices quarry, tournament and other day wages. A possible
+construction conversion is `labour/(foodYr()/360)` standard worker-days, with
+daily crew demand `labour/days/(foodYr()/360)`. This is a calibration choice for
+monetary labour recipes, not proof that every generic cash bill buys one day's
+work. Technology should continue to change the recipe or output per hand; it
+must not create additional person-days. `workers_` returns actual household
+heads: each is one person, not the household's population. Explicit existing
+strength or assigned-hand units must be retained where the source uses them.
+
+A payment ratio alone is unsafe for these immediate physical effects:
+
+- `carryHome` moves goods before its carriage bill.
+- Rural housing places the house and moves residents before its wage bill.
+- Tollhouse setup and settlement works complete physical changes without a saved
+  work remainder.
+- The direct walls command changes walls and clears the line immediately.
+- Charter and village founding create the settlement before their works bill.
+
+Those callers must either reserve the whole declared job before committing its
+effect, or commission an actual unfinished order with payer, rights, quantities
+and progress. They cannot complete the requested effect after a partially
+staffed payment. Common projects, equipment, tournament preparation and grange
+clearing already retain a real remainder; proportional maintenance can retain
+its existing neglected-work outcome.
+
+Daily workshop production has actual masters, rooms and hired hands. Claims
+must use those people and scale output with accepted attendance. The separate
+`craftWork` fee pool is settled by `payCrafts` on the place's monthly market day.
+A market-day service policy can claim present providers that day; a policy of
+continuous service paid monthly instead requires named daily orders/accruals.
+Neither can be inferred by silently dividing the fee pool by thirty.
+
+The implementation therefore needs explicit consumer declarations before a
+universal allocation wrapper. Native phase/project order can remain stable
+while the shared day budget removes duplicate attendance, but the chosen service
+schedule and any new order-completion dependencies must be recorded before the
+refactor. This audit ran no simulation or performance measurement.
