@@ -12,7 +12,7 @@ const source=inlineGameScript(fs.readFileSync(process.env.FURLONG_TEST_SOURCE||p
 const footprintStart=source.indexOf('function streetFootprintOverlap(');
 const footprintEnd=source.indexOf('\n// Water crossings',footprintStart);
 const nativeFootprint=source.slice(footprintStart,footprintEnd);
-const lotStart=source.indexOf('const buildLot=(c,tier,residentialOnly=false)=>');
+const lotStart=source.indexOf('const buildLot=(c,tier,residentialOnly=false,mode,retained,ownProject)=>');
 const lotEnd=source.indexOf('\n  /* ---- back lanes:',lotStart);
 assert.ok(footprintStart>=0&&footprintEnd>footprintStart,'native footprint predicate found');
 assert.ok(lotStart>=0&&lotEnd>lotStart,'production buildLot found');

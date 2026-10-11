@@ -3452,7 +3452,9 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
     while(capacity<goal){
       if(!s.growSlots.length){if(!extend())break;stitchRoads();s.growSlots=queue();if(!s.growSlots.length)continue;}
       const c=s.growSlots.shift();if(!c)continue;
+      if(c.st.hidden&&pathHitsBldg(c.st.pts,c.st.hw))continue; // the first home can open only a clear prospective lane
       const b=buildLot(c,tierFor(c,curE),true);if(!b)continue;
+      if(c.st.hidden){c.st.hidden=false;s._sg=null;G.roadsDirty=true;} // opening homes expose their own frontage, as paid new homes do
       b.grown=0;b.idx=W.bldList.length;W.bldList.push(b);G.buildingsDirty=true;updateBuildingInstance(b);capacity+=capOf(b);
     }
     return {capacity,goal,complete:capacity>=goal,exhausted:capacity<goal};

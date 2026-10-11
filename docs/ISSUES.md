@@ -22,6 +22,8 @@ Status: **open**, **investigating**, **in progress**, **queued** (waiting on ano
 | 28 | Some back-garden lots reach far from their house | open | 126 of the worker's own lots extend over 60 m from the house: real simulation geometry, not the display. |
 | 66 | Paid courtyard consolidation could finish without public access | fixed in candidate | The project now retains a reachable native public street and a private door corridor. Daily validation stops further payments and demolition after the public endpoint is stopped, moved or disconnected, or native water, fort, slope or another standing footprint obstructs it. Exact acquired plot/public frontage coverage forbids unpaid passage across another private toft. One focused source fixture passes; root release gates remain pending. |
 
+Candidate follow-up for #61/#65: the bounded native market seed and actual-parent branch exclusion are integrated. Opening completion now exposes its own clear prospective lane only after a successful native home build, matching paid new-home completion; previously those counted homes left their street hidden and unable to supply the next generation of frontage. The source loop/lot/graph fixture passes 3/3, but the final native occupied-world census and release gates remain pending. The sampled queue's exhaustion does not establish that every legal geographic layout is impossible. See [ISOLATED-TOWN-OPENING-STREET-DESIGN.md](ISOLATED-TOWN-OPENING-STREET-DESIGN.md).
+
 ## Performance
 
 | # | Issue | Status | Notes |
