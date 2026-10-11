@@ -118,9 +118,15 @@ Equipment has no separate wear stock; native site/owner/operator loss already
 stops its use. No simulation-century throughput or economy calibration claim
 follows from these focused fixtures.
 
-Light evidence: extracted inline JavaScript syntax and nineteen focused cases in
+Light evidence: extracted inline JavaScript syntax and twenty focused cases in
 `tools/equipment.test.mjs`, covering both native commodity ledgers, material and
 coin conservation, paid completion, actual exclusivity and current wages,
 finite mill work, held animal teams, paid paper/printing, native army holders,
 self-work, cold pure reports, actual native clashes/engineers and canonical
 army split/merge provenance. Root runs all heavier combined gates.
+
+Grinding uses the native craft index's ordered mill candidates and local miller
+trade group, validating current power, operator and title on each transaction.
+It does not rediscover every building for every family bread payment. Actual
+paid fabric completion invalidates work-room discovery immediately; a newly
+opened mill or repaired work room can recruit a master on the next daily phase.

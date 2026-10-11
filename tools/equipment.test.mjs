@@ -115,3 +115,8 @@ test('earned grinding claims retain their actual operator and entitled holder th
 test('immediate abbey grinding uses remaining actual operator time without draining family crop claims',()=>{
   const f=fixture();f.W.weather={state:'clear'};f.eval('technologyGrindingDay(s,1)');const family=f.s.mill.grindingPending;const R=f.eval('technologyGrindingDay(s,10,false)');assert.ok(R.worked>0);near(f.s.mill.grindingPending,family);const ordinary=f.eval('technologyGrindingReceipt(s,10)');near(ordinary.worked,family);
 });
+
+
+test('indexed grinding retains native mill order and validates the current operator without rediscovering every building',()=>{
+  const f=fixture();f.eval('craftIndex(s)');f.s.buildings=new Proxy(f.s.buildings,{get:(target,key)=>{if(key===Symbol.iterator)assert.fail('a bread payment must not rescan all town buildings');return Reflect.get(target,key);}});assert.equal(f.eval('technologyGrindingCash(s,H[0],-1)'),0);assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),1);f.H[2].role='company soldier';assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),0);
+});
