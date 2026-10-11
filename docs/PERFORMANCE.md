@@ -6,11 +6,28 @@ The app remains a single HTML file with no build step.
 
 ## Exact fast forward (current priority, 2026-10-10)
 
-The current growth/property batch keeps daily occupancy and live valuation
-inputs while retaining the unfinished six-day housing/fabric rate throttle.
-Operation-local native fields consolidate roof selection, lot ranking, buyer
+The current institution integration uses daily housing, road, castle and
+institution decisions with actual paid component projects. The assembled daily
+contract has 59 phases and 200 checked prerequisites. It retains dated market,
+court, harvest, lease and study obligations. Final native validation and
+measurement are pending; the century-per-minute target is not established.
+
+An obsolete integration suite was interrupted after 2,010 wall seconds and
+3,512 aggregate child CPU seconds (load 0.00→1.07). Its remaining native street
+fixture repeatedly surveyed first-castle geometry. Two owned five-second live
+profiles identified native deterministic hypot and point-to-box checks as the
+largest costs. The exact axis rejection retains the original corner predicate;
+operation-local polygon reuse and a certified failed-survey memory retain actual
+geometry authority. These are diagnostic samples, not a measured throughput
+claim. The same suite also exposed private mill counters entering display
+packets; that projection defect is repaired without changing simulation work.
+The combined source still requires the final suite and native exactness gates.
+
+The earlier growth/property batch below kept daily occupancy and live valuation
+inputs while retaining the then unfinished six-day housing/fabric throttle.
+Operation-local native fields consolidated roof selection, lot ranking, buyer
 rent averages and landlord tests; widening, refits and construction boundaries
-still obtain fresh fields. The dependencies and original regression are
+still obtained fresh fields. Its dependencies and original regression are
 recorded in [SIMULATION-GROWTH-INPUTS.md](SIMULATION-GROWTH-INPUTS.md).
 
 One serial unprofiled raw-journal diagnostic on 1001:42 sea (AD 850, ticks
