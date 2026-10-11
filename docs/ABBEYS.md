@@ -34,14 +34,18 @@ Church, residence, grange and guest house/almonry use the shared paid compound p
 
 Canonical buildings supply storage and housing; the compound owns neither a second capacity nor another inventory.
 
-The current visual model is simple: a church, residential range and grange placed as separate functional buildings. A recognizable cloister layout and richer stone ranges are unfinished.
-
-The accepted next architecture phase uses the same shared engine as castles,
-colleges and estates. It adds church-relative ranges and lawful retained internal
-connections, then real paid chapter/refectory space and covered walks; it does
-not introduce another population, pantry or building identity. The client audit,
-historical layout and dependency boundary are in
-[COMPOUND-LAYOUT-PHASE.md](COMPOUND-LAYOUT-PHASE.md). This is planned work.
+The isolated connected-layout batch extends the same shared engine as castles,
+colleges and estates. It prefers a church-relative dormitory and service range,
+then commissions a real chapter house, refectory and four roofed walks around an
+open seasonal court. Each stage retains its own paid footprint and lawful internal
+connection to the existing entrance. Native titles, physical access, materials,
+wages and food reserves can refuse a stage; unbuilt wings occupy no ground.
+Chapter, refectory and covered court provide no additional housing or storage.
+The native cellarer serves actual member pantries through existing meal receipts,
+so household consumption cannot feed the same person twice. College lodging uses
+the same shared layout/connection service. See
+[COMPOUND-LAYOUT-PHASE.md](COMPOUND-LAYOUT-PHASE.md) for dimensions, paid units,
+private/public access, dependencies and phase-two validation still required.
 
 ![Corscrug Abbey church in winter AD 1201](images/abbey-church-ad1201.png)
 

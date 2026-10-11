@@ -1,10 +1,10 @@
-# Connected compound layouts: next architecture phase
+# Connected compound layouts
 
-Status: accepted shared architecture direction, recorded 2026-10-11; implementation
-is pending. This is a plan, not a claim that the current abbey image contains a
-cloister. The closed AD 1201 image shows a real paid church under construction,
-with nave, chancel and bellcote. Current residence and service components are
-independently placed buildings.
+Status: the first connected-layout implementation is reviewable in an isolated
+phase-two batch; generated-world, cold-save, worker and drawing gates remain with
+the serialized root runner. The accepted direction was recorded 2026-10-11. The
+published AD 1201 image still shows the predecessor’s actual paid church, with
+nave, chancel and bellcote; it is not evidence of a completed cloister.
 
 ## Shared requirement
 
@@ -37,7 +37,8 @@ building or specialized completion adapter before the first connected layout.
 [SYSTEMS.md](SYSTEMS.md) section 2 promises a church with cloister buildings;
 [SIMULATION-COMPLETION.md](SIMULATION-COMPLETION.md) requires functional owned
 church, residence, work and storage structures. Those economic functions exist,
-but recognizable connected cloister architecture remains unfinished.
+and the new connected adapter supplies the missing paid court and domestic ranges.
+Their generated-world operation and drawing still require phase-two gates.
 
 Use the actual church's position, rotation and west/choir direction as the anchor.
 A common medieval arrangement has the church on one side of the cloister, an east
@@ -141,4 +142,89 @@ reciprocal pending reservations, partial wages/materials, no duplicate capacity 
 meals, one canonical completion, unfinished save continuation, worker projection
 and a real paid draw. Large stone cloisters, every medieval room, full interiors,
 cathedral-scale churches and universally completed precincts are later scope;
-the connected-cloister requirement itself is accepted unfinished work.
+the connected-cloister requirement itself is the scope of this implementation.
+
+
+## First operable implementation
+
+`compoundLayoutPoses` and `compoundConnectionPlan` are common services. The Abbey
+adapter anchors to an actually completed, entitled church and tries two mirrored
+sides and 14 m or 10 m inner court widths. It keeps the chosen arrangement only
+when a real component project is commissioned. Dormitory, chapter and refectory
+candidates have at most three nearby positions; each exact footprint and retained
+path still passes native terrain, titles, standing geometry and pending
+reservations. A preference for an unbuilt wing grants, occupies and reserves no
+future ground.
+
+The connected dormitory is an 8×24 m native longhouse, with the same 192 m² and
+native residential capacity as the previous 24×8 m range. The chapter house is
+8–10×8 m and the refectory is 8–12×8 m according to court size. They are separate
+nonresidential archetypes: neither supplies beds or commodity storage. Their
+inward doors are saved as `compoundDoor`; `serviceDoor` supplies the same entrance
+to path checks, and completion sets the native `fx/fz` front used by the wall atlas.
+This keeps the visible doorway on the physical inward face.
+
+A late funded stage builds one nonresidential `cloister` component, with four
+2.6 m roofed walks, .24×.24 m supports and an open rectangular court. The external
+width is inner width+5.2 m; depth follows the actual church. Its timber requirement
+is .12 native timber units per square metre of roof, with paid labour of
+`2*foodYr()+roofArea*.08*PL()` and `90+roofArea/4` base workdays. These are explicit
+physical game assumptions, not historical load weights. Shared construction
+technology modifies the bill, and actual materials and wages are consumed by the
+existing paid engine. The full outer envelope is conservatively fitted and
+reserved; its exact granted domestic/access union is removed from production once.
+There is no court housing, food, storage, productivity or defense bonus.
+
+Only actual supports obstruct walkers. A native .8 m internal footpath and closed
+walk loop pass between the supports with the existing .6 m walker clearance;
+external rural approaches retain their existing width and full checks. Rendering
+derives precisely four roofs and the supports from paid saved geometry. The
+inner court uses seasonal native grass; walk surfaces use the native ground mesh.
+Separate paid walk sections, stone arcades, integrated two-storey room allocations
+and richer interiors remain later detail.
+
+The completed church’s current lawful entrance is the root. Saved plain connection
+records retain actual compound, parent-building and street indices, segment,
+endpoint and path identity. A bounded local connector does not run distant A*.
+Every daily validation checks the current parent’s ownership, existence, physical
+access chain and retained geometry. Completed private footpaths may pass under
+this open roof only when the actual owning component and compound match and
+supports remain clear. No arbitrary same-compound building overlap is allowed.
+Unrelated private footpaths remain protected; a College cannot treat occupied
+private circulation as public entitlement.
+
+The College adapter is the second live client: paid scholars’ lodging uses the
+same bounded poses, internal connection, material bill, ground payment and
+completion binding, anchored to its real completed classroom. Ordinary public
+street graphs and castle, storage, growth and courtyard frontage proposals exclude
+these private routes. Members receive a derived private walking graph; the public
+graph never advertises a cloister as public frontage.
+
+Useful church, housing, grange, hospitality, schooling and feasible own-use
+industry/pond priorities remain ahead of domestic embellishment. A connected core
+range may still use the original lawful independent site if its preferred court
+cannot fit. After those priorities, chapter, refectory and covered court are
+sequential funded stages. A present named community meets in its actual chapter
+room. A present native cellarer serves actual member pantries in the refectory,
+recording the existing per-person meal receipt before household consumption;
+neither pass creates actors or a second meal.
+
+The focused `tools/compound-layout.test.mjs` uses actual native placement,
+commission/progress/completion, material custody, payments, capacity and meal
+helpers on controlled opening titles and terrain. It covers mirrored layout,
+paid Abbey and College completion, reserve/title/access refusals, private-route
+protection, open support navigation after all ranges are built, inward projected
+fronts, seasonal surface geometry and unfinished plain-data continuation. This
+is a light fixture, not a generated-world or browser proof.
+
+No daily phase changes. The dependency changes are shared connection/layout
+helpers and `live.compoundSite`; `collegePlanQuote`/completion; Abbey connected
+plans, commission/completion, chapter/refectory consumers and summaries; native
+`serviceDoor`, private/public `streetGraph`/frontage consumers; support-aware
+`armyObstacle` and its route certificate; completed court drawing and ground
+projection. Storage’s native fit certificate now includes the court/street
+compatibility entry. The first-castle survey records the private-anchor flag in
+its exact input certificate. Worker packets carry `coveredCourt` and
+`compoundDoor` geometry, while connection, arrangement, authority and meal records
+remain private. Final assembled-source manifest renewal belongs to the integration
+review, not this isolated patch.
