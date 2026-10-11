@@ -3556,6 +3556,7 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
               return{pts:pts.map(p=>({x:p.x,z:p.z})),hw,reach,startStreet:o.st};}}
         }}finally{Rmax=oldReach;}return null;},
     planSite(q,mode='validate'){ // only the buildings priced in this retained plan may be bought out
+      if(q.kind==='citadel'&&!citadelSiteValidate(s,q.site,q))return null;
       const allowed=new Set(q.hit||[]),paths=q.kind==='quarter'?(q.sts||[]).map(st=>({P:st.pts,hw:st.hw||HW})):q.kind==='street'?[{P:q.st?.pts,hw:q.st?.hw||HW}]:q.kind==='wall'?[{P:q.site?.path,hw:7}]:[];
       for(const {P,hw} of paths){if(!P||P.length<2)return null;if(q.kind==='wall'&&q.sameSite)continue;
         if(q.kind==='street'&&q.automatic&&!streetAccessAt(s,P[0]))return null;
@@ -3568,7 +3569,13 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
       if(q.kind==='square'){const P=compoundPolys(q.site)[0];if(!P||P.some(p=>!planCellOK(p.x,p.z))||liveB().some(b=>!allowed.has(b)&&!b.removed&&graveyardPolygonsOverlap(P,obbCorners(b.x,b.z,b.w,b.d,b.rot))))return null;}
       if(q.kind==='stopup'&&(!s.streets.includes(q.st)||q.st.gone))return null;
       if(q.kind==='wall'){const c=q.circuit||s;if(fortCircuitKey(s,c)!==q.circuitKey||JSON.stringify({rad:c.wallRad?Array.from(c.wallRad):null,walls:c.walls||0})!==q.wallBefore)return null;}
-      if(mode==='validate')return q;if(mode!=='complete')return null;live=true;curE=E;for(const b of q.hit||[])if(!b.removed&&b.state!=='gone')unplace(b);live=false;return q;},
+      if(mode==='validate')return q;if(mode!=='complete')return null;live=true;curE=E;for(const b of q.hit||[])if(!b.removed&&b.state!=='gone')unplace(b);
+      if(q.kind==='citadel'){s.citadel={...q.site.ct,exactGround:true,polys:q.site.polys.map(P=>P.map(p=>({...p}))),groundClaim:q.groundClaim,gate:q.site.gate};
+        for(const cut of q.site.cutStreets||[]){const st=cut.st;st.gone=true;st.hidden=true;for(const P of cut.keep)addStreet(P.map(p=>({...p})),st.hw||HW,st.kind,{name:st.name,planned:st.planned,straight:st.straight,paidPublic:true});}
+        const access=addStreet(q.site.path.map(p=>({...p})),1.3,'lane',{castlePath:true,compoundAccess:true,paidPublic:true});if(access)access.groundClaim=q.groundClaim;
+        const C=compoundEnsure(s,'citadel',s.owner);compoundBindCircuit(C,s,s.citadel,'citadel',['defensive']);s.citadel.barracks=[];
+        for(const B of q.site.buildings){const b=place(B.arch,B.tier,B.f,'keep',1.1,{inst:true,barracks:true,exactGround:true,ownerId:'lord',compoundKey:B.key,st:access});b.title=propertyRightsResolve('lord');b.idx=W.bldList.length;W.bldList.push(b);b.groundClaim=q.groundClaim;s.citadel.barracks.push(b.idx);compoundBindBuilding(C,b,['residential']);rehouse(s,b);updateBuildingInstance(b);}bindPropertyRights(s);C.stage='standing';}
+      live=false;return q;},
     planStreet(pts,hid,hw=HW,preview=false){const P=pts.map(p=>({x:p.x,z:p.z}));if(preview)return{pts:P,hw,kind:'lane',planned:AD(),hidden:true,planQ:true,straight:true};live=true;curE=E;const st=addStreet(P,hw,'lane',{planned:AD(),hidden:!!hid,planQ:!!hid,straight:true,paidPublic:true});live=false;return st;},
     planOpen(st){if(!st)return null;live=true;curE=E;let result=st;if(!s.streets.includes(st))result=addStreet(st.pts.map(p=>({x:p.x,z:p.z})),st.hw||HW,st.kind||'lane',{planned:st.planned,straight:st.straight,paidPublic:true});else{st.hidden=false;st.planQ=false;st.cands=null;}if(result){result.hidden=false;result.planQ=false;Rmax=Math.max(Rmax,...result.pts.map(p=>dist2d(p.x,p.z,C.x,C.z)+8));}live=false;return result;},
     planSquare(P,mk){live=true;curE=E;const p={x:P.x,z:P.z,r:P.r.slice()};
@@ -5585,7 +5592,7 @@ function compoundBindBuilding(C,b,purposes=[]){if(!b||b.removed||b.idx==null)ret
 function compoundBindCircuit(C,s,R,key,purposes=['defensive']){const ref=fortCircuitKey(s,R);if(!ref)return null;let c=C.components.find(c=>c.kind==='circuit'&&c.ref===ref);if(!c){c={id:C.id+':circuit:'+ref,key:key||'curtain',kind:'circuit',ref,purposes:[]};C.components.push(c);if(C.stage==='empty')C.stage='standing';}for(const p of purposes)if(!c.purposes.includes(p))c.purposes.push(p);return c;}
 function compoundHas(C,key,purpose){return C.components.some(c=>c.key===key&&(!purpose||c.purposes.includes(purpose))&&compoundComponentPresent(C,c));}
 function compoundComponentPresent(C,c){const s=W.settlements[C.si];if(!s)return false;if(c.kind==='building'){const b=W.bldList[c.ref];return !!b&&b.s===s&&!b.removed&&b.state==='sound';}if(c.kind==='hydraulic')return c.ref==='lake'&&!!s.lake&&s.lake.ownerId===C.ownerId;if(c.kind==='field')return W.land?.F[c.ref]?.estateWild?.compound===C.id&&W.land.F[c.ref].lord===C.ownerId;return !!compoundCircuit(s,c.ref);}
-function compoundCircuit(s,key){return key==='town'?s:key==='outer'?s.cas?.outerWall:key==='bailey'?s.bailey:key==='hill'?s.hillCastle:key==='ward'?s.ward:key==='motte'?s.motte:null;}
+function compoundCircuit(s,key){return key==='town'?s:key==='outer'?s.cas?.outerWall:key==='bailey'?s.bailey:key==='hill'?s.hillCastle:key==='ward'?s.ward:key==='motte'?s.motte:key==='citadel'?s.citadel:null;}
 function compoundPolys(site){const polys=[...(site?.polys||[])];if(site?.yard?.poly)polys.push(site.yard.poly);if(site?.poly?.length>2)polys.push(site.poly);if(site?.f)polys.push(obbCorners(site.f.x,site.f.z,site.f.w,site.f.d,site.f.rot));if(site?.ring){const R=site.ring;polys.push(Array.from({length:64},(_,k)=>{const a=k/64*Math.PI*2,r=wallRadAt(R,a);return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};}));}for(const P of site?.paths||(site?.path?[site.path]:[]))for(let k=1;k<P.length;k++){const a=P[k-1],b=P[k];polys.push(obbCorners((a.x+b.x)/2,(a.z+b.z)/2,site.pathWidth||2.6,dist2d(a.x,a.z,b.x,b.z),Math.atan2(b.x-a.x,b.z-a.z)));}return polys;}
 function compoundGround(site){const polys=compoundPolys(site);return{polys,cells:[...new Set(polys.flatMap(occupiedGroundCells))]};}
 function compoundProjectPayer(q){return typeof q.payerId==='number'?purseAcct(q.payerId):q.payerId==='crown'?'crown':corpOf(q.payerId);}
@@ -5721,7 +5728,56 @@ function institutionWharfProposal(s){if(AD()<950||!s.harbor||s.siegeBy||!s._lay?
       const r0=Math.max(0,r-6),len=end-r0,head={x:shore.x+nx*end,z:shore.z+nz*end};if(len<16||W.water[cIdx(toCell(head.x),toCell(head.z))]!==1||hAt(head.x,head.z)>SEA-2)continue;const f={x:shore.x+nx*(r0+len/2),z:shore.z+nz*(r0+len/2),w:7,d:len,rot:Math.atan2(nx,nz)};if(have.some(b=>dist2d(b.x,b.z,f.x,f.z)<30))continue;candidates.push({f,head,shore:{x:shore.x,z:shore.z},quay:st,quayA:{x:st.pts[i-1].x,z:st.pts[i-1].z},quayB:{x:shore.x,z:shore.z},score:-dist2d(shore.x,shore.z,s.pos.x,s.pos.z)/90-Math.abs(len-36)/25});}}
   candidates.sort((a,b)=>b.score-a.score);for(const P of candidates.slice(0,12)){const stone=constructionCapability(s,'stoneWharf').available&&s.prosperity>55,site={institution:'wharf',key:'wharf',arch:'wharf',tier:stone?2:0,...P};site.f.w=stone?9:7;const recipe=constructionRecipe(s,site.f.d*3*PL(),30+site.f.d*2,site.f.d*(stone?.4:.8),stone?site.f.d*1.5:0),q=institutionFoundationCommission(s,site,payer,'town',recipe,stone?'stoneWharf':null,'a wharf over navigable water');if(q)return q;}return null;
 }
-function tickInstitutionFoundations(){for(const s of W.settlements){if(!s._lay?.live||s.siegeBy)continue;institutionParishProposal(s);institutionParishProposal(s,'friary');institutionQuarryProposal(s);institutionWharfProposal(s);}}
+function citadelGeometry(ct){ // one native footprint for the parade ground, ramparts, bastions, gate and residential barracks
+  const ux=Math.cos(ct.rot),uz=Math.sin(ct.rot),vx=-uz,vz=ux,h=ct.S/2,corners=[[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,b])=>({x:ct.x+ux*h*a+vx*h*b,z:ct.z+uz*h*a+vz*h*b,a,b})),bastions=[],ramparts=[];
+  for(const c of corners){const dx=c.a*ux+c.b*vx,dz=c.a*uz+c.b*vz,L=Math.hypot(dx,dz),ox=dx/L,oz=dz/L,tx=-oz,tz=ox;bastions.push([{x:c.x-tx*11,z:c.z-tz*11},{x:c.x-tx*11+ox*8,z:c.z-tz*11+oz*8},{x:c.x+ox*24,z:c.z+oz*24},{x:c.x+tx*11+ox*8,z:c.z+tz*11+oz*8},{x:c.x+tx*11,z:c.z+tz*11}]);}
+  for(let k=0;k<corners.length;k++){const a=corners[k],b=corners[(k+1)%4];ramparts.push(obbCorners((a.x+b.x)/2,(a.z+b.z)/2,9,ct.S,Math.atan2(b.x-a.x,b.z-a.z)));}
+  const gate={x:ct.x-ux*h,z:ct.z-uz*h,side:2,half:3},buildings=[-18,0,18].map((o,i)=>({key:'barracks:'+i,arch:'longhouse',tier:2,f:{x:ct.x+vx*o-ux*14,z:ct.z+vz*o-uz*14,w:6,d:24,rot:Math.atan2(ux,uz)}}));return{corners,bastions,ramparts,gate,buildings,polys:[corners.map(c=>({x:c.x,z:c.z})),...bastions,...ramparts]};
+}
+function citadelStreetCuts(st,polys){ // exact intersections retain the public lane outside the paid enclosure
+  const keep=[];let run=[];const same=(a,b)=>dist2d(a.x,a.z,b.x,b.z)<1e-7,point=(a,b,t)=>({x:lerp(a.x,b.x,t),z:lerp(a.z,b.z,t)});
+  for(let k=1;k<st.pts.length;k++){const a=st.pts[k-1],b=st.pts[k],dx=b.x-a.x,dz=b.z-a.z,T=[0,1];
+    for(const P of polys)for(let j=0;j<P.length;j++){const p=P[j],q=P[(j+1)%P.length],ex=q.x-p.x,ez=q.z-p.z,D=dx*ez-dz*ex;if(Math.abs(D)<1e-10)continue;const px=p.x-a.x,pz=p.z-a.z,t=(px*ez-pz*ex)/D,u=(px*dz-pz*dx)/D;if(t>0&&t<1&&u>=0&&u<=1)T.push(t);}
+    T.sort((x,y)=>x-y);for(let j=1;j<T.length;j++){if(T[j]-T[j-1]<1e-10)continue;const m=point(a,b,(T[j]+T[j-1])/2),A=point(a,b,T[j-1]),B=point(a,b,T[j]);
+      if(polys.some(P=>inPolyXZ(P,m.x,m.z))){if(run.length>1)keep.push(run);run=[];}else{if(!run.length||!same(run.at(-1),A)){if(run.length>1)keep.push(run);run=[A];}run.push(B);}}}
+  if(run.length>1)keep.push(run);return keep;
+}
+function citadelStreetSnapshot(st){return JSON.stringify({pts:st.pts,hw:st.hw,kind:st.kind,hidden:!!st.hidden,gone:!!st.gone,planQ:!!st.planQ,name:st.name});}
+function citadelStreetHit(st,polys){return st.pts.some(p=>polys.some(P=>inPolyXZ(P,p.x,p.z)))||st.pts.some((b,k)=>k&&polys.some(P=>P.some((p,j)=>segSegDist(st.pts[k-1],b,p,P[(j+1)%P.length])<.01)));}
+function citadelSiteValidate(s,site,q){
+  const ct=site?.ct;if(!ct||s.citadel||!s.bastions||![ct.x,ct.z,ct.rot,ct.S].every(Number.isFinite)||!(ct.S>=60&&ct.S<=120))return false;
+  if(site.wallBefore!==JSON.stringify({rad:Array.from(s.wallRad||[]),kind:Array.from(s.wallKind||[]),walls:s.walls,bastions:!!s.bastions}))return false;
+  const Gd=citadelGeometry(ct);if(JSON.stringify(site.polys)!==JSON.stringify(Gd.polys)||JSON.stringify(site.buildings)!==JSON.stringify(Gd.buildings)||JSON.stringify(site.gate)!==JSON.stringify(Gd.gate))return false;
+  const allowed=new Set(q?.hit||[]),polys=compoundPolys(site),sample=(x,z)=>planCellOK(x,z)&&!riverAt(x,z,4)&&W.settlements.every(t=>!lakeAt(t,x,z,1)),guard=P=>{const xs=P.map(p=>p.x),zs=P.map(p=>p.z),x0=Math.min(...xs),x1=Math.max(...xs),z0=Math.min(...zs),z1=Math.max(...zs),n=Math.max(1,Math.ceil((x1-x0)/4)),m=Math.max(1,Math.ceil((z1-z0)/4));
+    for(let i=0;i<=n;i++)for(let j=0;j<=m;j++){const x=lerp(x0,x1,i/n),z=lerp(z0,z1,j/m);if(inPolyXZ(P,x,z)&&!sample(x,z))return false;}
+    return P.every((b,k)=>{const a=P[(k+P.length-1)%P.length],n=Math.max(1,Math.ceil(dist2d(a.x,a.z,b.x,b.z)/2));for(let j=0;j<=n;j++)if(!sample(lerp(a.x,b.x,j/n),lerp(a.z,b.z,j/n)))return false;return true;});};if(!polys.length||polys.some(P=>!guard(P)))return false;
+  for(const cut of site.cutStreets||[])if(!s.streets.includes(cut.st)||citadelStreetSnapshot(cut.st)!==cut.before||JSON.stringify(citadelStreetCuts(cut.st,Gd.polys))!==JSON.stringify(cut.keep))return false;
+  for(const t of W.settlements){for(const b of t.buildings||[])if(!b.removed&&b.state!=='gone'){const occupied=[obbCorners(b.x,b.z,b.w,b.d,b.rot),...(b.lot?.length?[b.lot]:[])];if(polys.some(P=>occupied.some(B=>graveyardPolygonsOverlap(P,B)))&&!allowed.has(b))return false;if(b._graveyard&&!b._graveyard.removed&&polys.some(P=>graveyardPolygonsOverlap(P,b._graveyard.poly)))return false;}
+    for(const p of t.places||[])if(polys.some(P=>graveyardPolygonsOverlap(P,placeEdge(p))))return false;
+    if(t!==s&&t.citadel&&polys.some(P=>citadelGeometry(t.citadel).polys.some(B=>graveyardPolygonsOverlap(P,B))))return false;
+    for(const R of fortCircuits(t)){if(t===s&&R===s)continue;const C=fortCenter(R),P=compoundPolys({ring:{...R,x:C.x,z:C.z}})[0];if(polys.some(B=>graveyardPolygonsOverlap(B,P)))return false;}
+    for(const p of t.remnants||[])if(polys.some(P=>P.some(v=>dist2d(v.x,v.z,p.x,p.z)<p.r+3)||inPolyXZ(P,p.x,p.z)))return false;
+    for(const R of t.relicWalls||[])if(polys.some(P=>graveyardPolygonsOverlap(P,R)))return false;
+    for(const st of t.streets||[])if(!st.gone&&!st.hidden&&!st.planQ&&st.kind!=='edge'&&citadelStreetHit(st,Gd.polys)&&!(site.cutStreets||[]).some(cut=>cut.st===st))return false;}
+  for(const r of W.roads||[])if(citadelStreetHit({pts:r.open||r.path||[]},Gd.polys))return false;
+  for(const other of W.projects||[])if(!other.dead&&other!==q){let P=[];if(other.type==='castle'&&other.site)P=compoundPolys({ring:other.site.ward,path:other.site.path});else if(['compound','fabric','plan'].includes(other.type)&&other.site)P=compoundPolys(other.site);else if(other.type==='road')P=compoundPolys({path:other.P?.path||[],pathWidth:8});else if(other.type==='storage')P=compoundPolys({f:{x:other.x,z:other.z,w:ARCH[other.arch][0],d:ARCH[other.arch][1],rot:0}});if(polys.some(B=>P.some(A=>graveyardPolygonsOverlap(A,B))))return false;}
+  for(const C of q?.compensations||[])for(const h of C.b.hh||[])if(!h.dead&&!C.receipts.some(R=>R.kind==='tenant'&&R.to===accountOwner(h)))return false; // no new, uncompensated tenant is evicted
+  const P=site.path;if(!P||P.length<2||dist2d(P[0].x,P[0].z,site.gate.x,site.gate.z)>0.01||!s.streets.includes(site.street)||site.street.gone||site.street.hidden||!streetAccessAt(s,P.at(-1)))return false;
+  for(let k=1;k<P.length;k++){const a=P[k-1],b=P[k],n=Math.ceil(dist2d(a.x,a.z,b.x,b.z)/2);for(let j=0;j<=n;j++){const x=lerp(a.x,b.x,j/(n||1)),z=lerp(a.z,b.z,j/(n||1));if(fortRoadBlocked(s,x,z,2)||!planCellOK(x,z)||riverAt(x,z,2))return false;}}return true;
+}
+function citadelProposal(s){ // cheap current strategic/funds gates before any star-fort geometry
+  const si=W.settlements.indexOf(s);if(s.citadel||!s.bastions||!s.wallRad||s.siegeBy||!s._lay?.live||!(s.role==='border'||s.kind==='capital')||!constructionCapability(s,'starCitadel').available||(W.projects||[]).some(q=>!q.dead&&q.type==='plan'&&q.si===si&&q.kind==='citadel'))return null;
+  const S=s.kind==='capital'?92:78,payer=lordAcct(s),minimum=constructionRecipe(s,S*6*PL()+3*6*24*.8*PL(),360*(1+S/80),S*.04+3*6*24*.07,260+3*6*24*.25),lower=minimum.labour+minimum.timber*price(s,'timber')+minimum.stone*price(s,'stone');if(means(payer)<lower+foodYr()*2||townWorth(s)*(0.03+townThreat(s)*.12)<lower)return null;
+  const points=s.streets.filter(st=>!st.gone&&!st.hidden&&(st.kind==='road'||st.kind==='mstreet')).flatMap(st=>st.pts),candidates=[];
+  for(let k=0;k<s.wallRad.length;k+=2){if(s.wallKind?.[k])continue;const a=k/s.wallRad.length*Math.PI*2,r=s.wallRad[k],ct={x:s.pos.x+Math.cos(a)*r,z:s.pos.z+Math.sin(a)*r,rot:a,S};if(!planCellOK(ct.x,ct.z)||points.some(p=>dist2d(p.x,p.z,ct.x,ct.z)<S*.8))continue;candidates.push({ct,score:hAt(ct.x,ct.z)});}candidates.sort((a,b)=>b.score-a.score);
+  for(const{ct}of candidates.slice(0,8)){const Gd=citadelGeometry(ct),g=Gd.gate,connections=[];
+    for(const st of s.streets)if(!st.gone&&!st.hidden&&!st.planQ&&st.kind!=='edge'&&!st.castlePath&&!citadelStreetHit(st,Gd.polys))for(let k=1;k<st.pts.length;k++){const a=st.pts[k-1],b=st.pts[k],dx=b.x-a.x,dz=b.z-a.z,t=clamp(((g.x-a.x)*dx+(g.z-a.z)*dz)/(dx*dx+dz*dz||1),0,1),end={x:a.x+dx*t,z:a.z+dz*t},d=dist2d(g.x,g.z,end.x,end.z);if(d<60&&streetAccessAt(s,end))connections.push({st,end,d});}connections.sort((a,b)=>a.d-b.d);
+    for(const connection of connections.slice(0,3)){const site={ct,polys:Gd.polys,gate:Gd.gate,buildings:Gd.buildings,path:[{x:g.x,z:g.z},connection.end],street:connection.st,wallBefore:JSON.stringify({rad:Array.from(s.wallRad),kind:Array.from(s.wallKind||[]),walls:s.walls,bastions:!!s.bastions})},polys=compoundPolys(site);site.cutStreets=s.streets.filter(st=>st.kind!=='road'&&st.kind!=='mstreet'&&st.kind!=='edge'&&!st.gone&&!st.hidden&&citadelStreetHit(st,Gd.polys)).map(st=>({st,before:citadelStreetSnapshot(st),keep:citadelStreetCuts(st,Gd.polys)}));
+      const hit=s.buildings.filter(b=>!b.removed&&b.state!=='gone'&&polys.some(P=>[obbCorners(b.x,b.z,b.w,b.d,b.rot),...(b.lot?.length?[b.lot]:[])].some(B=>graveyardPolygonsOverlap(P,B))));if(hit.length>24||hit.some(b=>b.inst||b._graveyard||fabricPending(b)))continue;
+      const probe={hit};if(!citadelSiteValidate(s,site,probe))continue;const project=planProjectCommission({ok:true,kind:'citadel',automatic:true,si,site,hit,works:S*6*PL()+3*6*24*.8*PL(),days:360*(1+S/80),timber:S*.04+3*6*24*.07,stone:260+3*6*24*.25,title:`A star citadel and three barracks at ${s.name}`},s.owner,payer);if(project)return project;
+    }}return null;
+}
+function tickInstitutionFoundations(){for(const s of W.settlements){if(!s._lay?.live||s.siegeBy)continue;institutionParishProposal(s);institutionParishProposal(s,'friary');institutionQuarryProposal(s);institutionWharfProposal(s);citadelProposal(s);}}
 function fabricProjectPayer(q){const p=q.payer;if(!p||p.dead||p.gone||p.exiled||p.household&&p.successors)return null;return accountOwner(p);}
 function fabricPending(b){return(W.projects||[]).some(q=>!q.dead&&(q.type==='fabric'&&q.target===b.idx||q.type==='compound'&&q.site?.target===b.idx));}
 function fabricProjectValidate(q,s){if(q.work==='foundation'){if(s.siegeBy)return{ok:false,reason:'siege'};if(q.authority!=null&&s.owner!==q.authority)return{ok:false,abandon:true,reason:'authority-lost'};if(q.target!=null){const b=W.bldList[q.target];if(!b||b.removed||b.s!==s||JSON.stringify(fabricSnapshot(b))!==JSON.stringify(q.before))return{ok:false,abandon:true,reason:'parent-changed'};if(!graveyardInsideParcel(b.lot,obbCorners(q.site.f.x,q.site.f.z,q.site.f.w,q.site.f.d,q.site.f.rot)))return{ok:false,reason:'private-plot'};}
@@ -7991,7 +8047,7 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
     for(const p of protectedGround){if(p.place&&placeHit(p.place,x,z,pad+1)||p.circle&&dist2d(x,z,p.circle.x,p.circle.z)<p.circle.r+pad+1||p.ring&&Math.abs(dist2d(x,z,p.ring.x,p.ring.z)-p.ring.r)<pad+3.5||p.a&&segDist(x,z,p.a,p.b)<pad+3.5)return false;}
     for(const R of circuits){const C=fortCenter(R),d=dist2d(x,z,C.x,C.z),r=wallRadAt(R,Math.atan2(z-C.z,x-C.x));if(Math.abs(d-r)<pad+7)return false;}
     for(const q of projects){if(q.type==='castle'&&q.site){if(dist2d(x,z,q.site.ward.x,q.site.ward.z)<q.site.ward.r+pad+2)return false;for(let k=1;k<q.site.path.length;k++)if(segDist(x,z,q.site.path[k-1],q.site.path[k])<pad+2)return false;}
-      if((q.type==='compound'||q.type==='fabric')&&q.site){if(reservedPolys(q).some(({P,box})=>castleFoundationBoxMayHit(x,z,box,pad+2)&&(inPoly(P,x,z)||P.some((p,k)=>segDist(x,z,p,P[(k+1)%P.length])<pad+2))))return false;}
+      if((q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')&&q.site){if(reservedPolys(q).some(({P,box})=>castleFoundationBoxMayHit(x,z,box,pad+2)&&(inPoly(P,x,z)||P.some((p,k)=>segDist(x,z,p,P[(k+1)%P.length])<pad+2))))return false;}
       if(q.type==='storage'&&dist2d(x,z,q.x,q.z)<Math.hypot(...ARCH[q.arch].slice(0,2))/2+pad+2)return false;
       if(q.type==='clear'&&dist2d(x,z,q.x,q.z)<q.r+pad+2)return false;
       if(q.type==='plan'){if(q.kind==='square'&&placeHit(q.place,x,z,pad+1))return false;
@@ -8056,7 +8112,7 @@ function castleFoundationSurveyRead(buffer=null){ // exact writer certificate, n
   const Q=(W.projects||[]).filter(q=>!q.dead);value(Q.length);for(const q of Q){value(q.type);value(q.kind);value(q.si);
     if(q.type==='road')poly(q.P?.path||[]);
     if(q.type==='castle'&&q.site){point(q.site.ward);value(q.site.ward.r);poly(q.site.path);}
-    if((q.type==='compound'||q.type==='fabric')&&q.site)site(q.site);
+    if((q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')&&q.site)site(q.site);
     if(q.type==='storage'){point(q);value(q.arch);list(ARCH[q.arch]?.slice(0,2));}if(q.type==='clear'){point(q);value(q.r);}
     if(q.type==='plan'){if(q.kind==='square'){point(q.place);list(q.place.r);}if(q.kind==='wall')list(q.rad);
       const A=q.kind==='quarter'?q.sts||[]:q.kind==='street'&&q.st?[q.st]:[];value(A.length);for(const st of A){poly(st.pts);value(st.hw||2);}}}
@@ -8390,13 +8446,14 @@ function planProjectCommission(D,payer,account){
   else if(D.kind==='stopup'){q.st=D.st;q.keep=D.keep;q.cut=D.pts;q.site={path:D.pts,pathWidth:(D.st.hw||3)*2};}
   else if(D.kind==='razewall'||D.kind==='raze'){q.cuts=D.cuts;q.cut=D.pts;q.site={path:D.pts,pathWidth:3};}
   else if(D.kind==='square'){q.place=D.place;q.mk=D.mk;q.site={poly:placeEdge(D.place)};}
+  else if(D.kind==='citadel'){q.site=D.site;q.method='starCitadel';}
   else if(D.kind==='wall'){q.circuit=D.circuit||s;q.circuitKey=fortCircuitKey(s,q.circuit);q.wallBefore=JSON.stringify({rad:q.circuit.wallRad?Array.from(q.circuit.wallRad):null,walls:q.circuit.walls||0});q.rad=D.rad.slice();q.stone=!!D.stone;q.sameSite=!!D.sameSite;q.need=D.need||0;q.method=q.stone?'stoneCurtain':'timberPalisade';const C=fortCenter(q.circuit),P=q.rad.map((r,k)=>({x:C.x+Math.cos(k/q.rad.length*Math.PI*2)*r,z:C.z+Math.sin(k/q.rad.length*Math.PI*2)*r}));P.push({...P[0]});q.site={path:P,pathWidth:14};}
   else return null;
   const length=q.site.paths?q.site.paths.reduce((n,P)=>n+polyLen(P),0):q.site.path?polyLen(q.site.path):0,area=q.site.poly?polyArea(q.site.poly):0,bridges=q.kind==='street'?(q.st.pts||[]).filter((p,k)=>k&&riverAt(p.x,p.z,0)&&!riverAt(q.st.pts[k-1].x,q.st.pts[k-1].z,0)).length:0;
   const timber=q.kind==='wall'?length*(q.stone?0.04:0.25):Math.max(0.5,length*0.005)+bridges*24+(q.kind==='square'?2:0),stone=q.kind==='wall'?q.need:q.kind==='square'?area*0.02:0;
-  Object.assign(q,constructionRecipe(s,D.works,D.days,timber,stone));q.works=q.labour;q.land=['street','quarter','square','wall'].includes(q.kind)?planGroundQuote(q.site):0;
+  Object.assign(q,constructionRecipe(s,D.works,D.days,D.kind==='citadel'?D.timber:timber,D.kind==='citadel'?D.stone:stone));q.works=q.labour;q.land=['street','quarter','square','wall','citadel'].includes(q.kind)?planGroundQuote(q.site):0;
   const PA=planProjectPayer(q);if(!PA)return null;
-  q.compensations=q.hit.map(b=>{const total=planComp(b),H=(b.hh||[]).filter(h=>!h.dead),owner=accountOwner(ownerAcct(b,s)),rows=[{to:owner,due:H.length?total*0.85:total,paid:0},...H.map(h=>({to:accountOwner(h),due:total*0.15/H.length,paid:0}))];for(const R of rows){R.owner=storageOwnerId(R.to);if(R.to===PA)R.due=0;}return{b,before:fabricSnapshot(b),receipts:rows};});
+  q.compensations=q.hit.map(b=>{const total=planComp(b),H=(b.hh||[]).filter(h=>!h.dead),owner=accountOwner(ownerAcct(b,s)),rows=[{kind:'owner',to:owner,due:H.length?total*0.85:total,paid:0},...H.map(h=>({kind:'tenant',to:accountOwner(h),due:total*0.15/H.length,paid:0}))];for(const R of rows){R.owner=storageOwnerId(R.to);if(R.to===PA)R.due=0;}return{b,before:fabricSnapshot(b),receipts:rows};});
   q.comp=q.compensations.reduce((n,c)=>n+c.receipts.reduce((t,R)=>t+R.due,0),0);q.total=q.labour+q.timber*price(s,'timber')+q.stone*price(s,'stone')+q.land+q.comp;
   const V=planProjectValidate(q,s);if(!V.ok||means(PA)<q.total)return null;
   (W.projects||(W.projects=[])).push(q);G.ordersDirty=true;
@@ -11963,8 +12020,9 @@ function tickPlan(q){ // the retained site, named receipts, materials and actual
   else if(q.kind==='stopup'){L.stopUp(q.st,q.keep);t=`${q.st.name||'The lane'} at ${s.name} is stopped up${q.keep.length?' where the brush ran':''}`;}
   else if(q.kind==='quarter'){q.sts=q.sts.map(st=>L.planOpen(st));for(const st of q.sts)st.groundClaim=q.groundClaim;t=`The new quarter at ${s.name} is laid out: ${q.sts.length} paid streets of plots for settlers`;}
   else if(q.kind==='square'){L.planSquare(q.place,q.mk);const p=s.places.at(-1);if(p){p.groundClaim=q.groundClaim;p.paidPublic=true;};t=`${q.mk?'A market place':'A new square'} is opened at ${s.name}`;}
+  else if(q.kind==='citadel'){t=`A star citadel and ${q.site.buildings.length} paid barracks are finished at ${s.name}; ${q.hit.length} priced properties were bought out for it`;}
   else if(q.kind==='wall'){const c=q.circuit||s;if(c===s)L.planWall(q.rad,q.stone);else{c.wallRad=Float32Array.from(q.rad);c.wallKind=new Uint8Array(q.rad.length);c.wallR=Math.max(...q.rad);if(c!==s.motte)c.r=c.wallR;c.wallRazed=0;c.razed=false;c.walls=q.stone?2:1;if(c===s.bailey)s.baileyStone=q.stone;else if(c===s.motte)s.motteStone=q.stone;else c.stone=q.stone;}delete c.wallBuild;c.groundClaim=q.groundClaim;const C=compoundEnsure(s,c===s?'town-defence':'castle',c===s?storageOwnerId(PA):s.owner);compoundBindCircuit(C,s,c,'curtain',['defensive']);s._wallPop=s.pop;s._wallYr=year();t=`The ${q.stone?'stone wall':'palisade'} about ${s.name} is finished on its paid site`;}
-  if(['street','quarter','square','wall'].includes(q.kind))markOccupiedGround(s,compoundPolys(q.site));
+  if(['street','quarter','square','wall','citadel'].includes(q.kind))markOccupiedGround(s,compoundPolys(q.site));
   q.dead=true;q.status='completed';s._hhY=-1;s.growSlots=s._lay.queue();syncLive(s);if(q.payer===campHouse()){achGet('planner');if(q.kind==='quarter')achGet('newtown');}
   (s.history||(s.history=[])).push({yr:year(),t:t.replace(` at ${s.name}`,'').replace(` about ${s.name}`,'')+'.'});if(!W.prehistory)emit(who?'house':'crown',6,s.pos,t+(who?`, at the charge of ${who.name}`:', at the crown’s charge')+'.');
 }
@@ -12119,7 +12177,7 @@ function markLot(P){ // a house's yard is no longer ploughland: the strips stop 
   if(ch&&(MODEL_ONLY||G.landView?.maskTex))G.landMaskDirty=true;}
 function markSettlementBuilt(s){
   for(const b of s.buildings)if(b.exactGround){for(const i of occupiedGroundCells(obbCorners(b.x,b.z,b.w,b.d,b.rot)))W.land.mask[i*4+2]=255;}else markBuilt(b.x,b.z,Math.hypot(b.w,b.d)/2+8);
-  for(const C of s.compounds||[])for(const c of C.components||[])if(c.kind==='circuit'){const R=compoundCircuit(s,c.ref);if(R)for(const i of compoundGround({ring:R}).cells)W.land.mask[i*4+2]=255;}
+  for(const C of s.compounds||[])for(const c of C.components||[])if(c.kind==='circuit'){const R=compoundCircuit(s,c.ref);if(R)for(const i of (R===s.citadel&&R.polys?R.polys.flatMap(occupiedGroundCells):compoundGround({ring:R}).cells))W.land.mask[i*4+2]=255;}
   for(const st of s.streets||[])if((st.compoundAccess||st.paidPublic)&&!st.gone&&!st.hidden)for(const i of compoundGround({path:st.pts,pathWidth:st.paidPublic?st.hw*2:2.6}).cells)W.land.mask[i*4+2]=255;
   for(const p of s.places||[])if(p.paidPublic)for(const i of occupiedGroundCells(placeEdge(p)))W.land.mask[i*4+2]=255;
   if(W.land._surveyed)for(const b of s.buildings)if(b.lot?.length&&b._graveyard&&!b._graveyard.removed)markChurchyardBuilt(s,b._graveyard);
@@ -13040,7 +13098,7 @@ function tickQuarries(){ // real named quarrymen, actual wages and their present
 function tickStone(){ // closing demand: what remains to be built, for departing loads and tomorrow's market
   const ad=AD();
   for(const s of W.settlements){
-    const wallPending=(W.projects||[]).some(q=>!q.dead&&q.type==='plan'&&q.kind==='wall'&&W.settlements[q.si]===s);let w=0;if(ad>=1150){if(!wallPending&&(s.walls===1||s.kind!=='village'&&!s.wallRad&&s.pop>750))w+=stoneFor(s,'wall');if(s.bailey&&!s.baileyStone)w+=stoneFor(s,'bailey');if(s.bastions&&!s.citadel)w+=stoneFor(s,'citadel');}
+    const wallPending=(W.projects||[]).some(q=>!q.dead&&q.type==='plan'&&q.kind==='wall'&&W.settlements[q.si]===s);let w=0;if(ad>=1150){if(!wallPending&&(s.walls===1||s.kind!=='village'&&!s.wallRad&&s.pop>750))w+=stoneFor(s,'wall');if(s.bailey&&!s.baileyStone)w+=stoneFor(s,'bailey');if(s.bastions&&!s.citadel&&constructionCapability(s,'starCitadel',ad).available&&!(W.projects||[]).some(q=>!q.dead&&q.type==='plan'&&q.kind==='citadel'&&W.settlements[q.si]===s))w+=stoneFor(s,'citadel');}
     if(constructionCapability(s,'stoneKeep',ad).available&&!s.motteStone&&(s.motte||ad>=1150)&&!(W.projects||[]).some(q=>!q.dead&&W.settlements[q.si]===s&&(q.type==='castle'||q.type==='compound'&&q.adapter==='castle')))w+=stoneFor(s,'keep');for(const b of s.buildings)if(b.ch&&b.ch.next&&!b.removed&&!fabricPending(b))w+=b.ch.next.st||0; // what the parish masons will want
     if(s.cas&&s.cas.next&&!(W.projects||[]).some(q=>q.type==='compound'&&!q.dead&&q.adapter==='castle'&&W.settlements[q.si]===s))w+=s.cas.next.st||0;
     if(ad>=1200&&s.prosperity>55&&s.kind!=='village')w+=stoneFor(s,'house')*12;if(ad>=1250&&s.harbor)w+=stoneFor(s,'wharf');
@@ -13530,8 +13588,8 @@ function closedToTrade(s,from){ // plague, sealed gates, or the besiegers' lines
 function siegeBlocks(s,ang){const A=s.siegeBy&&s.siegeBy.army&&s.siegeBy.army.siegeArc;if(!A)return !!s.siegeBy;
   const d=Math.abs((((ang-A.c+Math.PI)%(2*Math.PI))+2*Math.PI)%(2*Math.PI)-Math.PI);return d<=A.w;}
 function siegeRadius(s){const c=activeFort(s);return c?c.wallRad.reduce((t,v)=>t+v,0)/c.wallRad.length:(s.extentR||s.radius||90)*0.9;}
-function fortCircuitKey(s,c){if(c===s)return'town';if(c===s.cas?.outerWall)return'outer';if(c===casRing(s))return s.bailey?'bailey':s.hillCastle?'hill':'ward';if(c===s.motte)return'motte';return null;}
-function fortCircuitFor(s,key){return key==='town'?s:key==='outer'?s.cas?.outerWall:key==='bailey'?s.bailey:key==='hill'?s.hillCastle:key==='ward'?s.ward:key==='motte'?s.motte:null;}
+function fortCircuitKey(s,c){if(c===s)return'town';if(c&&c===s.citadel)return'citadel';if(c===s.cas?.outerWall)return'outer';if(c===casRing(s))return s.bailey?'bailey':s.hillCastle?'hill':'ward';if(c===s.motte)return'motte';return null;}
+function fortCircuitFor(s,key){return key==='town'?s:key==='outer'?s.cas?.outerWall:key==='bailey'?s.bailey:key==='hill'?s.hillCastle:key==='ward'?s.ward:key==='motte'?s.motte:key==='citadel'?s.citadel:null;}
 function objectiveBuilding(s,o){const same=b=>!b.removed&&b.state!=='gone'&&b.arch===o.arch&&Math.abs(b.x-o.x)<0.02&&Math.abs(b.z-o.z)<0.02;
   const near=s._lay?.placed?.near(o.x,o.z,1);if(near){for(const b of near)if(same(b))return b;return null;}return(s.buildings||[]).find(same)||null;}
 function campaignWallProgress(a,s,amt){const o=a&&a.objective,c=o&&fortCircuitFor(s,o.circuit);if(!o||o.kind!=='demolish'||o.si!==W.settlements.indexOf(s)||!c?.wallRad||!Number.isFinite(o.angle))return null;
@@ -15979,7 +16037,6 @@ function tickHistory(){ // once a year for each place (staggered): the town's ow
     if(s.kind==='village'&&AD()>=950&&marketHeads(s)>Math.max(150,s.pop*0.35)&&(roadsN>=2||s.river||s.harbor)){ // a charter follows the trade: when a good share of the place lives by its market, it is made a town
       L.live.promote();did=`${s.name} is granted a market charter; the village is a town now, and its fair draws the countryside.`;}
     else if((bid=townWallProposal(s)))did=null;
-    else if(s.bastions&&(s.role==='border'||s.kind==='capital')&&!s.citadel&&chance('sim',0.3)&&hasStone(s,'citadel')&&L.live.citadel()&&(useStone(s,'citadel'),true))did=`A star citadel is raised astride the walls of ${s.name}, a quarter razed for it.`;
 
 
     const nb=s.buildings.filter(b=>!b.removed&&b.state!=='gone').length;s._bPeak=Math.max((s._bPeak||0)*0.995,nb); // the most the town has been, slowly forgotten
@@ -17991,7 +18048,7 @@ function refreshOrders(){ // a mark on everything an order is still working on: 
       for(let k=k0;k<P.length;k++){const p=P[k],m=new THREE.Mesh(new THREE.BoxGeometry(0.8,5,0.8),mat(q.stalled?0x8a2f22:0xe0c070));m.position.set(p.x,hAt(p.x,p.z)+2.5,p.z);grp.add(m);} // surveyors' pegs where the road will run
     }else if(q.type==='pave'){const r=q.r,P=r.drawn||r.path;band(P,6.5,q.stalled?0x8a2f22:0xe0c070);}
     else if(q.type==='castle'&&q.site){const R=q.site.ward,P=Array.from(R.wallRad,(r,k)=>{const a=k/R.wallRad.length*Math.PI*2;return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};});P.push({...P[0]});const c=q.stalled?0x8a2f22:0xe0c070;band(P,1.3,c);band(q.site.path,1.3,c);}
-    else if((q.type==='compound'||q.type==='fabric')&&q.site){const c=q.stalled?0x8a2f22:0xe0c070;if(q.site.poly?.length>2)band([...q.site.poly,q.site.poly[0]],1.3,c);if(q.site.f){const f=q.site.f,P=obbCorners(f.x,f.z,f.w,f.d,f.rot);band([...P,P[0]],1.3,c);}if(q.site.ring){const R=q.site.ring,P=Array.from({length:65},(_,k)=>{const a=k/64*Math.PI*2,r=wallRadAt(R,a);return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};});band(P,1.3,c);}if(q.site.path)band(q.site.path,1.3,c);}
+    else if((q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')&&q.site){const c=q.stalled?0x8a2f22:0xe0c070;for(const P of q.site.polys||[])if(P.length>2)band([...P,P[0]],1.3,c);if(q.site.poly?.length>2)band([...q.site.poly,q.site.poly[0]],1.3,c);if(q.site.f){const f=q.site.f,P=obbCorners(f.x,f.z,f.w,f.d,f.rot);band([...P,P[0]],1.3,c);}if(q.site.ring){const R=q.site.ring,P=Array.from({length:65},(_,k)=>{const a=k/64*Math.PI*2,r=wallRadAt(R,a);return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};});band(P,1.3,c);}if(q.site.path)band(q.site.path,1.3,c);}
     else if(q.type==='buy')ring(q.f.x,q.f.z,FG*0.55,0x3e5f8a);
     else if(q.type==='clear')ring(q.x,q.z,q.r+4,q.stalled?0x5a2020:0xc0392b);
     else if(q.type==='persuade')ring(q.x,q.z,(q.r||30)+4,0xc4a24a);
