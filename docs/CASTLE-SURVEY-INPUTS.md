@@ -27,3 +27,29 @@ These writers include in-place edits, same-count moves, and derived state. There
 2. **Conservative scalar point-to-box broad phase.** `castleFoundationBoxMayHit` (`:7005`) currently allocates an array for `.every(Number.isFinite)` and calls `Math.hypot(dx,dz)` for each AABB test. A candidate kernel can check the seven scalar inputs directly, keep the current fail-open behavior for invalid values, and first reject when either axis separation exceeds `pad + 1e-6` (because Euclidean distance cannot then be within the pad). A squared-distance comparison may avoid `Math.hypot` for clearly separated points, but it must be conservative: float rounding must not skip a point that the current `Math.hypot(dx,dz) <= pad + 1e-6` accepts. Use an outward error allowance and call the original `Math.hypot` predicate for near-boundary/overflow cases; extra broad-phase hits are safe because exact geometry remains authoritative. Validate the kernel against the original predicate around boundaries, zero padding, invalid/non-finite inputs, and very large finite coordinates before adopting it.
 
 The profile motivating the review was an instrumented AD1066 sample reporting `tickCastles` at about **200.685 sampled CPU ms/day** and `castleFoundationSite` at about **202.126 sampled CPU ms/day**. Those are profiler sample costs, not measured throughput or wall-clock time per simulation day. The profiled `castleFoundationBoxMayHit` self/total and geometry-predicate costs make the scalar broad-phase idea a bounded target, not a claim that it resolves the whole site-survey cost.
+
+## Follow-up source/profile review (2026-10-11)
+
+The published shared-construction AD 1066 profile still attributes about 195.6
+sampled CPU ms/day to `tickCastles`. `castleFoundationSite` is about 10.6 own /
+197.1 inclusive, `clear` about 151.5 inclusive, and `placeFitRadii` about 97.9
+inclusive. These nested costs overlap and must not be summed. The sample's
+historical line positions precede the present source.
+
+The first-foundation survey checks a straight approach using `publicAt`,
+`clear`, terrain grade and `streetFootprintOverlap`. It does not call
+`serviceRoadPlan`, `armyObstacle` or `armyLandPath`; their existing local
+route/flood memos cannot remove this cost. Continue with the necessary-frontage
+and conservative scalar broad-phase proposals above, or measured repeated
+work inside this actual survey, rather than attributing its cost to routing.
+
+One smaller opportunity exists only for successful proposals: with a land
+mask, `check(site)` derives `castleFoundationGround(site)` for title checks,
+then `castleFoundationProposal` derives it again for opportunity cost. A
+private result scoped to this one synchronous proposal could retain the
+occupied cells and geometry, provided the complete native helper identities
+remain intact (`castleFoundationSite`, `castleFoundationGround`,
+`occupiedGroundCells`, `obbCorners`, `dist2d` and their dependencies). Overridden
+helpers must recompute. Keep paid-day retained-site checks fresh. This idea is
+not implemented and does not address the repeated failed surveys dominating
+the profile; no speedup or complete cross-day certificate is claimed.

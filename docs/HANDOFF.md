@@ -1,23 +1,23 @@
 # Handoff: state of work
 
-Updated 2026-10-11 in the cloud checkout for published shared paid construction and exact fort-route reuse, and the subsequent private opening-capacity diagnostics. Whoever carries the work keeps this file current: what is true now, what is next, what waits on the user.
+Updated 2026-10-11 in the cloud checkout for Castle and Commons, integrated opening-capacity completion and its serialized release gates. Whoever carries the work keeps this file current: what is true now, what is next, what waits on the user.
 
 ## Where things stand
 
-- **Current release (2026-10-11):** castles and storage share material installation and actual paid-work progress. Storage no longer advances on unpaid work; fractional paid work persists and the final share pays only remaining labor. Street graphs reuse native fort circuits and lazily resolved gates within one synchronous graph build, with no persistent cache or geometry change. All 1,555 unique checks, native 150-day history/speed comparison, worker/own-save continuation and two one-year conservation worlds are verified; detailed evidence is below. Storage history deliberately changes; the fort optimization and castle consolidation preserve the contemporary model exactly. Legal opening capacity (#61) is next; general abbeys and annual instant castle upgrades remain unfinished.
+- **Current validated phase (2026-10-11):** the game is renamed **Castle and Commons**. Direct-era starts now complete native residential fabric against actual household heads before refreshing layout extents and generating land. Burgher setbacks clear their own frontage under the unchanged road-overlap rule. Remaining local shortfalls are exposed as measured opening housing notes; #61 is partial, not closed. AD 850 retains its original branch. All 1,557 unique suite checks are verified across the initial unaffected results and the affected-file rerun at original deadlines. Native 150-day history/all-speed and checkpoint continuation, worker/reference own-save/view purity, and two one-year cash/goods/fault gates pass. Food calibration remains open. Final drawing and publication evidence follows below.
+- **Published predecessor:** game commit `877bb31` contains shared castle/storage actual paid construction and exact operation-local fort-route reuse. Documentation release `0d142af` follows it; workflow 38099042153 passes Pages and container jobs, with live HTML SHA256 `46bb5e12cac1b18d1a3e45c136e078a0553cd305a62aa22aff2df1efe496bf1f`. This is the actual AD 850 comparison baseline for the new candidate.
+- **Capacity evidence:** eight fresh uninstrumented native openings (850/1066/1250/1350, seeds 1001 and 42, fate 42/sea) pass chronology and exact physical-capacity reporting. All six direct openings repeat without building/street/slot/RNG changes and lodge every head without overflow in complete settlements. Local shortages remain. A separate native Bourport diagnostic proves its market-edge outline has no public street or road seed (#65), not fort clipping. Current results and the next source design are in [DIRECT-ERA-CAPACITY.md](DIRECT-ERA-CAPACITY.md) and [ISOLATED-TOWN-OPENING-STREET-DESIGN.md](ISOLATED-TOWN-OPENING-STREET-DESIGN.md).
 
-- **Published game phase:** commit `877bb31` is on `main`; workflow 38097699070 passes both Pages and container jobs. At that deployment, live Pages HTML matches the stamped/drawn SHA256 `895d4b74c4b11d4d451e5a7f6504e3ce55276b9099435de08002a93c4012e0e1`. The subsequent capacity evidence update changes documentation/build metadata only.
-- **Capacity continuation:** eight native private opening censuses pass reporting/chronology and direct-era idempotence, but substantial local shortages remain. Two bounded diagnostics identify burgher road-clearance mismatch (#64), changed native extent quantiles before land generation, and one town with no usable street network. These findings and the next source order are recorded in `DIRECT-ERA-CAPACITY.md`. The refined patch remains private and needs fresh batched gates; the predecessor census is not a release proof.
+- **Screenshot refresh (2026-10-11):** the README shows two new native 1920×1080 Spring 4, AD 1068 views with **Castle and Commons** visible: Vadoreal’s bridge/riverside streets and Campoolmo’s timber motte-and-bailey beside the town (42:42 sea). The world starts directly at 1068 and advances three ordinary simulation days; no assets, weather, time or model state are inserted for the images. Camera framing/pitch, labels and dismissal of UI notices are the capture controls. The selected images have no open cards or event bubbles. Source evidence and error-free textured frames are in `tools/soak-results/castle-commons-capacity-20261011/screenshots-release/`.
 
-- **Screenshot refresh (2026-10-10):** the README now shows two native 1920×1080 Spring 4, AD 1068 views: Vadoreal’s bridge/riverside streets and Campoolmo’s timber motte-and-bailey beside the town (42:42 sea). The world starts directly at 1068 and advances three ordinary simulation days; no assets, weather, time or model state are inserted for the images. Only camera framing/pitch and labels change for capture. Source evidence and error-free rendered frames are in `tools/soak-results/screenshots-1068-20261010/`; exact source and focused documentation checks follow below.
-
-The user selected **Crown & Commons** as the game name on 2026-10-10. The current
-release updates visible titles and advisor descriptions; repository/deployment
-URLs, internal APIs and save formats retain their existing compatibility names.
+The user renamed the game **Castle and Commons** on 2026-10-11. The current
+candidate updates visible titles, README/help and advisor descriptions;
+repository/deployment URLs, internal APIs and save formats retain their existing
+compatibility names. The previous published title was Crown & Commons.
 
 - **Direct-era release (2026-10-10):** Crown & Commons defaults to AD 1066; AD 850 retains the original sparse founding path, and later accepted start years generate their opening world directly without prehistory ticks. Construction has a pure calendar capability seam (current stone-keep gate 1070, proposal 1080 pending #44) and conservative foundation bounds with exact geometry authority. Cold settlement/toll/road inspections now avoid ownership, shoreline, prominence and building-name/sign writes; simulation-side behavior is unchanged.
-- **Release evidence:** all 1,549 unique checks verified (full batch 1,548 plus the reviewed UI-search inventory gate rerun); native 150-day same-speed/history comparisons preserve complete logical graphs, every RNG stream and all 1,812 raw accepted events. The final inspector revision uses no source/value normalization. All 42 native cold-opening summary/detail, toll-building and road queries preserve world/RNG. Worker/reference state, ten selected views, and 75+75-day continuations from each driver's own save match; their views leave world/RNG/commands/annals/settings/storage sequence unchanged. Three one-year direct-opening worlds at 1066/1250/1350 pass whole-day cash/goods and fault checks. Tested HTML `cdb06152f4e563f45801694b91f3988987ce8a006494c89f8f409b533f65d45f`; final stamped/drawn evidence follows below.
-- **Next:** gate the revised legal opening housing-capacity completion (#61/#64), then further exact foundation-survey work (#15) and genuine land-payment recipients (#63). The private `/workspace/issue61-opening-capacity.patch` uses native residential fabric and actual headed-household demand, retains the AD 850 initialization branch, corrects burgher setback, refreshes native extent quantiles before land generation, and reports only measured unmet opening demand. Its predecessor has eight native opening censuses; the revised model has seven focused geometry/presentation checks, syntax and clean patch checks only. Fresh generation, AD 850 data/history regression, speed, worker, save and conservation gates remain to run in one serialized batch. General compound composition and abbeys require real endowed title, income and staffing (#35); existing castle upgrades remain annual instant work. Inspector purity coverage is target-specific (#27), and first-year economy calibration and century-scale throughput remain open.
+- **Historical direct-era release evidence (not this capacity candidate):** all 1,549 unique checks verified (full batch 1,548 plus the reviewed UI-search inventory gate rerun); native 150-day same-speed/history comparisons preserve complete logical graphs, every RNG stream and all 1,812 raw accepted events. The final inspector revision uses no source/value normalization. All 42 native cold-opening summary/detail, toll-building and road queries preserve world/RNG. Worker/reference state, ten selected views, and 75+75-day continuations from each driver's own save match; their views leave world/RNG/commands/annals/settings/storage sequence unchanged. Three one-year direct-opening worlds at 1066/1250/1350 pass whole-day cash/goods and fault checks. Tested HTML `cdb06152f4e563f45801694b91f3988987ce8a006494c89f8f409b533f65d45f`; final stamped/drawn evidence follows below.
+- **Next:** implement the recorded isolated-town local street seed (#65), with native fit/access authority and fresh batched gates. Further exact foundation-survey work (#15) and genuine land-payment recipients (#63) follow. The source audit confirms first-foundation fit/occupancy checks dominate its sampled cost; a proposed successful-site per-call ground-result reuse cannot remove repeated failed surveys. General compound composition and abbeys require real endowed title, income and staffing (#35); existing castle upgrades remain annual instant work. Inspector purity coverage is target-specific (#27), and first-year economy calibration and century-scale throughput remain open.
 
 - **README publication (2026-10-10, `55f1eca`):** the browser play link is directly below the title, with two native screenshots from the previously verified build in `assets/screenshots/`. Embedded advisor rules match the README; seven focused advisor/source checks pass and the executable scripts are byte-identical to `5b3f2f8`. GitHub Pages and container workflow 38076759405 succeeded; live HTML matches the commit (`8155d50486c1655f0fb64749791144a4e22b50c9b144445d28cec7f9ac514fae`). Castle foundation code remained outside this documentation-only release while its gates ran.
 
@@ -1198,7 +1198,7 @@ navigation; a stricter wait then stalled on the game's normalized startup hash.
 The final harness waits for the requested world, origin and loaded renderer;
 no game code changed for either harness correction.
 
-### Opening-capacity evidence update (2026-10-11)
+### Historical documentation-only opening-capacity evidence release (0d142af, 2026-10-11)
 
 The private predecessor census and revised geometry/extent patch are recorded in
 `DIRECT-ERA-CAPACITY.md`; neither capacity version enters this release. This
@@ -1211,3 +1211,51 @@ gates above therefore apply to the unchanged executable. Updated HTML SHA256
 `46bb5e12cac1b18d1a3e45c136e078a0553cd305a62aa22aff2df1efe496bf1f`.
 Deployment verification is recorded separately in the ignored
 `tools/soak-results/opening-capacity-20261011/docs-release-verification.json`.
+
+### Castle and Commons: native opening-capacity release (2026-10-11)
+
+Direct-era initialization now derives resources, generates native households,
+completes legal physical homes against actual heads, refreshes native extents,
+then generates land, trees, tracks and gates. AD 850 keeps its original branch.
+Burgher frontage uses the same clearance margin as ordinary houses. The opening
+report exposes local unmet demand; it neither alters population nor invents
+capacity or construction payments. #61 remains partial; the isolated-town street
+seed (#65) is the next recorded source slice.
+
+All 1,557 unique suite checks are verified across the initial unaffected batch
+results and five affected-file reruns at unchanged limits. The initial full run
+had one concurrent VM timeout and four genuine layout-maker loading failures;
+the loading repair restores optional opening methods from saved maker paths
+before W is installed. No save format or persisted context field changes.
+The AD 850 150-day comparison preserves full graph data/identity/order, every
+RNG stream and all 1,812 raw accepted outcomes against `0d142af`; only the
+captured `buildLot` function source intentionally differs. The AD 1066 all-seven-
+speed comparison preserves complete logical graphs including function source,
+daily digests and all 1,812 raw outcomes. A native day-37 binary checkpoint
+continues exactly through day 150, including its 1,356 subsequent raw outcomes.
+All 154 cold inspections preserve world and RNG.
+
+Real browser worker/reference, each driver's own classic-save continuation
+(75+75 days), ten selected views and view purity pass. Two one-year direct
+worlds (1066/1001 and 1350/42, fate42/sea) pass cash, goods and fault checks,
+with zero money residuals and 722 inventory checks each. Their famine shares
+remain 22.29%/9.21% and populations decline; #12/#23 remain open. These are
+operability/conservation gates, not food calibration or throughput success.
+CPU/load and exact source scopes are in [DIRECT-ERA-CAPACITY.md](DIRECT-ERA-CAPACITY.md).
+
+Corrected frozen HTML SHA256
+`4ac21efbf4d39bcd399a899b458d3ecca8d7476cf4c3c21964f77f5e11aa753f`;
+stamped/drawn HTML SHA256
+`d676cdf4accea463c2a9f2a9edffa37292e5e1769305a5e599dac70ff865c327`.
+Only the build stamp changes between them; executable game SHA256 remains
+`33ab11a241ddfae0b7389039aa9eb81314742569eac98e20c51a3660acce23a9`.
+All 19 post-stamp source/advisor/frontage/presentation/search checks pass.
+Drawn native day-zero AD 1066/default and AD 1350 worlds show correct years
+and capability gates, roads, geometry and a loaded texture atlas. Native AD 1068
+README captures advance three days, show the new brand and actual timber motte,
+and have no open cards/bubbles. Both capture reports have zero runtime, console
+or worker faults. These use software WebGL, not Safari or hardware performance.
+
+Ignored evidence: `tools/soak-results/castle-commons-capacity-20261011/`, including
+`drawn-release/report.json`, selected `screenshots-release/report.json` and
+`release-verification.json` for the pushed commit/deployment identities.

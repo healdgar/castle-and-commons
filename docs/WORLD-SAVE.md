@@ -46,7 +46,7 @@ Property order, flags, frozen and non-extensible objects, null prototypes, holes
 No closure is stored. Every function in the world must be one a maker or binder makes, or the save fails and names its path. The loader checks each made function's source against the saved hash.
 
 - **Makers**, run over placeholders before the world is filled:
-  - `layoutSettlement(s,saved)`, given a saved context, makes a place's closures over it and lays nothing out: `s._lay`, its `live` operations, its spatial hashes and RNG, the context's `TRADES`;
+  - `layoutSettlement(s,saved,openingMethods)`, given a saved context, makes a place's closures over it and lays nothing out: `s._lay`, its `live` operations, its spatial hashes and RNG, the context's `TRADES`. Opening completion/extent methods are restored from that maker's saved closure paths; reconstruction does not read the world before it is installed;
   - `makeHash(cs)` makes `W.rivHash` and `W.treeHash` (the cell size is kept on `near.cell`);
   - `ownershipLard(s)` makes the old larder's Proxy.
 - **Binders**, run on the filled world:
@@ -74,14 +74,14 @@ Caches outside the world fill again as they are asked. Each gives what a fresh c
 
 ## Verified
 
-`tools/world-save.test.mjs`, on 42 sea and 1001 sea:
+`tools/world-save.test.mjs`, on founding 42 sea and 1001 sea, plus forced-1166 eyre and paid-first-castle fixtures:
 
 1. Plays 37 days in one worker realm and saves.
 2. Loads into a fresh worker realm.
 3. Requires:
    - the loaded world captures equal to the saved one (`captureExpression()`: world graph with closures' source text, RNG streams, annals, commands, storage journal);
    - saving it again gives the same bytes;
-   - every one of 23 more days is the same day in both realms.
+   - every one of 55 more days is the same day in both realms (90 for the paid-first-castle fixture).
 
 On 2026-10-08, 42 sea at day 37 measured:
 
@@ -91,13 +91,23 @@ On 2026-10-08, 42 sea at day 37 measured:
 | Save | 2 s CPU |
 | Load | 2.4 s CPU, against about 6 s to generate the world and 6 s to play the 37 days |
 
+The 2026-10-11 opening-capacity release also verifies a native direct AD 1066,
+1001:42 sea checkpoint at day 37. Its 21,000,348-byte document loads and
+re-saves identically in a fresh Node realm, then continues through day 150 with
+the complete logical graph, all RNG streams and all 1,356 subsequent binary-hashed
+accepted raw outcomes equal to the uninterrupted run. The layout maker restores
+its opening methods from its saved closure paths before installing the world.
+This is separate from browser classic-save replay; the browser worker still
+does not load binary world checkpoints. Source identities and measurement scope
+are in [DIRECT-ERA-CAPACITY.md](DIRECT-ERA-CAPACITY.md).
+
 ## Not yet
 
 - **The browser:** the worker's `init` still resumes by replay.
-  - `RawOutcomeJournal` (the worker's journal) is untried.
+  - `RawOutcomeJournal` checkpoint continuation is verified in the native Node probe above; loading a checkpoint with it in the browser worker is untried.
   - The IndexedDB storage-outcome archive of a loaded world starts afresh (`continuation:false`).
   - The full history recorder (`history=full`) is not carried over.
 - **Untried:**
   - closures that first appear later in a game fail the save loudly;
-  - worlds past day 60.
+  - saving a mature world after day 60 (the verified continuations run beyond that day).
 - **Size:** coordinates and terrain floats are most of the document; derivable data (tree spots, cached routes) is kept as it is.

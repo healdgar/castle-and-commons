@@ -95,3 +95,21 @@ test('card names preserve native sign uniqueness and recorded names without nami
   const inspector=source.slice(source.indexOf('function inspectorCard('),source.indexOf('\nfunction inspectorPickCode'));
   assert.doesNotMatch(inspector,/buildingName\(/);assert.match(inspector,/const name=detailNaming\(\)/);assert.match(inspector,/detailSettlement\(s,name\)/);assert.match(inspector,/detailHousehold\(s,p,name\)/);
 });
+
+test('opening-capacity failure note reads the stored worker result and projects only exhausted sites',()=>{
+  const record=Object.freeze({capacity:4,goal:7,complete:false,exhausted:true}),town=Object.freeze({name:'Town',openingCapacity:record});
+  const ctx=vm.createContext({});
+  vm.runInContext(extract('openingCapacityNote'),ctx);
+  assert.equal(ctx.openingCapacityNote(town),'At opening, 4 household places could be fitted for 7 households.');
+  assert.equal(ctx.openingCapacityNote(Object.freeze({openingCapacity:Object.freeze({capacity:7,goal:7,complete:true,exhausted:false})})), '');
+  const inspector=source.slice(source.indexOf('function inspectorCard('),source.indexOf('\nfunction inspectorPickCode'));
+  assert.match(inspector,/const note=openingCapacityNote\(s\);if\(note\)h\+=row\('Opening housing',note\)/);
+  assert.match(source,/\['Population','Unrest','Opening housing'\]\.includes\(r\.firstElementChild\?\.textContent\)/);
+  const projection=source.slice(source.indexOf('function visualSettlement('),source.indexOf('\nfunction visualField('));
+  assert.match(projection,/visualRecord\(s,'[^']* openingCapacity',m\)/);
+  assert.match(source,/const report=\{si,heads:heads\.size,\.\.\.result\};W\.openingCapacity\.push\(report\);if\(report\.exhausted\)s\.openingCapacity=report/);
+  assert.match(source,/const refreshExtent=\(\)=>\{s\.extentR=extent\(0\.92\);s\.radius=s\.extentR\+30;if\(!s\.wallRad\)s\.wallR=s\.extentR\+20;s\.paveR=isVil\?0:extent\(0\.45\);\}/);
+  assert.match(source,/s\._lay\?\.refreshExtent\?\.\(\);\s*const report=/);
+  assert.match(source,/completeResidential,refreshExtent/);
+  assert.doesNotMatch(source,/s\.coreR\s*=\s*extent/);
+});

@@ -1,4 +1,4 @@
-# Crown & Commons
+# Castle and Commons
 
 ## [▶ Play in your browser](https://healdgar.github.io/furlong-kingdom-annals/)
 
