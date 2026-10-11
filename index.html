@@ -4146,9 +4146,9 @@ function learningSchoolsHTML(){const T=learningState();let h='<div class="dhead"
 /* CRAFT LADDER (#43): one native person, one job; shops, contracts and guild
    chests are paid from actual takings. Opening craftsmen inherit their existing
    occupation, while every subsequent premium has a living local recipient. */
-function institutionalJobHeld(p){return !!p&&!p.dead&&(!!p.estateOffice||!!p.abbeyJob||!!p.outlawCampId||!!p.role&&p.abbey==null||p.schoolMaster!==undefined||p.tutorMaster!==undefined||!!p.office&&p.office!=='warden'||!!p.study&&!p.study.closed||!!p.apprentice&&!p.apprentice.closed||p.craft?.employer!=null);}
+function institutionalJobHeld(p){return !!p&&!p.dead&&(!!p.estateOffice||!!p.abbeyJob||p.portHealthJob!==undefined||!!p.outlawCampId||!!p.role&&p.abbey==null||p.schoolMaster!==undefined||p.tutorMaster!==undefined||!!p.office&&p.office!=='warden'||!!p.study&&!p.study.closed||!!p.apprentice&&!p.apprentice.closed||p.craft?.employer!=null);}
 const CRAFT_TRADES=new Set(['smith','baker','butcher','brewer','cook','miller','carpenter','mason','thatcher','cooper','potter','weaver','dyer','tailor','shoemaker','tanner','glover','chandler','merchant','spicer','roper','salter','wheelwright','bowyer','fletcher']);
-function craftPresent(s,p){return !!p&&!p.dead&&!p.role&&!p.outlawCampId&&W.settlements[p.si]===s&&!(p.away&&day()<p.away.until)&&!p.estateOffice&&!p.abbeyJob&&p.schoolMaster===undefined&&p.tutorMaster===undefined&&(!p.office||p.office==='warden')&&(!p.study||p.study.closed);}
+function craftPresent(s,p){return !!p&&!p.dead&&!p.role&&!p.outlawCampId&&W.settlements[p.si]===s&&!(p.away&&day()<p.away.until)&&!p.estateOffice&&!p.abbeyJob&&p.portHealthJob===undefined&&p.schoolMaster===undefined&&p.tutorMaster===undefined&&(!p.office||p.office==='warden')&&(!p.study||p.study.closed);}
 function craftIndex(s,pure=false){const revision=W._folkRevision||0,y=year(),old=s._craftIndex;if(!pure&&old&&old.revision===revision&&old.year===y)return old;
   const I={revision,year:y,heads:[],young:[],trades:new Map(),rooms:new Map()};for(const p of s.folk||[]){if(p.dead||p.outlawCampId)continue;const a=ageYrs(p);if(a>=14&&a<24&&!p.trChosen)I.young.push(p);if(p._hh?.head!==p||a<18)continue;I.heads.push(p);if(CRAFT_TRADES.has(p.tr)){const L=I.trades.get(p.tr)||[];L.push(p);I.trades.set(p.tr,L);}}
   for(const b of s.buildings||[])if(!b.removed&&b.state==='sound'){const L=I.rooms.get(b.arch)||[];L.push(b);I.rooms.set(b.arch,L);}return pure?I:(s._craftIndex=I);
@@ -11443,6 +11443,7 @@ function inspectorCard(pk,full=false){
     if(s.siegeBy)h+=row('Under siege by',s.siegeBy.houseName);
     if(s.ruinCount)h+=row('Ruins',s.ruinCount);
     if(s.quarantineUntil>day())h+=row('Gates','sealed until '+dateStr(s.quarantineUntil));
+    {const H=portHealthHTML(s);if(H)h+=row('Harbor isolation',H);}
     if(full)h+=detailSettlement(s,name);
     if(s.history&&s.history.length)h+=`<section class="detail-section" id="detail-history" aria-labelledby="detail-history-title"><h4 class="dhead" id="detail-history-title">History</h4><div class="agline">${s.history.map(x=>(x.yr?`<i>AD ${W.startAD+x.yr-1}:</i> `:x.ago?`<i>c. ${x.ago} years before the annals:</i> `:'')+esc(x.t)).join('<br>')}</div></section>`;
     flyToBtn(fb,'Visit',()=>flyTo(s.pos.x,s.pos.z,s.kind==='capital'?520:340));
@@ -11543,6 +11544,7 @@ function inspectorCard(pk,full=false){
     sub.textContent=W.settlements[c.origin].name+' → '+W.settlements[c.dest].name;
     h+=row('Cargo',c.good+' × '+Math.round(c.qty));
     h+=row('Value',Math.round(c.value)+' gold');
+    {const Q=portQuarantineSummary(c);if(Q)h+=row('Harbor isolation',Q.holding?`${Q.served} supported days · release ${dateStr(Q.until)} · ${Q.wages.toFixed(1)} attendant wages, ${Q.demurrage.toFixed(1)} delay expenses${Q.lost?'; '+Q.lost.toFixed(1)+' cargo spoiled':''}`:esc(Q.reason));}
     if(c.crew)h+=row(c.sea?'Master':c.river?'Bargeman':'Carter',`<a class="pp" data-pid="${c.crew.id}">${esc(folkName(c.crew))}</a> of ${esc(W.settlements[c.origin].name)}`);
     flyToBtn(fb,'Follow',()=>{markManual();cam.follow=c;cam.dist=140;});
   }else if(pk.type==='land'){
@@ -13669,14 +13671,14 @@ function ladeOut(c,o,quiet,actors){ladeOut.why=null;const mode=c.sea||c.river?'b
   c.qty=got;storageCargoOut(c,o,true);c.value*=got/want;c.fee=freight(o,got,c.len,mode);c.drv=drv;c.crew=drv;if(m!=='out'&&m.gn!==undefined)m._inc=(m._inc||0)-c.cost; // his outlay
   const travelFactor=technologyTravelFactor(o,drv,c.sea?'sea':mode),hull=c.sea?technologyEffect(o,'cog',drv)*technologyEffect(o,'carrack',drv):1;c.arriveDay=c.departDay+(c.arriveDay-c.departDay)/travelFactor;c.fee/=hull;const trip=Math.max(0.5,c.arriveDay-c.departDay),dest=W.settlements[c.dest];drv.away={until:c.arriveDay+trip,what:`${c.sea?'master of a cog':c.river?'on a barge':'carting'} ${c.good} to ${dest?dest.name:'market'}, and back`};
   (o._loads||(o._loads={}))[mode]=(o._loads[mode]||0)+1;
-  life(drv,`${mode==='cart'?'Carted':'Shipped'} ${Math.round(got)} ${c.good} from ${o.name} to ${dest?dest.name:'market'}${m!==drv&&m!=='out'?' for '+folkName(m):''}`);if(m!=='out'&&m!==drv)life(m,`Sent ${Math.round(got)} ${c.good} to ${dest?dest.name:'market'}`);return c;}
+  if(c.sea)portPlagueDeparture(c,o);life(drv,`${mode==='cart'?'Carted':'Shipped'} ${Math.round(got)} ${c.good} from ${o.name} to ${dest?dest.name:'market'}${m!==drv&&m!=='out'?' for '+folkName(m):''}`);if(m!=='out'&&m!==drv)life(m,`Sent ${Math.round(got)} ${c.good} to ${dest?dest.name:'market'}`);return c;}
 function ladeIn(c,d){if(typeof technologyContact==='function')technologyContact(W.settlements[c.origin],d);let m=c.m||'out';if(m!=='out'&&m.dead)m=lordAcct(W.settlements[c.origin]); // a merchant who died on the road: his goods to his lord
   const val=c.cost||0,lord=d.owner>0&&!inRevolt(d.owner)?W.houses[d.owner]:null;let dues=payTolls(c,m,val); // dues on what the goods cost him, not on a price no one may pay: first the pontage and pavage at each toll house it passed
   if(lord||d.commune){const tl=transfer(m,d.commune?d:lord,val*0.05*(d.works&&d.works.market?1.6:1),'markets',d);dues+=tl;d._marketToll=(d._marketToll||0)+tl;if(!d.commune)lordTake(d,tl);dues+=transfer(m,'crown',val*(MOD.tax/100)*0.14,'Trade tax',d);} // the market toll and the crown's aid, on what is brought to sell
   else dues+=transfer(m,'crown',val*(MOD.tax/100)*0.35,'Trade tax',d);
   const drv=c.drv&&!c.drv.dead?householdHead(c.drv):null;if(c.fee>0&&drv&&drv!==m)transfer(m,drv,c.fee,'freight'); // the carter is paid on delivery
   if(m!=='out'&&m.gn!==undefined)m._inc=(m._inc||0)-dues-(drv!==m?c.fee||0:0);
-  const unit=((c.cost||0)+(c.fee||0)+dues)/Math.max(1e-6,c.qty);if(c.commodityArrived){const who=c.m||'out';reserveAt(d,c.good,who,Math.max(0,(mkt(d,c.good).get(who)||0)-c.qty),c.qty,unit);}else offer(d,c.good,m,c.qty,unit);} // he sells as the town buys, never below what the load cost him laid down here: the price, the freight, the tolls // he sells in the market as the town buys, but not below what the load cost him
+  const unit=((c.cost||0)+(c.fee||0)+dues+(c.portQuarantine?.demurrage||0))/Math.max(1e-6,c.qty);if(c.commodityArrived){const who=c.m||'out';reserveAt(d,c.good,who,Math.max(0,(mkt(d,c.good).get(who)||0)-c.qty),c.qty,unit);}else offer(d,c.good,m,c.qty,unit);} // he sells as the town buys, never below what the load cost him laid down here: the price, the freight, the tolls // he sells in the market as the town buys, but not below what the load cost him
 /* the crafts buy the stuff they work, and the town its tools and the rich their spices, from whoever offered it */
 /* =========================================================================
    THE MARKET, monthly. What was made this month is offered by those who made it (the harvest split by
@@ -14115,29 +14117,89 @@ function tickSpoilage(){for(const s of W.settlements){const phaseK=commodityActi
   for(const g of GOODS)if(LU[g]===undefined)spoilOwned(s,g,g==='fish'&&tradeCounts(s).salter?SPOIL.fish*0.1:SPOIL[g]||0,phaseK);}} // carriage has put today's output under cover
 const STORAGE_INVESTMENT_NATIVE={quote:storageSiteQuote,sites:storageInvestmentSites,land:planLand,price,means,route:storageRoute,access:storageAccess,graph:streetGraph,near:storageRoadNear,door:serviceDoor,footprint:streetFootprintOverlap,roadPlan:storageRoadPlan,obstacle:armyObstacle,segment:armySegmentClear,frontage:streetAccessAt,road:roadAccessClear,onRoad,track:trackAt,landPrice,landValue,nearest:nearestBuildingDist,price0,titleEvent:storageTitleEvent,legacyEvent:StorageLedger.prototype.event,commodityEvent:CommodityBalanceLedger.prototype.event};
 function tickStorageInvestment(){for(const s of W.settlements)storageInvestment(s);} // new commissions start work tomorrow
+/* PORT_QUARANTINE_BEGIN */
+/* Ragusa's 1377 trentina: thirty actual supported days offshore, not an instant cure. The native
+   SIR is a town aggregate; a load carries an observed source outbreak, not invented sick sailors.
+   Only coastal consignments with named native crews use this client. Anonymous foreign ships
+   have neither a disease observation nor a named crew and cannot truthfully enter it yet. */
+const PORT_HEALTH_TERM=30; // a dated world custom, distinct from the player's existing gate closure
+function portPlagueDeparture(c,o,observedAt='departure'){if(c.sea&&!c.plagueDeparture)c.plagueDeparture={source:c.origin,day:day(),observedAt,infected:Math.max(0,o.infected||0),population:Math.max(1,o.pop||0),exposed:(o.infected||0)/Math.max(1,o.pop||0)>.02};}
+function portHealthPerson(id){return (W._pm||folkIndex()).get(id)||null;}
+function portHealthPayer(s){return townCourtAccount(s);}
+function portHealthWage(s,p){return Math.max(Math.max(1,householdSize(s,p))*foodYr()/360*1.5,Math.max(0,tradeIncome(s,p.tr))/360);} // a keeper's family bread and a half or the trade he forgoes; paid from the actual harbor authority's spare chest
+function portHealthCandidate(s){let best=null;for(const p of workers_(s,p=>!p.office&&p.portHealthJob===undefined&&!p.own&&!p.wk&&p.status!=='villein'&&!awayNow(p)&&ageYrs(p)>=18&&ageYrs(p)<65&&((p.sk?.[KL]||0)>=.2||['boatman','fisher'].includes(p.tr)))){if((s.furl||[]).some(f=>f.own===p.id||f.wk===p.id))continue;if(!best||portHealthWage(s,p)<portHealthWage(s,best)||portHealthWage(s,p)===portHealthWage(s,best)&&((p.sk?.[KL]||0)>(best.sk?.[KL]||0)||(p.sk?.[KL]||0)===(best.sk?.[KL]||0)&&p.id<best.id))best=p;}return best;}
+function portHealthCrew(c){const p=c.drv||c.crew;return p&&!p.dead?p:null;}
+function portHealthDelay(c,p){if(!c.m||c.m==='out'||accountOwner(c.m)===accountOwner(p))return 0;const s=W.settlements[p.si];return Math.max(1,householdSize(s,p))*foodYr()/360;} // extra absence, paid daily; the original freight is still paid only on delivery
+function portHealthExpectedLoss(s){return Math.max(0,s.pop||0)*foodYr()*.28*Math.max(0,MOD.leth||0)*clamp(.35*Math.max(0,MOD.vir||0),0,1);} // one year's bread per expected plague death: explicit #44 decision calibration, no income or cure
+function portHealthQuote(s,c=null){
+  if(!s?.harbor||s.siegeBy||!institutionalCapability(s,'quarantine').available)return null;
+  const A=portHealthPayer(s),p=portHealthCandidate(s);if(!p)return null;const wage=portHealthWage(s,p),cost=wage*PORT_HEALTH_TERM;
+  if(roadSpare(A,s)+1e-9<cost)return null;
+  if(!c)return {payer:A,attendant:p,wage,cost};
+  const crew=portHealthCrew(c),source=c.plagueDeparture;if(!c.sea||!c.storageCargo||!commodityActive(c.storageCargo.origin)||c.robbed||!(c.qty>0)||!crew||crew.away?.portHold!==undefined||institutionalJobHeld(crew)||!source?.exposed||s.infected>=1||!c.m||c.m==='out'||c.m.dead)return null;
+  const delay=portHealthDelay(c,crew),merchant=accountOwner(c.m),ms=W.settlements[c.m.si]||W.settlements[c.origin];if(roadSpare(merchant,ms)+1e-9<delay*PORT_HEALTH_TERM)return null;
+  const spoil=(c.qty||0)*(1-Math.pow(Math.max(0,1-(SPOIL[c.good]||0)),PORT_HEALTH_TERM))*price(s,c.good),benefit=portHealthExpectedLoss(s);
+  if(!(benefit>cost+delay*PORT_HEALTH_TERM+spoil))return null;
+  return {payer:A,attendant:p,crew,wage,cost,delay,benefit,spoil};
+}
+function portHealthRecord(s,c,reason){const H=s.portHealth,Q=c.portQuarantine;const row={day:day(),origin:c.origin,good:c.good,since:Q.since,until:Q.until,served:Q.served,completed:!!Q.completed,wages:Q.wages||0,demurrage:Q.demurrage||0,lost:Q.lost||0,reason};(H.roll||(H.roll=[])).push(row);if(H.roll.length>8)H.roll.shift();}
+function portHealthRelease(s,c,reason,completed=false){const H=s?.portHealth,Q=c?.portQuarantine;if(!H||!Q||Q.released!==undefined)return;Q.released=day();Q.reason=reason;Q.completed=!!completed;portHealthRecord(s,c,reason);
+  const p=portHealthPerson(Q.attendant);if(p&&p.portHealthJob===Q.si){delete p.portHealthJob;if(p.office==='healthAttendant'&&p.officeFor==='port:'+Q.si){delete p.office;delete p.officeFor;if(p.role==='harbor attendant')delete p.role;}}
+  const crew=portHealthCrew(c);if(crew?.away&&crew.away.portHold===Q.crewAwayKey){const trip=Math.max(.5,c.arriveDay-c.departDay);crew.away.until=day()+trip;delete crew.away.portHold;}
+  if(H.hold===c){H.hold=null;H.attendant=null;}householdHeadsChanged(s);if(typeof technologyActorsDirty==='function')technologyActorsDirty(s);G.detDirty=true;
+}
+function portCargoSpoil(c,Q){const cargo=c.storageCargo,K=cargo?.origin.storage,rate=Math.min(1,Math.max(0,SPOIL[c.good]||0)),before=c.qty;if(!K||!commodityActive(cargo.origin)||!(rate>0))return;let lost=0;
+  for(const row of [...K.entries({location:cargo.id})]){const q=K.consume(row,row.qty*rate,'port-quarantine-spoilage');lost+=q;commoditySpoiled(K,row.good,row.owner,row.availability,q,row.qty-q);}
+  Q.lost=(Q.lost||0)+lost;if(before>0)c.value*=Math.max(0,(before-lost)/before);
+}
+function portHealthServe(s,c){const H=s.portHealth,Q=c.portQuarantine,p=portHealthPerson(Q.attendant),crew=portHealthCrew(c),A=portHealthPayer(s);
+  if(Q.released!==undefined)return false;
+  if(day()>=Q.until){portHealthRelease(s,c,Q.served>=PORT_HEALTH_TERM?'the thirty supported days were served':'the isolation term was not fully supported',Q.served>=PORT_HEALTH_TERM);return false;}
+  let reason=!H.enabled?'the harbor policy was stopped':H.authority!==s.owner||A!==Q.payer?'the harbor authority changed':!institutionalCapability(s,'quarantine').available?'local quarantine practice is unavailable':s.siegeBy?'the harbor is under siege':s.infected>=1?'an existing local outbreak makes this arrival hold ineffective':!p||p.dead||p.si!==Q.si||awayNow(p)||p.portHealthJob!==Q.si||p.office!=='healthAttendant'?'the attendant is unavailable':c.gone||c.robbed||!crew||!(c.qty>0)?'the crew or cargo was lost':!c.m||c.m==='out'||c.m.dead?'the merchant is unavailable':null;
+  if(reason){portHealthRelease(s,c,reason);return false;}
+  if(Q.paidDay===day())return true;
+  const M=accountOwner(c.m),ms=W.settlements[c.m.si]||W.settlements[c.origin],delayDue=M===accountOwner(crew)?0:Q.delay;if(roadSpare(A,s)+1e-9<Q.wage||roadSpare(M,ms)+1e-9<delayDue){portHealthRelease(s,c,'the authority or merchant can no longer pay');return false;}
+  const wage=transfer(A,p,Q.wage,'harbor isolation wages',s),delay=delayDue>0?transfer(c.m,crew,delayDue,'coastal delay expenses',s):0;Q.wages+=wage;Q.demurrage+=delay;Q.paidDay=day();
+  if(wage+1e-9<Q.wage||delay+1e-9<delayDue){portHealthRelease(s,c,'the actual daily payment fell short');return false;}
+  Q.served++;portCargoSpoil(c,Q);c.halted=true;G.detDirty=true;return true;
+}
+function portQuarantine(c,s){if(c.portQuarantine)return portHealthServe(s,c);if(!c.sea||!s?.harbor||c.robbed||!c.plagueDeparture?.exposed)return false;
+  const H=s.portHealth;if(H?.enabled===false||H?.hold)return false;const Q=portHealthQuote(s,c);if(!Q)return false;
+  const si=W.settlements.indexOf(s),h=s.portHealth||(s.portHealth={enabled:true,authority:s.owner,attendant:null,hold:null,roll:[]}),p=Q.attendant;
+  h.authority=s.owner;h.attendant=p.id;h.hold=c;p.portHealthJob=si;p.office='healthAttendant';p.officeFor='port:'+si;p.role='harbor attendant';householdHeadsChanged(s);if(typeof technologyActorsDirty==='function')technologyActorsDirty(s);
+  c.portQuarantine={si,attendant:p.id,payer:Q.payer,since:day(),until:day()+PORT_HEALTH_TERM,served:0,wage:Q.wage,delay:Q.delay,wages:0,demurrage:0,lost:0,crewAwayKey:'port:'+si+':'+(c.storageCargo?.id||[c.origin,c.dest,c.departDay,c.good].join(':')),source:{...c.plagueDeparture},benefit:Q.benefit};
+  const away=Q.crew.away||(Q.crew.away={what:'a coastal consignment held outside '+s.name});away.until=Math.max(away.until||0,c.portQuarantine.until+Math.max(.5,c.arriveDay-c.departDay));away.portHold=c.portQuarantine.crewAwayKey;
+  return portHealthServe(s,c);
+}
+function portHealthPrepare(){let live=null;for(const s of W.settlements){const c=s.portHealth?.hold;if(!c)continue;live||=new Set(W.caravans);if(!live.has(c)||c.gone||c.robbed)portHealthRelease(s,c,'the held consignment no longer exists');}}
+function tradePlague(c,d){if(c.portQuarantine?.completed)return;const o=W.settlements[c.origin],exposed=c.sea?!!c.plagueDeparture?.exposed:(o.infected||0)/Math.max(1,o.pop||0)>.02;if(exposed&&d.infected<1&&chance('sim',.35*MOD.vir)){d.infected+=3;emit('fates',7,d.pos,`The pestilence has come to ${d.name}, borne on the ${c.sea?'tide':'road'} from ${o.name}.`);plagueArrives(d);}}
+function portQuarantineSummary(c){const Q=c?.portQuarantine;return Q?{holding:Q.released===undefined,since:Q.since,until:Q.until,served:Q.served,attendant:Q.attendant,wages:Q.wages||0,demurrage:Q.demurrage||0,lost:Q.lost||0,source:Q.source?.source,sourceDay:Q.source?.day,sourceObservedAt:Q.source?.observedAt,sourceInfected:Q.source?.infected,completed:!!Q.completed,reason:Q.reason||'a source outbreak was observed '+(Q.source?.observedAt||'at departure')}:null;}
+function portHealthSummary(s){const H=s?.portHealth;return H?{enabled:!!H.enabled,authority:H.authority,attendant:H.attendant,hold:H.hold?portQuarantineSummary(H.hold):null,roll:(H.roll||[]).map(r=>({...r}))}:null;}
+function portHealthHTML(s){const R=portHealthSummary(s);if(!R)return '';const p=R.attendant!=null?portHealthPerson(R.attendant):null;return R.hold?`${p?esc(folkName(p)):'No attendant'} · holding ${esc(s.portHealth.hold.good)} from ${esc(W.settlements[s.portHealth.hold.origin].name)} until ${dateStr(R.hold.until)} · ${R.hold.served} supported days · ${R.hold.wages.toFixed(1)} wages, ${R.hold.demurrage.toFixed(1)} delay expenses${R.hold.lost?'; '+R.hold.lost.toFixed(1)+' cargo spoiled':''}`:`${R.enabled?'Source-exposed coastal cargoes may be held':'Coastal isolation stopped'}${R.roll.length?'; last release: '+esc(R.roll.at(-1).reason):''}`;}
+function portHealthControls(s){if(!s.harbor||!institutionalCapability(s,'quarantine').available)return '';const si=W.settlements.indexOf(s),stop=s.portHealth?.enabled!==false;return `<button class="cbtn" data-cmd="s-port-health" data-arg="${si}:${stop?'stop':'enable'}">${stop?'Stop coastal isolation':'Enable funded coastal isolation'}</button>`;}
+function portHealthCmd(arg){const [n,mode,...rest]=String(arg).split(':'),si=+n,s=W.settlements[si];if(rest.length||!/^(0|[1-9]\d*)$/.test(n)||!Number.isInteger(si)||!['enable','stop'].includes(mode)||!s?.harbor||!sovOn()||s.owner!==plyH()||!institutionalCapability(s,'quarantine').available)return false;if(mode==='enable'&&!portHealthQuote(s))return false;
+  const H=s.portHealth||(s.portHealth={enabled:false,authority:s.owner,attendant:null,hold:null,roll:[]});H.enabled=mode==='enable';H.authority=s.owner;if(!H.enabled&&H.hold)portHealthRelease(s,H.hold,'the harbor policy was stopped');G.detDirty=true;return true;
+}
+/* PORT_QUARANTINE_END */
 function tickCaravans(){
+  portHealthPrepare();
   for(const c of W.caravans)if(!c._staffed){c._staffed=true;if(!c.crew&&!W.prehistory)crewFor(c);}
   // arrivals
   const besieged=W.settlements.filter(t=>t.siegeBy);
   for(let i=W.caravans.length-1;i>=0;i--){
-    const c=W.caravans[i];c.halted=false; // free to go unless a siege line stands across its road today (the flag used to outlive the last siege, and the carts with it)
+    const c=W.caravans[i];if(c.sea&&!c.plagueDeparture)portPlagueDeparture(c,W.settlements[c.origin],'in-transit report');c.halted=false; // free to go unless a siege line stands across its road today (the flag used to outlive the last siege, and the carts with it)
     if(besieged.length&&!c.robbed&&!c.sea&&!c.river&&day()<c.arriveDay){ // at the siege lines the carts stop, and wait for the road to open
       const p=polyPos(c.poly,clamp((day()-c.departDay)/Math.max(0.01,c.arriveDay-c.departDay),0,1));
       if(p)for(const t of besieged){const A=t.siegeBy.army&&t.siegeBy.army.siegeArc,Rr=(A?A.R:90)+30,d=dist2d(p.x,p.z,t.pos.x,t.pos.z);
         if(d<Rr+45&&siegeBlocks(t,Math.atan2(p.z-t.pos.z,p.x-t.pos.x))){c.arriveDay+=1;c.departDay+=1;c.halted=true;break;}}}
     if(day()>=c.arriveDay){
+      if(portQuarantine(c,W.settlements[c.dest]))continue;
       if(c.sea&&W.settlements[c.dest])W.settlements[c.dest]._berthDays=(W.settlements[c.dest]._berthDays||0)+4; // a cog takes a berth for days while she unloads
       const d=W.settlements[c.dest];
       if(!c.robbed){
         if(c.storageCargo){if(commodityActive(c.storageCargo.origin)){const incoming=c.qty;storageCargoArrive(c,d);ladeIn({...c,qty:incoming,commodityArrived:true},d);}else{ladeIn(c,d);storageCargoArrive(c,d);}}else{d.stores[c.good]+=c.qty;ladeIn(c,d);}
         d.tradeV=(d.tradeV||0)+c.value;W.settlements[c.origin].tradeV=(W.settlements[c.origin].tradeV||0)+c.value*0.7; // the trade is counted in both markets' surplus
-        // plague travels the trade network
-        const o=W.settlements[c.origin];
-        if(o.infected/Math.max(1,o.pop)>0.02&&d.infected<1&&chance('sim',0.35*MOD.vir)){
-          d.infected+=3;
-          emit('fates',7,d.pos,`The pestilence has come to ${d.name}, borne on the ${c.sea?'tide':'road'} from ${o.name}.`);
-          plagueArrives(d);
-        }
+        tradePlague(c,d); // one arrival draw; a fully paid isolation term prevents this route's modeled seeding
       }
       c.gone=true;commodityCargoRetire(c);
       W.caravans.splice(i,1);
@@ -16789,7 +16851,7 @@ function ownerOf(b,s){ // who owns this building: decided once (lazily), then ke
   if(occ&&(s.kind==='village'||(occ.w||0)>value()*6||b.rural))return b.ownerId=occ.id; // a cottager, a farmer, a householder of means: his own roof
   const rich=s.folk?headsOf(s).filter(h=>!h.role&&(h.w||0)>value()*10).sort((a,c)=>(c.w||0)-(a.w||0))[0]:null; // else a landlord of the town, or the lord
   return b.ownerId=rich?rich.id:'lord';}
-function ownerAcct(b,s){const o=ownerOf(b,s);if(b.title&&b.title.owner&&b.title.owner.household)return b.title.owner.head||b.title.owner;if(o==='lord')return lordAcct(s||b.s);if(o==='church'){const c=parishOf(s||b.s);return c?(c.ch||chOf(c),c):lordAcct(s||b.s);}if(o==='town')return s||b.s;const c=corpOf(o);if(c&&!c.gone)return c;const P=W._pm||(W._pm=folkIndex()),p=P.get(o);return p&&!p.dead?p:lordAcct(s||b.s);}
+function ownerAcct(b,s){const A=b.title?.owner&&accountOwner(b.title.owner);if(A?.household)return A.head||A;if(A&&A===W.houses[0])return 'crown';if(A&&(A==='crown'||W.houses.includes(A)||isCorp(A)&&!A.gone||A.ch&&(W.bldList||G.bldList||[]).includes(A)||W.settlements.includes(A)))return A;const o=ownerOf(b,s);if(o==='lord')return lordAcct(s||b.s);if(o==='church'){const c=parishOf(s||b.s);return c?(c.ch||chOf(c),c):lordAcct(s||b.s);}if(o==='town')return s||b.s;const c=corpOf(o);if(c&&!c.gone)return c;const P=W._pm||(W._pm=folkIndex()),p=P.get(o);return p&&!p.dead?p:lordAcct(s||b.s);}
 /* the market: what each seller has offered and not yet sold, by good; a buyer pays the sellers in proportion to what they offered */
 function mkt(s,g){const M=s.mkt||(s.mkt={});if(!(M[g] instanceof OwnedMarket)){const old=M[g];M[g]=new OwnedMarket(s,g);if(old)for(const[w,q]of old)M[g].set(w,q);}return M[g];}
 function rsv(s,g){const R=s.rsv||(s.rsv={});if(!(R[g] instanceof OwnedMarket)){const old=R[g];R[g]=new OwnedMarket(s,g,'reserve');if(old)for(const[w,q]of old)R[g].set(w,q);}return R[g];} // the least each seller will take
@@ -18262,7 +18324,7 @@ function settlementActsHTML(s){
     cbtn('s-levy',si,`Levy a host here (~${Math.round(Math.min(pop*0.12,40+pop*0.08,pop*0.25))} men)`,300,rd(cdLeft('s_lev'+si)),'townsmen and villagers called from their work')+
     cbtn('s-walls',si,s.wallBuild?`Masons at work (${Math.round(wallProg(s)*100)}%)`:s.walls>=2?'Walls are stone':(s.walls?'Rebuild the walls in stone':'Raise a palisade'),1500*(s.walls+1),s.wallBuild?'building':s.walls>=2?'complete':'')+
     cbtn('s-seal',si,s.quarantineUntil>day()?'Open the gates':'Seal the gates (quarantine)',0,rd(sl))+
-    cbtn('s-suppress',si,`Suppress unrest (−${suppression.toFixed(1)})`,150,rd(sup)||(!(suppression>0)?'needs troops and unrest':''),'uses the watch and troops in town; prosperity −5; an angry crowd may fight back')+worksHTML(s);
+    cbtn('s-suppress',si,`Suppress unrest (−${suppression.toFixed(1)})`,150,rd(sup)||(!(suppression>0)?'needs troops and unrest':''),'uses the watch and troops in town; prosperity −5; an angry crowd may fight back')+portHealthControls(s)+worksHTML(s);
 }
 function orderArmy(a,si){
   if(!a||a.gone)return false;
@@ -18682,6 +18744,7 @@ function runCmd(cmd,arg){
     case 's-guild':craftGuildCmd(arg);break;
     case 's-windmill':technologyWindmillCmd(arg);break;
     case 's-equipment':technologyEquipmentCmd(arg);break;
+    case 's-port-health':portHealthCmd(arg);break;
     case 's-custom':case 's-svc':manorCmd(cmd,arg);break; // the customs of a manor, and its services commuted or kept in hand (#36)
     case 'a-order':case 'a-road':case 'a-raft':case 'a-objective':case 'a-hold':case 'a-release':case 'a-disband':case 'a-split':case 'a-merge':case 'a-garrison':armyCmd(cmd.slice(2),arg);break;
   }
@@ -20496,7 +20559,7 @@ function visualBuilding(b,m){const out=visualRecord(b,'ch lot mill millWater dam
 // A wall circuit crosses as its town and its name in that town (fortCircuitKey), never as a copy: the foreground
 // finds the same ring it drew, so c===s and the gates of that ring hold.
 function visualCircuit(c,near){if(!c)return null;for(const t of near?[near,...W.settlements]:W.settlements){const key=fortCircuitKey(t,c);if(key)return{si:W.settlements.indexOf(t),key};}return null;}
-function visualSettlement(s,structures,m){const out=visualRecord(s,'pos keepPos lake motte bailey hillCastle ward burgRing cas citadel tg wallRad wallKind wallDmg wallBuild openingCapacity diocese',m);out.millId=s.mill?.idx??null;out.pop=detailPopulation(s);out.rotation=technologyRotation(s);out.si=W.settlements.indexOf(s);out.folk=[];out.renderGates=s.wallRad?fortGateAngles(s,s):[];out._gateTrafficVersion=s._gateTrafficVersion||0;
+function visualSettlement(s,structures,m){const out=visualRecord(s,'pos keepPos lake motte bailey hillCastle ward burgRing cas citadel tg wallRad wallKind wallDmg wallBuild openingCapacity diocese',m);out.portHealthReport=portHealthSummary(s);out.millId=s.mill?.idx??null;out.pop=detailPopulation(s);out.rotation=technologyRotation(s);out.si=W.settlements.indexOf(s);out.folk=[];out.renderGates=s.wallRad?fortGateAngles(s,s):[];out._gateTrafficVersion=s._gateTrafficVersion||0;
   out.siegeBy=s.siegeBy?{houseName:s.siegeBy.houseName,army:s.siegeBy.army?{id:s.siegeBy.army.id}:null}:null;
   // the circuit stormed: by name while it is still one of the town's rings, else only the dates the streets fighting reads
   out.takenCircuit=s.takenCircuit?fortCircuitKey(s,s.takenCircuit)??{breachUntil:s.takenCircuit.breachUntil,breachA:s.takenCircuit.breachA}:null;
@@ -20506,7 +20569,7 @@ function visualField(f,m){const out=visualRecord(f,'poly sap',m);for(const k of 
 // holds each to the whole of its record: every object-valued name crosses, or is named there as the worker's alone.
 const VISUAL_ENTITY={
   army(a,m){const b=visualRecord(a,'field poly tf battlePos raft objective',m);b.men=[];b.foe=a.foe?{id:a.foe.id}:null;b.joined=a.joined?{id:a.joined.id,strength:a.joined.strength,foe:a.joined.foe?{id:a.joined.foe.id}:null}:null;b.siegeArc=a.siegeArc?{...visualScalars(a.siegeArc),circuit:visualCircuit(a.siegeArc.circuit,W.settlements[a.at])}:null;const s=W.settlements[a.at];if(s)b.renderMuster=musterPos(s,a);return b;},
-  caravan:(c,i,m)=>({...visualRecord(c,'poly',m),qty:c.qty,renderKey:visualCaravanKey(c),renderIndex:i}),
+  caravan:(c,i,m)=>({...visualRecord(c,'poly',m),qty:c.qty,portHealthReport:portQuarantineSummary(c),renderKey:visualCaravanKey(c),renderIndex:i}),
   envoy:(e,m)=>visualRecord(e,'poly',m),
   traveller:(t,m)=>({...visualRecord(t,'poly',m),renderKey:visualTravellerKey(t),p:visualPerson(t.p)}),
   ship:(s,m)=>visualRecord(s,'poly berth',m),
@@ -21000,6 +21063,7 @@ function workerCommandTarget(e){
       }
       if(c==='p-manumit'){if(!/^\d+$/.test(a)||!workerCommandId(+a)||!(W._pm||folkIndex()).has(+a))throw Error('Invalid freedom command');return 'worker';}
       if(c==='s-school'||c==='s-learning'||c==='s-tutor'){const [si,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||v===undefined||v.trim()===''||!Number.isFinite(+v)||+v<0)throw Error('Invalid learning command');return 'worker';}
+      if(c==='s-port-health'){const[si,mode,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!['enable','stop'].includes(mode)||!sovOn()||W.settlements[+si].owner!==plyH()||!W.settlements[+si].harbor||!institutionalCapability(W.settlements[+si],'quarantine').available)throw Error('Invalid funded port policy');return 'worker';}
       if(c==='s-windmill'){if(!workerCommandIndexText(a,W.settlements.length))throw Error('Invalid windmill command');return 'worker';}
       if(c==='s-equipment'){const[si,k,t,id,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!Object.hasOwn(TECH_EQUIPMENT,k)||!['building','person','army'].includes(t)||!/^\d+$/.test(id||''))throw Error('Invalid equipment command');return 'worker';}
       if(c==='s-guild'){const[si,tr,on,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!CRAFT_TRADES.has(tr)||!['grant','refuse'].includes(on))throw Error('Invalid guild command');return 'worker';}
@@ -21840,7 +21904,7 @@ const ADV={muted:false,
       plague:s.infected>0.5?{sick:Math.round(s.infected),dead:Math.round(s.plagueDead||0)}:false,quarantinedUntil:s.quarantineUntil>now?dateStr(s.quarantineUntil):undefined,besieged:!!s.siegeBy,raidedUntil:s.raidedUntil>now?dateStr(s.raidedUntil):undefined,
       walls:['none','palisade','stone'][s.walls|0]||'stone',wallsBuilding:s.wallBuild?Math.round(wallProg(s)*100)+'%':undefined,garrison:Math.round(s.garrison||0),militia:Math.round(s.militia||0),murage:Math.round(s.murage||0),
       works:{mill:!!s.works?.mill,market:!!s.works?.market,clearing:s.clearUntil>now?'under way until '+dateStr(s.clearUntil):false},
-      port:s.harbor?{ships:(W.ships||[]).filter(x=>x.port===i).map(x=>({kind:x.kind,from:x.from,phase:x.phase,sails:x.until!=null?dateStr(x.until):undefined}))}:false,
+      port:s.harbor?{health:portHealthSummary(s),ships:(W.ships||[]).filter(x=>x.port===i).map(x=>({kind:x.kind,from:x.from,phase:x.phase,sails:x.until!=null?dateStr(x.until):undefined}))}:false,
       herds:Object.fromEntries(BEASTS.map(b=>[b,Math.round(s.stores?.[b]||0)])),stores:Object.fromEntries(Object.entries(s.stores||{}).filter(([,v])=>typeof v==='number').map(([g,v])=>[g,Math.round(v)])),
       prices:abs,prices_vs_usual:pr,trades:s._tcY===year()?s._tc:undefined,wardOf:s.wardOf!=null?W.settlements[s.wardOf]?.name:undefined};},
   house(h){const hi=W.houses.indexOf(h),now=day(),T=n=>n?{name:fullTitle(n),code:'n'+n.id}:undefined;

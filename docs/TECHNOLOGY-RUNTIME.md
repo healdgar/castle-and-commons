@@ -189,3 +189,7 @@ in the 850 opening, not a claim that stone extraction was invented in 950.
 Military-order clients use `hospitalOrder1113` and `templeOrder1119`, each
 requiring actual foreign-expedition knowledge. Suppression and lawful asset
 succession belong to the actual Church/foreign adapter, not knowledge deletion.
+
+The funded coastal quarantine consumer is described in [PORT-HEALTH.md](PORT-HEALTH.md).
+It uses the actual `quarantine` local capability, paid native staff and cargo,
+and preserves the separate existing gate-closure command.
