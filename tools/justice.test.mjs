@@ -6,8 +6,11 @@ import {realm,near} from './ownership-fixture.mjs';
 const source=fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8');
 const fn=n=>{const m=source.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))','m'));assert.ok(m,n);return m[0];};
 const cst=n=>source.match(new RegExp('^const '+n+'=.*$','m'))[0];
+// The daily dispatcher now calls native government and personal-status decisions before the dated hallmote.
+const government=source.slice(source.indexOf('function governmentAvailable('),source.indexOf('/* =========================================================================\n   PERSONAL STATUS'));
+assert.ok(government.includes('function tickGovernment('));
 function court(){const r=realm({households:5,cash:0,grain:0,fish:0});
-  r.eval(['courtGrazing','courtDebtor','courtOfficials','courtSession','tickJustice','courtCard','book','lordSeat','sovOn','plyH','workerCommandTarget','workerCommandIndexText','workerCommandString','runCmd','replayEntry','manorLines'].map(fn).join('\n')+'\n'+['dueOn','LK','LS'].map(cst).join('\n'));
+  r.eval(government+'\n'+['tickFreedom','courtGrazing','courtDebtor','courtOfficials','courtSession','tickJustice','courtCard','book','lordSeat','sovOn','plyH','workerCommandTarget','workerCommandIndexText','workerCommandString','runCmd','replayEntry','manorLines'].map(fn).join('\n')+'\n'+['dueOn','LK','LS'].map(cst).join('\n'));
   Object.assign(r.C,{KL:0,KLaw:3,MODEL_ONLY:true,trait:()=>0,backgroundUserRequest:()=>false,workerCommandIsLocal:()=>false,esc:x=>String(x),dateStr:d=>'day '+d});
   r.eval('W.houses=[{name:"the Crown"},{name:"House Ash",seat:0,gold:0}];W.capital=s;s.owner=1;W.player={on:true,house:1};s.furl=[];tilledOf=s=>s.furl;for(const h of H)h.sk=[1,0,0,1];ownershipTick();for(const h of H)householdAccount(h).population.set(s,1);W._pm=folkIndex();');
   return r;}
@@ -190,12 +193,14 @@ test('an exiled owner’s manor uses the actual buyer’s royal reserve, rather 
   const r=court();r.eval('W.houses[1].exiled=true;W.treasury=100;H[2].herd={swine:5};s.stores.swine=5;chestReserve=hi=>{if(hi!==0)throw Error("wrong buyer reserve");return 10}');loan(r);assert.equal(r.s.pleas.rows.length,1);
 });
 
-test('the bread and ale assize records actual named craft payments, not a trade estimate or the sundry pool',()=>{
+test('the bread and ale assize records each named shop’s actual paid receipts, not a trade estimate',()=>{
   const r=court();r.eval(fn('payCrafts')+'\n'+source.match(/^const TRADE_W=[\s\S]*?;/m)[0]);Object.assign(r.C,{KCr:0,tills:()=>false});
-  r.eval('H[2].tr="baker";H[3].tr="brewer";H[4].tr="smith";s._poolBy={baker:40,brewer:20,smith:10};s._poolCash=100;payCrafts(s,H)');
-  const rows=r.s.pleas.rows;assert.equal(rows.length,2);near(rows[0].v,40);near(rows[1].v,20);assert.equal(rows[0].kind,'assize');assert.equal(rows[0].against,r.eval('householdAccount(H[2])'));
-  assert.ok(r.H[2].w>40,'sundry craft payments are paid but not called bread receipts');near(r.s._poolCash,0);assert.equal(Object.keys(r.s._poolBy).length,0);
-  r.eval('s._poolBy={baker:15};payCrafts(s,H)');near(rows[0].v,55);assert.equal(r.s.pleas.rows.length,2);
+  r.eval('H[2].tr="baker";H[3].tr="brewer";H[4].tr="smith";s._poolBy={baker:40,brewer:20,smith:10};s._poolCash=100');
+  // Rebaseline: the assize follows the entire actual payment reaching each shop, including allocated service.
+  const before=total(r)+r.s._poolCash;r.eval('payCrafts(s,H)');near(total(r),before);
+  const rows=r.s.pleas.rows;assert.equal(rows.length,2);near(rows[0].v,r.H[2].w);near(rows[1].v,r.H[3].w);assert.equal(rows[0].kind,'assize');assert.equal(rows[0].against,r.eval('householdAccount(H[2])'));
+  assert.ok(r.H[2].w>40,'allocated shop service is an actual payment to the named baker');assert.ok(rows.every(p=>p.who!==r.H[4].id),'smith payments are not bread or ale receipts');near(r.s._poolCash,0);assert.equal(Object.keys(r.s._poolBy).length,0);
+  const paid=r.H[2].w;r.eval('s._poolBy={baker:15};payCrafts(s,H)');near(rows[0].v,paid+15);assert.equal(r.s.pleas.rows.length,2);
 });
 
 test('bread receipts wait for the twice-yearly great court while other dues are heard at the quarter day',()=>{
@@ -327,7 +332,8 @@ test('poor riot defendants are pardoned within a funded session and their beasts
 
 test('riot leadership is searched once at the event and no new daily census hears the case',()=>{
   const r=court();r.eval('globalThis.calls=0;globalThis.originalHeads=headsOf;headsOf=s=>{calls++;return originalHeads(s)};courtRiot(s)');assert.equal(r.eval('calls'),1);
-  r.eval('headsOf=()=>{throw Error("no daily leadership search")};day=()=>91;tickJustice()');assert.equal(r.s.pleas.rows.length,3);
+  // Ordinary daily credit decisions use their maintained roster; its first setup is not another riot search.
+  r.eval('creditRefresh(s);headsOf=()=>{throw Error("no daily leadership search")};day=()=>91;tickJustice()');assert.equal(r.s.pleas.rows.length,3);
   assert.ok(source.includes("s.prosperity=clamp(s.prosperity-3,1,100);courtRiot(s)"),'the native riot branch presents the event');
 });
 

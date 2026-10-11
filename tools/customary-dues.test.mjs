@@ -196,7 +196,7 @@ test('a journaled order sets a custom or commutes services the same way in a fre
 
 test('the governance view has a row and two orders for every custom, and the service orders; the town card names the mill\'s farmer',()=>{
   const r=manor({strips:[strip(2,{svc:'money',qrent:5}),strip(3,{k:1})],buildings:[{arch:'mill'}]});
-  r.eval(fn('manorOrdersHTML')+'\n'+fn('manorLines')+";esc=x=>String(x);W.startAD=850;s.custom={merchet:1}");
+  r.eval(fn('governmentAvailable')+'\n'+fn('manorOrdersHTML')+'\n'+fn('manorLines')+";esc=x=>String(x);W.startAD=850;s.custom={merchet:1}");
   const html=r.eval('manorOrdersHTML(s,0)'),keys=JSON.parse(r.eval('JSON.stringify(Object.keys(CUSTOMS))'));
   for(const k of keys){assert.ok(html.includes(`data-cmd="s-custom" data-arg="0:${k}:`),k);assert.equal(html.split(`data-arg="0:${k}:`).length-1,2,k);}
   assert.ok(html.includes('data-arg="0:merchet:0.875"')&&html.includes('data-arg="0:merchet:1.125"'),'a step is a quarter of the realm\'s custom');

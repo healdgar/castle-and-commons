@@ -45,7 +45,7 @@ test('cold toll payee labels match simulation ownership without assigning titles
     const W={settlements:[town],houses:[{}, {name:'The earl'}],households:new Map([[1,{members:new Set([away])}]]),abbeys:[{name:'St Mary'},{name:'St Paul',gone:true}],guilds:[]};
     return {W,town,parish,living};
   };
-  const code=['detailTollOwner','ownerOf','ownerAcct','lordAcct','corpOf','parishOf','acctLabel'].map(extract).join('\n');
+  const code=['detailTollOwner','ownerOf','ownerAcct','accountOwner','lordAcct','corpOf','parishOf','acctLabel'].map(extract).join('\n');
   const pure=realm(),canonical=realm();
   const context=(r,readonly)=>vm.createContext({...r,LORD_ARCH:new Set(['toll']),CHURCH_ARCH:new Set(),TOWN_ARCH:new Set(),folkName:p=>p.name,
     chOf:b=>{if(readonly)throw Error('inspector created a parish account');return b.ch={fund:0};},
