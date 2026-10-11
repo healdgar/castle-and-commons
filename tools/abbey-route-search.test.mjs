@@ -39,14 +39,20 @@ assert.ok(fn('serviceRoadPlan').includes('const bounded='+boundedExpression+';')
 // Restores only the old exhaustive flood branch; its actual flood body, native
 // path search, endpoint ordering and all physical/title predicates are shared.
 const oldFloodService=fn('serviceRoadPlan').replace(boundedExpression,'false');
+const endpointGate='    if(bounded&&endpointBlocked(q)){if(attempted.length===12)break;continue;}\n';
+assert.ok(fn('serviceRoadPlan').includes(endpointGate));
+// Remove only the new necessary endpoint predicate. Native target order,
+// attempted-target accounting, bounded path search and final clearance remain.
+const oldEndpointService=fn('serviceRoadPlan').replace(endpointGate,'');
 const countedBody=(n,key)=>{const code=fn(n),at=functions.get(n).body.start-functions.get(n).start+1;return code.slice(0,at)+'count.'+key+'++;'+code.slice(at);};
+const countedService=code=>code.replace('attempted.push(q);','attempted.push(q);count.targets.push({street:s.streets.indexOf(q.st),road:W.roads.indexOf(q.road),x:q.x,z:q.z});');
 
 const highwayClause=fn('serviceRoadPlan').match(/  \/\/ An Abbey's rural approach[^\n]*\n  if\(corridor\)\{const si=W\.settlements\.indexOf\(s\);[^\n]*\n/)[0];
 const oldServiceRoad=fn('serviceRoadPlan').replace(highwayClause,'').replaceAll('a.st||a.road','a.st').replaceAll('c.st||c.road','c.st').replace('(a.st)===(q.st||q.road)','a.st===q.st').replace("q.road?{path,road:q.road}:{path,street:q.st}","{path,street:q.st}").replace("q.road?{path,road:q.road}:{path,street:q.st}","{path,street:q.st}");
 assert.ok(!oldServiceRoad.includes('q.road')&&!oldServiceRoad.includes('a.road')&&!oldServiceRoad.includes('c.road'));
 
-function setup({old=false,oldService=false,oldFlood=false,countRoutes=false,prepare='',replaceableDistance=false}={}){
- const count={hypot:0,heightReads:0,reach:0,from:0,closed:0,land:0},math=Object.create(Math);
+function setup({old=false,oldService=false,oldFlood=false,oldEndpoint=false,countRoutes=false,prepare='',replaceableDistance=false}={}){
+ const count={hypot:0,heightReads:0,reach:0,from:0,closed:0,land:0,targets:[]},math=Object.create(Math);
  math.hypot=(...args)=>{count.hypot++;return Math.hypot(...args);};
  const C=vm.createContext({Math:math,count});
  const run=code=>vm.runInContext(code,C);
@@ -57,10 +63,13 @@ function setup({old=false,oldService=false,oldFlood=false,countRoutes=false,prep
  `);
  // Only replacement-reader tests make this lexical binding writable. The
  // captured native function body stays exact; replacing it invalidates proof.
- run(readers.map(n=>n==='armyDetour'&&old?oldDetour:n==='serviceRoadPlan'&&oldService?oldServiceRoad:n==='serviceRoadPlan'&&oldFlood?oldFloodService:countRoutes&&['armyReach','armyReachFrom','armyReachClosed','armyLandPath'].includes(n)?countedBody(n,({armyReach:'reach',armyReachFrom:'from',armyReachClosed:'closed',armyLandPath:'land'})[n]):n==='dist2d'&&replaceableDistance?constant(n).replace(/^const /,'let '):native(n)).join('\n'));
+ run(readers.map(n=>n==='armyDetour'&&old?oldDetour:n==='serviceRoadPlan'?(countRoutes?countedService:code=>code)(oldService?oldServiceRoad:oldFlood?oldFloodService:oldEndpoint?oldEndpointService:fn(n)):countRoutes&&['armyReach','armyReachFrom','armyReachClosed','armyLandPath'].includes(n)?countedBody(n,({armyReach:'reach',armyReachFrom:'from',armyReachClosed:'closed',armyLandPath:'land'})[n]):n==='dist2d'&&replaceableDistance?constant(n).replace(/^const /,'let '):native(n)).join('\n'));
  run(['abbeyRouteSurveyNative','abbeyRouteSurveyInputs','abbeyRouteTerrain','abbeyRouteMemo','abbeyTerrainSegmentClear','makeHash'].filter(n=>!readers.includes(n)).map(fn).join('\n'));
  run(`W.rivHash=makeHash(40);s._lay.placed=makeHash(16);onRoad.reach=-1;`);
  if(prepare)run(prepare);
+ // The disjoint row-strip batch adds this actual immutable reader capture;
+ // older parent sources keep their native rectangle fallback without a stub.
+ if(variables.has('OCCUPIED_GROUND_NATIVE'))run(constant('OCCUPIED_GROUND_NATIVE'));
  run(certificate);
  run(`const terrain=abbeyRouteTerrain(s);function walker(shared=true){const M=shared?abbeyRouteMemo(terrain):new Map();M.boxes=[];M.shut=[];return {house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3,_em:M};}
   function result(path,a){return {path,boxes:a._em.boxes,shut:a._em.shut.map(R=>({...R,closed:Array.from(R.closed)})),edges:[...a._em],roadBounds:W.roads.map(r=>r._bb),roadReach:onRoad.reach};}
@@ -176,10 +185,10 @@ test('retained landing metadata projects as detached scalar geometry while surve
 
 // Finite controlled native geometry/title fixture: one Crown-held parcel, no
 // generated people, goods, endowment, licence, commissioned project or RNG.
-function highwaySetup({prepare='',oldService=false,oldFlood=false,countRoutes=false,replaceableDistance=false}={}){
+function highwaySetup({prepare='',oldService=false,oldFlood=false,oldEndpoint=false,countRoutes=false,replaceableDistance=false}={}){
  const extra=['castleFoundationReserved','abbeyAccessEndpoint','lerpPt'].map(fn).join('\n')+'\n'+
   ['STREET_GRAPH_FORT_CONTEXTS','STREET_GRAPH_FORT_NATIVE','ABBEY_APPROACH_SURVEY_NATIVE'].map(constant).join('\n');
- return setup({oldService,oldFlood,countRoutes,replaceableDistance,prepare:extra+`
+ return setup({oldService,oldFlood,oldEndpoint,countRoutes,replaceableDistance,prepare:extra+`
 const FN=1,FG=SIZE,field={k:0,i:0,j:0,jx:.5,jz:.5,lord:0,own:'crown',wk:'crown'};
   W.houses=[{name:'Crown'},{name:'Other holder',gold:10}];W.projects=[];W.land={F:[field],mask:new Uint8Array(GRID*GRID*4)};
   for(let i=0;i<GRID*GRID;i++)W.land.mask[i*4]=1;
@@ -326,5 +335,69 @@ test('stale native corridor inputs and uncertified readers retain the old exhaus
   assert.deepEqual(current.json('queries'),prior.json('queries'),mutation);
   assert.deepEqual({reach:current.count.reach,from:current.count.from,closed:current.count.closed,land:current.count.land},
    {reach:prior.count.reach,from:prior.count.from,closed:prior.count.closed,land:prior.count.land},mutation);
+ }
+});
+
+const endpointNode=functions.get('serviceRoadPlan').body.body.find(n=>n.type==='VariableDeclaration'&&n.declarations.some(d=>d.id.name==='endpointBlocked')).declarations.find(d=>d.id.name==='endpointBlocked').init;
+const endpointPredicate=source.slice(endpointNode.start,endpointNode.end);
+const endpointEnclosure=`for(const wall of [{x:-34,z:0,w:2,d:16},{x:6,z:0,w:2,d:16},{x:-14,z:-7,w:42,d:2},{x:-14,z:7,w:42,d:2}]){Object.assign(wall,{rot:0,state:'sound',arch:'house'});s.buildings.push(wall);s._lay.placed.add(wall,28);}`;
+const nearBlockedEndpoint=endpointEnclosure+`const b={x:3,z:0,w:4,d:8,rot:0,state:'sound',arch:'house'};s.buildings.push(b);s._lay.placed.add(b,8);
+ W.roads.push({a:0,b:1,path:[{x:0,z:-1},{x:0,z:1}]},{a:0,b:2,path:[{x:-30,z:-1},{x:-30,z:1}]});`;
+
+test('certified standing-endpoint rejection removes only failed work and retains the actual accepted route, graph and RNG',()=>{
+ const current=highwaySetup({prepare:nearBlockedEndpoint,countRoutes:true}),prior=highwaySetup({prepare:nearBlockedEndpoint,countRoutes:true,oldEndpoint:true});
+ const graphClass=ast.body.find(n=>n.type==='ClassDeclaration'&&n.id.name==='HistoryGraph');assert.ok(graphClass);
+ for(const r of [current,prior]){r.C.btoa=btoa;r.run(constant('HISTORY_SCRATCH')+'\n'+source.slice(graphClass.start,graphClass.end)+'\n'+fn('sfc32')+'\n'+fn('seedStreams')+`
+  const RS=seedStreams(1001,42);function endpointGraph(){const G=new HistoryGraph(),F=G.capture({world:W,rng:RS,hashStamp:HASH_STAMP});return{root:F.root,state:[...G.state],code:G.code};}
+  const initialDice=Object.getOwnPropertyNames(RS).map(k=>[k,RS[k].state()]);`);}
+ const options={p:{x:-14,z:0}};
+ assert.deepEqual(roadSearch(current,options),roadSearch(prior,options));assert.ok(current.run('roadAnswer'));
+ assert.deepEqual(nativeRoadIdentity(current),nativeRoadIdentity(prior));assert.deepEqual(current.json('roadAnswer.path'),[{x:-14,z:0},{x:-30,z:0}]);
+ assert.equal(current.run('!!armyObstacle(walker(),0,0)'),false,'the old .6 m point test alone permits this endpoint');
+ assert.equal(current.run('streetFootprintOverlap(b,{a:{x:0,z:0},b:{x:0,z:0},hw:1.3},.3)'),true);
+ assert.equal(current.count.land,1);assert.equal(prior.count.land,2);assert.equal(current.count.reach+prior.count.reach,0);
+ assert.deepEqual(current.json('count.targets'),prior.json('count.targets'));assert.deepEqual(current.json('count.targets.map(q=>q.road)'),[0,1]);
+ assert.deepEqual(current.json('endpointGraph()'),prior.json('endpointGraph()'),'actual world graph and every native RNG without scratch omission');
+ for(const r of [current,prior])assert.deepEqual(r.json('Object.getOwnPropertyNames(RS).map(k=>[k,RS[k].state()])'),r.json('initialDice'));
+});
+
+test('blocked endpoints still consume twelve ordered distinct native targets and never retry that road through another segment',()=>{
+ const prepare=endpointEnclosure+`const b={x:3,z:0,w:4,d:8,rot:0,state:'sound',arch:'house'};s.buildings.push(b);s._lay.placed.add(b,8);
+  for(let i=0;i<12;i++)W.roads.push({a:0,b:i+1,path:[{x:0,z:-1},{x:0,z:1},{x:0,z:20},{x:-30,z:20}]});
+  W.roads.push({a:0,b:13,path:[{x:-30,z:-1},{x:-30,z:1}]});`;
+ const current=highwaySetup({prepare,countRoutes:true}),prior=highwaySetup({prepare,countRoutes:true,oldEndpoint:true});
+ assert.equal(roadSearch(current,{p:{x:-14,z:0}}),null);assert.equal(roadSearch(prior,{p:{x:-14,z:0}}),null);
+ assert.equal(current.count.land,0);assert.equal(prior.count.land,12);
+ assert.deepEqual(current.json('count.targets'),prior.json('count.targets'));assert.deepEqual(current.json('count.targets.map(q=>q.road)'),Array.from({length:12},(_,i)=>i));
+ assert.equal(current.count.targets.length,12);assert.equal(current.run('W.roads.length===13&&W.projects.length===0&&field.title.work.owner===houseAcct(0)'),true);
+ assert.deepEqual(current.json('field.title'),prior.json('field.title'));
+});
+
+test('rotated standing footprints and native churchyards use the actual index while uncertain or unsafe point geometry keeps native search',()=>{
+ const r=highwaySetup({prepare:`const b={x:0,z:0,w:4,d:8,rot:Math.PI/4,state:'sound',arch:'churchyard'};s.buildings.push(b);s._lay.placed.add(b,8);`});
+ r.run(`var p={x:20,z:0},corridor=abbeyCorridorReady(s,abbeyApproachSurvey(s),'crown',undefined,0,terrain),endpointBlocked=${endpointPredicate};
+  const rotated={x:3*Math.cos(b.rot),z:-3*Math.sin(b.rot)};`);
+ assert.equal(r.run('!!armyObstacle(walker(),rotated.x,rotated.z)'),false,'churchyards are deliberately outside the original point obstacle test');
+ assert.equal(r.run('endpointBlocked(rotated)'),true);assert.equal(r.run('streetFootprintOverlap(b,{a:rotated,b:rotated,hw:1.3},.3)'),true);
+ assert.equal(r.run('endpointBlocked({x:10,z:10})'),false);
+ r.run('b.rot=0;');
+ for(const expression of ['{x:3.6,z:0}','{x:3.6-.5e-6,z:0}','{x:NaN,z:0}','{x:Infinity,z:0}','{x:1e10,z:0}'])assert.equal(r.run(`endpointBlocked(${expression})`),false,expression);
+ assert.equal(r.run('endpointBlocked({x:3.6-2e-6,z:0})'),true);
+ for(const mutation of ['b.x=NaN;','b.w=-4;','b.d=Infinity;','b.rot=NaN;','b.x="0";','b.w=1e10;']){
+  r.run('Object.assign(b,{x:0,z:0,w:4,d:8,rot:0});'+mutation);
+  assert.equal(r.run('endpointBlocked({x:0,z:0})'),false,mutation);
+ }
+ r.run('Object.assign(b,{x:0,z:0,w:4,d:8,rot:0});p={x:0,z:0};');assert.equal(r.run('endpointBlocked(p)'),false,'zero-length corridors keep their native early return');
+});
+
+test('the native nearly-parallel boundary exception and zero-length endpoint retain the original accepted path',()=>{
+ const prepare=`const b={x:0,z:0,w:4,d:8,rot:0,state:'sound',arch:'house'};s.buildings.push(b);s._lay.placed.add(b,8);
+  W.roads.push({a:0,b:1,path:[{x:3.6,z:-1},{x:3.6,z:1}]});`;
+ for(const p of [{x:3.6000000005,z:0},{x:3.6,z:0}]){
+  const current=highwaySetup({prepare,countRoutes:true}),prior=highwaySetup({prepare,countRoutes:true,oldEndpoint:true});
+  assert.deepEqual(roadSearch(current,{p}),roadSearch(prior,{p}));assert.ok(current.run('roadAnswer'));
+  assert.deepEqual(nativeRoadIdentity(current),nativeRoadIdentity(prior));assert.equal(current.count.land,1);assert.equal(prior.count.land,1);
+  assert.equal(current.run('streetFootprintOverlap(b,{a:{x:3.6,z:0},b:{x:3.6,z:0},hw:1.3},.3)'),true);
+  if(p.x!==3.6)assert.equal(current.run('streetFootprintOverlap(b,{a:roadInput.p,b:{x:3.6,z:0},hw:1.3},.3)'),false,'the actual native <1e-9 parallel branch tests the outside start');
  }
 });

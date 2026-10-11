@@ -2228,12 +2228,18 @@ function serviceRoadPlan(s,p,placed,skip,hw=1.3,memo,ghost,banks,accept,publicAc
   if(armyObstacle(walker,p.x,p.z))return null;
   // A certified Abbey search needs only bounded A*: open floods prove failure, never build its accepted path.
   const bounded=!!corridor?.terrain&&walker._em.abbeyTerrain===corridor.terrain&&abbeyCorridorInputs(corridor,walker)&&corridor.C.native&&abbeyApproachSurveyNative();
+  // A positive corridor cannot end strictly inside a standing footprint expanded by its 1.3 m half-width and .3 m clearance.
+  // Keep uncertain boundaries and unsafe coordinates in the full native search, including its nearly-parallel segment rule.
+  const endpointBlocked=q=>{const size=Math.max(1,Math.abs(p.x),Math.abs(p.z),Math.abs(q.x),Math.abs(q.z));if(!Number.isFinite(p.x)||!Number.isFinite(p.z)||!Number.isFinite(q.x)||!Number.isFinite(q.z)||size>1e9||p.x===q.x&&p.z===q.z)return false;
+    const B={minX:q.x,maxX:q.x,minZ:q.z,maxZ:q.z};for(const entry of abbeySurveyIndexRows(corridor.C.buildingIndex,B,Math.SQRT2*1.6)){const b=entry.b,r=b.rot||0,scale=Math.max(size,Math.abs(b.x),Math.abs(b.z),b.w,b.d,Math.abs(r));if(!Number.isFinite(b.x)||!Number.isFinite(b.z)||!Number.isFinite(scale)||scale>1e9||!Number.isFinite(b.w)||!Number.isFinite(b.d)||!(b.w>0&&b.d>0)||b.rot!=null&&!Number.isFinite(b.rot))continue;
+      const c=Math.cos(r),sn=Math.sin(r),x=q.x-b.x,z=q.z-b.z,X=x*c-z*sn,Z=x*sn+z*c,margin=Math.max(1e-6,64*Number.EPSILON*scale);if(Math.abs(X)<b.w/2+1.6-margin&&Math.abs(Z)<b.d/2+1.6-margin)return true;}return false;};
   const attempted=[],banked=!bounded&&banks?banks.floods.filter(R=>R.hw===hw&&armyReachFrom(R,open,p)):[];let reach;
   const flood=from=>{const pts=[],seen=new Set(attempted.map(a=>a.st||a.road));for(let cj=from;cj<candidates.length&&pts.length+attempted.length<12;cj++){const c=candidates[cj];if(seen.has(c.st||c.road)||armyObstacle(walker,c.x,c.z))continue;seen.add(c.st||c.road);pts.push(c);}
     const span=banks&&pts.length?banks.span.filter(d=>dist2d(d.x,d.z,p.x,p.z)<160):[]; // too wide a box to flood: the door's own targets alone
     reach=pts.length>0?span.length&&armyReach(open,p,[...pts,...span],150,60000)||armyReach(open,p,pts,150,60000):null;if(reach&&banks&&armyReachClosed(reach,open)){reach.hw=hw;banks.floods.push(reach);}};
   if(banked.length)flood(0); // a door on ground already flooded floods its own reach first (its edges are mostly known) and searches only what that reaches
   for(let ci=0;ci<candidates.length;ci++){const q=candidates[ci];if(armyObstacle(walker,q.x,q.z)||attempted.some(a=>(a.st||a.road)===(q.st||q.road)))continue;attempted.push(q);
+    if(bounded&&endpointBlocked(q)){if(attempted.length===12)break;continue;}
     if((reach&&!armyReaches(reach,q)||banked.some(R=>armyReachCovers(R,p,q)&&!armyReaches(R,q)))&&!armySegmentClear(walker,p,q)){if(attempted.length===12)break;continue;} // blocked straight on, and no lattice route can reach it
     const path=armyLandPath(walker,[p,{x:q.x,z:q.z}]);if(path){if(!accept||accept(q.road?{path,road:q.road}:{path,street:q.st}))return q.road?{path,road:q.road}:{path,street:q.st};if(attempted.length===12)break;continue;}
     if(!bounded&&reach===undefined)flood(ci+1);
