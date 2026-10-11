@@ -14291,7 +14291,7 @@ function reprice(s){ // each price rises when buyers wanted more than was sold, 
   const P=s.px||(s.px={}),D=s._dem||{},S=s._sold||{},E=s._dAvg||(s._dAvg={}),Y=s._dYr||(s._dYr={});
   const L=s._lostM||{};s._lostM={};const PY=s._pxY||(s._pxY={});s._pxN=(s._pxN||0)+1;
   for(const g of GOODS){const p=price(s,g),d=D[g]||0,a=avail(s,g,p);E[g]=(E[g]??d)*0.75+d*0.25;Y[g]=(Y[g]??d)*11/12+d/12; // what is usually wanted in a month; and the year round (the hay bought in autumn is the winter's)
-    if(!(S[g]>0)&&!(a>0))continue; // nothing to be had at any price: no market, and no price found
+    if(!(S[g]>0)&&!(a>0)&&!(d>0))continue; // no sales, offers at this price or funded orders: no market to quote
     const keep=L[g]>0?Math.min(6,(s.stores[g]||0)/L[g]):6;if(L[g]>0&&s.stores[g]>0)(s._rot||(s._rot={}))[g]=L[g]/(L[g]+s.stores[g])/30; // half a year's stock is no glut, unless it rots sooner: then what it keeps for is the measure (#23: fish that rots in three weeks was weighed against six months' want, so its price held while nine-tenths of the catch rotted)
     const z=Math.log((d+0.01)/((S[g]||0)+0.01))+0.5*Math.log((E[g]*keep+0.01)/(a+0.01));P[g]=Math.max(GOODBASE[g]*1e-3,p*Math.exp(0.25*Math.tanh(z)));PY[g]=PY[g]==null?P[g]:PY[g]*11/12+P[g]/12;} // (the step is bounded, and the price kept above a thousandth of its base, #23: last resorts for a monthly search with no demand curve; unbounded, a good with no stock would multiply its price ninefold in a month, and a log needs a price above nothing)
   s._dem={};s._sold={};}
