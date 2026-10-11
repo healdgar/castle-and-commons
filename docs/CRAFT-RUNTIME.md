@@ -11,6 +11,13 @@ local candidates, trade groups and measured rooms by native population revision
 and year. It scans no other settlement. `W.apprentices` contains only active
 native person IDs; the completed contract remains on the person.
 
+Actual household-head and institutional trade changes also invalidate that
+local roster. School and tutor closures, estate keeper hire/release and outlaw
+enlistment/return can change eligible craft heads without adding or removing a
+native person. Released estate markers preserve any replacement office and
+trade. Six focused source lifecycle fixtures cover these transitions; the
+combined native history and release gates remain with root.
+
 - A seven-year apprenticeship is an explicit contract custom. It names a living
   local master; the family pays that master's premium. Family apprentices pay
   no one twice. Days of actual master work and a present pupil accrue service and

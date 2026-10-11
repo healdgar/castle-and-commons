@@ -4601,7 +4601,7 @@ function householdAccount(p){if(!p||p.merc)return null;if(p.household)return p;i
   const q=oldHouseholdHead(p),h=q._hh||newHousehold(q);bindHousehold(q,h);if(p!==q)bindHousehold(p,h);return h;}
 function householdHead(p){const h=householdAccount(p);return h&&h.head&&!h.head.dead?h.head:p;}
 function accountOwner(x){if(typeof x==='string'){const c=corpOf(x);if(c)return c;if(x.startsWith('household:'))return W.households?.get(x.slice(10))||x;}return x&&x.gn!==undefined&&!x.merc?householdAccount(x):x;}
-function householdHeadsChanged(s){if(typeof marketTradeIndexInvalidate==='function')marketTradeIndexInvalidate();s._householdsD=-1;s._hdC=null;s._tcY=-1;s._hbC=null;}
+function householdHeadsChanged(s){if(typeof marketTradeIndexInvalidate==='function')marketTradeIndexInvalidate();s._householdsD=-1;s._hdC=null;s._tcY=-1;s._hbC=null;delete s._craftIndex;}
 function householdsOf(s){if(s._householdsD===day()&&s._householdsN===(s.folk||[]).length)return s.households||[];
   if(s._householdsD>=0&&s._householdsV===(W._folkRevision||0)&&s._householdsN===(s.folk||[]).length){s._householdsD=day();return s.households||[];}
   const H=new Set();for(const p of s.folk||[])if(!p.dead){const h=householdAccount(p);if(h)H.add(h);}
@@ -13660,8 +13660,8 @@ function estatePondPlan(s,C){if(!institutionalCapability(s,'estateFishpond').ava
     const lake={poly,y:level-.15,dam:{x:D.x,z:D.z,a,w:span.width,lo:span.min,hi:span.max,bed:Math.min(hAt(D.x,D.z)-1.5,r.ys[k]-1.5)},ownerId:C.ownerId,compoundKey:'fishpond',area},site={key:'fishpond',hydraulic:true,poly,lake,f:{x:D.x,z:D.z,w:span.width,d:4,rot:-(a+Math.PI/2)}};if(estateGroundHeld(s,site)&&abbeyPondClear(s,site))return{adapter:'estate',key:'fishpond',ownerId:C.ownerId,payerId:s.owner,title:'a fishpond',site,field:f.k,labour,days:180,timber,stone,requires:[],purposes:['productive'],worker:p.id,annualWage:wage};}return null;}
 function estatePondComplete(q,s,C){if(!abbeyPondClear(s,q.site))return false;const owner=houseAcct(s.owner),seed=Math.max(1,q.site.lake.area/1000),have=(pantry(s,owner).fish||0)+(mkt(s,'fish').get(owner)||0);if(have<seed){purchase(s,'fish',owner,seed-have);commodityCreditPurchase(s,owner,'fish',purchase.got);}if((pantry(s,owner).fish||0)+(mkt(s,'fish').get(owner)||0)+1e-9<seed)return false;if(consumeOwnStock(s,owner,'fish',seed)+1e-9<seed)return false;s.lake=q.site.lake;delete W._lockIndex;C.fishery={stock:seed,seed,stocked:day(),day:day()};C.condition=1;
   const mask=W.land?.mask;for(const i of compoundGround(q.site).cells)if(mask){const x=cellX(i%GRID),z=cellZ((i/GRID)|0);if(lakeAt(s,x,z,1))mask[i*4]=mask[i*4+1]=mask[i*4+3]=0;}markOccupiedGround(s,compoundPolys(q.site));C.components.push({id:C.id+':hydraulic:lake',key:'fishpond',kind:'hydraulic',ref:'lake',purposes:['productive']});G.hydraulicsDirty=G.structuresDirty=G.detDirty=G.roadsDirty=true;return true;}
-function estateOfficeRelease(p){if(!p?.estateOffice)return;if(p.office==='estateKeeper')delete p.office;p.tr=p.estateOffice.priorTrade;delete p.estateOffice;delete p.estatePaidDay;}
-function estatePayKeeper(s,C,key,value){const owner=houseAcct(C.ownerId);if(!(value>0))return null;C.jobs||(C.jobs={});let p=(W._pm||folkIndex()).get(C.jobs[key]);if(p&&(p.dead||p.si!==C.si||awayNow(p)||p.estateOffice?.compound!==C.id)){estateOfficeRelease(p);p=null;}if(!p){p=estateWorker(s,key);if(!p)return null;const wage=estateKeeperQuote(s,p)/360;if(value<=wage||means(owner)<wage+chestReserve(C.ownerId))return null;p.estateOffice={compound:C.id,key,priorTrade:p.tr};p.office='estateKeeper';p.tr='keeper';C.jobs[key]=p.id;}
+function estateOfficeRelease(p){if(!p?.estateOffice)return;if(p.office==='estateKeeper'){delete p.office;p.tr=p.estateOffice.priorTrade;}delete p.estateOffice;delete p.estatePaidDay;const s=W.settlements[p.si];if(s)householdHeadsChanged(s);}
+function estatePayKeeper(s,C,key,value){const owner=houseAcct(C.ownerId);if(!(value>0))return null;C.jobs||(C.jobs={});let p=(W._pm||folkIndex()).get(C.jobs[key]);if(p&&(p.dead||p.si!==C.si||awayNow(p)||p.estateOffice?.compound!==C.id)){estateOfficeRelease(p);p=null;}if(!p){p=estateWorker(s,key);if(!p)return null;const wage=estateKeeperQuote(s,p)/360;if(value<=wage||means(owner)<wage+chestReserve(C.ownerId))return null;p.estateOffice={compound:C.id,key,priorTrade:p.tr};p.office='estateKeeper';p.tr='keeper';C.jobs[key]=p.id;householdHeadsChanged(s);}
   const wage=estateKeeperQuote(s,p)/360;if(value<=wage||means(owner)<wage+chestReserve(C.ownerId))return null;const paid=transfer(owner,p,wage,'estate keeper',s);if(paid+1e-9<wage)return null;p.estatePaidDay=day();C.wages=(C.wages||0)+paid;return p;}
 function estateMeat(s,C,q,cause){if(!(q>0))return;const o=houseAcct(C.ownerId);s.stores.meat=(s.stores.meat||0)+q;offer(s,'meat',o,q);C.meat=(C.meat||0)+q;C.lastHarvest={day:day(),qty:q,cause};}
 function estateHunt(s,C,c){const f=W.land.F[c.ref];if(!f||!estateFieldHeld(s,f)||f.lord!==C.ownerId||f.estateWild?.compound!==C.id)return;const key=c.key,k=key==='park'?'deer':'rabbit',S=ESTATE_SPECIES[k],E=estateWildlife(f),cap=estateHabitat(f,k),excess=Math.max(0,E.stocks[k]-cap/2),animals=Math.min(excess,FOOD*2/S.carcass)*(C.condition??1),q=animals*S.carcass;if(!estatePayKeeper(s,C,key,q*price(s,'meat')))return;E.stocks[k]-=animals;estateMeat(s,C,q,k+' from '+key);}
@@ -15824,7 +15824,7 @@ function outlawReturn(p,why){
   if(!p||p.dead||!p.outlawCampId)return;
   const o=p._outlawState;p.tr=o?o.tr:p.tr;
   if(o&&o.hadAway)p.away=o.away;else delete p.away;
-  const s=W.settlements&&W.settlements[p.si];if(s){s._tcY=-1;}if(typeof marketTradeIndexInvalidate==='function')marketTradeIndexInvalidate();
+  const s=W.settlements&&W.settlements[p.si];if(s){s._tcY=-1;delete s._craftIndex;}if(typeof marketTradeIndexInvalidate==='function')marketTradeIndexInvalidate();
   delete p._outlawState;delete p.outlawCampId;life(p,why||'Returned to the village after the outlaws scattered');
 }
 function outlawCampEnds(camp,why,casualtyRate=0){
@@ -15865,7 +15865,7 @@ function recruitBandit(camp,force=false){
   if(!chance('sim',joinP))return false;
   camp.men.push(p);p.outlawCampId=camp.id;p._outlawState={tr:p.tr,hadAway:!!p.away,away:p.away||null};
   p.tr=null;p.away={until:Number.MAX_SAFE_INTEGER,why:'outlaw',to:camp.id,what:'bandit camp'};
-  const home=W.settlements[si];if(home){home._tcY=-1;courtFelony(home,p,camp);}if(typeof marketTradeIndexInvalidate==='function')marketTradeIndexInvalidate();
+  const home=W.settlements[si];if(home){home._tcY=-1;delete home._craftIndex;courtFelony(home,p,camp);}if(typeof marketTradeIndexInvalidate==='function')marketTradeIndexInvalidate();
   const cause=hunger>=0.35?'hunger':burden>=0.2?'household debts':'want';
   const bent=justice<0?' and a hardening distrust of the law':'';
   life(p,`Driven by ${cause}${bent}, ${folkName(p)} joined the outlaws near ${W.settlements[si].name}`);
