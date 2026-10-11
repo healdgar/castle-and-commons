@@ -179,7 +179,9 @@ There is no court housing, food, storage, productivity or defense bonus.
 
 Only actual supports obstruct walkers. A native .8 m internal footpath and closed
 walk loop pass between the supports with the existing .6 m walker clearance;
-external rural approaches retain their existing width and full checks. Rendering
+completion and native occupied-ground rebuilds use the actual retained street
+half-width, so the paid .8 m private corridor never grows into a 2.6 m claim.
+External rural approaches retain their existing width and full checks. Rendering
 derives precisely four roofs and the supports from paid saved geometry. The
 inner court uses seasonal native grass; walk surfaces use the native ground mesh.
 Separate paid walk sections, stone arcades, integrated two-storey room allocations
@@ -216,8 +218,10 @@ commission/progress/completion, material custody, payments, capacity and meal
 helpers on controlled opening titles and terrain. It covers mirrored layout,
 paid Abbey and College completion, reserve/title/access refusals, private-route
 protection, open support navigation after all ranges are built, inward projected
-fronts, seasonal surface geometry and unfinished plain-data continuation. This
-is a light fixture, not a generated-world or browser proof.
+fronts, seasonal surface geometry and unfinished plain-data continuation. It also checks actual completion and occupied-ground reconstruction at a native
+raster-cell edge, where the former2.6m private-path assumption would claim extra
+cells. All15 checks pass. This is a light fixture, not a generated-world or
+browser proof.
 
 No daily phase changes. The dependency changes are shared connection/layout
 helpers and `live.compoundSite`; `collegePlanQuote`/completion; Abbey connected

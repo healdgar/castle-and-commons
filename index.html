@@ -12437,7 +12437,7 @@ function markLot(P){ // a house's yard is no longer ploughland: the strips stop 
 function markSettlementBuilt(s){
   for(const b of s.buildings)if(b.exactGround){for(const i of occupiedGroundCells(obbCorners(b.x,b.z,b.w,b.d,b.rot)))W.land.mask[i*4+2]=255;}else markBuilt(b.x,b.z,Math.hypot(b.w,b.d)/2+8);
   for(const C of s.compounds||[])for(const c of C.components||[])if(c.kind==='circuit'){const R=compoundCircuit(s,c.ref);if(R)for(const i of (R===s.citadel&&R.polys?R.polys.flatMap(occupiedGroundCells):compoundGround({ring:R}).cells))W.land.mask[i*4+2]=255;}
-  for(const st of s.streets||[])if((st.compoundAccess||st.paidPublic)&&!st.gone&&!st.hidden)for(const i of compoundGround({path:st.pts,pathWidth:st.paidPublic?st.hw*2:2.6}).cells)W.land.mask[i*4+2]=255;
+  for(const st of s.streets||[])if((st.compoundAccess||st.paidPublic)&&!st.gone&&!st.hidden)for(const i of compoundGround({path:st.pts,pathWidth:st.paidPublic||st.compoundPrivate?st.hw*2:2.6}).cells)W.land.mask[i*4+2]=255;
   for(const p of s.places||[])if(p.paidPublic)for(const i of occupiedGroundCells(placeEdge(p)))W.land.mask[i*4+2]=255;
   if(W.land._surveyed)for(const b of s.buildings)if(b.lot?.length&&b._graveyard&&!b._graveyard.removed)markChurchyardBuilt(s,b._graveyard);
   if(s.wallRad){const R=Math.max(...s.wallRad)+80;
