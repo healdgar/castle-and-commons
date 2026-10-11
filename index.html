@@ -13012,8 +13012,8 @@ function offRoute(si){ // from the edge of the world to this port, keeping to de
 function stoneFor(s,what){const R=s.wallR||(s.radius||90)*1.3;return what==='wall'?Math.round(2*Math.PI*R*0.25):({keep:150,bailey:120,church:130,citadel:260,house:6,wharf:50}[what]||0);}
 const hasStone=(s,w)=>(s.stores.stone||0)>=stoneFor(s,w),useStone=(s,w)=>{s.stores.stone=Math.max(0,(s.stores.stone||0)-stoneFor(s,w));};
 function tickQuarries(){ // real named quarrymen, actual wages and their present working strength
-  for(const s of W.settlements){if(s.stores.stone==null)s.stores.stone=0;const b=s.quarry;if(!b||b.removed||b.state!=='sound'||s.siegeBy||b.quarryPaidDay===day())continue;
-    const payer=accountOwner(ownerAcct(b,s)),P=workers_(s,p=>p.tr==='quarryman'&&!p.office&&!awayNow(p)&&ageYrs(p)>=16&&ageYrs(p)<65).sort((a,c)=>a.id-c.id);let hands=0,wagesPaid=0;
+  for(const s of W.settlements){if(s.stores.stone==null)s.stores.stone=0;const b=s.quarry;if(!b||b.removed||b.state!=='sound'||s.siegeBy||day()%7===0||b.quarryPaidDay===day())continue;
+    const payer=accountOwner(ownerAcct(b,s)),P=workers_(s,p=>p.tr==='quarryman'&&!p.office&&!awayNow(p)&&!(typeof institutionalJobHeld==='function'&&institutionalJobHeld(p))&&ageYrs(p)>=16&&ageYrs(p)<65).sort((a,c)=>a.id-c.id);let hands=0,wagesPaid=0;
     for(const p of P.slice(0,3)){const wage=foodYr()*1.5*Math.max(1,p._hh?.population.get(s)||1)/360,own=accountOwner(p)===payer;if(!own&&means(payer)<wage)break;const paid=own?0:transfer(payer,p,wage,'quarry wages',s);if(!own&&paid+1e-9<wage)continue;hands+=Math.max(0,Math.min(1,p._hh?.assets._fill??1));wagesPaid+=paid;}
     b.quarryPaidDay=day();b.quarryHands=hands;b.quarryWages=(b.quarryWages||0)+wagesPaid;const q=(s.res.stone||0)*2.2/30*Math.min(1,hands/3);if(!(q>0))continue;s.stores.stone+=q;offer(s,'stone',payer,q);}
 }

@@ -54,13 +54,16 @@ for(const commodity of [false,true])test(`delivery pays the real driver and supp
   r.eval('tickCaravans()');near(r.H[1].w,19); // retired delivery cannot pay again
 });
 
-test('daily quarry production keeps the former monthly physical rate and respects closure',()=>{
-  const s={stores:{},quarry:{state:'sound'},res:{stone:5},pop:99,plagueDead:0},offers=[];
-  const c=vm.createContext({W:{settlements:[s]},clamp:(x,a,b)=>Math.max(a,Math.min(b,x)),ownerAcct:()=>7,offer:(s,g,o,q)=>offers.push({g,o,q})});
-  vm.runInContext(fn('tickQuarries'),c);for(let i=0;i<30;i++)vm.runInContext('tickQuarries()',c);
-  near(s.stores.stone,5*2.2*.99);assert.equal(offers.length,30);assert.ok(offers.every(x=>x.o===7&&x.g==='stone'));
-  s.siegeBy={};vm.runInContext('tickQuarries()',c);assert.equal(offers.length,30);
-  s.siegeBy=null;s.quarry.state='ruin';vm.runInContext('tickQuarries()',c);assert.equal(offers.length,30);
+test('daily quarry production needs actual available paid workers and cannot run twice in one day',()=>{
+  const s={stores:{},quarry:{state:'sound'},res:{stone:5},pop:99},offers=[],payer={w:100},P=Array.from({length:3},(_,i)=>({id:i+1,tr:'quarryman',w:0}));let today=0;
+  const c=vm.createContext({W:{settlements:[s]},day:()=>today,foodYr:()=>360,ageYrs:()=>30,awayNow:()=>false,institutionalJobHeld:p=>!!p.job,
+    workers_:(s,pred)=>P.filter(pred),accountOwner:p=>p,means:p=>p.w,ownerAcct:()=>payer,transfer:(a,b,v)=>{if(a.w<v)return 0;a.w-=v;b.w+=v;return v;},offer:(s,g,o,q)=>offers.push({g,o,q})});
+  vm.runInContext(fn('tickQuarries'),c);for(today=1;today<=30;today++){payer.w=100;vm.runInContext('tickQuarries();tickQuarries()',c);}
+  const worked=26;near(s.stores.stone,5*2.2*worked/30);assert.equal(offers.length,worked);assert.ok(offers.every(x=>x.o===payer&&x.g==='stone'));near(P[0].w,worked*1.5);
+  s.siegeBy={};vm.runInContext('tickQuarries()',c);assert.equal(offers.length,worked);
+  s.siegeBy=null;s.quarry.state='ruin';vm.runInContext('tickQuarries()',c);assert.equal(offers.length,worked);
+  s.quarry.state='sound';P.forEach(p=>p.job='school');today++;vm.runInContext('tickQuarries()',c);assert.equal(offers.length,worked,'institutional workers cannot also quarry');
+  P.forEach(p=>delete p.job);payer.w=0;today++;vm.runInContext('tickQuarries()',c);assert.equal(offers.length,worked,'unpaid days produce no stone');
 });
 test('remaining stone demand is refreshed daily without producing another stone batch',()=>{
   const s={stores:{stone:8},buildings:[],res:{},kind:'village',pop:100},q={type:'pave',r:{a:0,len:100},done:.25},castle={type:'castle',si:0,stone:5,stoneInstalled:2,timber:8,timberInstalled:1};
