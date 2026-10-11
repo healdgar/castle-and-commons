@@ -2580,7 +2580,7 @@
           "tickGovernment",
           "tickFreedom"
         ],
-        "reads": "Current transaction evidence and closed production/meal/work purses; actual government duties precede personal claims and due native manor/eyre sittings."
+        "reads": "Current transaction evidence and closed production/meal/work purses; actual government duties precede personal claims and due native manor/eyre sittings. Court and royal officer quotes require current local presence, matching office identity and no conflicting institutional work. Only funded appointment releases the exact replaced office and invalidates canonical work rosters; these late writes affect tomorrow\u2019s ordinary production."
       },
       {
         "phase": "peoplePrepare",

@@ -10,8 +10,9 @@ intended model.
 
 The order was surveyed on 2026-10-10 and extended for the current institution batch on 2026-10-11. It is a
 dependency-informed foundation, not a demonstrated globally optimal schedule or
-centuries-per-minute clearance. Several mixed annual/monthly functions still need
-their quantities and obligations separated before ordinary choices become daily.
+centuries-per-minute clearance. The new paid institutional and building clients
+make ordinary proposals daily; older mixed annual/monthly functions still need
+their quantities and obligations separated.
 
 ## Evidence and contract
 
@@ -112,7 +113,7 @@ daily forecast, separate from the quantity produced by quarries.
 |---|---|---|
 | Growth, land | Funded housing/refit decisions and work daily; field use still monthly | Native housing/fabric has saved paid duration and current eligibility. Separate remaining field quantities/tenure decisions from dated assessments. |
 | Castles, churches | Paid native foundations and compound upgrades daily | Retained native geometry, prerequisites, paid material/work and current authority control completion. Parish gifts spread the customary annual quantity daily; Church assessments and order chapters remain dated. |
-| Streets, courtyards, infill, settlers | Streets, infill and speculative landlord roofs now have daily paid proposals; courtyard housing retains an annual review | Geometry, rights and paid construction control new native maps. `tickCourts` remains courtyard housing, separate from judicial `tickJustice`. |
+| Streets, courtyards, infill, settlers | Streets, purchased courtyard housing, infill and speculative landlord roofs have daily paid proposals | Geometry, rights and paid construction control new native maps. `tickCourts` is courtyard housing, separate from judicial `tickJustice`. |
 | Folk, households | Monthly reconciliation/annual aging by place; annual family/career/housing pass | Due birthdays, life hazards and actor eligibility need daily rates/queues. Household choices must be split from annual rent, clothing, wine, winter-hay and pannage quantities. |
 | Livestock, migration | Monthly herd/feed reckoning and opportunity pass | Convert production/feed quantities and stochastic hazards to daily rates; keep seasonal slaughter events. Cache grazing/opportunity inputs by their actual writers. |
 | Tenure, justice, domains, ways | Contracts and assessments mixed with admission/recruitment/investment decisions | Keep genuine rent, quarter-day farms, court sittings and tax/upkeep dates. Separate vacancies, profitable offices, hosts, toll-house and route choices. |
@@ -120,15 +121,13 @@ daily forecast, separate from the quantity produced by quarries.
 | Storage investment | Daily, from current exposed custody and funds | Native profitability and nearby-street bounds precede full site surveys; ordered proposals share only one synchronous pass. Eligible surveys start with fresh graphs. Cross-day reuse needs a complete geometry certificate ([audit](SIMULATION-CACHE-INPUTS.md)). Construction advances only by actual paid work, including fractional days. |
 | History, repairs, threats | Mixed dated choices, event hazards and physical work | Keep due events; separate ordinary proposals from calendar guards, annual assessments and damage rates. Daily physical hazard conversion changes probabilities intentionally, but must be fixed across speeds. |
 
-Annual land-value and town-worth caches are a prerequisite to cheap accurate
-daily building decisions. `lvField` caches spatial kernels plus live population
-scale and fear under a year key; `townWorth` is also year-keyed. No universal
-structural revision invalidates them. Cache the geometry-derived kernels, then
-apply current population/security inputs cheaply. Enumerate simulation writers
-of buildings, field use, roads, walls, owners and households. The drawing-only
-`updateBuildingInstance` hook must not become the source of authoritative cache
-invalidation. Same-size geometry edits, demolition, war/fire damage, births,
-deaths, moves, inheritance and wardrobe/household account changes need coverage.
+Live property certificates now separate geometry-derived kernels from current
+population and security. `lvField` compares ordered current geometry inputs,
+wall state and fear; `townWorth` reads current property rents. Operation-local
+queries share only an unchanged native field. Same-size geometry changes remain
+inputs, and the drawing-only `updateBuildingInstance` hook is not an
+authoritative invalidation source. The implemented contract and its frozen
+uncached comparisons are in [SIMULATION-GROWTH-INPUTS.md](SIMULATION-GROWTH-INPUTS.md).
 
 Other reuse candidates are current household/person indexes (already partly
 cached by day/revision), active owner/good rows, grazing summaries, construction
@@ -200,5 +199,11 @@ Estate keeper hiring/paid biological harvest runs after the current actor roll i
 Learning, local adoption and craft contracts run in that order at the start of `tickEconomy`. The actual actor roll, household identities, early abbey/Church staffing and estate work precede them. A teacher, current keeper, monk, apprentice or paid employee is unavailable for a second full ordinary job; an independent craft master remains a native construction candidate. Current net work receipts, rather than an occupational label, support skill and output.
 
 Within `tickGovernment`, lord journeys and dated credit settlement precede bench, assembly-of-estates and native local sessions. `tickChurchBodies` closes the parish/Church side after actual receipts; separately funded appointments first work on the following day. These are data dependencies, not new artificial monthly eligibility throttles.
+
+Native manor and royal officer selection now checks current presence, literacy,
+matching office identity and conflicting institutional duties. Quotes remain
+readonly. Funded court or eyre appointments release only the replaced holder's
+exact matching office and invalidate canonical work rosters in late justice;
+the changed staffing affects tomorrow's ordinary production.
 
 Current institutional details are recorded in the JSON `institution_integration` contract. Paid machinery completes in `tickProjects` after today's ordinary production, so its effect starts tomorrow. Abbey dairy/wool/ordinary crop shares are allocated once; its self-worked area is excluded from the ordinary tillers' grain. Church inheritance evidence follows actual creditor recovery. Foreign holdings and funded voyages update inside `tickKnighthood`, before domestic military work; actors aboard remain absent from home. No screen read makes equipment, advances an institution, changes a title or pays an account.

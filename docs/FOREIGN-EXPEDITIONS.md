@@ -40,7 +40,7 @@ The crusade tithe summons the existing actual assessment/consent machinery for a
 
 ## Validation and source-private records
 
-The focused `tools/foreign-expeditions.test.mjs` uses handcrafted small native/foreign records, never whole-world generation, Chrome or soaks. It covers exact foreign transfers and census boundaries, funded neutral hulls, native custody, real preparation wages/materials, finite captures, same-person casualties/return, road/ship recalls, finite detachment horses, actual order-member service, daily borrowing/forward eligibility, readonly reports and exact history under different daily batching. Actual Church foundation/suppression is additionally enabled when the coordinator merges the canonical Church registry; it remains a declared integration dependency here.
+The focused `tools/foreign-expeditions.test.mjs` uses handcrafted small native/foreign records, never whole-world generation, Chrome or soaks. It covers exact foreign transfers and census boundaries, funded neutral hulls, native custody, real preparation wages/materials, finite captures, same-person casualties/return, road/ship recalls, finite detachment horses, actual order-member service, daily borrowing/forward eligibility, readonly reports and exact history under different daily batching. Actual Church foundation and suppression now use the integrated canonical Church registry, vows, accounts and successor hooks. The coordinator's combined native gates remain the release authority.
 
 Source-private worker records needing explicit projection drift reasons:
 
