@@ -20,7 +20,7 @@ original guarded phases at `39d929e`: source references, reads, writes, ownershi
 aliases, RNG, ordered records, helpers, caches and uncertainties. Its old-order
 observations describe that source; they do not prescribe the redesigned model.
 Root review corrected several old-chronology assumptions, recorded in
-`corrections`. The current contract has **55** smaller phases and **181** directed
+`corrections`. The current contract has **57** smaller phases and **188** directed
 same-day prerequisites. The additional boundaries separate existing work; they
 do not introduce a second simulation or runtime modules.
 
@@ -195,3 +195,5 @@ See [PERFORMANCE.md](PERFORMANCE.md) for the throughput budgets and validation.
 The bounded growth/property implementation (2026-10-10) keeps the same 52 dispatcher phases and 168 prerequisites. Within each settlement’s growth visit: daily occupancy → due falls → six-day funded housing → independently scheduled annual widening/vacancy → six-day fabric. Live property certificates replace annual value authority. The remaining housing/fabric rate conversion is recorded in [SIMULATION-GROWTH-INPUTS.md](SIMULATION-GROWTH-INPUTS.md); founding-only geometry dependencies for #59 are in [OPEN-SPACES-AND-CASTLE-SITING.md](OPEN-SPACES-AND-CASTLE-SITING.md).
 
 First-castle foundations (#60, 2026-10-10) keep the dispatcher order: existing paid projects progress before growth, then daily first-foundation proposals see current growth/church geometry and begin work tomorrow. Exact occupied mask cells connect land rights and foregone value to completion and field production; remaining material demand closes before departures. Proposal/site selection is deterministic; completion uses the saved layout RNG. Existing upgrades remain annual/instant pending their paid conversion. The implementation contract is [CASTLE-FOUNDATIONS.md](CASTLE-FOUNDATIONS.md).
+
+Estate keeper hiring/paid biological harvest runs after the current actor roll in `tickEstateWork`, before production and storage. New titled estate projects are selected after meals, project completions and abbey endowments in the closing `tickEstates` phase. Wildlife growth is dated biological state; inspectors never advance it.

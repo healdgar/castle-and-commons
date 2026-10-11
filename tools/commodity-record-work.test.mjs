@@ -88,9 +88,10 @@ function runtimeContext(source, { volumeType = false } = {}) {
     storageRoute: () => 1,
     day: () => 7,
     means: () => 1e9,
+    isHouse: () => false,
     acct: () => {},
     wages: () => {},
-    buildWorks: () => {},
+    buildWorks: (s,v) => v, // receipt interface; real payer/crew effects are covered by estate-production
     lordAcct: () => 'crown',
   });
   vm.runInContext(fn(source, 'commodityFacilities') + '\n' + fn(source, 'commodityDestroy'), c);
@@ -162,7 +163,7 @@ test('facility shrink and custom-volume refresh retain public capacity validatio
 
 function runStorageTick(source, exposedDestination) {
   const c = runtimeContext(source);
-  vm.runInContext(fn(source, 'commodityExposed') + '\n' + fn(source, 'commodityStorageTick'), c);
+  vm.runInContext(fn(source, 'commodityExposed') + '\n' + fn(current, 'commodityStorageTick'), c);
   const input = JSON.stringify({ exposedDestination });
   return JSON.parse(vm.runInContext(`(()=>{
     const ownerId=o=>o==null?'unassigned':String(typeof o==='object'?o.id:o);

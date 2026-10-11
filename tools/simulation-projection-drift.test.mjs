@@ -31,14 +31,14 @@ const DRIFT_ALLOWED={
 };
 // Object-valued names of drawn things that stay in the worker, with why. Anything else object-valued must cross.
 const WORKER_ONLY={
-  settlement:{technology:'knowledge/adoption/support: Learning and adviser queries run in worker',stores:'goods: overlays and inspectors ask the worker',storage:'storage ledger',storageReport:'storage ledger',households:'household accounts',
+  settlement:{compounds:'institution decisions and resources; canonical component geometry crosses independently',technology:'knowledge/adoption/support: Learning and adviser queries run in worker',stores:'goods: overlays and inspectors ask the worker',storage:'storage ledger',storageReport:'storage ledger',households:'household accounts',
     mkt:'markets',rsv:'reserved stock',px:'prices',res:'resources',frt:'freight rates',hm:'herd management (herds come from actor plans)',
     history:'inspector text',cashY:'annual cash totals: reports ask the worker',cashPrev:'previous annual cash totals: reports ask the worker',oldWalls:'inspector count',dead:'the dead, for inspector links',growSlots:'building planner',roadSpoke:'layout planner',
     joinOut:'layout planner',landing:'shore landing for boats',burns:'generation burn scars',mill:'crosses as millId',
     custom:'the customs of the manor: the lord\'s and crown\'s panels and the settlement card ask the worker',pleas:'the manor court\'s roll (#37)',court:'court accounts and rulings: inspectors ask the worker',enrolments:'land and customary transaction witnesses: court inspectors ask the worker',royalPleas:'held criminal presentments: court inspectors ask the worker',royalCourt:'royal rulings and receipts: court inspectors ask the worker'},
   building:{s:'crosses as si',title:'title accounts',hh:'households',st:'street link, for gate placement in the worker',why:'planner notes',
     ownerId:'accessor; crosses when it names an owner',groundClaim:'the occupied footprint licence: inspector and accounting',farm:'the mill\'s or bakehouse\'s farm: the settlement card asks the worker'},
-  field:{title:'title accounts',trees:'cross as treeRefs',own:'accessor; crosses when it names a holder',wk:'accessor; crosses when it names a worker',
+  field:{wildlife:'live biological stocks, queried in worker',estateWild:'titled productive enclosure; fence geometry crosses separately',title:'title accounts',trees:'cross as treeRefs',own:'accessor; crosses when it names a holder',wk:'accessor; crosses when it names a worker',
     wild0:'a day number when set'},
   army:{flag:'foreground flags are its own',target:'a settlement index when set'},
   caravan:{m:'merchant account',drv:'driver',crew:'crew',storageCargo:'cargo ledger (its id is the render key)'},

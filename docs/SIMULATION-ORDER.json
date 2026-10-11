@@ -35,6 +35,7 @@
       "name": "Rights, supplies and protection",
       "data": "Current rights, herds, workshops and imports; put goods under cover before spoilage.",
       "phases": [
+        "tickEstateWork",
         "tickAbbeyWork",
         "tickLand",
         "tickTenure",
@@ -98,6 +99,7 @@
         "tickTitles",
         "tickUpkeep",
         "tickAbbeys",
+        "tickEstates",
         "tickStorageInvestment",
         "tickVictory",
         "commoditySettleAll"
@@ -1009,6 +1011,41 @@
       "before": "tickAbbeyMeals",
       "after": "commoditySettleAll",
       "reason": "Actual pantry title gifts precede the daily close."
+    },
+    {
+      "before": "ownershipTick",
+      "after": "tickEstateWork",
+      "reason": "Bind canonical estate goods and purses before keeper pay and harvest."
+    },
+    {
+      "before": "peoplePrepare",
+      "after": "tickEstateWork",
+      "reason": "Real arrivals, deaths and institutional jobs precede keeper selection."
+    },
+    {
+      "before": "tickEstateWork",
+      "after": "tickEconomy",
+      "reason": "Estate output and winepress availability precede native ownership and vintage distribution."
+    },
+    {
+      "before": "tickEstateWork",
+      "after": "tickStorage",
+      "reason": "Actual meat and pond catch can enter physical storage before spoilage."
+    },
+    {
+      "before": "tickPopulation",
+      "after": "tickEstates",
+      "reason": "Household meals precede discretionary new estate commissions."
+    },
+    {
+      "before": "tickProjects",
+      "after": "tickEstates",
+      "reason": "Finished native component sites precede daily next-component decisions."
+    },
+    {
+      "before": "tickAbbeys",
+      "after": "tickEstates",
+      "reason": "Endowed corporate title and ordinary gifts precede private estate proposals."
     }
   ],
   "splits": [
