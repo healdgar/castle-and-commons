@@ -124,10 +124,20 @@ Frozen `04614a7` then completed 60 fresh audited days, including two actual
 abbey foundations and 186 projects, with clean goods/fault checks and maximum
 cash residual 1.78e-10. Day 50 including audits took 1.905215 child CPU seconds;
 aggregate 172.793065 CPU/162.645695 wall seconds also includes generation,
-audits and saves, so it is not browser throughput. The final `d016a6a` adds one
-narrow approach-certificate guard. Its native 150-day speed/history/save/raw
-and full release gates remain pending; the earlier feasibility result belongs
-to `04614a7` only.
+audits and saves, so it is not browser throughput. This feasibility result
+belongs to `04614a7` only. The final `d016a6a` adds the narrow approach guard,
+but its native 150-day gate was deliberately stopped for performance after
+matches through 60 closed days/366 raw outcomes, two abbeys/186 projects and
+clean money/goods/faults; it is neither a timeout nor a 150-day pass. Readonly
+live partial day 67 still has every native founding/approach certificate true.
+The 5.687762-second live sample puts 97.9698546% inclusive work in `armyDetour`,
+after the earlier straight-span cost was resolved. Runner totals are
+1308.025605 child CPU/1251.1622995 wall seconds, load 0.474609→1.0, maximum
+RSS 1840044 KB, including generation/audits/saves. An economically derived
+maximum affordable physical path length and necessary landing–goal ellipse
+are being implemented, preserving unknown/cold fallback and final lawful
+licence/payment. No partial67 snapshot becomes a baseline: day-0/day-37 FWS
+remain same-source, and final history/save and release gates remain pending.
 
 There is also an explicit persistence barrier: `storageOutcomeReady()` can
 return false before incrementing the day while the asynchronous raw journal has
