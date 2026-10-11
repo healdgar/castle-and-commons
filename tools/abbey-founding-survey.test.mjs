@@ -80,7 +80,7 @@ test('first-seen custom callbacks and unregistered layouts remain independent co
 });
 
 test('registered closure, hashes and transitive query readers cannot be replaced or promoted',()=>{
- const mutations=["s._lay={...s._lay};","s._lay.live={...liveOps};","s._lay.fits=()=>true;","s._lay.placed=makeHash(16);","s._lay.segH=makeHash(24);","placed.near=(...args)=>[];","segH.near.cell=25;","const original=slopeAt;slopeAt=(...v)=>original(...v);","const original=lerpPt;lerpPt=(...v)=>original(...v);","const original=householdHerdBind;householdHerdBind=(...v)=>original(...v);","const original=abbeyApproachPlan;abbeyApproachPlan=(...v)=>original(...v);"];
+ const mutations=["s._lay={...s._lay};","s._lay.live={...liveOps};","s._lay.fits=()=>true;","s._lay.placed=makeHash(16);","s._lay.segH=makeHash(24);","placed.near=(...args)=>[];","segH.near.cell=25;","const original=slopeAt;slopeAt=(...v)=>original(...v);","const original=lerpPt;lerpPt=(...v)=>original(...v);","const original=householdHerdBind;householdHerdBind=(...v)=>original(...v);","const original=castleFoundationReserved;castleFoundationReserved=(...v)=>original(...v);","const original=abbeyApproachPlan;abbeyApproachPlan=(...v)=>original(...v);"];
  for(const mutation of mutations){const r=setup();assert.equal(r.run('abbeyFoundSurveyNative(s)'),true);r.run(mutation);assert.equal(r.run('abbeyFoundSurveyNative(s)'),false,mutation);}
 });
 

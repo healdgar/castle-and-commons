@@ -13550,7 +13550,7 @@ function abbeySitePlan(s,f,key,ownerId,legal,donorId=corpOf(ownerId)?.founder,su
 const ABBEY_FOUND_SURVEYS=new WeakMap();
 function abbeyFoundSurveyNative(s){
   if(typeof ABBEY_FOUND_SURVEY_NATIVE==='undefined')return false;const N=ABBEY_FOUND_SURVEY_NATIVE;
-  if(ABBEY_FOUND_SURVEY_CURRENT!==N.current||abbeyRouteSurveyNative!==N.route||!abbeyRouteSurveyNative())return false;
+  if(ABBEY_FOUND_SURVEY_CURRENT!==N.current||abbeyRouteSurveyNative!==N.route||!abbeyRouteSurveyNative()||!abbeyApproachSurveyNative())return false;
   const L=s?._lay,R=ABBEY_FOUND_SURVEYS.get(L?.live?.compoundSite);if(!R||R.s!==s||R.layout!==L||R.live!==L.live||R.placed!==L.placed||R.segH!==L.segH||R.fits!==L.fits||R.makeHash!==N.readers.makeHash||R.placedNear!==L.placed.near||R.placedAdd!==L.placed.add||R.placedCells!==L.placed.historyCells||!Object.is(R.placedCell,L.placed.near.cell)||R.segNear!==L.segH.near||R.segAdd!==L.segH.add||R.segCells!==L.segH.historyCells||!Object.is(R.segCell,L.segH.near.cell))return false;
   const current=ABBEY_FOUND_SURVEY_CURRENT();return Object.entries(N.readers).every(([key,f])=>current[key]===f);
 }
