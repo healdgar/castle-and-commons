@@ -14,14 +14,15 @@ The app remains a single HTML file with no build step.
 
 ## Exact fast forward (current priority, 2026-10-10)
 
-### Browser alternating-tick report, 11 October
+### Alternating-tick observation, 11 October
 
 The user reports alternating apparent tick costs. This is under investigation;
 there is no measured attribution or completed optimization. In the frozen
 `61dd0bb` native 90-day log, days 48–90 have even-day median tick-plus-audit CPU
 1.186234 seconds (22 days) and odd-day median 1.171209 (21 days). Their means
 2.3365/1.8032 reflect irregular spikes rather than a strict alternating pattern.
-These native audit timings do not establish the cause of browser latency.
+The location of the observed timing is still being clarified. These native
+audit timings do not establish a cause for the reported alternation.
 
 Source review finds an actual day-parity guard in `tickCallToArms`, a Crown
 panel refresh every second 500 ms HUD update, and worker view-inflight/ack plus
