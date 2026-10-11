@@ -8,7 +8,7 @@
   "stages": [
     {
       "name": "Opening authority and hazards",
-      "data": "Yesterday\u2019s closed demography and accounts; current weather, war and territorial outcomes.",
+      "data": "Yesterday’s closed demography and accounts; current weather, war and territorial outcomes.",
       "phases": [
         "ownershipTick",
         "tickWeather",
@@ -61,7 +61,7 @@
     },
     {
       "name": "Map, institutions and remaining demand",
-      "data": "Current stock, hunger and purses fund work; courts hear current evidence; recruits become available for tomorrow\u2019s military pass.",
+      "data": "Current stock, hunger and purses fund work; courts hear current evidence; recruits become available for tomorrow’s military pass.",
       "phases": [
         "tickHistory",
         "tickProjects",
@@ -197,7 +197,7 @@
     {
       "before": "dragonWake",
       "after": "tickThreats",
-      "reason": "Forced wake takes effect during today\u2019s hazard pass."
+      "reason": "Forced wake takes effect during today’s hazard pass."
     },
     {
       "before": "tickThreats",
@@ -297,12 +297,12 @@
     {
       "before": "tickMigration",
       "after": "peoplePrepare",
-      "reason": "Incoming population is visible to today\u2019s provisioning and demographics."
+      "reason": "Incoming population is visible to today’s provisioning and demographics."
     },
     {
       "before": "tickMigration",
       "after": "tickPopulation",
-      "reason": "Incoming population is visible to today\u2019s provisioning and demographics."
+      "reason": "Incoming population is visible to today’s provisioning and demographics."
     },
     {
       "before": "peoplePrepare",
@@ -462,12 +462,12 @@
     {
       "before": "tickSpoilage",
       "after": "tickMarket",
-      "reason": "Provision and eat the goods that survived today\u2019s protection/loss pass."
+      "reason": "Provision and eat the goods that survived today’s protection/loss pass."
     },
     {
       "before": "tickSpoilage",
       "after": "tickPopulation",
-      "reason": "Provision and eat the goods that survived today\u2019s protection/loss pass."
+      "reason": "Provision and eat the goods that survived today’s protection/loss pass."
     },
     {
       "before": "tickMarket",
@@ -487,42 +487,42 @@
     {
       "before": "tickPopulation",
       "after": "tickHouseholds",
-      "reason": "Today\u2019s meals, demography and hunger precede decisions and exports."
+      "reason": "Today’s meals, demography and hunger precede decisions and exports."
     },
     {
       "before": "tickPopulation",
       "after": "tickHistory",
-      "reason": "Today\u2019s meals, demography and hunger precede decisions and exports."
+      "reason": "Today’s meals, demography and hunger precede decisions and exports."
     },
     {
       "before": "tickPopulation",
       "after": "tickGrowth",
-      "reason": "Today\u2019s meals, demography and hunger precede decisions and exports."
+      "reason": "Today’s meals, demography and hunger precede decisions and exports."
     },
     {
       "before": "tickPopulation",
       "after": "tickGarrisons",
-      "reason": "Today\u2019s meals, demography and hunger precede decisions and exports."
+      "reason": "Today’s meals, demography and hunger precede decisions and exports."
     },
     {
       "before": "tickPopulation",
       "after": "tickCallToArms",
-      "reason": "Today\u2019s meals, demography and hunger precede decisions and exports."
+      "reason": "Today’s meals, demography and hunger precede decisions and exports."
     },
     {
       "before": "tickPopulation",
       "after": "tickShipDepartures",
-      "reason": "Today\u2019s meals, demography and hunger precede decisions and exports."
+      "reason": "Today’s meals, demography and hunger precede decisions and exports."
     },
     {
       "before": "tickPopulation",
       "after": "tickTrade",
-      "reason": "Today\u2019s meals, demography and hunger precede decisions and exports."
+      "reason": "Today’s meals, demography and hunger precede decisions and exports."
     },
     {
       "before": "tickPopulation",
       "after": "tickVictory",
-      "reason": "Today\u2019s meals, demography and hunger precede decisions and exports."
+      "reason": "Today’s meals, demography and hunger precede decisions and exports."
     },
     {
       "before": "tickHouseholds",
@@ -632,7 +632,7 @@
     {
       "before": "tickJustice",
       "after": "tickUpkeep",
-      "reason": "Hearings, fees and forfeitures enter today\u2019s financial close."
+      "reason": "Hearings, fees and forfeitures enter today’s financial close."
     },
     {
       "before": "tickGarrisons",
@@ -742,7 +742,7 @@
     {
       "before": "tickShipDepartures",
       "after": "tickUpkeep",
-      "reason": "Foreign purchases and export customs enter the day\u2019s financial close."
+      "reason": "Foreign purchases and export customs enter the day’s financial close."
     },
     {
       "before": "tickTrade",
@@ -772,12 +772,12 @@
     {
       "before": "tickUpkeep",
       "after": "tickStorageInvestment",
-      "reason": "Investment uses means after due upkeep and the Crown\u2019s household draw."
+      "reason": "Investment uses means after due upkeep and the Crown’s household draw."
     },
     {
       "before": "tickUpkeep",
       "after": "tickVictory",
-      "reason": "Investment uses means after due upkeep and the Crown\u2019s household draw."
+      "reason": "Investment uses means after due upkeep and the Crown’s household draw."
     },
     {
       "before": "tickCaravans",
@@ -1107,7 +1107,7 @@
     {
       "before": "governmentMeals",
       "after": "tickPopulation",
-      "reason": "Actual consumed destination board reduces the same person\u2019s native home meal and lord hall before population consumption."
+      "reason": "Actual consumed destination board reduces the same person’s native home meal and lord hall before population consumption."
     }
   ],
   "splits": [
@@ -1223,7 +1223,7 @@
       "ordered_records": "No direct journal/annal/ID effects. Its conditional sim-stream draw count affects later sim consumers.",
       "transitive_helpers": "seasonIdx, rand/randi/chance; chance uses RS[st]() and frand uses rand(folk) (index.html:830-833,3431).",
       "observed_order_at_survey": [
-        "Keep before later same-day shared `sim` stream consumers: weather transition draws are conditional, so relocating them can shift any later consumer reached that day. tickWeather\u2019s mutated state (weather, snowpack, flooding, eclipse) is read by intervening phases (e.g. military/land); tickEconomy directly reads season and W.drought, not tickWeather\u2019s state."
+        "Keep before later same-day shared `sim` stream consumers: weather transition draws are conditional, so relocating them can shift any later consumer reached that day. tickWeather’s mutated state (weather, snowpack, flooding, eclipse) is read by intervening phases (e.g. military/land); tickEconomy directly reads season and W.drought, not tickWeather’s state."
       ],
       "cache_or_preparation": "Season index is pure for a fixed day/calendar and is recomputed by other phases; sharing the value is safe only as a read-only same-day scalar. Do not hoist random weather transition decisions.",
       "uncertainty": null
@@ -1245,7 +1245,7 @@
       "ordered_records": "Storage mutations append canonical storage outcomes; transfers/books/cash records for trades and monthly payroll; annals on plague arrival; storage investment can allocate facility IDs. Caravans receive cargo IDs through storageCargo paths. Results depend on current call/iteration order.",
       "transitive_helpers": "storageInit, storageTick (routes exposed goods and charges handling), storageInvestment, landYield, made; initOwnership; consumeOwned; spoilOwned; tickTrade -> tradeOnTheWay/route/freight/wayToll/ladeOut/purchase/driverFor and caravan creation; arrival -> storageCargoArrive/ladeIn/tolls/taxes/offers; monthly soldiersPay/payWatch/cashRecord.",
       "observed_order_at_survey": [
-        "tickWeather must remain before any later shared `sim` RNG consumer: weather makes conditional sim-stream draws, while economy can conditionally consume `sim` on caravan plague arrival (12421). No direct tickWeather-state \u2192 tickEconomy data edge was established; economy reads season and W.drought (12374\u201312382).",
+        "tickWeather must remain before any later shared `sim` RNG consumer: weather makes conditional sim-stream draws, while economy can conditionally consume `sim` on caravan plague arrival (12421). No direct tickWeather-state → tickEconomy data edge was established; economy reads season and W.drought (12374–12382).",
         "tickEconomy -> tickPopulation: daily production, spoilage, trade arrivals and owner food stock precede household consumption; population stores hunger/fill/wealth from resulting stock.",
         "tickEconomy -> tickMarket: market reconciles output and owner stock after daily production/trade/consumption.",
         "tickEconomy -> commoditySettleAll: all changes must enter daily storage journal after day mutators."
@@ -1273,8 +1273,8 @@
       "transitive_helpers": "eatHouseholds -> initOwnership/shareOutput/reconcile/topUpFood/eatFood; housing; carryingCap -> marketHeads and settlementDistanceWeights; publicOrderSuppression; famineStrikes; emit/vary on famine text.",
       "observed_order_at_survey": [
         "tickEconomy -> tickPopulation, because it produces/spoils/transports food before eatHouseholds.",
-        "tickPopulation -> tickMarket in simTick order: market computes `_pl` from current s.pop/price and its due-settlement transaction reads current household/account state after this day\u2019s population and intervening phases; tickMarket is invoked after population, although it returns early if no monthly settlement is due.",
-        "tickPopulation -> tickTenure in the current order: annual tenure reads current prosperity/household and world state after population and intervening phases; population\u2019s conditional famine `sim` draws also precede later RNG consumers.",
+        "tickPopulation -> tickMarket in simTick order: market computes `_pl` from current s.pop/price and its due-settlement transaction reads current household/account state after this day’s population and intervening phases; tickMarket is invoked after population, although it returns early if no monthly settlement is due.",
+        "tickPopulation -> tickTenure in the current order: annual tenure reads current prosperity/household and world state after population and intervening phases; population’s conditional famine `sim` draws also precede later RNG consumers.",
         "ownershipTick -> tickPopulation for W._pm and claims."
       ],
       "cache_or_preparation": "A read-only settlement distance-weight cache is already used by carryingCap. Could share per-day `folkIndex` and due-independent household enumeration only while honoring invalidations from famine/migration and avoiding whole-day population snapshots.",
@@ -1293,11 +1293,11 @@
         "Owner and household stock via offers/purchases/consumption; sale/reserve/market maps; household wealth and credit; craft pools and unmet wants; monthly prices `_pxY`/`px`; `_wait`, freight rates; storage settlements; realm wage/price level `_pl`; possibly market trade/household cached data."
       ],
       "aliases": "`shareOutput` transfers unassigned yield into named owner claims and offers. `reconcile` synchronizes ownership ledger with physical settlement stock. `provision` draws household purse/credit and consumes/creates market stock. `waifs` transfers departed/dead seller stock to lord. Household `w`/`assets.w` is shared with yearly household decisions and account totals; stock views proxy the common StorageLedger; mkt/rsv maps refer to same balances.",
-      "rng": "No obvious direct RNG in tickMarket, but transitive storage/market/reprice helpers should be checked if candidate extraction changes calls; current body\u2019s order is canonical.",
+      "rng": "No obvious direct RNG in tickMarket, but transitive storage/market/reprice helpers should be checked if candidate extraction changes calls; current body’s order is canonical.",
       "ordered_records": "Purchases/flows/book transfers and storage journal outcomes; reprice updates price history; storage settleStores may generate spoilage events; no direct emit/ID in body.",
       "transitive_helpers": "shareOutput, reconcile, homeward, provision (goodWorth/foodDays/purchase/credit/pay/work), waifs, payCrafts, storage.settleStores, reprice, price; dueOn. `dueOn` is `(day()+si*salt)%period===0` (14309).",
       "observed_order_at_survey": [
-        "tickTenure -> tickMarket in simTick order: if a settlement is due in both routines that day, market provisions read after tenure\u2019s same-day rent/tax/land/purse writes. Other due dates read the latest earlier tenure result.",
+        "tickTenure -> tickMarket in simTick order: if a settlement is due in both routines that day, market provisions read after tenure’s same-day rent/tax/land/purse writes. Other due dates read the latest earlier tenure result.",
         "tickPopulation -> tickMarket in simTick order: when market runs, its realm `_pl` recomputation uses current s.pop and due transactions see the current post-population and intervening-phase household/account state. If no market settlement is due anywhere, tickMarket returns before recomputing `_pl`.",
         "tickEconomy -> tickMarket: current daily production, offers, spoilage, non-food use and arrivals are inputs.",
         "tickMarket -> tickHouseholds over the chronology: household annual choices read the latest market prices/stock/wealth/freight; on a coincident due day the market runs first.",
@@ -1325,10 +1325,10 @@
       "observed_order_at_survey": [
         "ownershipTick -> tickTenure: title accessors, owner claims, household identities and W._pm inputs.",
         "tickPopulation -> tickTenure in simTick order: tenure reads current prosperity/household state after population and intervening phases.",
-        "tickTenure -> tickMarket in simTick order: when market and annual tenure are due on the same day, market reads tenure\u2019s same-day writes.",
+        "tickTenure -> tickMarket in simTick order: when market and annual tenure are due on the same day, market reads tenure’s same-day writes.",
         "tickTenure reads current `_pl` and `yearPrice(s,\"grain\")`; because tenure precedes market, these values come from the latest prior market update, not the market pass later in that same simTick."
       ],
-      "cache_or_preparation": "Can precompute the exact 360-day and 90-day due masks from one day/order/salt without modifying behavior. The function already builds a single PM plus parent\u2192children and spouse maps; their order matters and could be shared only if invalidation/first-seen ordering remains identical.",
+      "cache_or_preparation": "Can precompute the exact 360-day and 90-day due masks from one day/order/salt without modifying behavior. The function already builds a single PM plus parent→children and spouse maps; their order matters and could be shared only if invalidation/first-seen ordering remains identical.",
       "uncertainty": null
     },
     {
@@ -1368,7 +1368,7 @@
       "writes": [
         "Each active StorageLedger settlement date and settled spoilage/pending outcomes; canonical storage outcome records/counters. In the save/flush mode, journal jot settlement marker."
       ],
-      "aliases": "Settles inventory ledgers that are shared with s.stores and owner held/sale views. Storage settle updates physical quantity and owner claim/reserve state through storage outcome callback; each later day\u2019s stock/market/eating sees the settled ledger.",
+      "aliases": "Settles inventory ledgers that are shared with s.stores and owner held/sale views. Storage settle updates physical quantity and owner claim/reserve state through storage outcome callback; each later day’s stock/market/eating sees the settled ledger.",
       "rng": "None.",
       "ordered_records": "Canonical storage outcomes are the purpose; daily=true suppresses the extra `jot({k:\"settle\"})` marker because daily outcomes are already in the archive stream.",
       "transitive_helpers": "commodityActive and StorageLedger.settle(day(), storageOutcome). Called through simPart at end of simTick after all phases and routingPrepare.",
@@ -2555,7 +2555,7 @@
     "At the original survey, Growth day%6===0 and Land day%30===15 were disjoint in the fixed 30/360 calendar. No RNG-order edge between adjacent inactive guards is needed.",
     "tickCourts means courtyard redevelopment, not judicial hearings.",
     "casNext itself has no direct random draw; construction/layout helpers may draw. The surveyed yearly castle gate was an artificial decision throttle; current foundations and upgrades use daily eligibility and saved paid duration.",
-    "storageInvestment\u2019s former monthly index stagger was an artificial decision throttle. It is now daily, using current custody/economics and bounded within-pass survey reuse; physical construction retains paid working days.",
+    "storageInvestment’s former monthly index stagger was an artificial decision throttle. It is now daily, using current custody/economics and bounded within-pass survey reuse; physical construction retains paid working days.",
     "The growth audit found annual widening/vacancy unreachable except at settlement indexes divisible by six. The first bounded batch made occupancy/due falls daily and the annual stagger independent; current paid housing, widening, vacancy/refit and fabric proposals are all daily with actual materials and saved paid duration. Property inputs are certified live, as recorded in SIMULATION-GROWTH-INPUTS.md.",
     "Ward transfers become effective within Metro; syncOwner establishes the old owner and updates field lord/title state before downstream consumers.",
     "Closing stone forecast covers completed current work; storage commissions created after financial close first enter work/forecast tomorrow.",
@@ -2582,7 +2582,7 @@
           "tickGovernment",
           "tickFreedom"
         ],
-        "reads": "Current transaction evidence and closed production/meal/work purses; actual government duties precede personal claims and due native manor/eyre sittings. Court and royal officer quotes require current local presence, matching office identity and no conflicting institutional work. Only funded appointment releases the exact replaced office and invalidates canonical work rosters; these late writes affect tomorrow\u2019s ordinary production."
+        "reads": "Current transaction evidence and closed production/meal/work purses; actual government duties precede personal claims and due native manor/eyre sittings. Court and royal officer quotes require current local presence, matching office identity and no conflicting institutional work. Only funded appointment releases the exact replaced office and invalidates canonical work rosters; these late writes affect tomorrow’s ordinary production."
       },
       {
         "phase": "peoplePrepare",
@@ -2598,7 +2598,7 @@
           "benchSession",
           "tickEstates"
         ],
-        "reads": "Current real whereabouts, dated claims, actual consent and funded officers; credit settlement precedes judicial recovery. Overdue unassessed grants retry current collector eligibility daily until their genuine expiry. Actual delegated profit and current town funds pay daily mayor service after reserving the annual farm; replacement updates only the matching former office. Annual farm dues and quarter-day arrears remain dated. Closing offices affect tomorrow\u2019s ordinary work.",
+        "reads": "Current real whereabouts, dated claims, actual consent and funded officers; credit settlement precedes judicial recovery. Overdue unassessed grants retry current collector eligibility daily until their genuine expiry. Actual delegated profit and current town funds pay daily mayor service after reserving the annual farm; replacement updates only the matching former office. Annual farm dues and quarter-day arrears remain dated. Closing offices affect tomorrow’s ordinary work.",
         "per_settlement": [
           "communeDaily",
           "communeDue",
@@ -2664,7 +2664,7 @@
           "tickExpeditions",
           "tickMilitaryOrders"
         ],
-        "reads": "Actual living holders, current court consent and chests fund obligations; foreign opening holdings and voyages update before domestic native combat. Expedition participants remain actual absent people and physical goods/coin cross a registered boundary only. Equipment completed later today affects tomorrow\u2019s combat."
+        "reads": "Actual living holders, current court consent and chests fund obligations; foreign opening holdings and voyages update before domestic native combat. Expedition participants remain actual absent people and physical goods/coin cross a registered boundary only. Equipment completed later today affects tomorrow’s combat."
       },
       {
         "phase": "tickCaravans",
@@ -2749,7 +2749,7 @@
         "herdTake": "ba7669bf3022d2a6819791abd648aebb407375b09bd54ffa43513ef875f6194b",
         "abbeyCompoundValidate": "28cf377ee55b1ac7198f001dcdc503ac9aea6085b90fe1799ee94749b6132757",
         "abbeyCompoundComplete": "c3af894308970b94ced1d0c82ac62bc0564ca71c831d205e6af2aaeb11977d0e",
-        "abbeySitePlan": "5d6a8b9275c337dd6dbfe2ebf2188da2ad71484de32d7cb321427147d96e23e3",
+        "abbeySitePlan": "ca912626aec958ca808af967be1d2e23da3ec5df92519c9a447b5eb94153e6b8",
         "abbeyCommission": "3cc00b8d1cfcfd39be21dd124fa381e2d41e20ac5371d3e54ba983ebc492bf64",
         "abbeyYear": "3e53350f13860299736ac8de8a409aab10064bba5368cb93b6c8fbfd7d19d08c",
         "abbeyAdmit": "312aec1480453ddf38ae95e3910b83ffaa028bfeceeb0c78134f97aa632bedb8",
@@ -2760,7 +2760,7 @@
         "abbeyIndustryOperator": "381bb80a70ed77926f7654410322a7fd337e6d6a8073354a22a14745425997fc",
         "abbeyIndustryPrepare": "f6181744cd8bebee4486414fae9a435305cca1607ec1c56174ac331ffffdcba5",
         "abbeyMillPower": "a87ce3a013885c3f66fa9c9dc93e5c3a204f7049163d51d9736c1498f0863108",
-        "abbeyMillPlan": "3b8e88c0c9b0dd5d330e4a80f20a44640470ab93f1964653b343f110f1b39684",
+        "abbeyMillPlan": "cf857f4e97f73d7ec35d4eef8ed175806877dac032c98d10159fae0c26fe647a",
         "abbeyLeatherMouths": "d0d62e97e2a1b4e65aa803f54bceeb16e7242c06ae42d4f67fee4e07f5bd5061",
         "abbeyTanningTarget": "eb74aef07a4831ab54421db7292143e643346c0dbb33267f3bc31341cb5fdde0",
         "abbeyTanneryPlan": "272e9cd69aa12eb2a0d61ebbaf3ce68c4cdc1fbb740f97b29ae099857436c444",
@@ -2788,7 +2788,7 @@
       "top_level_phases": 59,
       "intended_history_change": true,
       "conservation": "Zero opening skins/leather and zero ordinary household NEED. Actual lawful cattle/sheep slaughter credits the actual slaughterer once; native purchases/held stocks fund conserved hide+timber-to-leather and finite own-use wear. No stock or persons from a label.",
-      "operative_checks": "One focused native-source file passes 25 checks. Full generated-world industries, save, history, worker/draw and conservation remain serialized root gates."
+      "operative_checks": "28 focused native-source checks pass in isolation, including exact original pose order and real footprint collision/refusal. Full generated-world industries, save, history, worker/draw and conservation remain serialized root gates."
     },
     "current_cadence": {
       "ordinary_clients": "Daily actual foundation/admission/staffing, commune/market-charter, learning, credit proposal, knightly service choice, estate investment, machinery, castle and paid housing eligibility. Idempotence and unchanged-input guards do not schedule an arbitrary later day.",
@@ -2813,14 +2813,26 @@
       "scope": "These legacy quantity/cadence debts remain outside the new-institution conversion. The full older simulation is not claimed to make every ordinary decision daily."
     },
     "assembled_source_review": {
-      "commit": "2d81f11",
-      "index_sha256": "cc172f2ce341ae801825504195710b070037d957958402fedcce4584d184965b",
+      "commit": "6140286",
+      "index_sha256": "f942b98851f5732c562c4fc5639a29c48a011044393168d24ae70c490800cde8",
       "top_level_phases": 59,
       "prerequisite_edges": 200,
       "own_use_hashes": {
         "reviewed": 39,
         "exact_matches": 39,
-        "scope": "Acorn FunctionDeclaration source.slice(start,end), exact UTF-8 SHA-256; all existing reviewed_function_sha256 entries retained unchanged."
+        "scope": "Acorn FunctionDeclaration source.slice(start,end), exact UTF-8 SHA-256. Only the reviewed abbeySitePlan and abbeyMillPlan pins change for bounded shared poses; the other 37 remain exact."
+      },
+      "native_fault_repairs": {
+        "reviewed_function_sha256": {
+          "abbeyFounder": "f36a7e633fc157a775b9cdaad7812dcfcc53b60b9f7d6619ddef3831154b61e4",
+          "abbeyFoundPlan": "008e6b62f569dd1b33ad8b17c2e8052c0cb22a3bbbe5b902b364fcd847dc0cb6",
+          "abbeyEndowLease": "411491c2e43cca6332f40c6370d78e39cdb8b7642f3086bd6030b5300b035ab7",
+          "abbeySitePoses": "1ef5d4518f7b2263ac6f8749df561e90f7a26e8c8f824156797d579185716bbd",
+          "learningUniversityQuote": "13e23d56ab5369f05f247ccad651bcd348d5109ecd46ac51e9abd672f582d46b",
+          "technologyEquipmentCandidates": "625985f7e17bca430b2a9fe5030726e478b69f104bffa71187c269b92b7d689e"
+        },
+        "intended_history_change": true,
+        "reason": "Resolve the actual Crown founder; reject unavailable university masters before pricing and readonly equipment queries; bounded eight-pose windmill sites retain native ground, public approach, power, qualification and payment constraints."
       },
       "recognized_legacy_search_inventory": {
         "sites": 410,
@@ -2828,16 +2840,16 @@
         "patterns": {
           "collection:folk": 49,
           "collection:buildings": 187,
+          "unscoped-entries": 15,
           "collection:streets": 70,
-          "collection:_owners": 16,
           "helper:workers_": 22,
+          "collection:_owners": 16,
           "helper:heads_": 35,
-          "helper:headsOf": 16,
-          "unscoped-entries": 15
+          "helper:headsOf": 16
         },
         "scope": "Actual tools/legacy-search-audit.mjs syntactic inventory, not runtime cost or a prohibition of necessary one-pass traversals."
       },
-      "validation_scope": "Read-only AST/source/hash inventory only. No tests, native worlds or release-gate claim."
+      "validation_scope": "Read-only AST/source/hash inventory; source repairs have focused regressions. Combined and native release gates pending."
     }
   }
 }

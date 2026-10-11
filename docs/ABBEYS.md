@@ -73,3 +73,5 @@ For the root's serialized native gate, `tools/abbey-native-fixture.mjs` supplies
 Personal status integration: native abbey admission rejects an actual unfree
 person until the origin claimant has released that person through #42. A
 religious role does not erase a personal bond or create a free second identity.
+
+The reviewed native-siting repair shares the original eight deterministic ground poses between ordinary ranges and own-use windmills. A church at a granted field centroid no longer prevents trying its existing bounded offsets. Whole-footprint title, public access, live wind/water power, qualified operators, reserves, actual materials and paid completion still gate the result. The focused industry file passes 28 checks; generated-world operability remains a release gate.
