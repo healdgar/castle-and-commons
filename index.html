@@ -12056,26 +12056,25 @@ function tickLordPlayer(){ // what comes to a lord's table
   if(W.war&&W.war.rebel!==hi&&!inRevolt(hi)&&!h._summoned&&day()-W.war.start>20){h._summoned=W.war.start;
     petition({key:'summons',to:hi,title:'The crown summons its vassals',pos:W.capital.pos,days:30,ai:h.loyalty>50?0:1,
       text:`${W.war.name} is begun. The crown calls on ${h.name} to send men and silver to the royal host. Your standing at court is ${Math.round(h.loyalty)}.`,
-      opts:[{label:'Send men and silver',cost:500,act:()=>{const ra=W.armies.filter(a=>a.house===0&&!a.gone).sort((a,b)=>b.strength-a.strength)[0];if(ra)ra.strength+=120;h.loyalty=clamp(h.loyalty+12,0,100);
-          emit('war',5,W.capital.pos,`${h.name} answers the summons; its men join the royal host.`);}},
-        {label:'Plead that the harvest needs every hand',act:()=>{h.loyalty=clamp(h.loyalty-8,0,100);emit('house',3,W.capital.pos,`${h.name} sends excuses, not men. The crown notes it.`);}}]});}
+      opts:[{label:'Send men and silver',cost:500,act:petitionClosure('summonsSend',h)},
+        {label:'Plead that the harvest needs every hand',act:petitionClosure('summonsRefuse',h)}]});}
   if(!W.war)h._summoned=0;
   if(W.petitions.length||!chance('sim',0.006))return; // now and then, the small business of a lordship
   const own=W.settlements.filter(s=>s.owner===hi);if(!own.length)return;const t=pick('sim',own),nb=lordNeighbours(hi).filter(j=>!atWar(hi,j));
   const r=rand('sim');
   if(r<0.35)petition({key:'mill'+hi,to:hi,title:`A quarrel at ${t.name}`,pos:t.pos,days:20,ai:0,
     text:`The miller at ${t.name} takes a heavy toll of the villagers' grain, and they come to you. The miller pays well for your favour; the villagers are many.`,
-    opts:[{label:'Find for the villagers',act:()=>{t.unrest=clamp(t.unrest-8,0,100);emit('house',2,t.pos,`${h.name} finds for the villagers of ${t.name} against the miller.`);}},
-      {label:'Find for the miller (he pays 150 gold)',act:()=>{levy(t,150,h,'justice');t.unrest=clamp(t.unrest+10,0,100);}}]});
+    opts:[{label:'Find for the villagers',act:petitionClosure('millVillagers',t,h)},
+      {label:'Find for the miller (he pays 150 gold)',act:petitionClosure('millMiller',t,h)}]});
   else if(r<0.6)petition({key:'chantry'+hi,to:hi,title:`The priest of ${t.name}`,pos:t.pos,days:25,ai:1,
     text:`The priest of ${t.name} asks for a chantry, that masses be sung for your house forever. The people would think well of it.`,
-    opts:[{label:'Endow the chantry',cost:300,act:()=>{t.unrest=clamp(t.unrest-6,0,100);t.prosperity=clamp(t.prosperity+2,0,100);book(h,'piety',-300);}},
-      {label:'The church is rich enough',act:()=>{}}]});
+    opts:[{label:'Endow the chantry',cost:300,act:petitionClosure('chantryEndow',t,h)},
+      {label:'The church is rich enough',act:petitionClosure('none')}]});
   else if(nb.length){const j=pick('sim',nb),o=W.houses[j];
     petition({key:'match'+hi+'_'+j,to:hi,title:`A match with ${o.name}`,pos:W.settlements[o.seat]?.pos,days:30,ai:o.loyalty>50?0:1,
       text:`${o.name} proposes a marriage between your houses: a pact that neither will make war on the other for ten years. They are ${W.settlements.filter(s=>s.owner===j).length}-towned, with ${Math.round(o.gold||0).toLocaleString()} gold, and stand ${Math.round(o.loyalty)} at court.`,
-      opts:[{label:'Agree the match',act:()=>{const until=day()+3600;(h.pacts||(h.pacts={}))[j]=until;(o.pacts||(o.pacts={}))[hi]=until;emit('house',4,W.settlements[h.seat]?.pos,`${h.name} and ${o.name} are joined by marriage; there will be peace between them.`);}},
-        {label:'Decline',act:()=>{(o.grudges||(o.grudges={}))[hi]=true;}}]});}
+      opts:[{label:'Agree the match',act:petitionClosure('matchAgree',h,j,o,hi)},
+        {label:'Decline',act:petitionClosure('matchDecline',o,hi)}]});}
 }
 
 function tickCastles(){ // decisions daily; only commissioned, paid projects change the castle
@@ -14522,11 +14521,9 @@ function tickPolitics(){
       petition({key:'grant'+hi,title:`${h.name} is restive`,pos:seatPos,
         text:`Envoys of ${h.name} come to court with a list of grievances. Their loyalty stands at ${Math.round(h.loyalty)}; they hint that a house so ill-used might look to its own banners.`,
         ai:0,opts:[
-        {label:'Grant them lands and offices',cost:600,act:()=>{h.loyalty=clamp(h.loyalty+12,0,100);
-          emit('crown',4,W.capital.pos,vary('crown_grant',[()=>`Seeking peace at home, the crown grants lands and offices to ${h.name}; old wounds are salved with gold.`,()=>`The crown grants lands and offices to ${h.name}, seeking peace at home; old wounds are salved with gold.`,()=>`To buy peace at home, lands and offices are granted by the crown to ${h.name}; old wounds are salved with gold.`,()=>`Old wounds are salved with gold: seeking peace at home, the crown grants lands and offices to ${h.name}.`,()=>`${h.name} is granted lands and offices by the crown, which seeks peace at home; old wounds are salved with gold.`,()=>`Lands and offices are heaped on ${h.name}; the crown seeks peace at home, and old wounds are salved with gold.`]));}},
-        {label:'Demand a hostage for their good faith',act:()=>takeHostage(hi)},
-        {label:'Send the envoys away empty-handed',act:()=>{h.loyalty=clamp(h.loyalty-5,0,100);W.legitimacy=clamp(W.legitimacy+1,0,100);
-          emit('crown',4,seatPos,`The crown dismisses the grievances of ${h.name}. Its envoys ride home in silence.`);}}]});
+        {label:'Grant them lands and offices',cost:600,act:petitionClosure('grantAccept',h)},
+        {label:'Demand a hostage for their good faith',act:petitionClosure('grantHostage',hi)},
+        {label:'Send the envoys away empty-handed',act:petitionClosure('grantRefuse',h,seatPos)}]});
     }
   }
   // riots & revolts
@@ -14546,9 +14543,8 @@ function tickPolitics(){
       if(nh!==ow&&nh===plyH()){const h=W.houses[nh];s.revolted=true;
         petition({key:'offer'+W.settlements.indexOf(s),to:nh,title:`${s.name} offers itself to you`,pos:s.pos,days:20,ai:1,
           text:`The townsmen of ${s.name} have driven out the crown’s bailiffs and send to ${h.name}: take us under your banner. The crown will call it theft.`,
-          opts:[{label:`Take ${s.name} under your banner`,act:()=>{if(s.owner!==ow)return;s.owner=nh;s.unrest=45;syncOwner(s);h.loyalty=clamp(h.loyalty-15,0,100);refreshOverlay();
-              emit('war',8,s.pos,`${s.name} hoists the banner of ${h.name}!`);}},
-            {label:'Send them back to their king',act:()=>{h.loyalty=clamp(h.loyalty+5,0,100);s.revolted=false;emit('house',3,s.pos,`${h.name} will not receive the rebels of ${s.name}.`);}}]});}
+          opts:[{label:`Take ${s.name} under your banner`,act:petitionClosure('offerAccept',s,ow,nh,h)},
+            {label:'Send them back to their king',act:petitionClosure('offerRefuse',h,s)}]});}
       else if(nh!==ow&&(nh>0||ow>0)){s.owner=nh;s.revolted=true;s.unrest=45;syncOwner(s);
         emit('war',8,s.pos,`${s.name} rises in revolt and hoists the banner of ${W.houses[nh].name}!`);
         refreshOverlay();
@@ -15971,9 +15967,8 @@ function tickBandits(dis){
       petition({key:'bounty'+camp.id,title:'Outlaws on the roads',pos:camp,
         text:`Merchants petition the crown: the robbers near ${nearestPlaceName(camp.x,camp.z)}${camp.king?', led by '+camp.king+',':''} have taken ${camp.raids} caravans. Will the crown send riders?`,
         ai:0,opts:[
-        {label:'Post a bounty and send riders',cost:200,act:()=>sendRiders(camp)},
-        {label:'The roads must look to themselves',act:()=>{camp.ignoreUntil=day()+240;W.legitimacy=clamp(W.legitimacy-1,0,100);
-          emit('trade',3,camp,`The crown will not spare riders for the roads near ${nearestPlaceName(camp.x,camp.z)}; the merchants hire their own guards.`);}}]});
+        {label:'Post a bounty and send riders',cost:200,act:petitionClosure('bountyAccept',camp)},
+        {label:'The roads must look to themselves',act:petitionClosure('bountyRefuse',camp)}]});
     }
     if(camp.patrol&&day()>=camp.patrolArrive){
       if(chance('sim',camp.king?0.45:0.75)){
@@ -16034,19 +16029,14 @@ function tickDragon(){
     // the crown responds, per the monarch's valor
     const m=W.monarch;
     if(m&&m.alive&&ageOf(m)>=16){
-      const swear=()=>{d.slayAt=day()+25;d.slayer=m.id;
-        emit('crown',8,W.capital.pos,`${fullTitle(m)} swears before the court to slay the wyrm, and calls for volunteers of good courage.`);};
-      const tribute=()=>{const t=Math.max(0,W.treasury*0.2);
-        W.treasury-=t;cashRecord('crown',-t,'Dragon tribute');d.hoard+=t;d.peaceUntil=day()+1800;
-        W.legitimacy=clamp(W.legitimacy-6,0,100);
-        emit('crown',7,W.capital.pos,`${fullTitle(m)} sends tribute of ${Math.round(t)} gold to the dragon's peak, buying an uneasy peace. The smallfolk grumble at the cost.`);};
+      const swear=petitionClosure('wyrmSwear',d,m);
+      const tribute=petitionClosure('wyrmTribute',d,m);
       petition({key:'wyrm',title:`${d.name} returns to its peak`,pos:{x:d.lair.x,z:d.lair.z},
         text:`The wyrm has fed on ${d.target.name} and flown home. The court looks to ${fullTitle(m)}: will the crown ride against it, or pay for peace?`,
-        ai:()=>m.traits.includes('bold')||(!m.traits.includes('craven')&&chance('sim',0.5))?0:1,
+        ai:petitionClosure('wyrmAI',m),
         opts:[{label:`Swear to slay it (${m.traits.includes('bold')?'bold — ':''}the monarch rides in person)`,act:swear},
               {label:'Send tribute (a fifth of the treasury)',act:tribute},
-              {label:'Do nothing, and bar the gates',act:()=>{W.legitimacy=clamp(W.legitimacy-3,0,100);
-                emit('crown',5,W.capital.pos,`The crown neither fights nor pays; the smallfolk mutter that the wyrm will come again.`);}}]});
+              {label:'Do nothing, and bar the gates',act:petitionClosure('wyrmRefuse')}]});
     }
   }
   if(d.slayAt&&day()>=d.slayAt){
@@ -18028,6 +18018,77 @@ function bestLegacy(){if(MODEL_ONLY&&WORKER_PRESENTATION.profile)return WORKER_P
 function saveBest(v){if(MODEL_ONLY&&WORKER_PRESENTATION.profile){if(v>WORKER_PRESENTATION.profile.best){WORKER_PRESENTATION.profile.best=v;WORKER_PRESENTATION.profileDirty=true;}return;}try{if(v>bestLegacy())localStorage.setItem('annals-best-'+SEED,String(v));}catch(e){}}
 
 /* ---- petitions ---- */
+// Petition makers only bind their original inputs: they neither decide nor throw dice when made again.
+// Private quotes and option snapshots travel in a save; actual people, places and purses retain their graph identity.
+const PETITION_CLOSURES=new WeakMap();
+const PETITION_MAKERS={
+  summonsSend:(h)=>()=>{const ra=W.armies.filter(a=>a.house===0&&!a.gone).sort((a,b)=>b.strength-a.strength)[0];if(ra)ra.strength+=120;h.loyalty=clamp(h.loyalty+12,0,100);
+          emit('war',5,W.capital.pos,`${h.name} answers the summons; its men join the royal host.`);},
+  summonsRefuse:(h)=>()=>{h.loyalty=clamp(h.loyalty-8,0,100);emit('house',3,W.capital.pos,`${h.name} sends excuses, not men. The crown notes it.`);},
+  millVillagers:(t,h)=>()=>{t.unrest=clamp(t.unrest-8,0,100);emit('house',2,t.pos,`${h.name} finds for the villagers of ${t.name} against the miller.`);},
+  millMiller:(t,h)=>()=>{levy(t,150,h,'justice');t.unrest=clamp(t.unrest+10,0,100);},
+  chantryEndow:(t,h)=>()=>{t.unrest=clamp(t.unrest-6,0,100);t.prosperity=clamp(t.prosperity+2,0,100);book(h,'piety',-300);},
+  none:()=>()=>{},
+  matchAgree:(h,j,o,hi)=>()=>{const until=day()+3600;(h.pacts||(h.pacts={}))[j]=until;(o.pacts||(o.pacts={}))[hi]=until;emit('house',4,W.settlements[h.seat]?.pos,`${h.name} and ${o.name} are joined by marriage; there will be peace between them.`);},
+  matchDecline:(o,hi)=>()=>{(o.grudges||(o.grudges={}))[hi]=true;},
+  grantAccept:(h)=>()=>{h.loyalty=clamp(h.loyalty+12,0,100);
+          emit('crown',4,W.capital.pos,vary('crown_grant',[()=>`Seeking peace at home, the crown grants lands and offices to ${h.name}; old wounds are salved with gold.`,()=>`The crown grants lands and offices to ${h.name}, seeking peace at home; old wounds are salved with gold.`,()=>`To buy peace at home, lands and offices are granted by the crown to ${h.name}; old wounds are salved with gold.`,()=>`Old wounds are salved with gold: seeking peace at home, the crown grants lands and offices to ${h.name}.`,()=>`${h.name} is granted lands and offices by the crown, which seeks peace at home; old wounds are salved with gold.`,()=>`Lands and offices are heaped on ${h.name}; the crown seeks peace at home, and old wounds are salved with gold.`]));},
+  grantHostage:(hi)=>()=>takeHostage(hi),
+  grantRefuse:(h,seatPos)=>()=>{h.loyalty=clamp(h.loyalty-5,0,100);W.legitimacy=clamp(W.legitimacy+1,0,100);
+          emit('crown',4,seatPos,`The crown dismisses the grievances of ${h.name}. Its envoys ride home in silence.`);},
+  offerAccept:(s,ow,nh,h)=>()=>{if(s.owner!==ow)return;s.owner=nh;s.unrest=45;syncOwner(s);h.loyalty=clamp(h.loyalty-15,0,100);refreshOverlay();
+              emit('war',8,s.pos,`${s.name} hoists the banner of ${h.name}!`);},
+  offerRefuse:(h,s)=>()=>{h.loyalty=clamp(h.loyalty+5,0,100);s.revolted=false;emit('house',3,s.pos,`${h.name} will not receive the rebels of ${s.name}.`);},
+  bountyAccept:(camp)=>()=>sendRiders(camp),
+  bountyRefuse:(camp)=>()=>{camp.ignoreUntil=day()+240;W.legitimacy=clamp(W.legitimacy-1,0,100);
+          emit('trade',3,camp,`The crown will not spare riders for the roads near ${nearestPlaceName(camp.x,camp.z)}; the merchants hire their own guards.`);},
+  wyrmSwear:(d,m)=>()=>{d.slayAt=day()+25;d.slayer=m.id;
+        emit('crown',8,W.capital.pos,`${fullTitle(m)} swears before the court to slay the wyrm, and calls for volunteers of good courage.`);},
+  wyrmTribute:(d,m)=>()=>{const t=Math.max(0,W.treasury*0.2);
+        W.treasury-=t;cashRecord('crown',-t,'Dragon tribute');d.hoard+=t;d.peaceUntil=day()+1800;
+        W.legitimacy=clamp(W.legitimacy-6,0,100);
+        emit('crown',7,W.capital.pos,`${fullTitle(m)} sends tribute of ${Math.round(t)} gold to the dragon's peak, buying an uneasy peace. The smallfolk grumble at the cost.`);},
+  wyrmAI:(m)=>()=>m.traits.includes('bold')||(!m.traits.includes('craven')&&chance('sim',0.5))?0:1,
+  wyrmRefuse:()=>()=>{W.legitimacy=clamp(W.legitimacy-3,0,100);
+                emit('crown',5,W.capital.pos,`The crown neither fights nor pays; the smallfolk mutter that the wyrm will come again.`);},
+  famineOpen:(s)=>()=>{s.stores.grain+=s.pop*0.6;giveFood(s,'grain',s.pop*0.6);s.unrest=clamp(s.unrest-10,0,100);W.legitimacy=clamp(W.legitimacy+2,0,100);
+      emit('trade',5,s.pos,`Wagons of royal grain roll into ${s.name}; the bells ring for the crown's mercy.`);},
+  famineEndure:(s)=>()=>{s.unrest=clamp(s.unrest+5,0,100);},
+  plagueSeal:(s)=>()=>sealGates(s,true),
+  coinRecoin:()=>()=>{if(recoinOrder(.1,.9)){W.legitimacy=clamp(W.legitimacy-3,0,100);emit('crown',3,W.capital.pos,'The Crown orders a lighter penny. Receipts await funded mint work; foreign merchants weigh the silver.');}},
+  borderFirst:(A,Bh)=>()=>{A.loyalty=clamp(A.loyalty+10,0,100);Bh.loyalty=clamp(Bh.loyalty-12,0,100);emit('crown',4,W.capital.pos,`The crown finds for ${A.name} in the matter of the water-meadows; ${Bh.name} leaves court in a fury.`);},
+  borderSecond:(A,Bh)=>()=>{Bh.loyalty=clamp(Bh.loyalty+10,0,100);A.loyalty=clamp(A.loyalty-12,0,100);emit('crown',4,W.capital.pos,`The crown finds for ${Bh.name} in the matter of the water-meadows; ${A.name} leaves court in a fury.`);},
+  borderDivide:(A,Bh)=>()=>{A.loyalty=clamp(A.loyalty-3,0,100);Bh.loyalty=clamp(Bh.loyalty-3,0,100);W.legitimacy=clamp(W.legitimacy+2,0,100);emit('crown',3,W.capital.pos,`The crown divides the disputed meadows; neither ${A.name} nor ${Bh.name} is pleased, but the realm calls it just.`);},
+  guildPermit:(Q)=>()=>craftGuildCmd(`${W.settlements.indexOf(Q.s)}:merchant:grant`),
+  guildRefuse:(Q)=>()=>craftGuildCmd(`${W.settlements.indexOf(Q.s)}:merchant:refuse`),
+  shrineRaise:(S)=>()=>{W.legitimacy=clamp(W.legitimacy+6,0,100);W.settlements.forEach(x=>x.unrest=clamp(x.unrest-5,0,100));emit('crown',4,S.pos,`A shrine is raised over the relic near ${S.name}; pilgrims come from every corner of the realm.`);},
+  shrineRefuse:()=>()=>{W.legitimacy=clamp(W.legitimacy-1,0,100);},
+  tourneyAccept:()=>()=>{tourneyProclaim(0,0);},
+  tourneyRefuse:(H)=>()=>{H.loyalty=clamp(H.loyalty-4,0,100);},
+  preacherSeize:(S)=>()=>{S.unrest=clamp(S.unrest+8,0,100);W.legitimacy=clamp(W.legitimacy+2,0,100);emit('fates',4,S.pos,`The crown's men drag the preacher of ${S.name} from his cart; the crowd jeers the soldiers.`);},
+  preacherPermit:(S)=>()=>{S.unrest=clamp(S.unrest-6,0,100);W.legitimacy=clamp(W.legitimacy-2,0,100);},
+  persuade:(o,host,req,h)=>()=>{
+    if(o.lever==='none')return;
+    // gold goes with the envoys (the petition takes it from the purse and the envoys carry it): his if he agrees, home again if he refuses
+    if(o.lever==='force'&&host){orderArmy(host,req.si??nearestSettlementIdx(req.pos.x,req.pos.z));}
+    const decide=day()+12+randi('sim',25),seat=W.settlements[h.seat]&&W.settlements[h.seat].owner===req.hi?h.seat:(req.si??nearestSettlementIdx(req.pos.x,req.pos.z));
+    G.ordersDirty=true;(W.projects=W.projects||[]).push({type:'persuade',req,lever:o.lever,p:clamp(o.p,0.03,0.97),pay:o.pay,give:o.give,decide,x:req.pos.x,z:req.pos.z});
+    sendEnvoy(seat,decide,`${req.title} (${h.name})`);
+    emit('crown',4,req.pos,`The crown's envoys ride to ${h.name} about ${req.what||req.title}${o.lever==='gold'?`, with ${o.pay.toLocaleString()} gold`:o.lever==='land'?', with a charter of lands':o.lever==='tax'?', offering to remit their dues':o.lever==='force'?', and the royal host rides behind them':''}.`);},
+  clearAccept:(si,p,R,hi,s)=>()=>{(W.projects=W.projects||[]).push({type:'clear',si,x:p.x,z:p.z,r:R,next:day()+20,gone:0,payer:hi});s.unrest=clamp(s.unrest+5,0,100);G.ordersDirty=true;},
+  fallRule:(P)=>()=>{P.legacy=0;P.amb={};P.since=day();P.startPop=realmPop();P.peaceSince=day();},
+  fallWatch:()=>()=>setSovereign(false),
+  risingRebel:(oi,oh)=>()=>{raiseArmy(oi,oh.seat,600*(oh.might||1),'rebel');oh.loyalty=Math.min(oh.loyalty,20);emit('war',8,W.settlements[oh.seat].pos,`${oh.name} declares for the rebels; old grudges run deep.`);refreshOverlay();},
+  risingCrown:(oh)=>()=>{oh.loyalty=clamp(oh.loyalty+5,0,100);emit('house',3,W.capital.pos,`${oh.name} sends the rebels’ envoys to the crown in chains.`);},
+  claimRaise:(hi,why)=>()=>{if(!W.war){W.truceUntil=0;startWar(hi,why);}},
+  debtSell:(to,price,h,sell)=>()=>{if(to===0)W.treasury-=price;else W.houses[to].gold-=price;h.gold+=price;cashRecord(purseAcct(to),-price,'Land bought',sell);cashRecord(h,price,'Land sold',sell);sell.owner=to;syncOwner(sell);refreshOverlay();
+        emit('house',6,sell.pos,`${h.name}, deep in debt, sells ${sell.name} and its lands to ${W.houses[to].name} for ${price.toLocaleString()} gold.`);},
+  debtHold:(h,own,seat)=>()=>{h.loyalty=clamp(h.loyalty-3,0,100);for(const s of own)s.prosperity=clamp(s.prosperity-4,0,100);emit('house',3,seat.pos,`The creditors of ${h.name} grow loud in ${seat.name}’s market.`);}
+};
+function petitionClosure(kind,...args){
+  if(!Object.hasOwn(PETITION_MAKERS,kind))throw Error('An unknown petition maker: '+kind);
+  const f=PETITION_MAKERS[kind](...args);PETITION_CLOSURES.set(f,{kind,args});return f;
+}
 function petition(p){
   if(!sovOn()||(p.to|0)!==(W.player.house|0)){if(p.sovOnly)return;runPetition(p,aiPick(p),true);return;} // not ours to answer: its lord (or the council) decides
   if(W.petitions.some(q=>q.key===p.key))return;
@@ -18095,9 +18156,8 @@ function famineStrikes(s){
   petition({key:'famine'+W.settlements.indexOf(s),sovOnly:true,title:`Famine in ${s.name}`,pos:s.pos,
     text:`The granaries of ${s.name} are bare and ${Math.round(s.pop).toLocaleString()} souls go hungry. The reeve begs the crown to send grain from the royal stores.`,
     ai:1,opts:[
-    {label:'Open the royal granaries to them',cost,act:()=>{s.stores.grain+=s.pop*0.6;giveFood(s,'grain',s.pop*0.6);s.unrest=clamp(s.unrest-10,0,100);W.legitimacy=clamp(W.legitimacy+2,0,100);
-      emit('trade',5,s.pos,`Wagons of royal grain roll into ${s.name}; the bells ring for the crown's mercy.`);}},
-    {label:'They must endure',act:()=>{s.unrest=clamp(s.unrest+5,0,100);}}]});
+    {label:'Open the royal granaries to them',cost,act:petitionClosure('famineOpen',s)},
+    {label:'They must endure',act:petitionClosure('famineEndure',s)}]});
 }
 function plagueArrives(s){
   // one plague question at a time, and not again for the same town within the year — it spreads often
@@ -18106,8 +18166,8 @@ function plagueArrives(s){
   petition({key:'plague',sovOnly:true,title:`Pestilence in ${s.name}`,pos:s.pos,
     text:`The sickness has come to ${s.name}. The physicians urge that its gates be sealed and the roads closed, though the merchants will howl and the town will suffer for it.`,
     ai:1,opts:[
-    {label:`Seal the gates of ${s.name} for three months`,act:()=>sealGates(s,true)},
-    {label:'Keep the roads open',act:()=>{}}]});
+    {label:`Seal the gates of ${s.name} for three months`,act:petitionClosure('plagueSeal',s)},
+    {label:'Keep the roads open',act:petitionClosure('none')}]});
 }
 function sealGates(s,on){
   if(on){s.quarantineUntil=day()+90;emit('fates',4,s.pos,`By order of the crown the gates of ${s.name} are sealed; no cart may pass in or out.`);}
@@ -18125,31 +18185,31 @@ function courtDilemma(){
   const all=[
     ()=>({key:'coin',title:'The Master of Coin proposes a remedy',pos:W.capital.pos,
       text:'He proposes a lighter coin at ninety percent of the opening silver standard, with a ten percent mint fee. Real moneyers must remint held coin on each place’s next assessment day; foreign merchants will ask more for their goods.',
-      opts:[{label:'Order lighter coin and recoinage',act:()=>{if(recoinOrder(.1,.9)){W.legitimacy=clamp(W.legitimacy-3,0,100);emit('crown',3,W.capital.pos,'The Crown orders a lighter penny. Receipts await funded mint work; foreign merchants weigh the silver.');}}},
-            {label:'Keep the coin honest',act:()=>{}}]}),
+      opts:[{label:'Order lighter coin and recoinage',act:petitionClosure('coinRecoin')},
+            {label:'Keep the coin honest',act:petitionClosure('none')}]}),
     ()=>{if(live.length<2)return null;const a=pick('sim',live);let b=pick('sim',live);if(b===a)b=live.find(x=>x!==a);
       const A=W.houses[a],Bh=W.houses[b];
       return {key:'border',title:'A quarrel over the border stones',pos:W.settlements[A.seat]?.pos,
       text:`${A.name} and ${Bh.name} both claim the same water-meadows, and both appeal to the crown. Whoever is refused will remember it.`,
-      opts:[{label:`Find for ${A.name}`,act:()=>{A.loyalty=clamp(A.loyalty+10,0,100);Bh.loyalty=clamp(Bh.loyalty-12,0,100);emit('crown',4,W.capital.pos,`The crown finds for ${A.name} in the matter of the water-meadows; ${Bh.name} leaves court in a fury.`);}},
-            {label:`Find for ${Bh.name}`,act:()=>{Bh.loyalty=clamp(Bh.loyalty+10,0,100);A.loyalty=clamp(A.loyalty-12,0,100);emit('crown',4,W.capital.pos,`The crown finds for ${Bh.name} in the matter of the water-meadows; ${A.name} leaves court in a fury.`);}},
-            {label:'Divide the meadows between them',act:()=>{A.loyalty=clamp(A.loyalty-3,0,100);Bh.loyalty=clamp(Bh.loyalty-3,0,100);W.legitimacy=clamp(W.legitimacy+2,0,100);emit('crown',3,W.capital.pos,`The crown divides the disputed meadows; neither ${A.name} nor ${Bh.name} is pleased, but the realm calls it just.`);}}]};},
+      opts:[{label:`Find for ${A.name}`,act:petitionClosure('borderFirst',A,Bh)},
+            {label:`Find for ${Bh.name}`,act:petitionClosure('borderSecond',A,Bh)},
+            {label:'Divide the meadows between them',act:petitionClosure('borderDivide',A,Bh)}]};},
     ()=>{const Q=W.settlements.map(s=>craftGuildQuote(s,'merchant')).find(Boolean);if(!Q)return null;return{key:'guild',title:`The merchants of ${Q.s.name} seek a charter`,pos:Q.s.pos,
       text:`Their actual masters offer ${Q.price.toFixed(1)} gold for the licence and its written charter. Their own purses pay the lord and the clerk.`,
-      opts:[{label:'Permit them to buy the charter',act:()=>craftGuildCmd(`${W.settlements.indexOf(Q.s)}:merchant:grant`)},{label:'Refuse the charter',act:()=>craftGuildCmd(`${W.settlements.indexOf(Q.s)}:merchant:refuse`)}]};},
+      opts:[{label:'Permit them to buy the charter',act:petitionClosure('guildPermit',Q)},{label:'Refuse the charter',act:petitionClosure('guildRefuse',Q)}]};},
     ()=>({key:'shrine',title:'The High Priest asks for a shrine',pos:W.capital.pos,
       text:`A relic has been found near ${S.name}. The High Priest would raise a shrine over it, and pilgrims would bless the crown that built it.`,
-      opts:[{label:'Raise the shrine',cost:800,act:()=>{W.legitimacy=clamp(W.legitimacy+6,0,100);W.settlements.forEach(x=>x.unrest=clamp(x.unrest-5,0,100));emit('crown',4,S.pos,`A shrine is raised over the relic near ${S.name}; pilgrims come from every corner of the realm.`);}},
-            {label:'The treasury has better uses',act:()=>{W.legitimacy=clamp(W.legitimacy-1,0,100);}}]}),
+      opts:[{label:'Raise the shrine',cost:800,act:petitionClosure('shrineRaise',S)},
+            {label:'The treasury has better uses',act:petitionClosure('shrineRefuse')}]}),
     ()=>{if(!live.length)return null;const hi=pick('sim',live),H=W.houses[hi];
       return {key:'tourney',title:`${H.name} begs a royal tourney`,pos:W.settlements[H.seat]?.pos,
       text:`${H.name} would have the crown proclaim a tourney in its honour, that its young knights might win renown before the court.`,
-      opts:[{label:'Commission actual lists and prizes',cost:0,act:()=>{tourneyProclaim(0,0);}},
-            {label:'Decline with courtesy',act:()=>{H.loyalty=clamp(H.loyalty-4,0,100);}}]};},
+      opts:[{label:'Commission actual lists and prizes',cost:0,act:petitionClosure('tourneyAccept')},
+            {label:'Decline with courtesy',act:petitionClosure('tourneyRefuse',H)}]};},
     ()=>({key:'preacher',title:`A wild preacher in ${S.name}`,pos:S.pos,
       text:`A barefoot friar in ${S.name} preaches that lords and kings are thieves before God. The crowds grow larger every market day.`,
-      opts:[{label:'Have him seized',act:()=>{S.unrest=clamp(S.unrest+8,0,100);W.legitimacy=clamp(W.legitimacy+2,0,100);emit('fates',4,S.pos,`The crown's men drag the preacher of ${S.name} from his cart; the crowd jeers the soldiers.`);}},
-            {label:'Let him preach',act:()=>{S.unrest=clamp(S.unrest-6,0,100);W.legitimacy=clamp(W.legitimacy-2,0,100);}}]})
+      opts:[{label:'Have him seized',act:petitionClosure('preacherSeize',S)},
+            {label:'Let him preach',act:petitionClosure('preacherPermit',S)}]})
   ];
   const d=pick('sim',all)();
   if(d){d.ai=d.ai??(d.opts.length-1);d.sovOnly=true;petition(d);}
@@ -18275,14 +18335,7 @@ function persuade(req){ // req: {hi, title, text, value (what it costs him, in g
     ...(host&&hs>=0?[{label:`Send the royal host to his gates (${odds(Math.min(0.8,0.25+Math.log2(Math.max(0.25,host.strength/Math.max(20,hs)))*0.18+war*0.5))}; he will not forget it)`,p:Math.min(0.8,0.25+Math.log2(Math.max(0.25,host.strength/Math.max(20,hs)))*0.18+war*0.5),lever:'force'}]:[]), // even a weak lord may call the crown's bluff
     {label:`Ask him plainly (${odds(0.1+loyal*1.5+war)})`,p:0.1+loyal*1.5+war,lever:'ask'},
     {label:'Let it be',lever:'none'}];
-  const opts=L.map(o=>({label:o.label,cost:o.cost,escrow:o.escrow,act:()=>{
-    if(o.lever==='none')return;
-    // gold goes with the envoys (the petition takes it from the purse and the envoys carry it): his if he agrees, home again if he refuses
-    if(o.lever==='force'&&host){orderArmy(host,req.si??nearestSettlementIdx(req.pos.x,req.pos.z));}
-    const decide=day()+12+randi('sim',25),seat=W.settlements[h.seat]&&W.settlements[h.seat].owner===req.hi?h.seat:(req.si??nearestSettlementIdx(req.pos.x,req.pos.z));
-    G.ordersDirty=true;(W.projects=W.projects||[]).push({type:'persuade',req,lever:o.lever,p:clamp(o.p,0.03,0.97),pay:o.pay,give:o.give,decide,x:req.pos.x,z:req.pos.z});
-    sendEnvoy(seat,decide,`${req.title} (${h.name})`);
-    emit('crown',4,req.pos,`The crown's envoys ride to ${h.name} about ${req.what||req.title}${o.lever==='gold'?`, with ${o.pay.toLocaleString()} gold`:o.lever==='land'?', with a charter of lands':o.lever==='tax'?', offering to remit their dues':o.lever==='force'?', and the royal host rides behind them':''}.`);}}));
+  const opts=L.map(o=>({label:o.label,cost:o.cost,escrow:o.escrow,act:petitionClosure('persuade',o,host,req,h)}));
   petition({key:'persuade'+req.hi+'_'+day(),title:req.title,pos:req.pos,text:req.text+` It is ${h.name}'s to order. How shall the crown persuade them?`,ai:L.length-1,opts,days:20});
   return true;
 }
@@ -18389,7 +18442,7 @@ function clearDistrict(p){
     const hi=s.owner,comp=gone.reduce((t,b)=>t+30+40*b.tier,0);
     return persuade({hi,si,pos:{x:p.x,z:p.z},value:comp*1.2,title:`Clear a quarter of ${s.name}`,what:`clearing a quarter of ${s.name}`,
       text:`The crown would have ${gone.length} houses of ${s.name} pulled down and the ground laid out anew; the householders would want some ${comp.toLocaleString()} gold.`,
-      onAccept:()=>{(W.projects=W.projects||[]).push({type:'clear',si,x:p.x,z:p.z,r:R,next:day()+20,gone:0,payer:hi});s.unrest=clamp(s.unrest+5,0,100);G.ordersDirty=true;}});}
+      onAccept:petitionClosure('clearAccept',si,p,R,hi,s)});}
   if((W.projects||[]).some(q=>q.type==='clear'&&q.si===si&&dist2d(q.x,q.z,p.x,p.z)<R*2)){emit('crown',2,p,'That quarter is condemned already.');return false;}
   const cost=gone.reduce((t,b)=>t+30+40*b.tier,0);
   G.ordersDirty=true;(W.projects=W.projects||[]).push({type:'clear',si,x:p.x,z:p.z,r:R,next:day()+20,gone:0});
@@ -18632,8 +18685,8 @@ function dynastyChanged(oldName,winner){
   const yrs=Math.floor((day()-P.since)/360),L=P.legacy;saveBest(L);
   petition({key:'fall',title:'Your line is broken',pos:W.capital.pos,days:90,ai:0,
     text:`The dynasty you guided${oldName?' ('+oldName+')':''} has lost the throne after ${yrs} year${yrs===1?'':'s'} of your rule, with a legacy of ${L}${bestLegacy()>L?' (best for this realm: '+bestLegacy()+')':''}. ${fullTitle(W.monarch)} now wears the crown.`,
-    opts:[{label:`Rule on as ${W.houses[0].name}`,act:()=>{P.legacy=0;P.amb={};P.since=day();P.startPop=realmPop();P.peaceSince=day();}},
-          {label:'Lay down the crown and return to the chronicle',act:()=>setSovereign(false)}]});
+    opts:[{label:`Rule on as ${W.houses[0].name}`,act:petitionClosure('fallRule',P)},
+          {label:'Lay down the crown and return to the chronicle',act:petitionClosure('fallWatch')}]});
 }
 
 function setSovereign(on,hi){
@@ -18792,22 +18845,21 @@ function incite(by,j){ // agents in a rival's market: bread riots and sedition; 
 function warPetition(oi,hi){const oh=W.houses[oi],rb=W.houses[hi];
   petition({key:'rising'+hi,to:oi,title:`${rb.name} rises against the crown`,pos:W.settlements[rb.seat]?.pos,days:25,ai:grievanceOf(oh)*riseOdds(rb===W.houses[hi]?hi:W.houses.indexOf(rb))>0.2?0:2,
     text:`${rb.name} has raised its banners. Its envoys come to ${oh.name} by night: will you ride with them? Your standing at court is ${Math.round(oh.loyalty)}.`,
-    opts:[{label:'Declare for the rebels',act:()=>{raiseArmy(oi,oh.seat,600*(oh.might||1),'rebel');oh.loyalty=Math.min(oh.loyalty,20);emit('war',8,W.settlements[oh.seat].pos,`${oh.name} declares for the rebels; old grudges run deep.`);refreshOverlay();}},
-      {label:'Stand with the crown',act:()=>{oh.loyalty=clamp(oh.loyalty+5,0,100);emit('house',3,W.capital.pos,`${oh.name} sends the rebels’ envoys to the crown in chains.`);}},
-      {label:'Keep to your own lands',act:()=>{}}]});}
+    opts:[{label:'Declare for the rebels',act:petitionClosure('risingRebel',oi,oh)},
+      {label:'Stand with the crown',act:petitionClosure('risingCrown',oh)},
+      {label:'Keep to your own lands',act:petitionClosure('none')}]});}
 function claimPetition(hi,why){const h=W.houses[hi];
   petition({key:'claim'+hi,to:hi,title:'The throne is weak',pos:W.capital.pos,days:30,ai:1,
     text:`${h.name} could press its claim now: it ${why.replace(/^presses/,'would press').replace(/^moves/,'would move')}. The great houses are watching.`,
-    opts:[{label:'Raise your banners and claim the throne',act:()=>{if(!W.war){W.truceUntil=0;startWar(hi,why);}}},{label:'Hold your peace',act:()=>{}}]});}
+    opts:[{label:'Raise your banners and claim the throne',act:petitionClosure('claimRaise',hi,why)},{label:'Hold your peace',act:petitionClosure('none')}]});}
 function debtPetition(hi,own){const h=W.houses[hi],seat=W.settlements[h.seat]||own[0];
   const sell=own.filter(s=>s!==seat).sort((a,b)=>dist2d(b.pos.x,b.pos.z,seat.pos.x,seat.pos.z)-dist2d(a.pos.x,a.pos.z,seat.pos.x,seat.pos.z))[0];if(!sell)return;
   const price=Math.round(sell.pop*1.6+300),buyers=W.houses.map((o,i)=>i).filter(i=>i!==hi&&!W.houses[i].exiled&&!atWar(i,hi)&&(i===0?W.treasury>price*3:(W.houses[i].gold||0)>price));
   const to=buyers.sort((a,b)=>purse(b)-purse(a))[0];
   petition({key:'debt'+hi,to:hi,title:'Your creditors press',pos:sell.pos,days:40,ai:to!=null?0:1,
     text:`${h.name} owes ${Math.round(-h.gold).toLocaleString()} gold. ${to!=null?`${W.houses[to].name} offers ${price.toLocaleString()} gold for ${sell.name} and its lands.`:'No house will buy.'}`,
-    opts:[...(to!=null?[{label:`Sell ${sell.name} to ${W.houses[to].name}`,act:()=>{if(to===0)W.treasury-=price;else W.houses[to].gold-=price;h.gold+=price;cashRecord(purseAcct(to),-price,'Land bought',sell);cashRecord(h,price,'Land sold',sell);sell.owner=to;syncOwner(sell);refreshOverlay();
-        emit('house',6,sell.pos,`${h.name}, deep in debt, sells ${sell.name} and its lands to ${W.houses[to].name} for ${price.toLocaleString()} gold.`);}}]:[]),
-      {label:'Hold on, and let the creditors wait',act:()=>{h.loyalty=clamp(h.loyalty-3,0,100);for(const s of own)s.prosperity=clamp(s.prosperity-4,0,100);emit('house',3,seat.pos,`The creditors of ${h.name} grow loud in ${seat.name}’s market.`);}}]});}
+    opts:[...(to!=null?[{label:`Sell ${sell.name} to ${W.houses[to].name}`,act:petitionClosure('debtSell',to,price,h,sell)}]:[]),
+      {label:'Hold on, and let the creditors wait',act:petitionClosure('debtHold',h,own,seat)}]});}
 function crownPanelHTML(){
   const P=W.player,m=W.monarch;
   if(!P.on)return `<div class="note">You are the chronicler: the realm governs itself and you watch — or play Providence from the Acts tab.</div>
@@ -21756,7 +21808,7 @@ function worldSaveEncode(){
   // The walk: every node once, in the order it is first met; an object's own keys in their order, accessors unread.
   const N=new WorldSaveWriter(),ids=new Map(),nodes=[null],up=[0],via=[''],strings=new Map(),shapeRoot={next:new Map(),id:-1},shapes=[],codes=new Map(),codeList=[];
   const classes=new Map([[Object.prototype,0],[null,1],[Array.prototype,2],[Map.prototype,3],[Set.prototype,4],[HouseholdPopulation.prototype,5],[OwnedMarket.prototype,6],[CommodityBalanceLedger.prototype,7]]);
-  const accessors=[],ownerOf={assets:new Map(),stores:new Map()},accounts=new Map(),layouts=[],hashes=[],ledgerNodes=[];
+  const accessors=[],ownerOf={assets:new Map(),stores:new Map()},accounts=new Map(),layouts=[],hashes=[],ledgerNodes=[],petitions=[];
   const path=id=>{const p=[];for(;id>0;id=up[id]){const k=via[id];p.push(typeof k==='number'?'['+k+']':k);}return 'world save'+p.reverse().join('');};
   const str=s=>{let i=strings.get(s);if(i===undefined)strings.set(s,i=strings.size);return i;};
   let out=N,from=0,key='';
@@ -21779,7 +21831,8 @@ function worldSaveEncode(){
   ref(root);
   for(let id=1;id<nodes.length;id++){const v=nodes[id];
     if(typeof v==='function'){const s=src(v);let c=codes.get(s);if(c===undefined){codes.set(s,c=codeList.length);codeList.push(s);}
-      N.u8(8);N.uv(c);const st=typeof v.state==='function'?v.state():null;if(st){N.u8(1);N.uv(st.length);from=id;key='.state';for(const x of st)val(x);}else N.u8(0);continue;}
+      N.u8(8);N.uv(c);const st=typeof v.state==='function'?v.state():null;if(st){N.u8(1);N.uv(st.length);from=id;key='.state';for(const x of st)val(x);}else N.u8(0);
+      const p=PETITION_CLOSURES.get(v);if(p){petitions.push([id,p]);from=id;for(let i=0;i<p.args.length;i++){key='.makerArgs['+i+']';const x=p.args[i];if(x&&(typeof x==='object'||typeof x==='function'))ref(x);}}continue;}
     if(OWNERSHIP_LARDS.has(v)){N.u8(9);N.uv(str('lard'));from=id;key='.s';val(OWNERSHIP_LARDS.get(v));continue;}
     if(COMMODITY_VIEW_PROXIES.has(v))throw Error('A world keeps an owner\'s ledger view as data, at '+path(id));
     if(v.isObject3D||v.isMaterial||v.isTexture||v.isBufferGeometry||v.nodeType)throw Error('A world cannot keep a drawn object, at '+path(id));
@@ -21801,7 +21854,7 @@ function worldSaveEncode(){
     if(c>1&&c!==7)throw Error('A strange object at '+path(id));if(c===7)ledgerNodes.push(id);N.u8(1);N.uv(c);N.u8(ext);props(v,id);
   }
   out=new WorldSaveWriter();const M=out,need=v=>{if(v&&(typeof v==='object'||typeof v==='function')&&!ids.has(v))throw Error('A maker\'s argument is not in the world');return v;};
-  // Makers: what they make is found again by its keys from what they return (a place's layout, and its context) or from the hash.
+  // Makers: layout/hash members by their saved paths; petition callbacks by their exact captured graph inputs.
   const made=new Map(),makers=[],plain=x=>typeof x==='function'||x&&typeof x==='object'&&(x instanceof Map||Object.getPrototypeOf(x)===Object.prototype);
   const mark=(v,mi,base,keys)=>{const id=ids.get(v);if(id===undefined||made.has(id))return;made.set(id,[mi,base,keys]);if(typeof v==='function'||v instanceof Map)return;
     for(const k of Reflect.ownKeys(v)){const d=Object.getOwnPropertyDescriptor(v,k);if('value'in d&&plain(d.value))mark(d.value,mi,base,[...keys,k]);}};
@@ -21811,6 +21864,7 @@ function worldSaveEncode(){
   for(const hid of hashes){const h=nodes[hid];if(made.has(hid)||Object.getPrototypeOf(h)!==Object.prototype)continue;const near=Object.getOwnPropertyDescriptor(h,'near')?.value;
     if(typeof near!=='function'||worldSaveFamilies().get(src(near))!=='hash'||typeof near.cell!=='number')throw Error('A strange spatial hash at '+path(hid));
     const mi=makers.length;makers.push(['hash',hid,near.cell]);mark(h,mi,0,[]);}
+  for(const[id,p]of petitions){const mi=makers.length;makers.push(['petition',id,p.kind,p.args.map(need)]);mark(nodes[id],mi,0,[]);}
   // Binders: an accessor's binder and what it closes over, from its owner.
   const FAM=worldSaveFamilies(),groups=new Map(),bound=new Set();
   for(const[owner,k,g,s,flags]of accessors){const fam=FAM.get(src(nodes[g]||nodes[s]));if(!fam||fam==='hash'||(g&&s&&FAM.get(src(nodes[s]))!==fam)||made.has(owner))throw Error('An accessor no binder makes, at '+path(owner)+'.'+k);
@@ -21831,7 +21885,7 @@ function worldSaveEncode(){
   for(let id=1;id<nodes.length;id++)if(typeof nodes[id]==='function'&&!made.has(id)&&!bound.has(id))throw Error('A closure no maker makes again ('+src(nodes[id]).slice(0,60)+'), at '+path(id));
   for(const id of ledgerNodes)if(!ledgers.some(([K])=>ids.get(K)===id))throw Error('A ledger outside the realm\'s places, at '+path(id));
   // The document: strings, shapes, codes, classes; then makers, binders and anchors; then the nodes.
-  M.uv(makers.length);for(const m of makers){M.text(m[0]);M.uv(m[1]);if(m[0]==='layout'){M.uv(m[2]);M.uv(m[3]);}else val(m[2]);}
+  M.uv(makers.length);for(const m of makers){M.text(m[0]);M.uv(m[1]);if(m[0]==='layout'){M.uv(m[2]);M.uv(m[3]);}else if(m[0]==='petition'){M.text(m[2]);M.uv(m[3].length);for(const a of m[3])val(a);}else val(m[2]);}
   const madeList=[...made].sort((a,b)=>a[0]-b[0]);M.uv(madeList.length);for(const[id,[mi,base,keys]]of madeList){M.uv(id);M.uv(mi);M.u8(base);M.uv(keys.length);for(const k of keys)M.uv(str(k));}
   M.uv(binders.length);for(const[fam,owner,args,slots]of binders){M.text(fam);M.uv(owner);M.uv(args.length);for(const a of args)val(a);M.uv(slots.length);for(const[k,g,s,f]of slots){M.uv(str(k));M.uv(g);M.uv(s);M.u8(f);}}
   M.uv(ids.get(ANNAL_META)??0);M.uv(nodes.length-1);
@@ -21862,7 +21916,7 @@ function worldSaveDecode(bytes,at){
   // A value before the nodes are made: a node is {r:id}.
   const raw=()=>{const t=R.u8();if(t>15)return t%2?-(t-15)/2:(t-16)/2;switch(t){case 0:return undefined;case 1:return null;case 2:return false;case 3:return true;case 4:{const z=R.uv();return z%2?-(z+1)/2:z/2;}
     case 5:return R.f64();case 6:return S[R.uv()];case 7:return {r:R.uv()};case 8:return BigInt(S[R.uv()]);}throw Error('An unreadable value');};
-  R.section();const makers=[];for(let i=0,n=R.uv();i<n;i++){const kind=R.text();makers.push(kind==='layout'?[kind,R.uv(),R.uv(),R.uv()]:[kind,R.uv(),raw()]);}
+  R.section();const makers=[];for(let i=0,n=R.uv();i<n;i++){const kind=R.text(),id=R.uv();if(kind==='layout')makers.push([kind,id,R.uv(),R.uv()]);else if(kind==='petition'){const key=R.text(),args=[];for(let j=0,k=R.uv();j<k;j++)args.push(raw());makers.push([kind,id,key,args]);}else makers.push([kind,id,raw()]);}
   const madeList=[];for(let i=0,n=R.uv();i<n;i++){const id=R.uv(),mi=R.uv(),base=R.u8(),k=R.uv(),keys=[];for(let j=0;j<k;j++)keys.push(S[R.uv()]);madeList.push([id,mi,base,keys]);}
   const binders=[];for(let i=0,n=R.uv();i<n;i++){const fam=R.text(),owner=R.uv(),args=[];for(let j=0,m=R.uv();j<m;j++)args.push(raw());const slots=[];for(let j=0,m=R.uv();j<m;j++)slots.push([S[R.uv()],R.uv(),R.uv(),R.u8()]);binders.push([fam,owner,args,slots]);}
   const annal=R.uv(),N=R.uv(),obj=new Array(N+1),off=new Float64Array(N+1),foff=new Float64Array(N+1),made=new Uint8Array(N+1),kind=new Uint8Array(N+1),views=[],proxies=[],states=new Map(),fcode=new Map();
@@ -21909,6 +21963,7 @@ function worldSaveDecode(bytes,at){
   for(let mi=0;mi<makers.length;mi++){const[kind,a,b,c]=makers[mi];
     if(kind==='hash')obj[a]=makeHash(b);
     else if(kind==='layout'){const s=obj[a],opening=madeList.some(([,owner,base,keys])=>owner===mi&&!base&&(keys[0]==='completeResidential'||keys[0]==='refreshExtent'));layoutSettlement(s,obj[b],opening);obj[c]=s._lay;s._lay.historyState();}
+    else if(kind==='petition')obj[a]=petitionClosure(b,...c.map(x=>x&&typeof x==='object'&&'r'in x?obj[x.r]:x));
     else throw Error('A strange maker: '+kind);}
   for(const[id,s]of proxies)obj[id]=ownershipLard(obj[s]);
   for(const[id,mi,base,keys]of madeList){const m=makers[mi];let o=m[0]==='layout'?(base?obj[m[2]]:obj[m[3]]):obj[m[1]];
