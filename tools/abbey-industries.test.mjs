@@ -98,7 +98,7 @@ test('own windmill searches beyond its occupied church centroid while retaining 
 
 test('private own-use mill does not veto native public windmill preflight',()=>{const r=setup();building(r,'mill','windmill');r.eval("H[2].tr='miller';H[2].craft={qualified:true,rank:'journeyman'};s.growSlots=[];price(s,'grain');price(s,'timber');let quotes=0;const nativeRecipe=constructionRecipe;constructionRecipe=(...args)=>{quotes++;return nativeRecipe(...args)};technologyWindmillProposal(s,true)");near(r.eval('quotes'),1);r.eval("s.buildings.push({arch:'windmill',state:'sound',removed:false,ownerId:'lord'});technologyWindmillProposal(s,true)");near(r.eval('quotes'),1);assert.ok(r.eval('bmill.abbey===a.storageOwnerId'));});
 
-function ruralSetup(){const r=setup();r.eval(['obbCorners','obbOverlap','locW','segDist','segSegDist','inPolyXZ','graveyardPolygonsOverlap','streetFootprintOverlap','serviceDoor','polyLen','occupiedGroundCells','compoundPolys','compoundGround','storageGroundClaim','storageGroundPay','institutionFoundationAccess','institutionFoundationPath','storageRoadPlan','serviceRoadPlan','castleFoundationReserved','landValue','landPrice'].map(fn).join('\n'));r.eval(`
+function ruralSetup(beforeCapture=''){const r=setup();r.eval(['obbCorners','obbOverlap','locW','segDist','segSegDist','inPolyXZ','graveyardPolygonsOverlap','streetFootprintOverlap','serviceDoor','polyLen','occupiedGroundCells','compoundPolys','compoundGround','storageGroundClaim','storageGroundPay','institutionFoundationAccess','institutionFoundationPath','storageRoadPlan','serviceRoadPlan','castleFoundationReserved','landValue','landPrice'].map(fn).join('\n'));r.eval(`
  const GRID=16,CELL=40,SIZE=640,LANDV={};cIdx=(x,z)=>z*GRID+x;toCell=x=>Math.floor((x+SIZE/2)/CELL);cellX=x=>-SIZE/2+(x+.5)*CELL;cellZ=cellX;PL=()=>1;
  W.monarch={alive:true,traits:['pious'],sk:[0,0,.6]};W.land.mask=new Uint8Array(GRID*GRID*4);for(let c=0;c<GRID*GRID;c++){W.land.mask[c*4]=1;W.land.mask[c*4+2]=255;}
  const privateField={...f,k:1,alms:null,own:'crown',wk:'crown',core:0,area:10000};privateField.title={own:propertyRightsResolve('crown'),work:propertyRightsResolve('crown')};let corridorFields=[privateField];occupiedGroundFields=cells=>new Set(cells.length?corridorFields:[]);occupiedGroundAreas=()=>new Map();
@@ -107,7 +107,7 @@ function ruralSetup(){const r=setup();r.eval(['obbCorners','obbOverlap','locW','
  let blocked=false,routeCalls=0;armyObstacle=()=>blocked;armySegmentClear=()=>!blocked;roadAccessClear=()=>!blocked;armyReach=()=>null;armyReachFrom=()=>false;armyReachClosed=()=>false;armyReachCovers=()=>false;armyReaches=()=>true;armyLandPath=(walker,P)=>{routeCalls++;return blocked?null:P;};
  const placed={near:()=>[]};s._lay.placed=placed;s._lay.segH={near:()=>s.streets.flatMap(st=>st.pts.slice(1).map((b,k)=>({a:st.pts[k],b,st,hw:st.hw})))};
  const base={key:'church',arch:'temple',tier:0,hm:1,accessMode:'abbey-rural',accessDonor:0,f:{x:200,z:0,w:12,d:22,rot:0}};
- `);r.eval([constant('ABBEY_APPROACH_SURVEY_CURRENT'),constant('ABBEY_APPROACH_SURVEY_NATIVE')].join('\n'));return r;}
+ `);if(beforeCapture)r.eval(beforeCapture);r.eval([constant('ABBEY_APPROACH_SURVEY_CURRENT'),constant('ABBEY_APPROACH_SURVEY_NATIVE')].join('\n'));return r;}
 
 test('rural abbey survey retains a paid long native approach and exempts only actual public surface',()=>{const r=ruralSetup();const cash=coins(r);r.eval(`const short=storageRoadPlan(s,base.f,s._lay.placed,s._lay.segH),site=abbeyApproachPlan(s,base,a.storageOwnerId),length=polyLen(site.path),recipe=abbeyApproachRecipe(s,site,{labour:120,days:360,timber:40,stone:0}),claim=abbeyApproachClaim(s,site,a);`);assert.equal(r.eval('short'),null);assert.ok(r.eval('length>150&&site.access.endpoint.kind===\"street\"&&site.access.endpoint.ref===0'));assert.ok(r.eval('abbeyApproachClear(s,site)'));assert.ok(r.eval('site.access.privatePolys.every(P=>P.every(p=>p.x>=3-1e-6))'));assert.ok(r.eval('site.access.land>0&&claim.ok&&claim.recipients.length===1&&claim.recipients[0].donated&&claim.recipients[0].due===0'));near(r.eval('recipe.labour'),120+r.eval('length')*.6);near(r.eval('recipe.days'),360+20+r.eval('length')/4);near(r.eval('recipe.timber'),40+r.eval('length')*.005);assert.equal(r.eval('W.projects.length'),0);near(coins(r),cash);});
 
@@ -208,10 +208,9 @@ test('own mill preflight carries actual wheel ground and rejects lost grant or p
 });
 
 
-function routeSetup(beforeCapture=''){const r=ruralSetup();const readers=['armyLandPath','armyDetour','armyReach','armyReaches','armyReachClosed','armyReachFrom','armyReachCovers','armySegmentClear','armyObstacle','armyBridgeAt','armyRaftAt','armyCauseway','hAt','riverAt','onRoad','paidRoadAt','walkedRoadAt','roadWalkedBounds','roadBounds','fortGround','fortSurface','motteSurface','fortCircuits','casRing','fortCenter','wallRadAt','wallKindAt','wallBuilt','wallProg','wallDmgAt','fortGateAngles','wallGates','citadelBarrier','citadelLocal','citadelBastion','citadelFootprintAt','citadelTownCut','hostileTo','atWar','inRevolt','inPoly','makeHash'];
- r.eval([constant('sstep'),constant('cIdx'),constant('inB'),constant('toCell'),...readers.map(fn)].join('\n'));
- r.eval(`HASH_STAMP=0;const SEA_SURFACE=.5,BACKGROUND=null,MOTTEH=9;W.h=new Float32Array(GRID*GRID).fill(10);W.dom=new Int16Array(GRID*GRID);W.roads=[];W.feuds=[];W.clock={day:now};W.rivHash=makeHash(40);s._lay.placed=makeHash(16);
-  const nativeHeight=hAt;let heightCalls=0;hAt=(...args)=>{heightCalls++;return nativeHeight(...args)};`);
+function routeSetup(beforeCapture=''){const readers=['armyLandPath','armyDetour','armyReach','armyReaches','armyReachClosed','armyReachFrom','armyReachCovers','armySegmentClear','armyObstacle','armyBridgeAt','armyRaftAt','armyCauseway','hAt','riverAt','onRoad','paidRoadAt','walkedRoadAt','roadWalkedBounds','roadBounds','fortGround','fortSurface','motteSurface','fortCircuits','casRing','fortCenter','wallRadAt','wallKindAt','wallBuilt','wallProg','wallDmgAt','fortGateAngles','wallGates','citadelBarrier','citadelLocal','citadelBastion','citadelFootprintAt','citadelTownCut','hostileTo','atWar','inRevolt','inPoly','makeHash'];
+ const r=ruralSetup([constant('sstep'),constant('cIdx'),constant('inB'),constant('toCell'),...readers.map(fn),`HASH_STAMP=0;const SEA_SURFACE=.5,BACKGROUND=null,MOTTEH=9;W.h=new Float32Array(GRID*GRID).fill(10);W.dom=new Int16Array(GRID*GRID);W.roads=[];W.feuds=[];W.clock={day:now};W.rivHash=makeHash(40);s._lay.placed=makeHash(16);
+  const nativeHeight=hAt;let heightCalls=0;hAt=(...args)=>{heightCalls++;return nativeHeight(...args)};`].join('\n'));
  if(beforeCapture)r.eval(beforeCapture);r.eval(constant('ABBEY_ROUTE_SURVEY_NATIVE'));return r;}
 
 test('shared native world edges retain exact directions, signed zeros and independent ghost samples',()=>{
@@ -314,4 +313,62 @@ test('uninterrupted native detour certifies once and restores its scope at actua
   const retained=walker._em,originalHeight=hAt;hAt=()=>0;const stale=armyLandPath(walker,[p,q]),fresh=armyLandPath({...walker,_em:undefined},[p,q]);hAt=originalHeight;`);
  assert.ok(r.eval('shared.length>2&&JSON.stringify(shared)===JSON.stringify(cold)&&checks===1'));assert.equal(r.eval('leftover'),undefined);
  assert.equal(r.eval('stale'),r.eval('fresh'));assert.equal(r.eval('stale'),null);assert.equal(r.eval('walker._em===retained'),true);assert.equal(r.eval('walker._em.abbeyRouteGuard'),undefined);
+});
+
+test('full Abbey corridor finds a usable detour where the old skinny native street route is declined',t=>{
+ const r=routeSetup();const cash=coins(r);r.eval(`base.f={x:-20,z:-19.2,w:12,d:22,rot:0};s.streets=[{kind:'main',pts:[{x:60,z:-100},{x:60,z:100}],hw:3}];
+  for(const z of [-13,-1.5]){const b={x:10,z,w:6,d:8,rot:0,state:'sound',arch:'house'};s.buildings.push(b);s._lay.placed.add(b,6);}
+  const p=serviceDoor(base.f),face=serviceDoor(base.f,0),skinny=serviceRoadPlan(s,p,s._lay.placed,null,1.3,undefined,base.f),oldPath=[face,...skinny.path],old={...base,path:oldPath,access:{endpoint:abbeyAccessEndpoint(s,oldPath),pathKey:JSON.stringify(oldPath)}};
+  const oldFits=abbeyApproachClear(s,old),quote=abbeyApproachPlan(s,base,a.storageOwnerId),clear=quote&&abbeyApproachClear(s,quote),claim=quote&&abbeyApproachClaim(s,quote,a),landing=serviceDoor(base.f,2),length=quote&&polyLen(quote.path);`);
+ t.diagnostic(JSON.stringify(r.eval('({oldFits,pathPoints:quote?.path.length,clear,length})')));assert.ok(r.eval('skinny.path.length===2&&!oldFits&&quote&&clear&&claim.ok&&quote.path.length>4'));
+ assert.ok(r.eval('quote.access.corridorFrom===2&&quote.path[1].x===p.x&&quote.path[1].z===p.z&&quote.path[2].x===landing.x&&quote.path[2].z===landing.z&&quote.access.endpoint.ref===0&&length>80'));
+ near(coins(r),cash);assert.equal(r.eval('W.projects.length'),0);r.eval('quote.path[2].z+=.1;quote.access.pathKey=JSON.stringify(quote.path)');assert.equal(r.eval('abbeyApproachClear(s,quote)'),false);
+});
+
+test('full native corridor checks parallel-bank clearance and current pending footprints before search accepts edges',()=>{
+ const r=routeSetup();r.eval(`const water={a:{x:0,z:-100},b:{x:0,z:100},hw:7,y:10,x:0,z:0};W.rivHash.add(water,107);
+  const C0=abbeyApproachSurvey(s),terrain=abbeyRouteTerrain(s),corridor=abbeyCorridorReady(s,C0,a.storageOwnerId,undefined,0,terrain),plain={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3},p={x:10,z:20},q={x:10,z:22};
+  const skinny=armySegmentClear(plain,p,q),wide=armySegmentClear({...plain,_em:abbeyRouteMemo(terrain),abbeyCorridor:corridor},p,q),far=armySegmentClear({...plain,_em:abbeyRouteMemo(terrain),abbeyCorridor:corridor},{x:12,z:20},{x:12,z:22});
+  W.projects.push({type:'compound',si:0,site:{f:{x:12,z:21,w:2,d:2,rot:0}}});const current=abbeyCorridorReady(s,abbeyApproachSurvey(s),a.storageOwnerId,undefined,0,abbeyRouteTerrain(s)),reserved=armySegmentClear({...plain,_em:abbeyRouteMemo(current.terrain),abbeyCorridor:current},{x:12,z:20},{x:12,z:22});`);
+ assert.equal(r.eval('skinny'),true);assert.equal(r.eval('wide'),false);assert.equal(r.eval('far'),true);assert.equal(r.eval('reserved'),false);
+});
+
+test('zero-payment corridor preflight refuses a native tenant and final positive freeholder licence remains unpaid at quote',()=>{
+ const r=routeSetup();r.eval(`privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh);const terrain=abbeyRouteTerrain(s),context=abbeyApproachSurvey(s),corridor=abbeyCorridorReady(s,context,a.storageOwnerId,undefined,0,terrain),p={x:80,z:20},q={x:82,z:20},walker={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3,_em:abbeyRouteMemo(terrain),abbeyCorridor:corridor};
+  const scope=abbeyRouteEnter(walker),tenant=armySegmentClear(walker,p,q),again=armySegmentClear(walker,p,q),known=corridor.claims.size;abbeyRouteLeave(walker,scope);privateField.wk=privateField.own=H[0]._hh;privateField.title={own:propertyRightsResolve(H[0]._hh),work:propertyRightsResolve(H[0]._hh)};
+  const freshTerrain=abbeyRouteTerrain(s),fresh=abbeyCorridorReady(s,abbeyApproachSurvey(s),a.storageOwnerId,undefined,0,freshTerrain),freeholder=armySegmentClear({...walker,_em:abbeyRouteMemo(freshTerrain),abbeyCorridor:fresh},p,q),site=abbeyApproachPlan(s,base,a.storageOwnerId),claim=site&&abbeyApproachClaim(s,site,a);`);
+ assert.equal(r.eval('tenant'),false);assert.equal(r.eval('again'),false);assert.ok(r.eval('known>0&&freeholder&&site&&claim.ok&&claim.recipients[0].due>0'));
+ assert.equal(r.eval('site.access.approachPaid'),undefined);assert.equal(r.eval('W.projects.length'),0);assert.ok(r.eval('privateField.title.work.owner===H[0]._hh&&privateField.title.own.owner===H[0]._hh'));
+});
+
+test('warmed full-width corridor caches cannot outlive native route scope or changed current inputs',()=>{
+ const mutations=[
+  ['same-day tenant right',`privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh)`],
+  ['day',`now++;privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh)`],
+  ['world',`W={...W};privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh)`],
+  ['settlement owner',`s.owner=1;privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh)`],
+  ['placed hash',`s._lay.placed=makeHash(16);privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh)`],
+  ['current title helper',`const claim0=storageGroundClaim;storageGroundClaim=(...args)=>claim0(...args);privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh)`],
+  ['private polygon helper',`const difference0=compoundPolygonDifference;compoundPolygonDifference=(...args)=>difference0(...args);privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh)`],
+  ['standing footprint',`const b={x:81,z:20,w:2,d:2,rot:0,state:'sound',arch:'house'};s.buildings.push(b);s._lay.placed.add(b,3)`],
+  ['pending corridor',`W.projects.push({type:'compound',si:0,site:{path:[{x:81,z:10},{x:81,z:30}]}})`]
+ ];
+ for(const [name,mutation] of mutations){const r=routeSetup(),cash=coins(r);r.eval(`const terrain=abbeyRouteTerrain(s),C0=abbeyApproachSurvey(s),corridor=abbeyCorridorReady(s,C0,a.storageOwnerId,undefined,0,terrain),p={x:80,z:20},q={x:82,z:20},walker={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3,_em:abbeyRouteMemo(terrain),abbeyCorridor:corridor},scope=abbeyRouteEnter(walker),warm=armySegmentClear(walker,p,q),repeat=armySegmentClear(walker,p,q),claimCount=corridor.claims.size,memoCount=corridor.memo.size;abbeyRouteLeave(walker,scope);`);
+  assert.ok(r.eval('C0.native&&warm&&repeat&&claimCount>0&&memoCount>0'),name+' warms actual indexed native corridor');r.eval(mutation);r.eval(`const current={...walker,house:s.owner,placed:s._lay.placed},cold=abbeyCorridorCold(current,corridor),expected=abbeyCorridorWorldClear({...current,_em:undefined},p,q,cold),actual=armySegmentClear(current,p,q);`);
+  assert.equal(r.eval('actual'),false,name);assert.equal(r.eval('actual'),r.eval('expected'),name+' retains cold full-width truth');assert.ok(r.eval('corridor.claims.size===claimCount&&corridor.memo.size===memoCount'),name+' leaves old scratch untouched');near(coins(r),cash);
+ }
+});
+
+test('stale corridor entry discards bank proofs and checks every native walker input',()=>{
+ const r=routeSetup();r.eval(`const T=abbeyRouteTerrain(s),corridor=abbeyCorridorReady(s,abbeyApproachSurvey(s),a.storageOwnerId,undefined,0,T),ordinary={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3},poison={};Object.defineProperty(poison,'hw',{get(){throw Error('stale flood proof was reused')}});corridor.banks.floods.push(poison);now++;s.streets=[];const result=serviceRoadPlan(s,{x:80,z:20},s._lay.placed,null,1.3,new Map(),base.f,corridor.banks,undefined,undefined,corridor),fresh=abbeyCorridorCold(ordinary,corridor);`);
+ assert.equal(r.eval('result'),null);assert.ok(r.eval('fresh!==corridor&&fresh.C!==corridor.C&&fresh.claims.size===0&&fresh.memo.size===0&&fresh.banks.floods.length===0&&fresh.terrain===null'));
+ for(const change of [`house:1`,`placed:makeHash(16)`,`waterClearance:1.3`,`requireRoadCrossing:false`,`raft:{}`])assert.equal(r.eval(`abbeyCorridorInputs(fresh,{...ordinary,${change}})`),false,change);
+ assert.equal(r.eval('abbeyCorridorInputs(fresh,ordinary)'),true);
+});
+
+
+test('a replaced spatial predicate cold-checks the complete ordered public surface instead of retaining an index exemption',()=>{
+ const r=routeSetup();r.eval(`const T=abbeyRouteTerrain(s),corridor=abbeyCorridorReady(s,abbeyApproachSurvey(s),a.storageOwnerId,undefined,0,T),p={x:0,z:20},q={x:0,z:22},walker={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3,_em:abbeyRouteMemo(T),abbeyCorridor:corridor},scope=abbeyRouteEnter(walker),warm=armySegmentClear(walker,p,q);abbeyRouteLeave(walker,scope);
+  privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh);let invalidIndexCalls=0;abbeySurveyIndexRows=()=>{invalidIndexCalls++;return []};const cold=abbeyCorridorCold(walker,corridor),actual=armySegmentClear(walker,p,q);`);
+ assert.ok(r.eval('warm&&!cold.C.native&&actual&&invalidIndexCalls===0'),'actual public road surface remains an easement, with no use of the invalid spatial index');
 });
