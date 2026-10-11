@@ -59,12 +59,14 @@ The running consumers are:
   collar/shoe fittings. Foreign anonymous ship supply is unchanged.
 - Army recipes pay real local native makers and consume material before arms
   or siege kit exists. Individual bows/armour record actual qualified native
-  holder IDs; deaths reduce the operative share. `technologyArmyEquipmentFactor
-  (s,army,'combat'|'siege')` exposes the paid gear effect for actual battle
+  holder IDs; deaths reduce the operative share. `technologyArmyEquipmentFactor(s,army,'combat'|'siege')` exposes the paid gear effect for actual battle
   clients. A completed ram/mining recipe is recorded as
   `army.techEquipment.siegeEngine`; completed trebuchets/cannon add their
-  specific method there. Capability alone confers no siege bonus. Combat,
-  ammunition, wear and captured gear remain actual army-client responsibilities.
+  specific method there. Capability alone confers no siege bonus. Native field clashes and assaults now consume the actual living-holder factor.
+  Wall battering requires a completed native engine and actual living engineers;
+  calendar changes supply no engines. Foreign battle clients share the same
+  completed records. Ammunition, wear and captured gear remain explicit limits
+  where no separate native stock exists.
 
 Recipes are `heavyPlough`, `horseshoe`, `horseCollar`, `loom`, `spinningWheel`,
 `fullingMill`, `tripHammer`, `sawmill`, `blastFurnace`, `paperMill`, `spectacles`,
@@ -86,12 +88,21 @@ without these graphs.
 
 Limits: paid windmill siting/grinding, explicit port quarantine, real canal
 locks and machine-specific guild resistance still require native clients.
+Army splits partition actual individual holders and divide their paid recipe
+provenance; one siege engine remains in the original army unless explicitly
+moved. Its method and generic engine alias share the same canonical record.
+Army merges retain extra actual machines in `reserveEquipment`; they confer
+no second anonymous crew or battle bonus. Automatic army ordering uses real
+funded idle native hosts at their own town. The same journaled equipment command
+can fund actual owned armies.
+
 Equipment has no separate wear stock; native site/owner/operator loss already
 stops its use. No simulation-century throughput or economy calibration claim
 follows from these focused fixtures.
 
-Light evidence: extracted inline JavaScript syntax and eleven focused cases in
+Light evidence: extracted inline JavaScript syntax and thirteen focused cases in
 `tools/equipment.test.mjs`, covering both native commodity ledgers, material and
 coin conservation, paid completion, actual exclusivity and current wages,
 finite mill work, held animal teams, paid paper/printing, native army holders,
-self-work and cold pure reports. Root runs all heavier combined gates.
+self-work, cold pure reports, actual native clashes/engineers and canonical
+army split/merge provenance. Root runs all heavier combined gates.

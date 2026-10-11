@@ -13,8 +13,8 @@ function fixture(commodity=false){
   f.H[1].tr='carpenter';f.H[2].tr='miller';f.H[3].tr='smith';f.H[4].tr='bowyer';f.H[5].tr='merchant';for(const [i,b]of[[0,rooms[0]],[3,rooms[2]]]){f.H[i].bh=b;f.H[i].craft={rank:'master',qualified:true,room:b.idx,employees:[],opened:0,takings:10000,lastWorkDay:1};b.craftMasters=[f.H[i].id];}
   f.eval('H.forEach(householdAccount);householdsOf(s)');f.W._pm=new Map(f.H.map(p=>[p.id,p]));f.s._job={weaver:{sum:10000,n:1},miller:{sum:10000,n:1},carpenter:{sum:10000,n:1},smith:{sum:10000,n:1},merchant:{sum:10000,n:1}};
   Object.assign(f.C,{day:()=>d,year:()=>0,AD:()=>1600,TRADE_W:{weaver:1,smith:1},TILLERS:new Set(['ploughman']),TRADE_ARCH:{weaver:'burgher',smith:'smithy'},KL:0,KR:1,KS:2,KLaw:3,KA:4,KRi:5,KCr:7,GW:0,GD:2,trait:()=>0,
-    price0:(s,g)=>s.px?.[g]??1,technologyKey:k=>k,technologyCapability:(s,key)=>({available:s.denied!==key}),waterMill:s=>!!(s.mill&&s.river&&s.mill.state==='sound'),institutionalCapability:()=>({available:true}),marketTradeIndexInvalidate:()=>{},sovOn:()=>true,plyH:()=>0,rentDue:()=>0,chestReserve:()=>0,esc:String,LS:{TILLED:1},ARABLE:new Set([1]),G:{ordersDirty:false},emit:()=>{}});
-  const names=['learningHead','learningPayer','learningFamilySize','learningPerson','learningSpare','learningTeacherCost','tradeIncome','corpFound','workers_','millHolder','technologyEffect'];
+    price0:(s,g)=>s.px?.[g]??1,technologyKey:k=>k,technologyCapability:(s,key)=>({available:s.denied!==key}),waterMill:s=>!!(s.mill&&s.river&&s.mill.state==='sound'),institutionalCapability:()=>({available:true}),marketTradeIndexInvalidate:()=>{},sovOn:()=>true,plyH:()=>0,rentDue:()=>0,chestReserve:()=>0,esc:String,LS:{TILLED:1},ARABLE:new Set([1]),G:{ordersDirty:false},emit:()=>{},houseAtWar:()=>false,notableById:()=>null,generalship:()=>1,menQuality:()=>1,horseShare:()=>0,rand:()=>.5});
+  const names=['resolveClash','siegeEngines','learningHead','learningPayer','learningFamilySize','learningPerson','learningSpare','learningTeacherCost','tradeIncome','corpFound','workers_','millHolder','technologyEffect'];
   vm.runInContext(rules+'\n'+names.map(fn).join('\n')+'\n'+craft,f.C);
   for(const g of ['timber','tools','stone','cloth','ore','wool','paper']){f.s.stores[g]=100;f.eval(`offer(s,'${g}','crown',100)`);}return{...f,rooms,setDay:x=>d=x};
 }
@@ -66,4 +66,18 @@ test('a native maker building his own device records real self-work without an i
 
 test('a real paper mill converts paid cloth and wood under one native commodity title',()=>{
   const f=fixture(true);f.s.mill.techEquipment={paperMill:{installed:true}};f.s._dem={paper:.5};const coins=f.coins(),paper=f.s.stores.paper,cloth=f.s.stores.cloth,timber=f.s.stores.timber;f.eval('technologyPaperMill(s)');near(f.s.stores.paper,paper+.5);near(f.s.stores.cloth,cloth-.1);near(f.s.stores.timber,timber-.05);near(f.eval('mkt(s,"paper").get(H[2])'),.5);near(f.coins(),coins);
+});
+
+
+test('native clash and siege battering consume actual paid gear instead of the calendar',()=>{
+  const f=fixture();f.W.weather={state:'clear'};const a={id:1,house:0,home:0,at:0,strength:3,morale:70,men:f.H.slice(0,3)},b={id:2,house:1,home:0,at:0,strength:3,morale:70,men:f.H.slice(3)};f.C.a=a;f.C.b=b;
+  assert.equal(f.eval('resolveClash(a,b)'),false);assert.equal(f.eval('siegeEngines(a,s)'),0);
+  a.techEquipment={crossbow:{installed:true,si:0,holders:a.men.map(p=>p.id)}};assert.equal(f.eval('resolveClash(a,b)'),true);
+  const engine={installed:true,method:'trebuchet',si:0,materials:{timber:40,tools:6},paid:300};a.techEquipment.siegeEngine=engine;a.techEquipment.trebuchet=engine;a.men[0].sk[7]=.5;a.men[1].sk[7]=.5;assert.ok(f.eval('siegeEngines(a,s)')>.0035);a.men.forEach(p=>{p.sk[7]=0;p.tr='archer';});assert.equal(f.eval('siegeEngines(a,s)'),0,'a real machine needs actual engineers');
+});
+
+test('army detachments partition actual holder kits and never duplicate the paid siege engine',()=>{
+  const f=fixture(),engine={installed:true,method:'trebuchet',si:0,materials:{timber:40},paid:300},a={home:0,men:f.H.slice(0,3),techEquipment:{crossbow:{installed:true,holders:f.H.map(p=>p.id),materials:{tools:60},paid:600},trebuchet:engine,siegeEngine:engine}},b={home:0,men:f.H.slice(3)};f.C.a=a;f.C.b=b;f.eval('technologySplitArmyEquipment(a,b)');assert.equal(b.techEquipment.siegeEngine,undefined);assert.equal(a.techEquipment.siegeEngine,engine);assert.equal(b.techEquipment.crossbow.holders.length,3);assert.equal(a.techEquipment.crossbow.holders.length,3);near(a.techEquipment.crossbow.paid+b.techEquipment.crossbow.paid,600);near(a.techEquipment.crossbow.materials.tools+b.techEquipment.crossbow.materials.tools,60);
+  a.men.push(...b.men);f.eval('technologyMergeArmyEquipment(a,b)');assert.equal(a.techEquipment.crossbow.holders.length,6);near(a.techEquipment.crossbow.paid,600);assert.equal(Object.keys(b.techEquipment).length,0);
+  a.men=f.H.slice(0,3);b.men=f.H.slice(3);f.eval('technologySplitArmyEquipment(a,b,{moveSiege:true})');assert.equal(a.techEquipment.siegeEngine,undefined);assert.equal(a.techEquipment.trebuchet,undefined);assert.equal(b.techEquipment.siegeEngine,engine);assert.equal(b.techEquipment.trebuchet,engine);
 });
