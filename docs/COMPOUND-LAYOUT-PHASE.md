@@ -1,9 +1,9 @@
 # Connected compound layouts
 
-Status: the first connected-layout implementation is reviewable in an isolated
-phase-two batch; generated-world, cold-save, worker and drawing gates remain with
-the serialized root runner. The accepted direction was recorded 2026-10-11. The
-published AD 1201 image still shows the predecessor’s actual paid church, with
+Status: the first connected-layout implementation is integrated in the unpublished
+phase-two candidate; generated-world, cold-save, worker and drawing gates remain
+with the serialized root runner. The accepted direction was recorded 2026-10-11.
+The retained AD 1201 image shows the predecessor’s actual paid church, with
 nave, chancel and bellcote; it is not evidence of a completed cloister.
 
 ## Shared requirement
