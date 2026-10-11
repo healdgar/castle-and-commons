@@ -31,3 +31,17 @@ function paving(){const r=setup();r.eval(`
 `);return r;}
 test('paving purchases the other end\'s real offered stone and progresses only by paid wages',()=>{const r=paving(),total=coins(r);r.eval('roadProjectTick(q)');near(r.eval('q.stoneInstalled'),4);near(r.eval('q.materialPaid'),8);near(r.eval('q.paid'),5);near(r.eval('road.grade'),0);near(r.eval('road.paveF'),0.5);near(r.eval('B.stores.stone'),0);near(coins(r),total);r.eval('roadProjectTick(q)');near(r.eval('road.grade'),1);near(r.eval('q.paid'),10);near(coins(r),total);});
 test('stone alone cannot pave a road when no native crew receives wages',()=>{const r=paving();r.eval('crew=false;roadProjectTick(q)');near(r.eval('q.stoneInstalled'),4);near(r.eval('q.worked'),0);near(r.eval('road.grade'),0);assert.equal(r.eval('q.reason'),'workers');});
+test('a commissioned owner project keeps the canonical household account when its head dies',()=>{const r=setup();r.eval(`
+  delete b.ch;b.arch='house';b.ownerId=H[0].id;transfer('crown',H[0],100,'actual owner savings',s);
+  q=fabricProjectCommission(s,b,{work:'tier',tier:1,payer:H[0],labour:10,days:2,timber:4,stone:0});const owner=householdAccount(H[0]);
+  if(q.payer!==owner)throw Error('payer must be the actual canonical household');H[0].dead=true;
+  if(fabricProjectPayer(q)!==owner)throw Error('same living household retains its paid contract');
+`);assert.ok(r.eval('q'));});
+test('a fully paid native footprint licence survives parcel succession without a second land charge',()=>{const r=setup();vm.runInContext(['storageGroundClaim','storageGroundPay'].map(fn).join('\n'),r.C);r.eval(`
+  const F={k:'native-field',title:{own:propertyRightsResolve(H[1].id),work:{owner:-1}},lord:0};W.land={mask:new Uint8Array(16)};let cells=[1,2];
+  compoundGround=()=>({cells:cells.slice()});occupiedGroundFields=()=>new Set([F]);occupiedGroundAreas=()=>new Map([[F,100]]);
+  transfer('crown',H[0],100,'real savings for land',s);q={site:{f:{}},land:20,paid:0};const payer=accountOwner(H[0]),claim=storageGroundClaim(s,q,payer);const result=storageGroundPay(q,s,payer,claim);
+  if(!result.ok||result.paid!==20)throw Error('full actual receipts required');const before=means(payer);
+  F.title.own=propertyRightsResolve(H[0].id);const inherited=storageGroundClaim(s,q,payer);if(!inherited.ok||inherited.recipients.length)throw Error('lawful successor takes the parcel subject to paid licence');
+  if(means(payer)!==before)throw Error('licence must not charge again');cells=[1,3];const moved=storageGroundClaim(s,q,payer);if(moved.ok)throw Error('paid licence must not move to different native ground');
+`);near(r.eval('q.landCash'),20);assert.equal(r.eval('q.groundClaim.cells.join(",")'),'1,2');});

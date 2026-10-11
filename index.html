@@ -5153,10 +5153,12 @@ function compoundMaterialDemand(s,g){const si=W.settlements.indexOf(s);let n=0;f
 
 function storageGroundClaim(s,q,payer){ // exact native ground titles, not a list of unrelated ploughmen
   if(!W.land)return {ok:!(q.land>0),key:null,recipients:[],reason:'ground-title'};
-  const ground=compoundGround(q.site||{f:{x:q.x,z:q.z,w:ARCH[q.arch][0],d:ARCH[q.arch][1],rot:0}}),cells=ground.cells.filter(c=>!W.land.mask||W.land.mask[c*4+2]!==255),fields=new Map(),recipients=new Map(),areas=occupiedGroundAreas(cells);
-  if(!cells.length)return {ok:true,key:null,recipients:[]}; // existing occupied fabric creates no new agricultural claim
+  const ground=compoundGround(q.site||{f:{x:q.x,z:q.z,w:ARCH[q.arch][0],d:ARCH[q.arch][1],rot:0}}),fullCells=[...ground.cells].sort((a,b)=>a-b);
+  if(q.landPaid&&q.groundClaim?.cells){const paid=q.groundClaim.cells;if(paid.length!==fullCells.length||paid.some((c,k)=>c!==fullCells[k]))return{ok:false,reason:'ground-footprint-changed'};return{ok:true,key:q.groundClaim.key,cells:fullCells,recipients:[]};} // a paid fixed footprint licence burdens the parcel after lawful succession
+  const cells=ground.cells.filter(c=>!W.land.mask||W.land.mask[c*4+2]!==255),fields=new Map(),recipients=new Map(),areas=occupiedGroundAreas(cells);
+  if(!cells.length)return {ok:true,key:null,cells:fullCells,recipients:[]}; // existing occupied fabric creates no new agricultural claim
   for(const F of [...occupiedGroundFields(cells)].sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0))fields.set(F,Math.max(1,areas.get(F)||0));
-  if(!fields.size)return {ok:!(q.land>0),key:null,recipients:[],reason:'ground-title'};
+  if(!fields.size)return {ok:!(q.land>0),key:null,cells:fullCells,recipients:[],reason:'ground-title'};
   const claims=[];let weight=0;
   for(const [F,n]of fields){const own=F.title?.own||propertyRightsResolve(F.own),work=F.title?.work||propertyRightsResolve(F.wk);
     let owner=own.owner;if(typeof owner==='number'&&owner<0||owner==null)owner=F.lord>=0?houseAcct(F.lord):null;
@@ -5168,14 +5170,14 @@ function storageGroundClaim(s,q,payer){ // exact native ground titles, not a lis
   }
   const key=claims.join('|');if(q.groundClaim&&q.groundClaim.key!==key)return {ok:false,reason:'ground-title-changed'};
   const R=[...recipients.values()];for(const r of R)r.due=r.owner===accountOwner(payer)?0:Math.max(0,q.land||0)*r.weight/weight;
-  return {ok:true,key,recipients:R};
+  return {ok:true,key,cells:fullCells,recipients:R};
 }
 function storageGroundPay(q,s,payer,ground){ // a saved receipt is the actual transfer; use of one's own ground carries no cash
   const payments=q.landPayments||{},remaining=r=>Math.max(0,r.due-(payments[r.id]||0)),due=ground.recipients.reduce((v,r)=>v+remaining(r),0);
   if(due>means(payer))return {ok:false,paid:0};let paid=0;
   for(const r of ground.recipients){const v=remaining(r);if(!(v>0))continue;const actual=transfer(payer,r.owner,v,'land',s)||0;payments[r.id]=(payments[r.id]||0)+actual;paid+=actual;}
   q.landPayments=payments;q.landCash=(q.landCash||0)+paid;q.paid=(q.paid||0)+paid;q.groundClaim={key:ground.key,recipients:ground.recipients.map(r=>({id:r.id,due:r.due})),quoted:q.land||0};
-  const ok=ground.recipients.every(r=>!(remaining(r)>1e-9));if(ok)q.landPaid=true;return {ok,paid};
+  const ok=ground.recipients.every(r=>!(remaining(r)>1e-9));if(ok){q.landPaid=true;q.groundClaim.cells=(ground.cells||[]).slice();}return {ok,paid};
 }
 
 /* Ordinary fabric uses the same stock and wage mechanics as institutional
@@ -5192,7 +5194,7 @@ function fabricProjectValidate(q,s){if(q.work==='new'){if(s.siegeBy)return{ok:fa
   if(q.extension&&typeof storageGroundClaim==='function'){const ground=storageGroundClaim(s,q,fabricProjectPayer(q));if(!ground.ok)return ground;}
   return{ok:true};}
 function fabricProjectCommission(s,b,plan){if(!['new','tier','rebuild','repair','refit','widen','church'].includes(plan?.work))return null;if((plan?.work!=='new'&&(!b||b.idx==null||fabricPending(b)))||!Number.isFinite(plan?.labour)||!(plan.labour>0)||!Number.isFinite(plan.days)||!(plan.days>0))return null;
-  const q={...plan,type:'fabric',si:W.settlements.indexOf(s),target:b?.idx??null,before:b?fabricSnapshot(b):null,site:plan.site||{f:{x:b.x,z:b.z,w:b.w,d:b.d,rot:b.rot}},start:day(),worked:0,done:0,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,status:'building',stalled:false,dead:false};
+  const q={...plan,payer:accountOwner(plan.payer),type:'fabric',si:W.settlements.indexOf(s),target:b?.idx??null,before:b?fabricSnapshot(b):null,site:plan.site||{f:{x:b.x,z:b.z,w:b.w,d:b.d,rot:b.rot}},start:day(),worked:0,done:0,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,status:'building',stalled:false,dead:false};
   const payer=fabricProjectPayer(q),V=payer&&fabricProjectValidate(q,s);if(!V?.ok)return null;const total=q.labour+q.timber*price(s,'timber')+q.stone*price(s,'stone')+(q.land||0);if(means(payer)<total)return null;
   (W.projects||(W.projects=[])).push(q);G.ordersDirty=true;return q;}
 function fabricProjectComplete(q,s){if(q.work==='new'){const b=s._lay.buildLot(q.slot,q.site.tier,true,'complete',q.site,q);if(!b)return false;b.ownerId=q.ownerId;b.title={owner:accountOwner(q.payer),beneficiary:q.payer?.gn!==undefined?q.payer:q.payer?.head||null};if(q.ownerId==='lord')b.title=propertyRightsResolve('lord');b.groundClaim=q.groundClaim;b.exactGround=true;b.grown=day();b.idx=W.bldList.length;W.bldList.push(b);s.growSlots=(s.growSlots||[]).filter(c=>{if(c.st===q.slot.st&&Math.abs(c.mx-q.slot.mx)<0.01&&Math.abs(c.mz-q.slot.mz)<0.01){c.done=true;return false;}return true;});if(q.slot.st.hidden){q.slot.st.hidden=false;G.roadsDirty=true;}clearLandUnder(b);bindPropertyRights(s);rehouse(s,b);settleParcels([b]);updateBuildingInstance(b);s._room=undefined;G.buildingsDirty=G.structuresDirty=true;return true;}
