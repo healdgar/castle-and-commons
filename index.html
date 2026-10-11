@@ -3833,7 +3833,7 @@ function mkPerson(s,si,o){
   p.hair=o.ma&&o.pa?(frand()<0.45?o.ma.hair:frand()<0.8?o.pa.hair:hairDraw(s.cult)):hairDraw(s.cult);
   p.gn=givenPick(s.cult||W.crownCult,p.sx,o.avoid);nameUse(p.gn,1);
   if(o.ma)(o.ma.kids||(o.ma.kids=[])).push(p);if(o.pa)(o.pa.kids||(o.pa.kids=[])).push(p); // the parish book: who were whose children
-  (s.folk||(s.folk=[])).push(p);invalidateFolkIndex();return p;}
+  (s.folk||(s.folk=[])).push(p);invalidateFolkIndex();if(W.freedom&&typeof freedomInherit==='function')freedomInherit(p,s);return p;}
 function life(p,t){if(!p||!t)return;const E=p.ev||(p.ev=[]);E.push([day(),t]);if(typeof HISTORY!=='undefined')HISTORY.event('life',{person:p.id,text:t});} // the complete ledger of a life, including the years before play begins
 function dropPerson(p,why){if(!p||p.dead)return;if(p.outlawCampId&&typeof outlawMemberDied==='function')outlawMemberDied(p);const s=W.settlements&&W.settlements[p.si];life(p,why||`Died at ${s?s.name:'home'}, aged ${Math.floor(ageYrs(p))}`);if(!p.merc&&s&&!/^Left the realm/.test(why||'')){const T=(s.buildings||[]).filter(b=>b.arch==='temple'&&b.state==='sound'&&!b.removed&&!b.castle&&!b.friary);let burial=null,bd=Infinity;const home=p._hh?.head?.bh||p.bh,x=home?.x??s.pos.x,z=home?.z??s.pos.z;for(const b of T){const d=dist2d(x,z,b.x,b.z);if(d<bd){bd=d;burial=b;}}p.burial=burial;if(burial){const ch=chOf(burial);ch.burials=(ch.burials||0)+1;}(s.dead||(s.dead=[])).push(p);}if(!p.merc&&W.settlements)inherit(p);p.dead=true;if(!p.merc)nameUse(p.gn,-1);if(p.sp){p.spR=p;p.sp.spR=p;p.sp.sp=null;p.sp=null;}
   invalidateFolkIndex();if(!p.merc)archivePerson(p);}
@@ -5374,7 +5374,7 @@ function musterSync(a){ // the roll follows the host's numbers: the released go 
 const WALK_MPD=750;
 function journey(p,from,to,why){ // p leaves `from` (already off its roll) and joins `to` when it arrives
   if(!W.settlements[from]||!W.settlements[to]){if(W.settlements[to]){p.si=to;W.settlements[to].folk.push(p);invalidateFolkIndex();}return;}
-  departHousehold(p,from,to,why);const r=from>=0&&to>=0?route(from,to):null,A=W.settlements[from],Bt=W.settlements[to];
+  if(typeof freedomLeave==='function')freedomLeave(p,from,to,why);departHousehold(p,from,to,why);const r=from>=0&&to>=0?route(from,to):null,A=W.settlements[from],Bt=W.settlements[to];
   const poly=r?r.poly:[{x:A.pos.x,z:A.pos.z},{x:Bt.pos.x,z:Bt.pos.z}],len=r?r.len:dist2d(A.pos.x,A.pos.z,Bt.pos.x,Bt.pos.z);
   p.si=-1;(W.travellers||(W.travellers=[])).push({p,from,to,why,poly,len,depart:day(),arrive:day()+Math.max(0.3,len/WALK_MPD)});}
 function inboundOf(){const m=new Map();for(const t of W.travellers||[])if(!t.errand)m.set(t.to,(m.get(t.to)||0)+1);return m;}
@@ -10892,7 +10892,7 @@ function inspectorCard(pk,full=false){
       h+=row('Household',`${hh===p?'':'of '+esc(folkName(hh))+'; '}worth ${Math.round(hh.w)} crowns${hh._debt>0.5?` (owing ${Math.round(hh._debt)})`:''}${strips.length?`; works ${strips.length} strip${strips.length>1?'s':''} (${ha.toFixed(1)} ha)${strips.some(f=>f.ten==='crop'&&f.own!==hh.id)?', some as a sharecropper':''}`:tills(hh,s)?'; no land: a labourer for wages':''}${own.filter(f=>f.wk!==hh.id).length?`; lets ${own.filter(f=>f.wk!==hh.id).length} to sharecroppers`:''}`);}}
     {const hh=detailHead(p);if(hh.w!==undefined){const counts={};for(const {head} of detailHouseholds(s))if(head?.tr&&!head.outlawCampId)counts[head.tr]=(counts[head.tr]||0)+1;const inc=tradeIncome(s,hh.tr,counts),herd=s._owners?.get(p._hh||hh._hh)?.animals||{},rh=hh.bh&&hh.bh.rural?(hh.bh.ownerId===hh.id?'their own farmstead out on the land':'a farmstead on the land they work, let by its owner'):null;
       h+=row('Living',`${hh.tr?esc(hh.tr):'labouring'}: about ${Math.round(inc)} crowns a year here${beastsWord(herd)?`; ${beastsWord(herd)}`:''}${rh?`; lives in ${rh}`:''}${p!==hh&&ageYrs(p)>=18&&!p.sp?(p.own?'; has set up house':'; still under the family roof'):''}`);}}
-    {const o=officeTitle(p);if(o)h+=row('Office',esc(o));}
+    {const o=officeTitle(p);if(o)h+=row('Office',esc(o));}h+=freedomPersonHTML(p);
     if(fm)h+=row('Family',`${esc(fm.n)} — ${{occ:'named for a founder\'s trade',loc:'named for where the first of them lived',nick:'named for how a founder looked or carried himself',patr:'named for a founder\'s father',fitz:'a lord\'s natural line'}[fm.k]||'an old name'}, first in ${esc(W.settlements[fm.home]?.name||'the realm')}`);
     h+=`<div class="note"><a class="tr" data-tree="${tKey(p)}">Family tree</a></div>`;
     if(full){h+=detailHousehold(s,p,name);h+=detailTable('detail-skills','Learning and skills',['Skill','Ability'],SKILLS.map((k,i)=>[esc(k),`${esc(skillWord(p.sk?.[i]||0)||'untaught')} · ${detailNumber((p.sk?.[i]||0)*100)}%`]));}
@@ -12009,7 +12009,7 @@ function initializeSimulation(){
     }
   }
   genLand();if(typeof technologyFields==='function')for(const s of W.settlements)technologyFields(s);prepareTrees();W.sapFree=Array.from({length:5000},(_,i)=>4999-i);
-  settleTracks();for(const s of W.settlements)settleFortGates(s);prepareFences();if(!directEra)simInit();
+  settleTracks();for(const s of W.settlements)settleFortGates(s);prepareFences();if(!directEra)simInit();if(typeof freedomPrepare==='function')freedomPrepare();
 }
 
 function addBuildingLive(s,settle=true){ // growth: empty houses fill first, then the next open frontage; when there is none the town reaches further out
@@ -13093,7 +13093,7 @@ function tickEconomy(){
   }
 }
 function storagePrepare(){for(const s of W.settlements)storageInit(s);} // every destination ledger is ready before cargo arrives
-function peoplePrepare(){W._pm=folkIndex();} // arrivals and new families have changed the opening roll
+function peoplePrepare(){W._pm=folkIndex();freedomPrepare();} // arrivals and new families have changed the opening roll
 function tickStorage(){for(const s of W.settlements)storageTick(s);}
 function tickSpoilage(){for(const s of W.settlements){const phaseK=commodityActive(s)?s.storage:undefined;
   for(const g of GOODS)if(LU[g]===undefined)spoilOwned(s,g,g==='fish'&&tradeCounts(s).salter?SPOIL.fish*0.1:SPOIL[g]||0,phaseK);}} // carriage has put today's output under cover
@@ -15271,7 +15271,47 @@ function governmentHTML(){const J=W.houses[0]?.justice,E=W.estates,S=E?.session,
   if(S)for(const v of S.votes)h+=row(esc(v.kind==='lord'?W.houses[v.who]?.name:W.settlements[v.who]?.name),'consent '+(+v.score.toFixed(3)));h+='<p>The ruler requests a rate. Once parliament is available, actual attending lords and burgesses vote before any assessment. Dues preserve a family’s next month of bread and rent.</p>';
   h+=row('Requested rural rate',+((E?.rate||1/15)*100).toFixed(3)+'% (towns one half more)')+`<div class="hb"><button data-cmd="c-subsidy-rate" data-arg="${Math.max(1/120,(E?.rate||1/15)-1/120)}">Lower request</button><button data-cmd="c-subsidy-rate" data-arg="${Math.min(1,(E?.rate||1/15)+1/120)}">Raise request</button></div>`;h+=`<button class="wbtn" data-cmd="c-estates" data-arg="${E?.rate||1/15}"${S?' disabled':''}>Summon estates for a subsidy</button>`;return h;}
 
-function tickJustice(){tickGovernment();W.settlements.forEach((s,si)=>{if(dueOn(si,90,37)&&s.pleas?.rows.length)courtSession(s,si);});if(!(typeof institutionalCapability==='function'?institutionalCapability(W.capital,'royalEyre').available:AD()>=EYRE_AD))return;royalEyreVisit();if(day()%30===17)royalEyreStart();} // the royal clerk reviews the held rolls monthly; only profitable, funded circuits ride
+/* =========================================================================
+   PERSONAL STATUS — a person's bond survives a change of land or household.
+   The manor's named customs price leave and release; a borough's year and day
+   protects only actual, continuously resident, unclaimed fugitives (#42).
+   ========================================================================= */
+function freedomState(){return W.freedom||(W.freedom={active:new Map(),roll:{rows:[],over:{}}});}
+function freedomRegister(p,status,bond){p.status=status;if(status==='villein'){p.bond=bond;freedomState().active.set(p.id,p);}else{delete p.bond;if(W.freedom)W.freedom.active.delete(p.id);}return status;}
+function freedomParent(p,s){return (s?.custom?.bondLine==='mother'?p.ma||p.pa:p.pa||p.ma)||null;}
+function freedomInherit(p,s,opening){if(p.status)return p.status;const par=freedomParent(p,s);if(par?.status==='villein')return freedomRegister(p,'villein',{si:par.bond.si,field:par.bond.field,holder:par.bond.holder});
+  if(par?.status==='free')return freedomRegister(p,'free');const f=opening;return f?freedomRegister(p,'villein',{si:W.settlements.indexOf(s),field:f.k,holder:null}):freedomRegister(p,'free');}
+function freedomPrepare(){if(W._freedomRevision===(W._folkRevision||0))return;const pending=[];for(const s of W.settlements){const unknown=(s.folk||[]).filter(p=>!p.dead&&!p.status);if(!unknown.length)continue;const bonds=new Map();
+    for(const f of s.furl||[])if(f.ten==='villein'){const p=(W._pm||folkIndex()).get(f.wk),h=p&&householdAccount(p);if(h&&!bonds.has(h))bonds.set(h,f);}
+    for(const p of unknown)pending.push([p,s,bonds.get(householdAccount(p))]);}
+  pending.sort((a,b)=>a[0].id-b[0].id);for(const[p,s,f]of pending)freedomInherit(p,s,f);W._freedomRevision=W._folkRevision||0;}
+function freedomOrigin(p){return p.bond&&W.settlements[p.bond.si];}
+function freedomLord(p){const b=p.bond,s=freedomOrigin(p);if(!s)return null;if(b.holder)return accountOwner(b.holder);const f=Number.isInteger(b.field)?W.land?.F?.[b.field]:null;return f?stripLord(f,s):lordAcct(s);}
+function freedomCustom(s,k){return s?.custom?.[k]??({chevage:1/60,leaveYears:1,releaseYears:5}[k]);} // named manor customs, in years of an adult's bread and years of those dues
+function freedomDues(p){const s=freedomOrigin(p);return s?foodYr()*freedomCustom(s,'chevage'):0;}
+function freedomFree(p,why,paid=0){const F=freedomState(),origin=p.bond?.si;freedomRegister(p,'free');delete p.fugitive;delete p.chevage;life(p,why);rollAdd(F.roll,{kind:'free',d:day(),who:p.id,name:folkName(p),origin,paid,why},48);}
+function freedomLeave(p,from,to,why){if(p.status!=='villein'||!p.bond||!['migrant','bride','abbey','school','apprentice'].includes(why))return;const A=W.settlements[from],B=W.settlements[to],lord=freedomLord(p);if(!A||!B||!lord||B===freedomOrigin(p)||lord===lordAcct(B))return;
+  const h=householdAccount(p),s=freedomOrigin(p),id=storageOwnerId(lord),perm=h.statusLeave;if(perm&&perm.day===day()&&perm.to===to&&perm.holder===id){p.chevage={to,due:day()+360};delete p.fugitive;return;}
+  const adults=[...h.members].filter(q=>!q.dead&&q.status==='villein'&&freedomLord(q)===lord&&ageYrs(q)>=16),price=adults.reduce((v,q)=>v+freedomDues(q),0)*freedomCustom(s,'leaveYears'),spare=Math.max(0,means(h)-courtKeep(A,p));
+  if(price<=spare){const paid=transfer(h,lord,price,'licence to leave',s);if(paid+1e-9>=price){h.statusLeave={day:day(),to,holder:id,paid};p.chevage={to,due:day()+360};delete p.fugitive;rollAdd(freedomState().roll,{kind:'leave',d:day(),who:p.id,name:folkName(p),from,to,paid},48);return;}}
+  p.fugitive={from:p.bond.si,to,fled:day(),resident:null,claim:null};delete p.chevage;rollAdd(freedomState().roll,{kind:'flight',d:day(),who:p.id,name:folkName(p),from:p.bond.si,to},48);}
+function freedomReleaseQuote(p){if(p.status!=='villein')return null;const s=freedomOrigin(p),lord=freedomLord(p);if(!s||!lord)return null;const dues=freedomDues(p),price=dues*freedomCustom(s,'releaseYears');return{s,lord,dues,price};}
+function freedomBuy(p){const Q=freedomReleaseQuote(p);if(!Q||householdHead(p)!==p||p.si<0||p.dead)return false;const home=W.settlements[p.si],A=householdAccount(p),spare=Math.max(0,means(A)-courtKeep(home,p));if(Q.price>spare)return false;
+  const remain=Math.max(0,60-ageYrs(p)),here=tradeIncome(home,p.tr),best=W.settlements.reduce((v,s)=>s.siegeBy?v:Math.max(v,tradeIncome(s,p.tr)-rentOfHome(s,p)),here),benefit=remain*Q.dues+Math.max(0,best-here)*Math.min(5,remain);
+  if(!(benefit>Q.price))return false;const paid=transfer(A,Q.lord,Q.price,'manumission',Q.s);if(paid+1e-9<Q.price)return false;freedomFree(p,`Bought freedom under the custom of ${Q.s.name}`,paid);return true;}
+function freedomClaim(p){const f=p.fugitive,s=freedomOrigin(p),town=W.settlements[p.si],lord=freedomLord(p);if(!f||f.claim||!s||!town||p.si!==f.to||!lord||day()-f.resident>=361)return false;const from=W.settlements.indexOf(s),to=p.si,r=route(from,to);if(!r||r.len>2400)return false;
+  const O=governmentOfficer(s,'bailiff',s.hundred?.bailiff);if(!O||awayNow(O))return false;const days=Math.max(0.25,r.len/WALK_MPD)*2+1,fee=Math.max(1,householdSize(s,O))*foodYr()/360*days,value=freedomDues(p)*Math.max(0,60-ageYrs(p));
+  if(!(value>fee)||means(lord)<fee||!errand(O,from,to,'fugitive claim',1))return false;const paid=transfer(lord,O,fee,'fugitive claim',s);const t=(W.travellers||[]).find(t=>t.p===O&&!t.home&&t.why==='fugitive claim'&&t.to===to&&t.depart>=day());if(!t)throw Error('A funded fugitive claim has no journey');
+  f.claim={official:O,arrive:t.arrive,to,holder:lord,paid};rollAdd(freedomState().roll,{kind:'claim',d:day(),who:p.id,name:folkName(p),official:O.id,to,paid},48);return true;}
+function tickFreedom(){const F=W.freedom;if(!F)return;for(const p of F.active.values()){if(p.dead){F.active.delete(p.id);continue;}if(p.status!=='villein'){F.active.delete(p.id);continue;}if(p.si<0){if(p.fugitive)p.fugitive.resident=null;continue;}const s=W.settlements[p.si],origin=freedomOrigin(p),lord=freedomLord(p);if(!s||!origin||!lord)continue;
+    if(freedomBuy(p))continue;const f=p.fugitive;if(f){if(p.si!==f.to){f.resident=null;f.claim=null;continue;}if(f.resident===null)f.resident=day();const c=f.claim;
+      if(c&&day()>=c.arrive){if(c.official.dead||c.holder!==lord){f.claim=null;}else if(day()-f.resident<361){const i=s.folk.indexOf(p);if(i>=0)removeAt(s,i);delete p.fugitive;journey(p,p.si,p.bond.si,'reclaimed');life(p,`Reclaimed by the court to ${origin.name}`);rollAdd(F.roll,{kind:'reclaimed',d:day(),who:p.id,name:folkName(p),official:c.official.id,paid:c.paid},48);continue;}else f.claim=null;}
+      if(!f.claim&&s.commune&&day()-f.resident>=361){freedomFree(p,`Free after a year and a day unclaimed in ${s.name}`);continue;}if(!f.claim)freedomClaim(p);}
+    if(p.chevage&&p.si===p.chevage.to&&householdHead(p)===p&&ageYrs(p)>=16&&day()>=p.chevage.due){const due=freedomDues(p),spare=Math.max(0,means(p)-courtKeep(s,p)),paid=transfer(p,lord,Math.min(due,spare),'chevage',origin);p.chevage.due+=360;rollAdd(F.roll,{kind:'chevage',d:day(),who:p.id,name:folkName(p),paid,assessed:due},48);if(paid+1e-9<due){p.fugitive={from:p.bond.si,to:p.si,fled:day(),resident:day(),claim:null};delete p.chevage;}}}}
+function freedomCmd(arg){const p=(W._pm||folkIndex()).get(+arg);if(!p||p.status!=='villein'||!sovOn())return;const s=freedomOrigin(p);if(!s||s.owner!==plyH()||freedomLord(p)!==houseAcct(plyH()))return;freedomFree(p,`Freed by the lord of ${s.name}`);}
+function freedomPersonHTML(p){let h=`<div class="row"><span>Personal status</span><b>${p.status==='villein'?'Unfree':p.status==='free'?'Free':'Not yet enrolled'}</b></div>`;if(p.status!=='villein')return h;const s=freedomOrigin(p),Q=freedomReleaseQuote(p);h+=`<div class="row"><span>Manor of origin</span><b>${esc(s?.name||'Unknown')}</b></div>`;if(Q)h+=`<div class="row"><span>Customary release price</span><b>${+Q.price.toFixed(2)}</b></div>`;if(p.fugitive)h+='<p>A flight claim remains possible until a chartered town’s year and day is complete.</p>';if(sovOn()&&s?.owner===plyH()&&freedomLord(p)===houseAcct(plyH()))h+=`<button class="wbtn" data-cmd="p-manumit" data-arg="${p.id}">Grant this person freedom</button>`;return h;}
+
+function tickJustice(){tickGovernment();tickFreedom();W.settlements.forEach((s,si)=>{if(dueOn(si,90,37)&&s.pleas?.rows.length)courtSession(s,si);});if(!(typeof institutionalCapability==='function'?institutionalCapability(W.capital,'royalEyre').available:AD()>=EYRE_AD))return;royalEyreVisit();if(day()%30===17)royalEyreStart();} // the royal clerk reviews the held rolls monthly; only profitable, funded circuits ride
 function justiceCmd(arg){const[a,k,v,...rest]=String(arg).split(':'),s=W.settlements[+a];if(rest.length||!s||!sovOn()||s.owner!==plyH()||k!=='cap'||!Number.isFinite(+v)||+v<0||+v>1)return;
   const h=W.houses[s.owner];if(h)(h.justice||(h.justice={})).cap=+v;}
 function courtCard(s,si){const C=s.court,J=W.houses[s.owner]?.justice,PM=W._pm||W._folkIndex||new Map(),person=(id,name)=>{const p=PM.get(id);return id>=0||p||name?`<a class="nm" data-nm="p${id}">${esc(p?folkName(p):name||'Person '+id)}</a>`:'No one appointed';},row=(k,v)=>`<div class="row"><span>${k}</span><b>${v}</b></div>`; // a court read does not populate the world's person index
@@ -15370,8 +15410,8 @@ function farmMills(s,si){ // the year's letting of the lord's mill and bakehouse
     if(!was||was.who!==best.id)life(best,`Took the farm of the ${mill?'mill':'bakehouse'} at ${s.name}, for ${Math.round(bid)} a year`);
     if(mill&&!s._millLet){s._millLet=true;if(!W.prehistory)emit('trade',2,s.pos,`The lord's mill at ${s.name} is let to ${folkName(best)} for ${Math.round(bid)} a year.`);}}}
 function merchet(s,w){ // a villein's daughter weds by her lord's leave, and the leave is bought (#36): her household pays it where it holds villein land, as heriot is found (inherit)
-  const B=householdAccount(w);if(!B||!s.furl)return 0;const ids=new Set();for(const p of B.members)ids.add(p.id);const f=s.furl.find(f=>f.ten==='villein'&&(ids.has(f.wk)||ids.has(f.own)));if(!f)return 0;
-  const lord=stripLord(f,s),assessed=customOf(s,'merchet')*foodYr(),paid=transfer(B,lord,assessed,'merchet',s);if(lord===lordAcct(s))lordTake(s,paid);
+  const B=householdAccount(w);if(!B||!s.furl||w.status==='free')return 0;const ids=new Set();for(const p of B.members)ids.add(p.id);const f=s.furl.find(f=>f.ten==='villein'&&(ids.has(f.wk)||ids.has(f.own)));if(!f&&w.status!=='villein')return 0;
+  const lord=w.status==='villein'&&typeof freedomLord==='function'?freedomLord(w)||stripLord(f,s):stripLord(f,s),assessed=customOf(s,'merchet')*foodYr(),paid=transfer(B,lord,assessed,'merchet',s);if(lord===lordAcct(s))lordTake(s,paid);
   courtEnrol(s,'merchet',w,{payer:B.head?.id??-1,payerName:B.head?folkName(B.head):'',partner:w.sp?.id??-1,partnerName:w.sp?folkName(w.sp):'',paid,assessed,...courtLord(s,f,lord)});return paid;}
 function liveries(T,sv,v,h){ // the hall pays its servants part of their wage in food from the lord's own stock at his seat, valued at the market, where that food would bring him less sold, for what spoils before it sells, than the coin it saves; the rest in coin (#36)
   if(!(v>0)||!sv.length)return payAmong(sv,v,h,'household',T);const owed=sv.map(()=>v/sv.length);let kind=0;
@@ -15571,7 +15611,7 @@ function soldiersPay(a,v,payer){ // a host's pay: to the households its men come
   if(!(v>0))return;if(payer){const can=Math.max(0,means(payer));if(can<v){a._arrears=(a._arrears||0)+(v-can);v=can;}else if(a._arrears>0){const back=Math.min(a._arrears,can-v);a._arrears-=back;v+=back;}if(!(v>0))return;}rollLiving(a);const M=a.men||[];if(!M.length){const t=W.settlements[a.home]||W.settlements[a.at];payAmong(t?heads_(t,h=>ageYrs(h)<50):[],v,payer,'hosts',t);return;}/* the levy is of the host's own country */const each=v/M.length;
   for(const p of M){const to=p.merc?'out':(p.sp&&!p.sp.dead?p.sp:(p.ma&&!p.ma.dead?householdHead(p.ma):p));transfer(payer,to,each,'hosts',W.settlements[a.home]||W.settlements[a.at]);}}
 function inherit(p){invalidateFolkIndex();p._dying=true;const h=householdAccount(p);if(!h)return;const s=W.settlements[p.si]||W.settlements.find(x=>h.population.has(x))||W.capital;
-  const isHead=h.head===p,servile=(s.furl||[]).some(f=>f.ten==='villein'&&(f.wk===p.id||f.own===p.id)),survivors=[...h.members].filter(q=>q!==p&&!q.dead),widow=p.sp&&!p.sp.dead?p.sp:null;let heirs,shares;ESTATE_CHILDREN=new Map();try{heirs=landHeirs(p,s);shares=isHead?estateShares(p,s):[];}finally{ESTATE_CHILDREN=null;}
+  const isHead=h.head===p,servile=p.status?p.status==='villein':(s.furl||[]).some(f=>f.ten==='villein'&&(f.wk===p.id||f.own===p.id)),survivors=[...h.members].filter(q=>q!==p&&!q.dead),widow=p.sp&&!p.sp.dead?p.sp:null;let heirs,shares;ESTATE_CHILDREN=new Map();try{heirs=landHeirs(p,s);shares=isHead?estateShares(p,s):[];}finally{ESTATE_CHILDREN=null;}
   const changed=[];let heriot=null;const enrol=()=>{for(const[t,f,was]of changed)courtLand(t,f,was,'inheritance');if(heriot)courtEnrol(s,'heriot',p,heriot);}; // occupation projects the settled household head, after the estate is divided
   // Land, occupation and movables are different rights. A minor's holding is not forfeited for want of an adult.
   for(const t of W.settlements){for(const f of t.furl||[]){if(f.own!==p.id&&f.wk!==p.id)continue;const was=courtHolding(f);if(f.own===p.id){const heir=heirs.length?heirs[(f.k||0)%heirs.length]:null;f.own=heir?heir.id:-1;if(heir)f._ent=heir.id; /* his entry fine falls due at the place's next reckoning (tickTenure, #36) */
@@ -15579,7 +15619,7 @@ function inherit(p){invalidateFolkIndex();p._dying=true;const h=householdAccount
     for(const b of t.buildings||[])if(b.ownerId===p.id)b.ownerId=heirs.length?heirs[(b.k||0)%heirs.length].id:widow?widow.id:'lord';householdHeadsChanged(t);}
   if(!isHead){householdMemberDelete(h,p);enrol();return;}
   // Customary heriot is a single best beast from a servile tenant, not seizure of the whole family's goods.
-  if(inheritanceCustom(s).heriot&&servile){const H=h.assets.herd||{},best=BEASTS.filter(g=>(H[g]||0)>=1).sort((a,b)=>price(s,b)-price(s,a))[0];if(best){H[best]-=1;offer(s,best,lordAcct(s),1);heriot={beast:best,qty:1,...courtLord(s,null,lordAcct(s))};}}
+  if(inheritanceCustom(s).heriot&&servile){const H=h.assets.herd||{},best=BEASTS.filter(g=>(H[g]||0)>=1).sort((a,b)=>price(s,b)-price(s,a))[0];if(best){H[best]-=1;const recipient=p.status==='villein'&&typeof freedomLord==='function'?freedomLord(p)||lordAcct(s):lordAcct(s);offer(s,best,recipient,1);heriot={beast:best,qty:1,...courtLord(s,null,recipient)};}}
   repay(p,Math.max(0,h.assets.w||0));
   // Insolvent estates satisfy creditors with chattels in kind, at local prices; heirs incur no personal debt.
   let value=0;
@@ -17389,6 +17429,7 @@ function runCmd(cmd,arg){
     case 'c-eyre':royalEyreCmd();break;
     case 'c-estates':case 'c-subsidy-rate':case 's-charter':case 'h-attend':case 'h-stay':governmentCmd(cmd,arg);break;
     case 's-learning':technologyCmd(arg);break;
+    case 'p-manumit':freedomCmd(arg);break;
     case 's-custom':case 's-svc':manorCmd(cmd,arg);break; // the customs of a manor, and its services commuted or kept in hand (#36)
     case 'a-order':case 'a-road':case 'a-raft':case 'a-objective':case 'a-hold':case 'a-release':case 'a-disband':case 'a-split':case 'a-merge':case 'a-garrison':armyCmd(cmd.slice(2),arg);break;
   }
@@ -19700,6 +19741,7 @@ function workerCommandTarget(e){
       if(c==='s-work'){
         const [si,k,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!WORKS.some(w=>w[0]===k))throw Error('Invalid works command');return 'worker';
       }
+      if(c==='p-manumit'){if(!/^\d+$/.test(a)||!workerCommandId(+a)||!(W._pm||folkIndex()).has(+a))throw Error('Invalid freedom command');return 'worker';}
       if(c==='s-learning'){const [si,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||v===undefined||v.trim()===''||!Number.isFinite(+v)||+v<0)throw Error('Invalid learning command');return 'worker';}
       if(c==='s-justice'){const [si,k,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||k!=='cap'||!/^\d+(\.\d+)?$/.test(v||'')||+v>1)throw Error('Invalid justice command');return 'worker';}
       if(c==='c-eyre'){if(a!=='')throw Error('Invalid eyre command');return 'worker';}

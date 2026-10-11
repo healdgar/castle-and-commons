@@ -45,6 +45,15 @@ and the remaining demand. Castle and storage clients retain their own eligibilit
 recipes, site checks and completion. Storage's legacy land-payment policy is
 separate (#63); extracting wages does not certify that quoted land field.
 
+The current institution integration adds internal dependencies without changing
+those 52 top-level boundaries: technology discovery/local paid adoption runs
+first in economy, reading prior staffing/support and actual incoming contacts
+before current crop/mill production. Government runs first inside justice,
+followed by daily personal-status decisions and existing due manor/eyre business.
+Personal status is initially enrolled after native opening land and refreshed for
+unknown actors in person preparation; migration records leave/flight before
+departure. These are intended model changes, with combined gates pending.
+
 ## The fixed day
 
 | Stage | Order and source | Same-day meaning |
