@@ -108,6 +108,8 @@ cash, goods, reserved ground and records; tomorrow must see those changes, and
 `commoditySettleAll(true)` must follow the last stock writer. Moving a costly
 phase earlier does not remove that dependency or reduce its total work.
 
+Current `af07d28` also keeps a paid pending private footprint and approach reserved against later public street/quarter/square/wall and road proposals. Validation runs before commissioning or further material/work payment and again at completion. Only a proved current retained public endpoint segment allows a connecting road/street overlap; the existing two-metre native fit margin is clearance, not extra claimed or paid land. The day602 nonpublic wedge remains refused. Actual funded unsuccessful purchases feed the unchanged monthly `reprice` formula on the next genuine market day; repricing creates no goods, payment or work. Fresh `af07d28`90-day feasibility passes with three abbeys/231 projects and clean cash/goods/faults; full history/save, core/industry and release gates remain pending. Frozen `61dd0bb`’s later core was deliberately stopped at audited closed660, with four abbeys and a completed Benedictine church; the exact actual church-only draw is not full-core/industry completion.
+
 Frozen `219b90e` exceeded the original 120-second deadline in partial day
 50 after 49 closed days. Its later 5.396-second live CPU sample put 99.27% in
 `serviceRoadPlan`, 97.2% in `armyLandPath` and 90.3% in full-corridor world
@@ -136,7 +138,7 @@ after the earlier straight-span cost was resolved. Runner totals are
 RSS 1840044 KB, including generation/audits/saves. No partial67 snapshot
 becomes a baseline; day-0/day-37 FWS stay tied to that stopped source.
 
-Current `61dd0bb` instead derives a conservative whole-route length from actual
+Frozen `61dd0bb` instead derives a conservative whole-route length from actual
 available purse, minimum endowment, current timber price and adopted labour/
 equipment recipe. Only a registered current native founding quote forwards it;
 a necessary landing–goal ellipse refuses unaffordable target/node queries
@@ -153,10 +155,9 @@ Day37 full-graph/exact-resave and113-day/678raw continuation also pass, with
 clean cash/goods/faults. The runner uses1822.352379 child CPU/1679.469807 wall
 seconds, load0.730957→1.013672, RSS1911716 KB. Audited fixed-speed5/variable-speed
 steps cost248.294278/246.477937 seconds on this same candidate; no old-source
-performance or browser throughput claim follows. Root's paid native core job
-splits only at a genuine closed-core FWS/full-graph/exact-resave boundary before
-drawing and then industry continuation, retaining original actors/assertions/
-deadlines. Paid core/industry, worker, era, full-suite and drawing/release gates
+performance or browser throughput claim follows. Its later paid core job was deliberately stopped at genuine audited closed
+day660; its exact saved/source church-only draw is distinct from core and
+industry completion, with original actors/assertions/deadlines retained. Paid core/industry, worker, era, full-suite and drawing/release gates
 remain pending; measured feasibility and determinism alone do not close them.
 
 There is also an explicit persistence barrier: `storageOutcomeReady()` can
@@ -300,18 +301,23 @@ refusal reasons and annual/lifetime counters remain worker state and detached
 inspector output. This intentionally adds the accepted own-use mechanics and
 changes affected histories; same-speed/history/save discipline still applies.
 
-The assembled static review at `61dd0bb` retains 59 phases and 200 edges;
-`simTick` is byte-identical to `d016a6a` (and `219b90e`). All 39 own-use-industry
-pins match; only `abbeySitePlan` renews for budget forwarding, preserving the
-other 38. This follow-up reviews seven changed bodies, two new helpers
-and two changed declarations; unchanged pins are preserved. The recognized legacy search
-inventory still contains 418 sites, now across 1430 reported functions:
-192 building, 73 street, 49 folk and 16 owner collection scans; 35 `heads_`,
-22 `workers_`, 16 `headsOf` helper calls and 15 unscoped entries. No recognized
-occurrence or count key is new. Indexed funding-floor scans of local streets
-and incident roads are explicit in the JSON helper inventory because they
-fall outside the scanner vocabulary. These are syntactic counts, not measured
-costs or a centuries-per-minute result.
+The assembled static review at `af07d28` retains 59 phases and 200 edges;
+`simTick` is byte-identical to `61dd0bb`, `d016a6a` and `219b90e`. All 39
+own-use-industry pins, 41 castle fixture pins and 38 army fixture pins stay
+unchanged. This follow-up reviews seven changed existing bodies, exactly four
+new pure reservation helpers and two changed declarations. Their insertion
+alone changes the managed-core source hash; existing quantity, cash, title,
+custody and payment writers, inspector and outside writer corpus remain exact.
+The recognized legacy search inventory still contains 418 sites, now across
+1434 reported functions: 192 building, 73 street, 49 folk and 16 owner collection
+scans; 35 `heads_`, 22 `workers_`, 16 `headsOf` helper calls and 15 unscoped
+entries. Every existing count key/order/limit is unchanged. The four newly
+search-reaching names are `fits`, `projectReservationPublic`,
+`projectSiteReserved` and `castleFoundationReserved`; this is transitive source
+reach, not four new broad scans. The ordered pending-project reservation pass
+is explicitly inventoried alongside earlier indexed geometry scans, since
+projects lie outside the legacy scanner vocabulary. These are syntactic counts,
+not measured costs or a centuries-per-minute result.
 
 Rural abbey surveys share native ordered building/project geometry within one
 synchronous proposal, across its existing candidate fields and poses. Daily
@@ -335,7 +341,7 @@ exact source and dependency review separately from historical evidence and
 the current source's pending native speed/save/conservation gates.
 
 The later route adapter shares ghost-free terrain edges, native scope/circuit
-lists and certified flood banks only inside that proposal. Its current 112-entry
+lists and certified flood banks only inside that proposal. Its current 114-entry
 identity certificate and current world/place/owner/day/size/cell/placed checks
 guard reuse. Each candidate pose keeps a fresh ghost-edge memo; its current
 ghost still uses the native interpolation and strict rotated footprint test.
@@ -477,8 +483,8 @@ the original distance queries; these local arrays enter no saved state.
 Full corridor width, actual work rights and incident highway targets
 intentionally affect route selection and founding outcomes. This carries no old-model 150-day identity claim; the
 current model must still produce identical history at every speed and after
-save/load. Earlier failed/stopped native diagnostics establish no clearance of
-`61dd0bb`. The certified reject-only flood omission has its own current
+save/load. Earlier failed/stopped native diagnostics and prior-source passes
+establish no clearance of `af07d28`. The certified reject-only flood omission has its own current
 source gates; prior-source evidence is not retagged. Current-source native performance and release gates remain
 coordinator work.
 
@@ -490,3 +496,20 @@ Daily `tickGrowth` grants an eligible village's market charter after current
 paid project completions and before housing and late commune choices. The
 annual history visit still maintains its native peak/queue/aftermath work, but
 no longer gates that charter.
+
+
+The current pending-reservation and funded-market review is recorded in the JSON
+`pending_reservation_and_funded_market_review`. `projectReservationPublic`
+resolves only the actual existing public segment at the retained abbey endpoint.
+`projectReservationPolys` clips only connecting road/street/quarter paths from
+that public ground; structural footprints and walls are preserved.
+`projectReservationSetback` reproduces native fit clearance without altering
+licensed ground. `projectSiteReserved` visits current pending projects in native
+order before public acceptance/payment. Abbey validation reuses connector
+clipping only in a local `joins` Map guarded by the actual registered Found route
+identity plus current route/approach proofs. The approach certificate has 25
+readers and route certificate 114; the 67 founding and 49 castle readers remain.
+These helpers add no world/save/DTO field or cross-day permission. Repricing
+uses actual current purse-clipped demand; its formula, monthly cadence and
+clearing/payment order are unchanged. Current-source native/release validation
+remains with root.

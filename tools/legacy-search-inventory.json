@@ -644,5 +644,27 @@
       "abbeyFoundBudget"
     ],
     "scope": "Fixed actual canonical fields/current recipe queries only, no new collection discovery. Necessary exact-endpoint ellipse checks are per selected native target/lattice node inside its existing search. Stable native target order/cap12 and current survivor title/funding/payment checks stay; uncertainty/custom/stale provenance keeps full cold search. Economically rejected nodes never write false to physical caches. All count entries/key order/inventory limits and unrelated reviewed records are preserved."
+  },
+  "reviewedPendingReservationsAndFundedMarket": {
+    "sourceCommit": "af07d282f03100f61fa6ad2f661ce3d8f6320882",
+    "indexSHA256": "11fb123ebd3e7ded5f40ad1739fd78f6ce85b7413cf5d216a11745b8840bc8cc",
+    "baselineCommit": "61dd0bb3d7282c9dcbb56a6b22f7b7dc095b9331",
+    "recognizedSites": 418,
+    "reportedFunctionsWithDirectOrTransitiveSearches": 1434,
+    "newRecognizedSiteOccurrences": 0,
+    "newOrChangedCountKeys": [],
+    "newlySearchReachingNamedFunctions": [
+      "fits",
+      "projectReservationPublic",
+      "projectSiteReserved",
+      "castleFoundationReserved"
+    ],
+    "actualOrderedTraversal": {
+      "function": "projectSiteReserved",
+      "collection": "W.projects",
+      "recognizedByLegacyScanner": false,
+      "scope": "Once per actual public proposal/retained validation, native order and self/dead exclusion before any new commissioning/payment. Current endpoint geometry only exempts actual already-public joins; private structures/approaches remain protected."
+    },
+    "scope": "Exactly four new geometry-only helpers and the current public endpoint query chain. Every recognized count/key/order/limit and unrelated reviewed record stays exact. Reprice changes one funded-demand predicate and adds no search or cadence. Local joins Map is confined to one certified uninterrupted Abbey validation and is never saved/projected. Current native/release gates remain pending; no prior-source proof or throughput result is retagged."
   }
 }

@@ -186,7 +186,14 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // calls retain the original survey. Cells, current title/work rights, named
  // recipients, paid receipts and all quantity/payment writers remain unchanged.
  // The external writer corpus, inspector and title-dirty call count stay exact.
- assert.equal(digest(source.slice(a,b)),"0ae008b74de00893188f5eb19d1a1a53e30862d513f1c19fc165b9e8dab0cdb7");
+ // Reviewed af07d28: exactly four new pure pending-reservation helpers are
+ // inserted after compoundPolys. Removing that contiguous block reproduces the
+ // prior managed region byte-for-byte. They read current native endpoint/project
+ // geometry and return local polygons/clearance; the optional joins Map lives
+ // only inside one certified synchronous validation. Reciprocal fit setbacks
+ // grant no extra land. Existing cash, goods, title, custody and payment writers,
+ // the external corpus, inspector and title-dirty count remain unchanged.
+ assert.equal(digest(source.slice(a,b)),"8fb8455cc3eb9f9009b9f36b3d00a039deb22ba74667df2143c3398a7af59c59");
  // This explicit worker inspector copies existing balances. Pin the entire line
  // before excluding it so a future mutation cannot hide behind the read exemption.
  const inspectorLine=source.split('\n').find(l=>l.trim().startsWith("if(kind==='household'){const h=W.households.get(payload.id);"));
