@@ -2538,9 +2538,10 @@
         "first": [
           "tickLearning",
           "tickTechnology",
-          "tickCrafts"
+          "tickCrafts",
+          "tickTechnologyEquipment"
         ],
-        "reads": "Actual paid teachers, pupils and equipment, current adoption and canonical employment before current production. Independent masters remain available to construction; employed journeymen, teachers, abbey and estate staff cannot take a second full job."
+        "reads": "Actual paid teachers, pupils, adopted knowledge and current paid craft capacity precede machinery decisions and ordinary production. Machinery supplies only completed paid native targets; apprentices/teachers/abbey/estate staff and actual military roles cannot take a second full job."
       },
       {
         "phase": "tickJustice",
@@ -2575,6 +2576,33 @@
         "phase": "tickChurches",
         "closing": "tickChurchBodies",
         "reads": "Actual parish closed receipts and titles fund assessments, fabric and separate domestic/foreign remittances; appointments become available for paid service next day."
+      },
+      {
+        "phase": "tickProjects",
+        "dispatch": [
+          "equipment",
+          "fabric",
+          "compound",
+          "plan",
+          "castle",
+          "storage",
+          "road/pave"
+        ],
+        "reads": "Fixed retained native targets and geometry, current adopted authority, actual installed goods and named paid makers/crew. Saved productive equipment is consumed only after completion; no map structure or gear from a method name."
+      },
+      {
+        "phase": "tickAbbeys",
+        "closing": [
+          "daily native flock investment",
+          "paid due order visitation/reform",
+          "licensed post-plague leasing"
+        ],
+        "reads": "Current granted grazing, spare actually fed/paid hands, real sellers and closed-year surplus; changed work rights feed the next crop pass. Dated General Chapter and mother-house visits are paid journeys."
+      },
+      {
+        "phase": "tickChurchBodies",
+        "closing": "churchCasesTick",
+        "reads": "Actual marriage/will evidence, current paid clergy, funded named party fees and an independent paid appeal; inheritance witnesses follow creditor priority and precede title distribution."
       }
     ],
     "new_phase_sources": {
