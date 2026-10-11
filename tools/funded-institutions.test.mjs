@@ -1,0 +1,36 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {realm,near} from './ownership-fixture.mjs';
+const html=fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8');
+const fn=n=>{const m=html.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))','m'));assert.ok(m,n);return m[0];};
+const names=['constructionRecipe','fabricSnapshot','fabricProjectPayer','fabricPending','fabricProjectValidate','fabricProjectCommission','fabricProjectComplete','fabricProjectTick','fabricMaterialDemand','constructionProjectMaterials','constructionProjectPaidWork','buildWorks','payAmong','workers_','storageOwnerId',
+  'institutionFoundationPending','institutionFoundationValidate','institutionFoundationComplete','institutionFoundationCommission','institutionFoundationPath','obbCorners','obbOverlap','segDist','locW','serviceDoor','tickQuarries'];
+function setup(kind='parish'){const r=realm({grain:0,fish:0,cash:0,crown:1000,households:2});vm.runInContext(names.map(fn).join('\n'),r.C);r.eval(`
+  const SIZE=1000,GRID=1,SEA=0,B={ROCK:6},RESID=new Set(),ARCH={temple:[12,18,9,2,'church'],quarry:[20,14,1.2,1,'quarry'],wharf:[7,30,.5,1,'wharf']};let now=1;day=()=>now;
+  W.bldList=[];W.projects=[];W.roads=[];W.water=[0];W.biome=[6];H[0].tr='mason';H[1].tr='carter';let valid=true,access=true,yard=true,crew=true,placed=0,marked=0;const events=[];
+  s.history=[];s.res={stone:9};s.stores.timber=20;s.stores.stone=20;s.px.timber=s.px.stone=1;offer(s,'timber',H[1],20);offer(s,'stone',H[1],20);
+  const nativeWorkers=workers_;workers_=(town,pred)=>crew?nativeWorkers(town,pred):[];consumeOwnStock=()=>0;const hungryHands=()=>[];
+  hAt=(x,z)=>z>20?-5:10;cIdx=()=>0;toCell=()=>0;inB=()=>true;slopeAt=()=>.1;constructionCapability=()=>({available:true});streetAccessAt=()=>access;armyObstacle=()=>false;armySegmentClear=()=>access;
+  graveyardLandClear=()=>yard;graveyardPolygonsOverlap=()=>false;institutionFoundationFootprint=()=>valid;
+  bindPropertyRights=()=>{};settleParcels=()=>{};updateBuildingInstance=()=>{};rehouse=()=>{};syncLive=()=>{};markOccupiedGround=()=>{marked++};
+  compoundGround=()=>({polys:[],cells:[0]});planGroundQuote=()=>0;storageGroundClaim=()=>({ok:true,recipients:[],cells:[0],key:'native-ground'});storageGroundPay=q=>{q.landPaid=true;return{ok:true,paid:0}};
+  emit=(...a)=>events.push(a);awayNow=()=>false;
+  const quay={kind:'quay',serviceLinked:true,hw:2,pts:[{x:-30,z:0},{x:30,z:0}]};s.streets=[quay];
+  s._lay={fits:()=>valid,placed:{near:()=>[]},live:{planStreet:P=>{const st={pts:P,kind:'lane',hw:1.3};s.streets.push(st);return st;}},place:(arch,tier,f,district,hm,extra)=>{placed++;const b={...f,arch,tier,s,state:'sound',hh:[],h:3,...extra};s.buildings.push(b);return b;}};
+  const site={institution:${JSON.stringify(kind)},key:${JSON.stringify(kind)},arch:${JSON.stringify(kind==='quarry'?'quarry':kind==='wharf'?'wharf':'temple')},tier:0,f:{x:0,z:12,w:12,d:18,rot:0},path:[{x:0,z:21},{x:0,z:0}],ch:{fund:0,stone:false,W:1,door:'W'},yard:{x:20,z:12,w:14,d:17,rot:0,poly:[{x:13,z:4},{x:27,z:4},{x:27,z:20}]},quay,shore:{x:0,z:0},head:{x:0,z:40}};
+  if(site.institution!=='parish')delete site.yard;if(site.institution==='wharf'){W.water[0]=1;delete site.path;}
+  const plan={work:'foundation',payer:'crown',ownerId:site.institution==='quarry'?'lord':site.institution==='wharf'?'town':'church',authority:s.owner,extension:true,land:0,site,labour:10,days:2,timber:4,stone:2};let q;
+`);return r;}
+const coins=r=>r.W.treasury+r.H.reduce((n,h)=>n+(h.w||0),0);
+test('a parish is a saved paid project before its nave, churchyard or path enters the native map',()=>{const r=setup(),total=coins(r);r.eval('q=fabricProjectCommission(s,null,plan)');assert.ok(r.eval('q'));near(r.W.bldList.length,0);near(r.eval('placed'),0);near(r.eval('marked'),0);near(coins(r),total);r.eval('fabricProjectTick(q)');near(r.eval('q.worked'),1);near(r.eval('placed'),0);near(coins(r),total);r.eval('fabricProjectTick(q)');near(r.eval('placed'),1);near(r.W.bldList.length,1);assert.ok(r.W.bldList[0]._graveyard);assert.ok(r.W.bldList[0].st.compoundAccess);assert.equal(r.W.bldList[0].title.owner,'church');near(r.eval('q.materialPaid'),6);near(r.eval('q.paid'),10);near(coins(r),total);});
+test('a parish needs both its fixed bounded grave plot and an actual reachable approach',()=>{for(const change of ['yard=false','access=false']){const r=setup(),before=r.W.treasury;r.eval(change+';q=fabricProjectCommission(s,null,plan)');assert.equal(r.eval('q'),null);near(r.eval('placed'),0);near(r.W.treasury,before);}});
+test('a later churchyard obstruction pauses wages and leaves the paid building uninstalled',()=>{const r=setup();r.eval('q=fabricProjectCommission(s,null,plan);fabricProjectTick(q);const cash=W.treasury;yard=false;fabricProjectTick(q);');assert.equal(r.eval('q.reason'),'churchyard-obstructed');near(r.eval('q.worked'),1);near(r.eval('placed'),0);near(r.W.treasury,r.eval('cash'));});
+test('a quarry is attached to the actual settlement only after its work and material payment',()=>{const r=setup('quarry');r.eval('q=fabricProjectCommission(s,null,plan);fabricProjectTick(q)');assert.equal(r.s.quarry,undefined);r.eval('fabricProjectTick(q)');assert.equal(r.s.quarry,r.W.bldList[0]);assert.equal(r.s.quarry.title.owner,'lord');assert.ok(r.s.quarry.st.compoundAccess);near(r.eval('q.paid'),10);});
+test('a wharf needs current linked quay geometry and deep water and keeps its native town owner',()=>{const r=setup('wharf');r.eval('q=fabricProjectCommission(s,null,plan);fabricProjectTick(q)');near(r.W.bldList.length,0);r.eval('fabricProjectTick(q)');assert.equal(r.W.bldList[0].arch,'wharf');assert.equal(r.W.bldList[0].title.owner,'town');near(r.W.bldList[0].h,.5);
+  const moved=setup('wharf');moved.eval('q=fabricProjectCommission(s,null,plan);fabricProjectTick(q);site.quay.pts=[{x:100,z:0},{x:130,z:0}];fabricProjectTick(q)');near(moved.W.bldList.length,0);assert.equal(moved.eval('q.reason'),'wharf-shore-or-water');
+  const shallow=setup('wharf');shallow.eval('site.head.z=15;q=fabricProjectCommission(s,null,plan)');assert.equal(shallow.eval('q'),null);});
+test('without actual workers a paid institution cannot open or advance',()=>{const r=setup('friary');r.eval('plan.method="franciscan";q=fabricProjectCommission(s,null,plan);crew=false;fabricProjectTick(q)');near(r.eval('q.worked'),0);near(r.eval('placed'),0);assert.equal(r.eval('q.reason'),'workers');});
+test('resource labels and a native pit produce no stone without named paid quarrymen',()=>{const r=setup('quarry');r.eval('q=fabricProjectCommission(s,null,plan);fabricProjectTick(q);fabricProjectTick(q);s.stores.stone=0;tickQuarries()');near(r.s.stores.stone,0);near(r.s.quarry.quarryHands,0);r.eval('now++;H[1].tr="quarryman";const wageBefore=H[1].w,expectedWage=foodYr()*1.5*Math.max(1,H[1]._hh?.population.get(s)||1)/360;tickQuarries()');near(r.H[1].w-r.eval('wageBefore'),r.eval('expectedWage'));assert.ok(r.s.stores.stone>0);near(r.s.quarry.quarryHands,1);near(r.s.quarry.quarryWages,r.eval('expectedWage'));
+  r.eval('now++;W.treasury=0;s.stores.stone=0;tickQuarries()');near(r.s.stores.stone,0,'an unpaid productive day emits no stone');});

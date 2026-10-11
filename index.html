@@ -909,7 +909,7 @@ const AD=()=>((W&&W.startAD)||1250)+Math.max(0,year()-1);
 // Shared pure construction query. Initialized worlds require realm knowledge
 // and local adoption. Tiny fixtures predating technology retain the explicit
 // calendar fallback; actual purchases and building work remain ordinary systems.
-const CONSTRUCTION_METHODS=Object.freeze({timberPalisade:{historicalYear:550,proposalYear:550},stoneKeep:{historicalYear:1070,proposalYear:1080},stoneCurtain:{historicalYear:1150,proposalYear:1150},castleRoundTowers:{historicalYear:1220,proposalYear:1220},castleBarbican:{historicalYear:1230,proposalYear:1230},castleOuterCurtain:{historicalYear:1270,proposalYear:1270},churchMasonry:{historicalYear:980,proposalYear:980},churchAisles:{historicalYear:1080,proposalYear:1080},churchTransepts:{historicalYear:1100,proposalYear:1100},churchGothic:{historicalYear:1190,proposalYear:1190},churchStoneSpire:{historicalYear:1230,proposalYear:1230},houseMasonry:{historicalYear:1200,proposalYear:1200}});
+const CONSTRUCTION_METHODS=Object.freeze({timberPalisade:{historicalYear:550,proposalYear:550},quarry:{historicalYear:850,proposalYear:850},franciscan:{historicalYear:1210,proposalYear:1210},dominican:{historicalYear:1216,proposalYear:1216},stoneWharf:{historicalYear:1250,proposalYear:1250},starCitadel:{historicalYear:1500,proposalYear:1500},stoneKeep:{historicalYear:1070,proposalYear:1080},stoneCurtain:{historicalYear:1150,proposalYear:1150},castleRoundTowers:{historicalYear:1220,proposalYear:1220},castleBarbican:{historicalYear:1230,proposalYear:1230},castleOuterCurtain:{historicalYear:1270,proposalYear:1270},churchMasonry:{historicalYear:980,proposalYear:980},churchAisles:{historicalYear:1080,proposalYear:1080},churchTransepts:{historicalYear:1100,proposalYear:1100},churchGothic:{historicalYear:1190,proposalYear:1190},churchStoneSpire:{historicalYear:1230,proposalYear:1230},houseMasonry:{historicalYear:1200,proposalYear:1200}});
 function constructionCapability(s,method,ad=AD()){
   const key=typeof technologyKey==='function'?technologyKey(method):method,rule=CONSTRUCTION_METHODS[method]||(typeof TECH_RULES==='undefined'?null:TECH_RULES[key]);if(!rule)return{available:false,known:false,adopted:false,reason:'unknown-method'};
   if(typeof W!=='undefined'&&W?.technology)return technologyCapability(s,key,ad);
@@ -2640,7 +2640,7 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
     for(const o of placed.near(f.x,f.z,Math.hypot(f.w,f.d)/2+gap))if(!o.removed&&!allowed?.has(o)&&obbOverlap(F,o))return false;
     return true;
   };
-  const registerYard=y=>placeChurchyardInHash(placed,y),yardLotConflict=(y,b)=>!!W.land?._surveyed&&!!b.lot?.length&&placed.near(y.x,y.z,100).some(o=>o!==y&&o.arch!=='churchyard'&&(y.adjunct||o!==b)&&o.lot?.length>2&&graveyardPolygonsOverlap(y.poly,o.lot)),reserveChurchyard=b=>{if(b.arch!=='temple'||b.castle||b.friary||b.abbey)return null;if(b._graveyard){const y=b._graveyard;let parcelOK=true;if(!y.adjunct&&b.lot?.length){const clipped=graveyardClipToParcel(y.poly,b.lot);parcelOK=graveyardSetShape(y,clipped);}if(parcelOK&&!yardLotConflict(y,b)&&(!W.land?._surveyed||graveyardLandClear(s,y.poly,y.adjunct?null:furlongAt(b.x,b.z)?.k))){y.removed=false;y.churchyardOf=b;registerYard(y);return y;}rejectChurchyardCandidate(b);}
+  const registerYard=y=>placeChurchyardInHash(placed,y),yardLotConflict=(y,b)=>!!W.land?._surveyed&&!!b.lot?.length&&placed.near(y.x,y.z,100).some(o=>o!==y&&o.arch!=='churchyard'&&(y.adjunct||o!==b)&&o.lot?.length>2&&graveyardPolygonsOverlap(y.poly,o.lot)),reserveChurchyard=b=>{if(b.arch!=='temple'||b.castle||b.friary||b.abbey)return null;if(b._graveyard){const y=b._graveyard;let parcelOK=true;if(!y.adjunct&&b.lot?.length){const clipped=graveyardClipToParcel(y.poly,b.lot);parcelOK=graveyardSetShape(y,clipped);}if(parcelOK&&!yardLotConflict(y,b)&&(!W.land?._surveyed||graveyardLandClear(s,y.poly,y.adjunct?null:furlongAt(b.x,b.z)?.k))){y.removed=false;y.churchyardOf=b;registerYard(y);return y;}rejectChurchyardCandidate(b);}if(b._fixedChurchyard)return null;
     const WID=14,DEP=17,side0=hash01(Math.round(b.x*3.1+b.z*7.7))>0.5?1:-1,c=Math.cos(b.rot),sn=Math.sin(b.rot),origin=W.land&&furlongAt(b.x,b.z),originParcel=origin?.k;
     const make=(x,z,rot,adjunct)=>{const f={x,z,w:WID,d:DEP,rot};let poly=graveyardShape(x,z,rot,WID/2-0.45,DEP/2-0.45,Math.round(x*3+z*7));
       if(!adjunct&&b.lot?.length){poly=graveyardClipToParcel(poly,b.lot);if(!poly)return null;}
@@ -5519,10 +5519,90 @@ function storageGroundPay(q,s,payer,ground){ // a saved receipt is the actual tr
    compounds, with the actual household, owner or church fund as payer. */
 function constructionRecipe(s,labour,days,timber=0,stone=0){const T=typeof constructionTechnologyRecipe==='function'?constructionTechnologyRecipe(s,stone>0?'masonry':'timber'):{laborFactor:1,timber:0},factor=Number.isFinite(T.laborFactor)&&T.laborFactor>0?T.laborFactor:1;return{labour:labour*factor,days:Math.max(1,days*factor),timber:timber+(T.timber||0),stone};}
 function fabricSnapshot(b){const ch=b.ch;return{x:b.x,z:b.z,w:b.w,d:b.d,rot:b.rot,arch:b.arch,tier:b.tier,h:b.h,state:b.state,ownerId:storageOwnerId(accountOwner(ownerAcct(b,b.s))),church:ch?{stone:ch.stone,gothic:ch.gothic,aisles:ch.aisles,tower:ch.tower,spire:ch.spire,trans:ch.trans,ctower:ch.ctower,porch:ch.porch,W:ch.W}:null};}
+// Institutional foundations are clients of paid fabric, retaining actual native
+// building/yard/approach geometry. Specialized crag and pier rules never mint capacity.
+function institutionFoundationPending(s,kind){const si=W.settlements.indexOf(s);return(W.projects||[]).some(q=>!q.dead&&q.type==='fabric'&&q.si===si&&q.site?.institution===kind);}
+function institutionFoundationFootprint(s,f,q,water=false){ // exact native obstacles for a quarry or marine pier, rather than ordinary dry-house slope rules
+  if(!f||![f.x,f.z,f.w,f.d,f.rot].every(Number.isFinite)||!(f.w>0&&f.d>0)||castleFoundationReserved(s,f,q))return false;
+  const P=obbCorners(f.x,f.z,f.w,f.d,f.rot),c=Math.cos(f.rot),sn=Math.sin(f.rot);
+  const nu=Math.max(1,Math.ceil(f.w/2)),nv=Math.max(1,Math.ceil(f.d/2)),probes=[];
+  for(let i=0;i<=nu;i++)for(let j=0;j<=nv;j++){const u=-f.w/2+f.w*i/nu,v=-f.d/2+f.d*j/nv,x=f.x+u*c+v*sn,z=f.z-u*sn+v*c,ci=toCell(x),cj=toCell(z);if(Math.abs(x)>=SIZE/2||Math.abs(z)>=SIZE/2||!inB(ci,cj)||riverAt(x,z,0.5)||lakeAt(s,x,z,0)||(!water&&(W.water[cIdx(ci,cj)]||hAt(x,z)<=SEA+0.8)))return false;probes.push({x,z});}
+  for(const t of W.settlements){for(const b of t.buildings||[])if(!b.removed&&b.state!=='gone'){
+      if(obbOverlap({...f,w:f.w+1,d:f.d+1},b)||b._graveyard&&!b._graveyard.removed&&graveyardPolygonsOverlap(P,b._graveyard.poly))return false;}
+    for(const p of t.places||[])if(probes.some(v=>placeHit(p,v.x,v.z,1)))return false;
+    if(probes.some(p=>fortRoadBlocked(t,p.x,p.z,1)||t.citadel&&dist2d(p.x,p.z,t.citadel.x,t.citadel.z)<t.citadel.S*.85+1||(t.remnants||[]).some(r=>dist2d(p.x,p.z,r.x,r.z)<r.r+1)||t.burgRing&&Math.abs(dist2d(p.x,p.z,t.burgRing.x,t.burgRing.z)-t.burgRing.r)<3.5||(t.relicWalls||[]).some(R=>R.some((v,k)=>segDist(p.x,p.z,v,R[(k+1)%R.length])<3.5))))return false;
+    for(const st of t.streets||[])if(!st.gone&&st.kind!=='edge'&&!(water&&st.kind==='quay'))for(let k=1;k<st.pts.length;k++)if(streetFootprintOverlap(f,{a:st.pts[k-1],b:st.pts[k],hw:st.hw||2},0.5))return false;}
+  for(const r of W.roads||[])for(let k=1;k<(r.path?.length||0);k++)if(streetFootprintOverlap(f,{a:r.path[k-1],b:r.path[k],hw:4},0.5))return false;return true;
+}
+function institutionFoundationAccess(s,f){ // a real direct connector to a reachable street or this settlement's built highway
+  const p=serviceDoor(f),local=storageRoadPlan(s,f,s._lay.placed,s._lay.segH);if(local)return local.path.map(q=>({x:q.x,z:q.z}));
+  const si=W.settlements.indexOf(s),walker={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3};let best=null,bd=60;
+  for(const r of W.roads||[])if(r.a===si||r.b===si){const P=r.open||r.path||[];for(let k=1;k<P.length;k++){const a=P[k-1],b=P[k],dx=b.x-a.x,dz=b.z-a.z,t=clamp(((p.x-a.x)*dx+(p.z-a.z)*dz)/(dx*dx+dz*dz||1),0,1),end={x:a.x+dx*t,z:a.z+dz*t},d=dist2d(p.x,p.z,end.x,end.z);if(d<bd&&roadAccessClear(s,p,end)&&armySegmentClear(walker,p,end)){bd=d;best=[p,end];}}}return best;
+}
+function institutionFoundationPath(s,P){if(!P?.length||P.length<2)return false;const walker={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3},end=P.at(-1),si=W.settlements.indexOf(s);
+  const publicEnd=streetAccessAt(s,end)||(W.roads||[]).some(r=>(r.a===si||r.b===si)&&(r.open||r.path||[]).some((p,k,A)=>k&&segDist(end.x,end.z,A[k-1],p)<4.1));
+  return publicEnd&&P.every((p,k)=>!armyObstacle(walker,p.x,p.z)&&(!k||armySegmentClear(walker,P[k-1],p)));
+}
+function institutionChurchyardPlan(s,f,q){ // native bounded irregular grave plot, adjacent to and distinct from the paid nave
+  const c=Math.cos(f.rot),sn=Math.sin(f.rot),origin=W.land?.F&&furlongAt(f.x,f.z),parcel=origin?.k;
+  for(const side of[1,-1]){const off=f.w/2+8.5,x=f.x+side*off*c,z=f.z-side*off*sn,y={x,z,w:14,d:17,rot:f.rot,poly:graveyardShape(x,z,f.rot,6.55,8.05,Math.round(x*3+z*7)),adjunct:false,arch:'churchyard',state:'sound',inst:true,removed:false};
+    if(origin){const P=graveyardClipToParcel(y.poly,computeFurlongPoly(origin));if(!P||!graveyardSetShape(y,P))continue;}else if(!graveyardSetShape(y,y.poly))continue;
+    if(!s._lay.fits(y,0,true,q)||obbOverlap(y,f)||!graveyardLandClear(s,y.poly,parcel))continue;
+    if(W.settlements.some(t=>(t.buildings||[]).some(b=>!b.removed&&b.lot?.length&&graveyardPolygonsOverlap(y.poly,b.lot))))continue;return y;}return null;
+}
+function institutionFoundationValidate(q,s){const site=q.site,k=site?.institution,f=site?.f;if(!['parish','friary','quarry','wharf'].includes(k)||!f)return{ok:false,abandon:true,reason:'unknown-institution'};
+  if(k==='quarry'&&s.quarry&&!s.quarry.removed)return{ok:false,abandon:true,reason:'quarry-already-open'};
+  if(k==='friary'&&(!constructionCapability(s,q.method).available||site.tier>=2&&!constructionCapability(s,'churchMasonry').available))return{ok:false,reason:'technology'};
+  if(k==='friary'&&s.buildings.some(b=>b.friary&&!b.removed))return{ok:false,abandon:true,reason:'friary-already-founded'};
+  if(k==='parish'||k==='friary'){
+    if(!s._lay.fits(f,1.2,true,q)||!institutionFoundationPath(s,site.path))return{ok:false,reason:'site-obstructed'};
+    if(k==='parish'){const y=site.yard,parcel=W.land?.F&&furlongAt(f.x,f.z)?.k;if(!y||!s._lay.fits(y,0,true,q)||obbOverlap(y,f)||!graveyardLandClear(s,y.poly,parcel)||W.settlements.some(t=>(t.buildings||[]).some(b=>!b.removed&&b.lot?.length&&graveyardPolygonsOverlap(y.poly,b.lot))))return{ok:false,reason:'churchyard-obstructed'};}
+  }else if(k==='quarry'){
+    const ci=toCell(f.x),cj=toCell(f.z),i=cIdx(ci,cj);if(!(W.biome[i]===B.ROCK||slopeAt(ci,cj)>0.4)||!institutionFoundationFootprint(s,f,q)||!institutionFoundationPath(s,site.path))return{ok:false,reason:'quarry-ground-or-access'};
+  }else{
+    const shore=site.shore,head=site.head,st=site.quay;if(!shore||!head||!st||st.gone||st.hidden||!st.serviceLinked||st.kind!=='quay'||!st.pts.some((p,i,P)=>i&&segDist(shore.x,shore.z,P[i-1],p)<=(st.hw||2)+0.1)||!streetAccessAt(s,shore)||W.water[cIdx(toCell(head.x),toCell(head.z))]!==1||hAt(head.x,head.z)>SEA-2||!institutionFoundationFootprint(s,f,q,true))return{ok:false,reason:'wharf-shore-or-water'};
+  }return{ok:true};
+}
+function institutionFoundationComplete(q,s){if(!institutionFoundationValidate(q,s).ok)return false;const site=q.site,k=site.institution,
+    extra={inst:true,exactGround:true,ownerId:q.ownerId,compoundKey:k,...(k==='parish'||k==='friary'?{ch:{...site.ch},friary:k==='friary',friaryOrder:site.order||null,...(site.yard?{_fixedChurchyard:true,_graveyard:{...site.yard,poly:site.yard.poly.map(p=>({...p}))}}:{})}:{})};
+  const b=s._lay.place(site.arch,site.tier||0,site.f,k==='wharf'?'harbour':k==='quarry'?'quarry':'temple',site.hm||1,extra);if(!b)return false;
+  if(site.yard&&!b._graveyard){b.removed=true;b.state='gone';const i=s.buildings.indexOf(b);if(i>=0)s.buildings.splice(i,1);VACANT_RESIDENTIALS.delete(s);return false;}
+  if(site.path?.length>1){b.st=s._lay.live.planStreet(site.path,1.3,'lane',null,false);if(b.st){b.st.compoundAccess=true;b.st.groundClaim=q.groundClaim;}}
+  if(k==='quarry')s.quarry=b;if(k==='wharf'){b.y=Math.max(SEA+1.3,Math.min(b.y,SEA+2.2));b.h=.5;}
+  return b;
+}
+function institutionFoundationCommission(s,site,payer,ownerId,recipe,method,title){if(!site)return null;const land=planGroundQuote(site),q=fabricProjectCommission(s,null,{work:'foundation',site,payer,ownerId,authority:s.owner,extension:true,land,method,title,...recipe});if(q)emit('trade',3,site.f,`${s.name} commissions ${title}; ground, materials and ${Math.ceil(q.days)} working days must be paid before it opens.`);return q;}
+function institutionParishProposal(s,kind='parish'){
+  if(s.siegeBy||!s._lay?.live||institutionFoundationPending(s,kind)||kind==='parish'&&!(AD()>=1000&&s.pop>150&&parishNeed(s))||kind==='friary'&&!(s.kind!=='village'&&s.wallRad&&s.pop>1100&&!s.buildings.some(b=>b.friary&&!b.removed)))return null;
+  const order=kind==='friary'?(constructionCapability(s,'franciscan').available?'franciscan':constructionCapability(s,'dominican').available?'dominican':null):null;if(kind==='friary'&&!order)return null;
+  const payer=kind==='parish'&&parishOf(s)?parishOf(s):lordAcct(s),stone=constructionCapability(s,'churchMasonry').available,tier=stone?2:0,scale=kind==='parish'?.8:1,w=ARCH.temple[0]*scale,d=ARCH.temple[1]*scale,recipe=constructionRecipe(s,w*d*.8*PL(),60+w*d/4,w*d*(stone?.035:.1),stone?w*d*.25:0),method=order||(stone?'churchMasonry':null);
+  if(means(payer)<recipe.labour+recipe.timber*price(s,'timber')+recipe.stone*price(s,'stone')+foodYr()*2)return null;
+  const slots=(s.growSlots||[]).filter(c=>!c.done&&!c.st.gone&&!c.st.hidden&&!c.st.planQ&&c.d>60);let tested=0;for(const c of slots){if(kind==='friary'){const wd=dist2d(c.mx,c.mz,s.pos.x,s.pos.z)-wallRadAt(s,Math.atan2(c.mz-s.pos.z,c.mx-s.pos.x));if(!(wd<-12&&wd>-55))continue;}
+    if(s.buildings.some(b=>b.arch==='temple'&&!b.removed&&dist2d(b.x,b.z,c.mx,c.mz)<(kind==='friary'?90:s.kind==='capital'?170:190)))continue;
+    const nx=-c.uz*c.side,nz=c.ux*c.side,L=Math.hypot(nx,nz)||1,off=(c.st.hw||2)+d/2+2,f={x:c.mx+nx/L*off,z:c.mz+nz/L*off,w,d,rot:Math.atan2(-nx,-nz)},site={institution:kind,key:kind,arch:'temple',tier,hm:scale,order,f};
+    const P=s._lay.live.compoundSite(site,'survey','church');if(!P){if(++tested>=12)break;continue;}site.path=[serviceDoor(f,0),...P.path];site.paths=[site.path];
+    site.ch={stone,gothic:false,aisles:0,tower:1,spire:0,trans:false,ctower:false,porch:false,fund:0,cong:0,taste:hash01(Math.round(f.x*3.1+f.z*7.7)),W:1,door:'W',room:2};
+    if(kind==='parish'){site.yard=institutionChurchyardPlan(s,f);if(!site.yard){if(++tested>=12)break;continue;}}
+    const q=institutionFoundationCommission(s,site,payer,'church',recipe,method,kind==='parish'?'a parish church and bounded churchyard':`a ${order==='franciscan'?'Franciscan':'Dominican'} friary church`);if(q)return q;if(++tested>=12)break;}return null;
+}
+function institutionQuarryProposal(s){if(!constructionCapability(s,'quarry').available||s.quarry&&!s.quarry.removed||s.siegeBy||!s._lay?.live||!(s.res?.stone>=4)||institutionFoundationPending(s,'quarry'))return null;
+  const payer=lordAcct(s),recipe=constructionRecipe(s,foodYr()*4,90,8,0);if(means(payer)<recipe.labour+recipe.timber*price(s,'timber')+foodYr()*2)return null;
+  const demand=W.settlements.some(t=>(t._stoneWant||0)>(t.stores.stone||0)&&dist2d(t.pos.x,t.pos.z,s.pos.x,s.pos.z)<4000);if(!demand)return null;const sites=[];
+  for(let dz=-9;dz<=9;dz++)for(let dx=-9;dx<=9;dx++){const cx=s.cx+dx,cz=s.cz+dz;if(!inB(cx,cz))continue;const i=cIdx(cx,cz);if(W.water[i]||!(W.biome[i]===B.ROCK||slopeAt(cx,cz)>.4))continue;const x=cellX(cx),z=cellZ(cz),d=dist2d(x,z,s.pos.x,s.pos.z);if(d<(s.extentR||s.radius||90)*.55)continue;sites.push({x,z,d});}sites.sort((a,b)=>a.d-b.d);
+  for(const {x,z}of sites.slice(0,12)){const f={x,z,w:20,d:14,rot:Math.atan2(s.pos.x-x,s.pos.z-z)},site={institution:'quarry',key:'quarry',arch:'quarry',tier:0,f};if(!institutionFoundationFootprint(s,f))continue;const P=institutionFoundationAccess(s,f);if(!P)continue;site.path=[serviceDoor(f,0),...P];return institutionFoundationCommission(s,site,payer,'lord',recipe,'quarry','a quarry and its paid access lane');}return null;
+}
+function institutionWharfProposal(s){if(AD()<950||!s.harbor||s.siegeBy||!s._lay?.live||!(s.portLoad>berthsOf(s).length*.3&&s.prosperity>38)||institutionFoundationPending(s,'wharf'))return null;
+  const payer=s,minimum=40*PL()+12*price(s,'timber');if(means(payer)<minimum+foodYr()*2)return null;const have=s.buildings.filter(b=>b.arch==='wharf'&&!b.removed),candidates=[];
+  for(const st of s.streets)if(st.kind==='quay'&&!st.gone&&!st.hidden&&st.serviceLinked)for(let i=1;i<st.pts.length-1;i++){const a=st.pts[i-1],b=st.pts[i+1],shore=st.pts[i],L=dist2d(a.x,a.z,b.x,b.z)||1,tx=(b.x-a.x)/L,tz=(b.z-a.z)/L;
+    for(const side of[1,-1]){const nx=-tz*side,nz=tx*side;let r=0;for(;r<44;r+=2)if(W.water[cIdx(toCell(shore.x+nx*r),toCell(shore.z+nz*r))]===1)break;if(r>=44)continue;let end=r;for(;end<r+72;end+=3){const x=shore.x+nx*end,z=shore.z+nz*end;if(W.water[cIdx(toCell(x),toCell(z))]!==1)break;if(hAt(x,z)<SEA-3&&end>r+20)break;}
+      const r0=Math.max(0,r-6),len=end-r0,head={x:shore.x+nx*end,z:shore.z+nz*end};if(len<16||W.water[cIdx(toCell(head.x),toCell(head.z))]!==1||hAt(head.x,head.z)>SEA-2)continue;const f={x:shore.x+nx*(r0+len/2),z:shore.z+nz*(r0+len/2),w:7,d:len,rot:Math.atan2(nx,nz)};if(have.some(b=>dist2d(b.x,b.z,f.x,f.z)<30))continue;candidates.push({f,head,shore:{x:shore.x,z:shore.z},quay:st,quayA:{x:st.pts[i-1].x,z:st.pts[i-1].z},quayB:{x:shore.x,z:shore.z},score:-dist2d(shore.x,shore.z,s.pos.x,s.pos.z)/90-Math.abs(len-36)/25});}}
+  candidates.sort((a,b)=>b.score-a.score);for(const P of candidates.slice(0,12)){const stone=constructionCapability(s,'stoneWharf').available&&s.prosperity>55,site={institution:'wharf',key:'wharf',arch:'wharf',tier:stone?2:0,...P};site.f.w=stone?9:7;const recipe=constructionRecipe(s,site.f.d*3*PL(),30+site.f.d*2,site.f.d*(stone?.4:.8),stone?site.f.d*1.5:0),q=institutionFoundationCommission(s,site,payer,'town',recipe,stone?'stoneWharf':null,'a wharf over navigable water');if(q)return q;}return null;
+}
+function tickInstitutionFoundations(){for(const s of W.settlements){if(!s._lay?.live||s.siegeBy)continue;institutionParishProposal(s);institutionParishProposal(s,'friary');institutionQuarryProposal(s);institutionWharfProposal(s);}}
 function fabricProjectPayer(q){const p=q.payer;if(!p||p.dead||p.gone||p.exiled||p.household&&p.successors)return null;return accountOwner(p);}
 function fabricPending(b){return(W.projects||[]).some(q=>!q.dead&&(q.type==='fabric'&&q.target===b.idx||q.type==='compound'&&q.site?.target===b.idx));}
 function fabricProjectValidate(q,s){if(q.work==='foundation'){if(s.siegeBy)return{ok:false,reason:'siege'};if(q.authority!=null&&s.owner!==q.authority)return{ok:false,abandon:true,reason:'authority-lost'};if(q.target!=null){const b=W.bldList[q.target];if(!b||b.removed||b.s!==s||JSON.stringify(fabricSnapshot(b))!==JSON.stringify(q.before))return{ok:false,abandon:true,reason:'parent-changed'};if(!graveyardInsideParcel(b.lot,obbCorners(q.site.f.x,q.site.f.z,q.site.f.w,q.site.f.d,q.site.f.rot)))return{ok:false,reason:'private-plot'};}
-    if(q.method&&!constructionCapability(s,q.method).available)return{ok:false,reason:'technology'};if(!s._lay?.live?.compoundSite(q.site,'validate',q.ownerId,q))return{ok:false,reason:'site-obstructed'};return storageGroundClaim(s,q,fabricProjectPayer(q));}
+    if(q.method&&!constructionCapability(s,q.method).available)return{ok:false,reason:'technology'};if(q.site.institution){const V=institutionFoundationValidate(q,s);if(!V.ok)return V;}else if(!s._lay?.live?.compoundSite(q.site,'validate',q.ownerId,q))return{ok:false,reason:'site-obstructed'};return storageGroundClaim(s,q,fabricProjectPayer(q));}
   if(q.work==='new'){if(s.siegeBy)return{ok:false,reason:'siege'};if(q.authority!=null&&s.owner!==q.authority)return{ok:false,abandon:true,reason:'authority-lost'};if(q.method&&!constructionCapability(s,q.method).available)return{ok:false,reason:'technology'};if(!q.slot||q.slot.st.gone||q.slot.st.planQ||q.slot.st.hidden&&!s._lay.laneClear(q.slot.st)||!s._lay.buildLot(q.slot,q.site.tier,true,'validate',q.site,q))return{ok:false,reason:'site-obstructed'};return storageGroundClaim(s,q,fabricProjectPayer(q));}
   const b=W.bldList[q.target];if(!b||b.s!==s||b.removed)return{ok:false,abandon:true,reason:'building-lost'};if(JSON.stringify(fabricSnapshot(b))!==JSON.stringify(q.before))return{ok:false,abandon:true,reason:'fabric-changed'};
   if(s.siegeBy)return{ok:false,reason:'siege'};if(q.method&&!constructionCapability(s,q.method).available)return{ok:false,reason:'technology'};
@@ -5534,7 +5614,7 @@ function fabricProjectCommission(s,b,plan){if(!['new','foundation','use','tier',
   const q={...plan,payer:accountOwner(plan.payer),type:'fabric',si:W.settlements.indexOf(s),target:b?.idx??null,before:b?fabricSnapshot(b):null,site:plan.site||{f:{x:b.x,z:b.z,w:b.w,d:b.d,rot:b.rot}},start:day(),worked:0,done:0,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,status:'building',stalled:false,dead:false};
   const payer=fabricProjectPayer(q),V=payer&&fabricProjectValidate(q,s);if(!V?.ok)return null;const total=q.labour+q.timber*price(s,'timber')+q.stone*price(s,'stone')+(q.land||0);if(means(payer)<total)return null;
   (W.projects||(W.projects=[])).push(q);G.ordersDirty=true;return q;}
-function fabricProjectComplete(q,s){if(q.work==='foundation'){const b=s._lay.live.compoundSite(q.site,'complete',q.ownerId,q);if(!b)return false;b.title={owner:accountOwner(q.payer),beneficiary:q.payer?.gn!==undefined?q.payer:q.payer?.head||null};if(q.ownerId==='lord')b.title=propertyRightsResolve('lord');b.groundClaim=q.groundClaim;b.grown=day();b.idx=W.bldList.length;W.bldList.push(b);markOccupiedGround(s,compoundGround(q.site).polys);bindPropertyRights(s);if(RESID.has(b.arch))rehouse(s,b);settleParcels([b]);updateBuildingInstance(b);syncLive(s);return true;}
+function fabricProjectComplete(q,s){if(q.work==='foundation'){const b=q.site.institution?institutionFoundationComplete(q,s):s._lay.live.compoundSite(q.site,'complete',q.ownerId,q);if(!b)return false;b.title={owner:accountOwner(q.payer),beneficiary:q.payer?.gn!==undefined?q.payer:q.payer?.head||null};if(['lord','town','church'].includes(q.ownerId))b.title=propertyRightsResolve(q.ownerId);b.groundClaim=q.groundClaim;b.grown=day();b.idx=W.bldList.length;W.bldList.push(b);markOccupiedGround(s,compoundGround(q.site).polys);bindPropertyRights(s);if(RESID.has(b.arch))rehouse(s,b);settleParcels([b]);if(q.site.institution){const t=`${q.title||ARCH[b.arch][4]} opens at ${s.name} after its retained ground, materials and work are paid.`;s.history.push({yr:year(),t});emit('trade',4,b,t);}updateBuildingInstance(b);syncLive(s);return true;}
   if(q.work==='new'){const b=s._lay.buildLot(q.slot,q.site.tier,true,'complete',q.site,q);if(!b)return false;b.ownerId=q.ownerId;b.title={owner:accountOwner(q.payer),beneficiary:q.payer?.gn!==undefined?q.payer:q.payer?.head||null};if(q.ownerId==='lord')b.title=propertyRightsResolve('lord');b.groundClaim=q.groundClaim;b.exactGround=true;b.grown=day();b.idx=W.bldList.length;W.bldList.push(b);s.growSlots=(s.growSlots||[]).filter(c=>{if(c.st===q.slot.st&&Math.abs(c.mx-q.slot.mx)<0.01&&Math.abs(c.mz-q.slot.mz)<0.01){c.done=true;return false;}return true;});if(q.slot.st.hidden){q.slot.st.hidden=false;G.roadsDirty=true;}clearLandUnder(b);bindPropertyRights(s);rehouse(s,b);settleParcels([b]);updateBuildingInstance(b);s._room=undefined;G.buildingsDirty=G.structuresDirty=true;return true;}
   const b=W.bldList[q.target];if(!s._lay.live.fabricSite(q.site,b,'complete',q))return false;
   if(q.work==='church')churchFabricApply(s,b,q.change);
@@ -12823,10 +12903,12 @@ function offRoute(si){ // from the edge of the world to this port, keeping to de
 /* stone: the quarry's, carried to where the masons want it; every work in stone waits on it */
 function stoneFor(s,what){const R=s.wallR||(s.radius||90)*1.3;return what==='wall'?Math.round(2*Math.PI*R*0.25):({keep:150,bailey:120,church:130,citadel:260,house:6,wharf:50}[what]||0);}
 const hasStone=(s,w)=>(s.stores.stone||0)>=stoneFor(s,w),useStone=(s,w)=>{s.stores.stone=Math.max(0,(s.stores.stone||0)-stoneFor(s,w));};
-function tickQuarries(){ // the old month's output, cut a day at a time
-  for(const s of W.settlements){
-    if(s.stores.stone==null)s.stores.stone=0;
-    if(s.quarry&&s.quarry.state!=='ruin'&&!s.siegeBy){const q=(s.res.stone||0)*2.2/30*clamp(s.pop/(s.pop+s.plagueDead+1),0.4,1);s.stores.stone+=q;offer(s,'stone',ownerAcct(s.quarry,s),q);}}}
+function tickQuarries(){ // real named quarrymen, actual wages and their present working strength
+  for(const s of W.settlements){if(s.stores.stone==null)s.stores.stone=0;const b=s.quarry;if(!b||b.removed||b.state!=='sound'||s.siegeBy||b.quarryPaidDay===day())continue;
+    const payer=accountOwner(ownerAcct(b,s)),P=workers_(s,p=>p.tr==='quarryman'&&!p.office&&!awayNow(p)&&ageYrs(p)>=16&&ageYrs(p)<65).sort((a,c)=>a.id-c.id);let hands=0,wagesPaid=0;
+    for(const p of P.slice(0,3)){const wage=foodYr()*1.5*Math.max(1,p._hh?.population.get(s)||1)/360,own=accountOwner(p)===payer;if(!own&&means(payer)<wage)break;const paid=own?0:transfer(payer,p,wage,'quarry wages',s);if(!own&&paid+1e-9<wage)continue;hands+=Math.max(0,Math.min(1,p._hh?.assets._fill??1));wagesPaid+=paid;}
+    b.quarryPaidDay=day();b.quarryHands=hands;b.quarryWages=(b.quarryWages||0)+wagesPaid;const q=(s.res.stone||0)*2.2/30*Math.min(1,hands/3);if(!(q>0))continue;s.stores.stone+=q;offer(s,'stone',payer,q);}
+}
 function tickStone(){ // closing demand: what remains to be built, for departing loads and tomorrow's market
   const ad=AD();
   for(const s of W.settlements){
@@ -15590,14 +15672,9 @@ function tickHistory(){ // once a year for each place (staggered): the town's ow
     if(s.kind==='village'&&AD()>=950&&marketHeads(s)>Math.max(150,s.pop*0.35)&&(roadsN>=2||s.river||s.harbor)){ // a charter follows the trade: when a good share of the place lives by its market, it is made a town
       L.live.promote();did=`${s.name} is granted a market charter; the village is a town now, and its fair draws the countryside.`;}
     else if((bid=townWallProposal(s)))did=null;
-    else if(AD()>=1000&&s.pop>150&&parishNeed(s)&&L.live.parish())did=`A new parish church is built for a growing quarter of ${s.name}.`;
-    else if(s.kind!=='village'&&AD()>=1220&&s.wallRad&&s.pop>1100&&chance('sim',0.2)&&L.live.friary())did=`Friars are given ground by the wall of ${s.name} for their house.`;
     else if(s.kind!=='village'&&AD()>=1150&&(s.role==='crossing'||s.kind==='capital'&&s.river)&&s.pop>900&&chance('sim',0.1)&&L.live.neustadt())did=`The lord plants a “New Town” across the river from ${s.name}: one straight street of equal plots.`;
     else if(s.bastions&&(s.role==='border'||s.kind==='capital')&&!s.citadel&&chance('sim',0.3)&&hasStone(s,'citadel')&&L.live.citadel()&&(useStone(s,'citadel'),true))did=`A star citadel is raised astride the walls of ${s.name}, a quarter razed for it.`;
-    if(!did&&!s.quarry&&(s.res&&s.res.stone>=4)&&AD()>=950&&chance('sim',0.3)&&W.settlements.some(o=>(o._stoneWant||0)>(o.stores.stone||0)&&dist2d(o.pos.x,o.pos.z,s.pos.x,s.pos.z)<4000)&&L.live.quarry())
-      did=vary('quarry',[()=>`The men of ${s.name} open a quarry in the hillside; the masons of the realm will buy all it can cut.`,()=>`A quarry is cut into the crag above ${s.name}, and its first blocks go down the road on sledges.`,()=>`${s.name} has stone for the taking: a quarry is opened, and carts come for it from the towns that are building.`]);
-    if(!did&&s.harbor&&AD()>=950&&(s.portLoad||0)>berthsOf(s).length*0.3&&s.prosperity>38&&chance('sim',0.4)&&L.live.wharf())
-      did=vary('wharf',[()=>`The waterfront of ${s.name} is too crowded for the ships that come: a new wharf is run out from the quay.`,()=>`Ships lie off ${s.name} waiting for a berth; the merchants pay for a new wharf.`,()=>`Piles are driven into the harbour mud at ${s.name}, and a new wharf goes out over the water.`]);
+
 
     const nb=s.buildings.filter(b=>!b.removed&&b.state!=='gone').length;s._bPeak=Math.max((s._bPeak||0)*0.995,nb); // the most the town has been, slowly forgotten
     if(did){syncLive(s);emit('trade',6,s.pos,did);}
@@ -16933,6 +17010,7 @@ function simTick(){
   simPart('tickProjects',()=>tickProjects());
   simPart('tickGrowth',()=>tickGrowth());
   simPart('tickStreets',()=>tickStreets());
+  simPart('tickInstitutionFoundations',()=>tickInstitutionFoundations());
   simPart('tickChurches',()=>tickChurches());
   simPart('tickCastles',()=>tickCastles());
   simPart('tickCourts',()=>tickCourts());
@@ -19936,7 +20014,7 @@ function visualDataNames(o){
 // town, a churchyard's church, a person or a crew). A link is cut; the same name holding a number (a tree's size
 // s, say) is plain geometry and crosses.
 // (cands: a street's frontage candidates, the layout planner's own scratch: a point every 2.2 m along both sides, most of the bytes of a town and nothing that is drawn.)
-const VISUAL_PRIVATE=new Set(['storage','ledger','holdings','account','ownerAccount','beneficiary','cands','groundClaim']),VISUAL_LINKS=new Set(['s','churchyardOf','title','head','p','men','riders','crew']);
+const VISUAL_PRIVATE=new Set(['storage','ledger','holdings','account','ownerAccount','beneficiary','cands','groundClaim','quarryPaidDay','quarryHands','quarryWages']),VISUAL_LINKS=new Set(['s','churchyardOf','title','head','p','men','riders','crew']);
 function visualGeometry(value,seen=new Set()){
   if(value===null||['number','string','boolean'].includes(typeof value))return value;
   if(!value||typeof value!=='object'||value instanceof Map||value instanceof Set||value.household||value._hh||seen.has(value))return undefined;
