@@ -156,3 +156,22 @@ named native wages and cash conservation, no-crew stalls, lost-title abandonment
 prerequisites, partial saved progress, single canonical completion and multiple
 purposes without duplicate identity. These are source-level controlled fixtures,
 not native generation, replay, worker, world-save or performance proof.
+
+### Native mask width correction
+
+`occupiedGroundCells` uses `CELL/2` on each side of a terrain-aligned native mask
+center, matching the GRID raster. The previous 7.5 metre half-width confused
+the 15 metre agricultural sample spacing with the wider mask cells (about
+27.27 metres in the ordinary map). Tiny footprints near a mask edge could
+therefore miss the cell whose actual ground they occupied.
+
+`occupiedGroundAreas(cells)` counts the exact existing 15 metre survey samples
+that those currently productive, unoccupied mask cells remove, grouped by the
+current `furlongAt` result. One mask cell may remove several samples and may
+span several titled fields. `occupiedGroundFields(cells)` intersects current
+Voronoi parcel polygons with the entire reserved mask cells; its temporary
+polygon memo lasts for that call only. First foundations and castle additions
+validate all those titles and quote the actual survey-area loss. Native mask
+completion refreshes every affected production field, rather than just the
+field at each mask cell’s center. These changes intentionally correct land
+occupation/yield histories; they are not an exact performance refactor.

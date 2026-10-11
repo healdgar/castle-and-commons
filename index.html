@@ -3215,7 +3215,7 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
       if(casKeep(s)||casRing(s)||!castleFoundationSite(s,site.spec,site))return false;
       live=true;curE=E;const a=site.spec;keep=place('keep',a.tier,site.f,'keep',a.hm,{inst:true,timberKeep:!!a.timber,exactGround:true});
       s.ward={...site.ward,wallRad:Float32Array.from(site.ward.wallRad)};s.keepPos={x:keep.x,z:keep.z,y:keep.y};
-      keep.st=addStreet(site.path.map(p=>({x:p.x,z:p.z})),1.3,'lane',{straight:true,castlePath:true});
+      keep.st=addStreet(site.path.map(p=>({x:p.x,z:p.z})),1.3,'lane',{straight:true,castlePath:true,compoundAccess:true});
       hist(0,`A first ${a.timber?'timber':'stone'} keep and palisaded yard were built beside the road.`);live=false;return keep;},
     stoneTimberKeep(){if(!keep||keep.removed||!keep.timberKeep||!constructionCapability(s,'stoneKeep').available)return false;live=true;curE=E;keep.timberKeep=false;keep.tier=2;keep.h=ARCH.keep[2]*1.3*0.8;updateBuildingInstance(keep);
       hist(0,'The timber tower was rebuilt in stone on its own ground.');live=false;return true;},
@@ -3362,14 +3362,14 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
       const g=segH.near(end.x,end.z,6).find(g=>!g.st.hidden&&!g.st.gone&&!g.st.planQ&&g.st.kind!=='edge'&&segDist(end.x,end.z,g.a,g.b)<=g.hw+0.1);if(!g)return null;
       if(mode==='validate')return site;if(mode!=='complete')return null;
       live=true;curE=E;const b=place(site.arch,site.tier||0,f,'compound',site.hm||1,{inst:true,exactGround:true,ownerId,abbey:typeof ownerId==='string'&&ownerId.startsWith('abbey:'),compoundKey:site.key||site.arch});
-      const ok=serviceAccess(b,{path:path.map(p=>({x:p.x,z:p.z})),street:g.st});live=false;if(!ok){unplace(b);return null;}return b;},
+      const ok=serviceAccess(b,{path:path.map(p=>({x:p.x,z:p.z})),street:g.st});if(ok&&b.st!==g.st)b.st.compoundAccess=true;live=false;if(!ok){unplace(b);return null;}return b;},
     compoundCastleApply(site){ // a paid native plan; no neighbour is pulled down for it
       const k=site.action,c=casOf(s),b=site.target==null?null:W.bldList[site.target];live=true;curE=E;
       if(k==='keep'||k==='timberStone'){if(!b||b!==keep||b.removed){live=false;return false;}const f=site.f;b.x=f.x;b.z=f.z;b.w=f.w;b.d=f.d;b.rot=f.rot;b.tier=2;b.h=site.height;b.timberKeep=false;if(b.motte){b.motte=false;b.shell=true;s.motteStone=true;}else if(k==='keep')s._keepRebuilt=true;groundBuilding(b);b._r=Math.hypot(b.w,b.d)/2;placed.add(b,b._r+1);updateBuildingInstance(b);}
       else if(k==='hall'){if(!b||b.removed){live=false;return false;}b.tier=2;b.h=ARCH.hall[2]*1.3;updateBuildingInstance(b);}
       else if(k==='ward'){s.ward={...site.ring,wallRad:Float32Array.from(site.ring.wallRad),stone:!!site.stone};}
       else if(k==='outer'){c.outer=site.offset;c.outerWall={...site.ring,wallRad:Float32Array.from(site.ring.wallRad),stone:true};s._outerCleared=0;}
-      else if(k==='chapel'){const f=site.f;const b=place('temple',2,f,'keep',0.75,{inst:true,castle:true,exactGround:true,compoundKey:'chapel'});if(site.path?.length>1)b.st=addStreet(site.path.map(p=>({x:p.x,z:p.z})),1.3,'lane',{straight:true,castlePath:true});c.chapel=true;}
+      else if(k==='chapel'){const f=site.f;const b=place('temple',2,f,'keep',0.75,{inst:true,castle:true,exactGround:true,compoundKey:'chapel'});if(site.path?.length>1)b.st=addStreet(site.path.map(p=>({x:p.x,z:p.z})),1.3,'lane',{straight:true,castlePath:true,compoundAccess:true});c.chapel=true;}
       else if(k==='bailey')s.baileyStone=true;else if(k==='wardStone')s.ward.stone=true;else if(k==='towers'){c.towers+=2;if(constructionCapability(s,'castleRoundTowers').available)c.round=true;}else if(k==='gate')c.gate=1;else if(k==='barb')c.gate=2;else if(k==='round')c.round=true;else if(k==='repair'){for(const D of site.damage||[]){const R=compoundCircuit(s,D.key);if(!R)continue;if(R.wallDmg)for(let i=0;i<R.wallDmg.length;i++)R.wallDmg[i]=Math.max(0,R.wallDmg[i]-(D.amount[i]||0));if(!R.wallDmg||Array.from(R.wallDmg).every(v=>v===0)){delete R.wallDmg;if(R.breachA===D.breachA&&R.breachUntil===D.breachUntil){delete R.breachUntil;delete R.breachA;R._breachPaid=0;}}}G.wallsDirty=true;}else{live=false;return false;}
       live=false;return true;},
     hovel(x,z,rot,arch){arch=arch||'cot';const a=ARCH[arch],f={x,z,w:a[0],d:a[1],rot};if(!ruralRoadAccess(s,f))return null;if(onRoad(x,z,Math.hypot(a[0],a[1])/2)||trackAt(x,z,Math.hypot(a[0],a[1])/2+1.5)||!fits(f,1.2,true))return null;live=true;curE=E;const b=place(arch,0,f,'fields',1);live=false;return b;},
@@ -4905,7 +4905,7 @@ function compoundBindCircuit(C,s,R,key,purposes=['defensive']){const ref=fortCir
 function compoundHas(C,key){return C.components.some(c=>c.key===key&&compoundComponentPresent(C,c));}
 function compoundComponentPresent(C,c){const s=W.settlements[C.si];if(!s)return false;if(c.kind==='building'){const b=W.bldList[c.ref];return !!b&&b.s===s&&!b.removed&&b.state==='sound';}return !!compoundCircuit(s,c.ref);}
 function compoundCircuit(s,key){return key==='town'?s:key==='outer'?s.cas?.outerWall:key==='bailey'?s.bailey:key==='hill'?s.hillCastle:key==='ward'?s.ward:key==='motte'?s.motte:null;}
-function compoundGround(site){const polys=[];if(site?.f)polys.push(obbCorners(site.f.x,site.f.z,site.f.w,site.f.d,site.f.rot));if(site?.ring){const R=site.ring;polys.push(Array.from({length:64},(_,k)=>{const a=k/64*Math.PI*2,r=wallRadAt(R,a);return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};}));}for(let k=1;k<(site?.path?.length||0);k++){const a=site.path[k-1],b=site.path[k];polys.push(obbCorners((a.x+b.x)/2,(a.z+b.z)/2,2.6,dist2d(a.x,a.z,b.x,b.z),Math.atan2(b.x-a.x,b.z-a.z)));}return{polys,cells:[...new Set(polys.flatMap(occupiedGroundCells))]};}
+function compoundGround(site){const polys=[];if(site?.poly?.length>2)polys.push(site.poly);if(site?.f)polys.push(obbCorners(site.f.x,site.f.z,site.f.w,site.f.d,site.f.rot));if(site?.ring){const R=site.ring;polys.push(Array.from({length:64},(_,k)=>{const a=k/64*Math.PI*2,r=wallRadAt(R,a);return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};}));}for(let k=1;k<(site?.path?.length||0);k++){const a=site.path[k-1],b=site.path[k];polys.push(obbCorners((a.x+b.x)/2,(a.z+b.z)/2,2.6,dist2d(a.x,a.z,b.x,b.z),Math.atan2(b.x-a.x,b.z-a.z)));}return{polys,cells:[...new Set(polys.flatMap(occupiedGroundCells))]};}
 function compoundProjectPayer(q){return typeof q.payerId==='number'?purseAcct(q.payerId):q.payerId==='crown'?'crown':corpOf(q.payerId);}
 function compoundProjectValidate(q,s,C){if(!C||C.ownerId!==q.ownerId)return{ok:false,abandon:true,reason:'institution-lost'};for(const key of q.requires||[])if(!compoundHas(C,key))return{ok:false,reason:'prerequisite'};if(q.adapter==='castle')return castleCompoundValidate(q,s,C);if(q.adapter==='abbey'&&typeof abbeyCompoundValidate==='function')return abbeyCompoundValidate(q,s,C);return{ok:false,abandon:true,reason:'unknown-adapter'};}
 function compoundProjectCommission(s,C,plan){if(!C||C.si!==W.settlements.indexOf(s)||!plan?.key||!Number.isFinite(plan.labour)||!(plan.labour>0)||!Number.isFinite(plan.days)||!(plan.days>0)||!['castle','abbey'].includes(plan.adapter))return null;
@@ -7160,7 +7160,7 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
     const door=serviceDoor(F,2.2);if(dist2d(door.x,door.z,P[0].x,P[0].z)>1e-6)return false;
     const poly=Array.from(R.wallRad,(r,k)=>{const a=k/R.wallRad.length*Math.PI*2;return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};});
     for(let k=0;k<poly.length;k++){const a=poly[k],b=poly[(k+1)%poly.length],c=poly[(k+2)%poly.length];if((b.x-a.x)*(c.z-b.z)-(b.z-a.z)*(c.x-b.x)<-1e-6)return false;} // parcel and curtain operations require a convex yard
-    if(W.land?.mask)for(const i of castleFoundationGround(site).cells)if(W.land.mask[i*4+2]!==255&&!castleFoundationLandOK(furlongAt(cellX(i%GRID),cellZ((i/GRID)|0)),s,si))return false; // the land raster reserves whole intersected cells
+    if(W.land?.mask){const cells=castleFoundationGround(site).cells.filter(i=>W.land.mask[i*4+2]!==255);if(typeof occupiedGroundFields==='function'&&W.land.F){for(const f of occupiedGroundFields(cells))if(!castleFoundationLandOK(f,s,si))return false;}else for(const i of cells)if(!castleFoundationLandOK(furlongAt(cellX(i%GRID),cellZ((i/GRID)|0)),s,si))return false;} // every actual parcel touched by the reserved raster cells
     if(!P?.length||!publicAt(P.at(-1).x,P.at(-1).z))return false;
     const gate=Math.atan2(P.at(-1).z-R.z,P.at(-1).x-R.x);if(Math.abs(Math.atan2(Math.sin(gate-R.gateA),Math.cos(gate-R.gateA)))>1e-6)return false;
     for(let x=R.x-R.r;x<=R.x+R.r;x+=1.5)for(let z=R.z-R.r;z<=R.z+R.r;z+=1.5)if(fortContains(R,x,z)&&!clear(x,z,1.3))return false;
@@ -7193,7 +7193,7 @@ function castleFoundationProposal(s,si){
   const seat=s===W.capital||s.owner>0&&W.settlements[W.houses[s.owner].seat]===s,V=townWorth(s)*(seat?1.6:1)+3000*casLvl(s),gain=(0.06*townThreat(s)+(seat?0.01:0))*V; // the existing ward's defence factor; a tower alone adds no circuit strength
   if(gain<=lower)return null;const site=castleFoundationSite(s,spec);if(!site)return null;
   const per=circuitLen(site.ward),len=polyLen(site.path),timber=spec.timberTower+per*0.25+recipe.timber,stone=spec.stone,labour=(base+wallCost(s,false,per)+len*0.8*PL())*recipe.laborFactor,materialEstimate=timber*price(s,'timber')+stone*price(s,'stone');
-  let landOpportunity=0;if(W.land?.mask){const used=new Map();for(const i of castleFoundationGround(site).cells)if(W.land.mask[i*4+2]!==255){const f=furlongAt(cellX(i%GRID),cellZ((i/GRID)|0));if(f)used.set(f,(used.get(f)||0)+225);}for(const[f,area]of used)landOpportunity+=landPrice(f)*Math.min(1,area/Math.max(1,f.area||20000));}
+  let landOpportunity=0;if(W.land?.mask){const cells=castleFoundationGround(site).cells,used=typeof occupiedGroundAreas==='function'?occupiedGroundAreas(cells):new Map();if(typeof occupiedGroundAreas!=='function')for(const i of cells)if(W.land.mask[i*4+2]!==255){const f=furlongAt(cellX(i%GRID),cellZ((i/GRID)|0));if(f)used.set(f,(used.get(f)||0)+225);}for(const[f,area]of used)landOpportunity+=landPrice(f)*Math.min(1,area/Math.max(1,f.area||20000));}
   const cost=labour+materialEstimate,net=gain-cost-landOpportunity;
   if(!(net>0)||purse(s.owner)<cost*1.25)return null;
   return {si,payer:s.owner,site,spec,x:site.f.x,z:site.f.z,timber,stone,labour,materialEstimate,landOpportunity,cost,gain,net,days:Math.ceil((60+per/15+spec.timberTower/2+stone/0.5+len/4)*recipe.laborFactor),title:'First keep and palisaded yard'};
@@ -7230,7 +7230,7 @@ function castleCompoundSite(s,action,retained,ownProject){const k=casKeep(s),R=c
   }else if(!R&&action!=='repair')return null;
   return site;
 }
-function castleCompoundLand(s,site){if(!site.f&&!site.ring)return{ok:true,opportunity:0};const Gd=compoundGround(site),si=W.settlements.indexOf(s),used=new Map();for(const i of Gd.cells){if(W.land?.mask?.[i*4+2]===255)continue;const x=cellX(i%GRID),z=cellZ((i/GRID)|0),f=furlongAt(x,z);if(!castleFoundationLandOK(f,s,si))return{ok:false};if(f)used.set(f,(used.get(f)||0)+225);}let opportunity=0;for(const[f,area]of used)opportunity+=landPrice(f)*Math.min(1,area/Math.max(1,f.area||20000));return{ok:true,opportunity};}
+function castleCompoundLand(s,site){if(!site.f&&!site.ring)return{ok:true,opportunity:0};const Gd=compoundGround(site),si=W.settlements.indexOf(s),cells=Gd.cells.filter(i=>W.land?.mask?.[i*4+2]!==255),used=occupiedGroundAreas(cells);for(const f of occupiedGroundFields(cells))if(!castleFoundationLandOK(f,s,si))return{ok:false};let opportunity=0;for(const[f,area]of used)opportunity+=landPrice(f)*Math.min(1,area/Math.max(1,f.area||20000));return{ok:true,opportunity};}
 function castleCompound(s){const C=compoundEnsure(s,'castle',s.owner),k=casKeep(s),R=casRing(s);if(k)compoundBindBuilding(C,k,[]);if(R)compoundBindCircuit(C,s,R,'curtain');if(s.motte)compoundBindCircuit(C,s,s.motte,'motte');for(const b of s.buildings)if(!b.removed&&(b.bailey||b.castle))compoundBindBuilding(C,b,[]);return C;}
 function castleCompoundProposal(s,si,n){if(!n||!(n.net>0)||purse(s.owner)<n.cost*1.25||!s._lay?.live?.compoundCastleApply)return null;const site=castleCompoundSite(s,n.k);if(!site)return null;const land=castleCompoundLand(s,site);if(!land.ok||n.net<=land.opportunity)return null;
   let timber=n.timber||0,stone=n.st||0;if(n.k==='keep'){const area=site.f.w*site.f.d;timber=area*0.08+(n.toolTimber||0);stone=150*area/169;}else if(['ward','outer','bailey','wardStone'].includes(n.k)){const ring=site.ring||casRing(s),per=circuitLen(ring),st=n.k!=='ward'||site.stone;timber=per*(st?0.02:0.25)+(n.toolTimber||0);stone=st?per*0.25:0;}
@@ -8932,17 +8932,29 @@ function graveyardMarkers(yard,count){
   const c=Math.cos(yard.rot||0),sn=Math.sin(yard.rot||0),step=2.65,u0=yard.uMin??-yard.w/2,u1=yard.uMax??yard.w/2,v0=yard.vMin??-yard.d/2,v1=yard.vMax??yard.d/2;for(let v=v0+1.4;v<v1-1&&out.length<count;v+=step)for(let u=u0+1.4+(Math.round((v-v0)/step)%2)*0.7;u<u1-1&&out.length<count;u+=step){const x=yard.x+u*c+v*sn,z=yard.z-u*sn+v*c,kind=out.length%4===0?'tomb':'stone',[sx,sz]=kind==='tomb'?[1.05,0.68]:[0.76,0.22];if(!graveyardFootprintInside(yard,x,z,sx,sz))continue;out.push({x,z,rot:yard.rot||0,kind});}
   return out;
 }
-function occupiedGroundCells(P){ // the exact intersected cells of the existing 15 m agricultural mask
+function occupiedGroundCells(P){ // exact intersections with the native CELL-wide agricultural-mask raster
   if(!P?.length)return [];let x0=Infinity,x1=-Infinity,z0=Infinity,z1=-Infinity;const cells=[];
   for(const q of P){x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);z0=Math.min(z0,q.z);z1=Math.max(z1,q.z);}
-  const c0=toCell(x0-8),c1=toCell(x1+8),r0=toCell(z0-8),r1=toCell(z1+8),hit=(cx,cz)=>{const ax=cellX(cx)-7.5,bx=cellX(cx)+7.5,az=cellZ(cz)-7.5,bz=cellZ(cz)+7.5,C=[[ax,az],[bx,az],[bx,bz],[ax,bz]];
+  const half=CELL/2,c0=toCell(x0-half),c1=toCell(x1+half),r0=toCell(z0-half),r1=toCell(z1+half),hit=(cx,cz)=>{const ax=cellX(cx)-half,bx=cellX(cx)+half,az=cellZ(cz)-half,bz=cellZ(cz)+half,C=[[ax,az],[bx,az],[bx,bz],[ax,bz]];
     if(C.some(([x,z])=>inPolyXZ(P,x,z))||P.some(q=>q.x>=ax&&q.x<=bx&&q.z>=az&&q.z<=bz))return true;
     for(let k=0;k<P.length;k++){const a=P[k],b=P[(k+1)%P.length];for(let j=0;j<4;j++){const u={x:C[j][0],z:C[j][1]},v={x:C[(j+1)%4][0],z:C[(j+1)%4][1]};if(segSegDist(a,b,u,v)<0.01)return true;}}return false;};
   for(let cz=Math.max(0,r0);cz<=Math.min(GRID-1,r1);cz++)for(let cx=Math.max(0,c0);cx<=Math.min(GRID-1,c1);cx++)if(hit(cx,cz))cells.push(cIdx(cx,cz));return cells;
 }
+function occupiedGroundAreas(cells){ // the same 15 m survey points refreshArea loses when a native mask cell is occupied
+  const areas=new Map();if(!W.land?.mask)return areas;const mask=W.land.mask,half=CELL/2;
+  for(const c of new Set(cells)){if(!mask[c*4]||mask[c*4+2]===255)continue;const x=cellX(c%GRID),z=cellZ((c/GRID)|0),i0=Math.ceil((x-half+SIZE/2-7.5)/15),i1=Math.floor((x+half+SIZE/2-7.5)/15),j0=Math.ceil((z-half+SIZE/2-7.5)/15),j1=Math.floor((z+half+SIZE/2-7.5)/15);
+    for(let j=Math.max(0,j0);j<=j1&&j<SIZE/15;j++)for(let i=Math.max(0,i0);i<=i1&&i<SIZE/15;i++){const px=-SIZE/2+7.5+i*15,pz=-SIZE/2+7.5+j*15;if(cIdx(toCell(px),toCell(pz))!==c)continue;const f=furlongAt(px,pz);if(f)areas.set(f,(areas.get(f)||0)+225);}
+  }return areas;
+}
+function occupiedGroundFields(cells){ // actual current Voronoi parcels touched by any claimed native raster cell
+  const fields=new Set(),polys=new Map(),half=CELL/2;if(!W.land?.F)return fields;
+  for(const c of new Set(cells)){const x=cellX(c%GRID),z=cellZ((c/GRID)|0),P=[{x:x-half,z:z-half},{x:x+half,z:z-half},{x:x+half,z:z+half},{x:x-half,z:z+half}],ci=Math.floor((x+SIZE/2)/FG),cj=Math.floor((z+SIZE/2)/FG);
+    for(let j=Math.max(0,cj-2);j<=Math.min(FN-1,cj+2);j++)for(let i=Math.max(0,ci-2);i<=Math.min(FN-1,ci+2);i++){const f=W.land.F[j*FN+i];if(!f||fields.has(f))continue;let poly=polys.get(f);if(!poly){poly=computeFurlongPoly(f);polys.set(f,poly);}if(graveyardPolygonsOverlap(P,poly))fields.add(f);}
+  }return fields;
+}
 function markOccupiedGround(s,polys){ // reserve actual ground and clear only trees inside its surveyed boundaries
   if(!W.land?.mask||!polys?.length)return;const mask=W.land.mask,affected=new Set();
-  for(const i of new Set(polys.flatMap(occupiedGroundCells)))if(mask[i*4+2]!==255){mask[i*4+2]=255;const f=furlongAt(cellX(i%GRID),cellZ((i/GRID)|0));if(f)affected.add(f);}
+  const cells=[...new Set(polys.flatMap(occupiedGroundCells))];for(const f of occupiedGroundAreas(cells).keys())affected.add(f);for(const i of cells)if(mask[i*4+2]!==255)mask[i*4+2]=255;
   for(const f of affected){refreshArea(f);writeFurlong(f);}if(affected.size&&(MODEL_ONLY||G.landView?.maskTex))G.landMaskDirty=true;
   if(W.treeHash)for(const P of polys){const xs=P.map(q=>q.x),zs=P.map(q=>q.z),x0=Math.min(...xs),x1=Math.max(...xs),z0=Math.min(...zs),z1=Math.max(...zs),R=Math.max(x1-x0,z1-z0)/2+3;
     for(const t of W.treeHash.near((x0+x1)/2,(z0+z1)/2,R))if(!t.cut&&inPolyXZ(P,t.x,t.z)){t.cut=true;queueTree(t);}}
@@ -11197,6 +11209,8 @@ function markLot(P){ // a house's yard is no longer ploughland: the strips stop 
   if(ch&&(MODEL_ONLY||G.landView?.maskTex))G.landMaskDirty=true;}
 function markSettlementBuilt(s){
   for(const b of s.buildings)if(b.exactGround){for(const i of occupiedGroundCells(obbCorners(b.x,b.z,b.w,b.d,b.rot)))W.land.mask[i*4+2]=255;}else markBuilt(b.x,b.z,Math.hypot(b.w,b.d)/2+8);
+  for(const C of s.compounds||[])for(const c of C.components||[])if(c.kind==='circuit'){const R=compoundCircuit(s,c.ref);if(R)for(const i of compoundGround({ring:R}).cells)W.land.mask[i*4+2]=255;}
+  for(const st of s.streets||[])if(st.compoundAccess&&!st.gone&&!st.hidden)for(const i of compoundGround({path:st.pts}).cells)W.land.mask[i*4+2]=255;
   if(W.land._surveyed)for(const b of s.buildings)if(b.lot?.length&&b._graveyard&&!b._graveyard.removed)markChurchyardBuilt(s,b._graveyard);
   if(s.wallRad){const R=Math.max(...s.wallRad)+80;
     for(let cz=toCell(s.pos.z-R);cz<=toCell(s.pos.z+R);cz++)for(let cx=toCell(s.pos.x-R);cx<=toCell(s.pos.x+R);cx++){
@@ -16426,7 +16440,7 @@ function refreshOrders(){ // a mark on everything an order is still working on: 
       for(let k=k0;k<P.length;k++){const p=P[k],m=new THREE.Mesh(new THREE.BoxGeometry(0.8,5,0.8),mat(q.stalled?0x8a2f22:0xe0c070));m.position.set(p.x,hAt(p.x,p.z)+2.5,p.z);grp.add(m);} // surveyors' pegs where the road will run
     }else if(q.type==='pave'){const r=q.r,P=r.drawn||r.path;band(P,6.5,q.stalled?0x8a2f22:0xe0c070);}
     else if(q.type==='castle'&&q.site){const R=q.site.ward,P=Array.from(R.wallRad,(r,k)=>{const a=k/R.wallRad.length*Math.PI*2;return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};});P.push({...P[0]});const c=q.stalled?0x8a2f22:0xe0c070;band(P,1.3,c);band(q.site.path,1.3,c);}
-    else if(q.type==='compound'&&q.site){const c=q.stalled?0x8a2f22:0xe0c070;if(q.site.f){const f=q.site.f,P=obbCorners(f.x,f.z,f.w,f.d,f.rot);band([...P,P[0]],1.3,c);}if(q.site.ring){const R=q.site.ring,P=Array.from({length:65},(_,k)=>{const a=k/64*Math.PI*2,r=wallRadAt(R,a);return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};});band(P,1.3,c);}if(q.site.path)band(q.site.path,1.3,c);}
+    else if(q.type==='compound'&&q.site){const c=q.stalled?0x8a2f22:0xe0c070;if(q.site.poly?.length>2)band([...q.site.poly,q.site.poly[0]],1.3,c);if(q.site.f){const f=q.site.f,P=obbCorners(f.x,f.z,f.w,f.d,f.rot);band([...P,P[0]],1.3,c);}if(q.site.ring){const R=q.site.ring,P=Array.from({length:65},(_,k)=>{const a=k/64*Math.PI*2,r=wallRadAt(R,a);return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};});band(P,1.3,c);}if(q.site.path)band(q.site.path,1.3,c);}
     else if(q.type==='buy')ring(q.f.x,q.f.z,FG*0.55,0x3e5f8a);
     else if(q.type==='clear')ring(q.x,q.z,q.r+4,q.stalled?0x5a2020:0xc0392b);
     else if(q.type==='persuade')ring(q.x,q.z,(q.r||30)+4,0xc4a24a);
