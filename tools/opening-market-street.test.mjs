@@ -6,7 +6,7 @@ import vm from 'node:vm';
 const source=fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8');
 const between=(a,b)=>{const i=source.indexOf(a),j=source.indexOf(b,i);assert.ok(i>=0&&j>i,a);return source.slice(i,j);};
 const seed=between('  const seedMarketStreet=()=>','  const completeResidential=goal=>');
-const graph=between('function streetGraph(s){','function nearestNode(');
+const graph=between('function streetGraph(','function nearestNode(');
 const footprint=between('function streetFootprintOverlap(','// Water crossings');
 const road=between('function roadAccessClear(','// A service lane');
 const place=between('function placeR(','function placeReach(');
