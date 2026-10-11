@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import {realm,near} from './ownership-fixture.mjs';
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const technologyRules=source.slice(source.indexOf('const TECH_RULES=Object.freeze('),source.indexOf('function technologyKey('));
+const constructionRules=source.match(/^const CONSTRUCTION_METHODS=.*$/m)?.[0]||'';
 const learning=source.slice(source.indexOf('/* LEARNING (#40):'),source.indexOf('/* the rank-and-file notables share'));
 function fn(n){return source.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))','m'))?.[0]||'';}
 function fixture(households=4){
@@ -19,7 +20,7 @@ function fixture(households=4){
   Object.assign(f.C,{KL:0,KR:1,KS:2,KLaw:3,KA:4,KRi:5,KC:6,KCr:7,KH:8,GW:1,GD:2,GV:3,GB:4,TILLERS:new Set(['ploughman']),TRADE_W:{merchant:1.6,reeve:.3},day:()=>d,year:()=>1,AD:()=>1250,
     RESID:new Set(['inn','hospital','house']),institutionalCapability:()=>({available:false}),livingNotableCandidates:()=>[],trait:()=>0,technologyActorsDirty:()=>{},technologyRecordTeaching:(s,p,v)=>{s.receipts=(s.receipts||0)+v;},houseAcct:hi=>hi?f.W.houses[hi]:'crown',purse:hi=>hi?f.W.houses[hi].gold:f.W.treasury,
     rentDue:()=>0,sovOn:()=>true,plyH:()=>0,esc:String,householdHeadsChanged:()=>{},emit:()=>{}});
-  vm.runInContext(technologyRules+'\n'+['technologyKey','technologyCapability','technologyEffect','tradeIncome','capOf'].map(fn).join('\n')+'\n'+learning,f.C);
+  vm.runInContext(constructionRules+'\n'+technologyRules+'\n'+['constructionCapability','technologyKey','technologyCapability','technologyEffect','tradeIncome','capOf'].map(fn).join('\n')+'\n'+learning,f.C);
   return {...f,master,parent,kid,other,room,setDay:x=>d=x};
 }
 
@@ -96,4 +97,19 @@ test('college proposal and journal command require knowledge, real funds and com
   Object.assign(f.C,{constructionTechnologyRecipe:()=>({laborFactor:1,timber:2}),storageGroundClaim:()=>({ok:true,recipients:[]}),compoundEnsure:()=>assert.fail('a read quote creates no compound'),price:(s,g)=>s.px[g]??1});assert.equal(f.eval('collegePlanQuote(s)'),null);
   f.C.institutionalCapability=()=>({available:true});const coins=f.coins(),Q=f.eval('collegePlanQuote(s)');assert.ok(Q);assert.equal(Q.site.arch,'hall');assert.deepEqual(Array.from(Q.purposes),['school']);assert.equal(Q.groundRequired,true);assert.equal(f.W.projects.length,0);near(f.coins(),coins);assert.equal(f.eval('collegePlanQuote(s,"residence")'),null);
   f.W.treasury=0;assert.equal(f.eval('collegePlanQuote(s)'),null);f.W.treasury=1000;f.s.owner=1;assert.equal(f.eval('collegeCmd("0:classroom")'),false);
+});
+
+
+test('actual scholar board consumes only the remaining meal and retains its receipt through same-day graduation',()=>{
+  const f=universityFixture();f.setDay(3);f.eval('tickLearning()');f.setDay(4);const U=f.W.universities[0],S=f.W.schools[U.school];f.C.school=S;
+  f.eval('personBoardRecord(H[7],0,FOOD/2,"abbey:0")');const food=f.s.stores.grain,coins=f.coins();assert.equal(f.eval('learningScholarBoard(school,H[7])'),true);near(f.s.stores.grain,food-f.eval('FOOD')/2);near(f.eval('personBoardMeal(H[7])'),f.eval('FOOD'));near(f.scholar.study.journey.boarded,1);near(f.coins(),coins);
+  const paid=U.board,rent=U.lodging,gold=f.scholar._hh.assets.w;assert.equal(f.eval('learningScholarBoard(school,H[7])'),true);near(f.s.stores.grain,food-f.eval('FOOD')/2);near(U.board,paid);near(U.lodging,rent);near(f.scholar._hh.assets.w,gold);
+  f.scholar.sk[0]=.75;assert.equal(f.eval('learningGraduate(school,H[7])'),true);assert.equal(f.scholar.study.journey.leave,4);near(f.eval('learningHomeAbsence(home,H[7]._hh)'),1);near(f.eval('personBoardMeal(H[7])'),f.eval('FOOD'));
+  f.setDay(5);near(f.eval('learningHomeAbsence(home,H[7]._hh)'),0);near(f.eval('personBoardMeal(H[7])'),0);
+});
+
+test('an already fed visiting scholar still pays one actual lodging bill without buying a second meal',()=>{
+  const f=universityFixture();f.setDay(3);f.eval('tickLearning()');f.setDay(4);const U=f.W.universities[0],S=f.W.schools[U.school];f.C.school=S;f.eval('personBoardRecord(H[7],0,FOOD,"government")');const food=f.s.stores.grain,coins=f.coins();
+  assert.equal(f.eval('learningScholarBoard(school,H[7])'),true);near(f.s.stores.grain,food);near(U.board,0);assert.ok(U.lodging>0);near(f.scholar.study.journey.boarded,1);near(f.coins(),coins);const rent=U.lodging;
+  assert.equal(f.eval('learningScholarBoard(school,H[7])'),true);near(U.lodging,rent);near(f.s.stores.grain,food);
 });

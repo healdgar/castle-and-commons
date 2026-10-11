@@ -151,3 +151,11 @@ money, technology receipt evidence and room-loss closure; college quotes require
 knowledge/cash and a completed prerequisite, create no buildings/compound on
 read, and enforce ruler ownership. Native geometry/ground/work/completion,
 speed/replay/save/projection and multi-era economy are root's serialized gates.
+
+Daily visiting-scholar board uses the shared actual-person `boardReceipt`: it
+consumes only the part of `FOOD` not already eaten through another native host.
+It records newly consumed food before changing the journey's daily fraction,
+and one destination-room rent and actual host-service receipt are paid per day.
+The current meal survives same-day graduation/return and leaves home mouths
+exactly once; yesterday's receipt supplies no food today. This is actual food
+already consumed, not a second inventory or guaranteed future meal.

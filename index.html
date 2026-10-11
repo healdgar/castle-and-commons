@@ -4107,10 +4107,12 @@ function learningScholarReturn(p,why){
 function learningScholarBoard(S,p){
   const J=p.study?.journey;if(!J)return true;if(day()<J.arrive||day()>=J.leave)return false;
   const s=W.settlements[J.to],home=W.settlements[J.from],b=W.bldList?.[J.lodging],payer=learningPayer(learningHead(p));if(!b||b.removed||b.state!=='sound'||!RESID.has(b.arch)||s.siegeBy||(b.hh||[]).filter(h=>!h.dead&&h.bh===b).length*HOUSEHOLD+learningLodgingUsed(b)>capOf(b)*HOUSEHOLD){learningScholarReturn(p,'the lodging is unavailable');return false;}
-  const g=FOODS.slice().sort((a,b)=>price(s,a)-price(s,b)).find(g=>avail(s,g,price(s,g))>=FOOD),host=learningPerson(J.host),service=host&&!host.dead&&host.si===J.to&&host.bh===b?J.meal:0,need=FOOD;
-  if(!g||learningSpare(home,payer)<need*price(s,g)+J.rent+service+S.fee){learningScholarReturn(p,'board and tuition are no longer affordable');return false;}
-  const board=purchase(s,g,payer,need),got=purchase.got;commodityCreditPurchase(s,payer,g,got);const eaten=consumeOwned(s,payer,g,got);
-  const rent=transfer(payer,J.owner,J.rent,'scholar lodging',s),meal=service>0?transfer(payer,host,service,'scholar board',s):0;J.board+=board+meal;J.lodgingPaid+=rent;J.boardedDay=day();J.boarded=Math.min(1,eaten/Math.max(1e-9,need));const U=W.universities[S.university];U.board+=board+meal;U.lodging+=rent;
+  if(J.boardedDay===day())return personBoardMeal(p)>0; // one actual room and host-service receipt per day
+  const need=Math.max(0,FOOD-personBoardMeal(p)),g=need>0?FOODS.slice().sort((a,b)=>price(s,a)-price(s,b)).find(g=>avail(s,g,price(s,g))>=need):null,host=learningPerson(J.host),service=need>0&&host&&!host.dead&&host.si===J.to&&host.bh===b?J.meal:0;
+  if((need>0&&!g)||learningSpare(home,payer)<(need>0?need*price(s,g):0)+J.rent+service+S.fee){learningScholarReturn(p,'board and tuition are no longer affordable');return false;}
+  let board=0,eaten=0;if(need>0){board=purchase(s,g,payer,need);const got=purchase.got;commodityCreditPurchase(s,payer,g,got);eaten=consumeOwned(s,payer,g,got);}
+  personBoardRecord(p,J.to,eaten,'scholar'); // preserve the actual meal before today's fraction or return date changes
+  const boarded=personBoardMeal(p),rent=transfer(payer,J.owner,J.rent,'scholar lodging',s),meal=service>0?transfer(payer,host,service,'scholar board',s):0;J.board+=board+meal;J.lodgingPaid+=rent;J.boardedDay=day();J.boarded=Math.min(1,boarded/FOOD);const U=W.universities[S.university];U.board+=board+meal;U.lodging+=rent;
   if(!J.contacted){technologyContact(home,s);J.contacted=true;}return J.boarded>0;
 }
 // Board receipts describe food already eaten by this person, never another pantry or mouth.
