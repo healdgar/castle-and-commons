@@ -14,7 +14,22 @@ test('named collectors assess actual coin and titled movables once, preserve kee
 
 test('subsidy arrears follow a household merger and retire after actual payment without assessing twice',()=>{const r=fixture();book(r,1);r.eval('subsidyAssessment(E,G,Q);globalThis.A=householdAccount(H[0]);globalThis.B=householdAccount(H[1]);globalThis.owed=E.dues.get(A).due;marryHouseholds(H[1],H[0]);H[1].w=10000');const before=cash(r);r.eval('subsidyRecover(s)');near(cash(r),before);assert.equal(r.eval('E.dues.has(A)'),false);near(r.eval('G.assessed'),r.eval('G.collected+G.arrears'));r.eval('subsidyRecover(s)');near(cash(r),before);});
 
-test('an extinct debtor leaves discharged subsidy, not a charge on an unrelated heir',()=>{const r=fixture();book(r,1);r.eval('subsidyAssessment(E,G,Q);globalThis.A=householdAccount(H[0]);transfer(A,H[1],means(A),"estate");H[0].dead=true;inherit(H[0]);globalThis.other=H[1].w;subsidyRecover(s)');near(r.eval('H[1].w'),r.eval('other'));assert.ok(r.eval('G.discharged>0'));near(r.eval('G.assessed'),r.eval('G.collected+G.arrears+G.discharged'));});
+test('an extinct debtor leaves discharged subsidy, not a charge on an unrelated heir',()=>{
+  const r=fixture(),before=cash(r);book(r,1);
+  // Give the recipient no assessed wealth of its own. Its later gift must not
+  // be confused with collection of arrears it already owed before the death.
+  r.eval('globalThis.A=householdAccount(H[0]);globalThis.B=householdAccount(H[1]);transfer(B,"crown",means(B),"prior obligations",s);subsidyAssessment(E,G,Q);globalThis.owed=E.dues.get(A).due');
+  near(cash(r),before);assert.ok(r.eval('owed>0'));assert.equal(r.eval('E.dues.has(B)'),false);
+  r.eval('transfer(A,B,means(A),"estate gift",s)');near(cash(r),before);
+  r.eval('H[0].dead=true;inherit(H[0]);globalThis.other=means(B)');
+  near(cash(r),before);assert.equal(r.eval('A.head'),null);assert.ok(r.eval('A.estate'));
+  r.eval('subsidyRecover(s)');
+  near(r.eval('means(B)'),r.eval('other'));near(cash(r),before);
+  assert.equal(r.eval('E.dues.has(A)||E.dues.has(B)'),false);
+  near(r.eval('G.discharged'),r.eval('owed'));
+  near(r.eval('G.assessed'),r.eval('G.collected+G.arrears+G.discharged'));
+  r.eval('subsidyRecover(s)');near(r.eval('means(B)'),r.eval('other'));near(cash(r),before);near(r.eval('G.discharged'),r.eval('owed'));
+});
 
 test('consent refusal creates no tax grant and danger can change a positive vote deterministically',()=>{for(const war of [false,true]){const r=fixture();r.eval(`W.war=${war?'{}':'null'};W.legitimacy=0;s.hunger=1;s.unrest=100;W.houses[1].at={si:0,until:100};globalThis.E=W.estates={sessions:{rows:[],over:{}},grants:[],passed:0,denied:0,assessed:0,collected:0,arrears:0};globalThis.S={rate:.1,parliament:true,lords:[1],towns:[],votes:[],why:"war"};`);if(war)r.eval('s.hunger=0;s.unrest=0;t.hunger=0;t.unrest=0;W.legitimacy=100');else r.eval('t.hunger=1;t.unrest=100');const before=cash(r);r.eval('estatesGrant(E,S);estatesGrant(E,S)');assert.equal(r.eval('E.grants.length'),war?1:0);assert.equal(r.eval('S.granted'),war);near(cash(r),before);}});
 
