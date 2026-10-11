@@ -5981,6 +5981,7 @@ function fabricProjectValidate(q,s){if(q.work==='consolidate')return courtyardPr
     if(q.method&&!constructionCapability(s,q.method).available)return{ok:false,reason:'technology'};if(q.site.institution){const V=institutionFoundationValidate(q,s);if(!V.ok)return V;}else if(!s._lay?.live?.compoundSite(q.site,'validate',q.ownerId,q))return{ok:false,reason:'site-obstructed'};return storageGroundClaim(s,q,fabricProjectPayer(q));}
   if(q.work==='new'){if(s.siegeBy)return{ok:false,reason:'siege'};if(q.authority!=null&&s.owner!==q.authority)return{ok:false,abandon:true,reason:'authority-lost'};if(q.method&&!constructionCapability(s,q.method).available)return{ok:false,reason:'technology'};if(!q.slot||q.slot.st.gone||q.slot.st.planQ||q.slot.st.hidden&&!s._lay.laneClear(q.slot.st)||!s._lay.buildLot(q.slot,q.site.tier,true,'validate',q.site,q))return{ok:false,reason:'site-obstructed'};return storageGroundClaim(s,q,fabricProjectPayer(q));}
   const b=W.bldList[q.target];if(!b||b.s!==s||b.removed)return{ok:false,abandon:true,reason:'building-lost'};if(JSON.stringify(fabricSnapshot(b))!==JSON.stringify(q.before))return{ok:false,abandon:true,reason:'fabric-changed'};
+  if(['use','refit'].includes(q.work)&&!housingRefitAllowed(b))return{ok:false,abandon:true,reason:'institutional-purpose'};
   if(s.siegeBy)return{ok:false,reason:'siege'};if(q.method&&!constructionCapability(s,q.method).available)return{ok:false,reason:'technology'};
   if(q.work==='refit'){const h=q.occupant;if(!h||h.dead||h.si!==q.si||(b.hh||[]).length)return{ok:false,abandon:true,reason:'occupancy-changed'};}
   if(!s._lay?.live?.fabricSite(q.site,b,'validate',q))return{ok:false,reason:'site-obstructed'};
@@ -6123,18 +6124,20 @@ function ownersRetire(){if(!W.households)return;let road=null;
       if(C){const r=C.records.get(x);C.records.delete(x);C.size=M.size;if(r)for(const L of [...(C.goods?.values()||[]),...(C.offers?.values()||[])]){const i=L.indexOf(r);if(i>=0)L.splice(i,1);}}
       s.storage.forget(h);}
     OWNERS_RETIRED.add(h);}}
+function housingEligible(b,h){return b.abbey?b.abbey===((h.abbey!=null||h.corrodian!=null)?'abbey:'+(h.abbey??h.corrodian):null):h.abbey==null;}
+function housingSlots(b){return Math.max(0,capOf(b)-learningHouseholdSlots(b));}
+function housingRefitAllowed(b){return !b.inst&&!b.abbey&&!b.college&&!b.compoundKey&&!b.compoundConnection&&!b.coveredCourt;} // a named institutional purpose needs its own authorized change
 function houseFolk(s){
-  const homes=(s.buildings||[]).filter(b=>RESID.has(b.arch)&&b.state==='sound'&&!b.removed),cap=new Map();for(const b of homes){cap.set(b,Math.max(0,capOf(b)-learningHouseholdSlots(b)));b.hh=[];}
+  const homes=(s.buildings||[]).filter(b=>RESID.has(b.arch)&&b.state==='sound'&&!b.removed),cap=new Map();for(const b of homes){cap.set(b,housingSlots(b));b.hh=[];}
   const heads=new Set();for(const p of s.folk||[])heads.add(householdHead(p));
-  const eligible=(b,h)=>b.abbey?b.abbey===((h.abbey!=null||h.corrodian!=null)?'abbey:'+(h.abbey??h.corrodian):null):h.abbey==null;
-  const later=[];for(const h of heads){const b=h.bh;if(b&&cap.get(b)>0&&eligible(b,h)){cap.set(b,cap.get(b)-1);b.hh.push(h);}else later.push(h);}
+  const later=[];for(const h of heads){const b=h.bh;if(b&&cap.get(b)>0&&housingEligible(b,h)){cap.set(b,cap.get(b)-1);b.hh.push(h);}else later.push(h);}
   const shared=typeof lvReadNative==='function'&&lvReadNative('home');let F=null;
   let rr=0;for(const h of later){const want=TRADE_ARCH[h.tr];let b=null;
-    if(want)b=homes.find(x=>x.arch===want&&cap.get(x)>0&&eligible(x,h));
+    if(want)b=homes.find(x=>x.arch===want&&cap.get(x)>0&&housingEligible(x,h));
     if(!b){const wk=workOf(h,s);let bs=-1e9;const st=Math.max(1,Math.floor(homes.length/40)),o0=(h.id>>>0)%st; // a household looks over some forty houses with room, not every one in a great town
-      for(let ii=o0;ii<homes.length;ii+=st){const x=homes[ii];if(!(cap.get(x)>0)||!eligible(x,h))continue;const v=(shared?homeScore(h,s,x.x,x.z,x.st,wk,F||(F=lvField(s))):homeScore(h,s,x.x,x.z,x.st,wk))+(TILLERS.has(h.tr)&&(x.arch==='house'||x.arch==='longhouse'||x.arch==='cot')?0.4:0);if(v>bs){bs=v;b=x;}}} // the nearest to its work it can afford
-    if(!b)b=homes.find(x=>cap.get(x)>0&&eligible(x,h))||null; // none with room among those it looked at: the first that has any
-    if(!b&&homes.length){const free=homes.filter(x=>eligible(x,h));if(free.length)b=free[(rr++)%free.length];} // no room left: they lodge with another household
+      for(let ii=o0;ii<homes.length;ii+=st){const x=homes[ii];if(!(cap.get(x)>0)||!housingEligible(x,h))continue;const v=(shared?homeScore(h,s,x.x,x.z,x.st,wk,F||(F=lvField(s))):homeScore(h,s,x.x,x.z,x.st,wk))+(TILLERS.has(h.tr)&&(x.arch==='house'||x.arch==='longhouse'||x.arch==='cot')?0.4:0);if(v>bs){bs=v;b=x;}}} // the nearest to its work it can afford
+    if(!b)b=homes.find(x=>cap.get(x)>0&&housingEligible(x,h))||null; // none with room among those it looked at: the first that has any
+    if(!b&&homes.length){const free=homes.filter(x=>housingEligible(x,h)&&housingSlots(x)>0);if(free.length)b=free[(rr++)%free.length];} // no room left: they lodge with another household
     if(b){cap.set(b,(cap.get(b)||0)-1);b.hh.push(h);}h.bh=b;}
   for(const b of homes)if(b.hh.length)b._vac=0; // lived in: its empty years count afresh
   if(typeof resetVacantResidentials==='function')resetVacantResidentials(s,homes.filter(b=>!(b.hh&&b.hh.length)));
@@ -12296,7 +12299,7 @@ function tickSettlers(){ // a named landlord funds a speculative roof; families 
 }
 function tickTownReuse(s){ // a changing market gives the actual owner a daily decision to pay for a refit
   if(s.siegeBy||!s._lay?.reuse||!s.buildings.some(b=>!b.removed&&!fabricPending(b)&&means(ownerAcct(b,s))>=b.w*b.d*0.12*PL()))return;
-  for(const P of s._lay.reuse(1,'survey')){const b=P.b;if(fabricPending(b)||!ARCH[P.arch])continue;const recipe=constructionRecipe(s,b.w*b.d*0.12*PL(),Math.max(5,b.w*b.d/6),b.w*b.d*0.025);
+  for(const P of s._lay.reuse(1,'survey')){const b=P.b;if(!housingRefitAllowed(b)||fabricPending(b)||!ARCH[P.arch])continue;const recipe=constructionRecipe(s,b.w*b.d*0.12*PL(),Math.max(5,b.w*b.d/6),b.w*b.d*0.025);
     if(fabricProjectCommission(s,b,{work:'use',payer:ownerAcct(b,s),arch:P.arch,home0:P.home0,why:P.why,...recipe}))return;
   }
 }
@@ -17718,13 +17721,14 @@ function tickWays(){
 function unhousedOf(s){return headsOf(s).filter(h=>!h.bh||h.bh.removed||h.bh.s!==s||h.bh.state!=='sound').sort((a,b)=>(b.w||0)-(a.w||0));}
 function rehouse(s,b){ // a house rebuilt or brought back into use: its own household comes home if it has found no other roof, else the best-off household without one (or lodging over another's) moves in
   b._vac=0;b.hh=(b.hh||[]).filter(h=>h.bh===b&&!h.dead);if(b.hh.length){vacantResidentialChanged(s,b);return;}
-  const h=unhousedOf(s)[0]||heads_(s,x=>x.bh&&!x.bh.removed&&x.bh.s===s&&x.bh.state==='sound'&&(x.bh.hh||[]).indexOf(x)>=capOf(x.bh))[0];
+  if(!RESID.has(b.arch)||!(housingSlots(b)>0)){vacantResidentialChanged(s,b);return;}
+  const h=unhousedOf(s).find(x=>housingEligible(b,x))||heads_(s,x=>housingEligible(b,x)&&x.bh&&!x.bh.removed&&x.bh.s===s&&x.bh.state==='sound'&&(x.bh.hh||[]).indexOf(x)>=housingSlots(x.bh))[0];
   const old=h&&h.bh;if(!h){vacantResidentialChanged(s,b);return;}if(old&&old.hh)old.hh=old.hh.filter(x=>x!==h);b.hh=[h];h.bh=b;vacantResidentialChanged(s,b);if(old&&old!==b)vacantResidentialChanged(old.s||s,old);}
 function moveIn(s){ // households with no roof, or lodging over another's, take the empty houses the place has before anyone builds; each the one that suits it best
   let empty=null,F=null;const vacated=new Set(),shared=typeof lvReadNative==='function'&&lvReadNative('home');
-  for(const h of heads_(s,x=>!x.bh||x.bh.removed||x.bh.s!==s||x.bh.state!=='sound'||(x.bh.hh||[]).indexOf(x)>=capOf(x.bh)).sort((a,b)=>(b.w||0)-(a.w||0))){
+  for(const h of heads_(s,x=>!x.bh||x.bh.removed||x.bh.s!==s||x.bh.state!=='sound'||!housingEligible(x.bh,x)||(x.bh.hh||[]).indexOf(x)>=housingSlots(x.bh)).sort((a,b)=>(b.w||0)-(a.w||0))){
     if(!empty)empty=[...vacantResidentials(s)];if(!empty.length)break;
-    const wk=workOf(h,s);let bi=0,bs=-1e9;empty.forEach((x,i)=>{const v=shared?homeScore(h,s,x.x,x.z,x.st,wk,F||(F=lvField(s))):homeScore(h,s,x.x,x.z,x.st,wk);if(v>bs){bs=v;bi=i;}});
+    const wk=workOf(h,s);let bi=-1,bs=-1e9;empty.forEach((x,i)=>{if(!housingEligible(x,h)||!(housingSlots(x)>0))return;if(bi<0)bi=i;const v=shared?homeScore(h,s,x.x,x.z,x.st,wk,F||(F=lvField(s))):homeScore(h,s,x.x,x.z,x.st,wk);if(v>bs){bs=v;bi=i;}});if(bi<0)continue;
     const b=empty.splice(bi,1)[0],old=h.bh;vacantResidentials(s).delete(b);if(old&&old.hh){old.hh=old.hh.filter(x=>x!==h);vacated.add(old);}b.hh=[h];h.bh=b;b._vac=0;}
   for(const b of vacated)vacantResidentialChanged(b.s||s,b);}
 function tickFalling(s){ // a due native fall is saved by occupation or actual completed roof repair
@@ -17800,7 +17804,7 @@ function tickGrowthVacancy(s){ // roofs need an annual quantity of repair; the d
   if(!s.folk?.length)return;const homes=s.buildings.filter(b=>RESID.has(b.arch)&&b.state==='sound'&&!b.removed),empty=homes.filter(b=>!(b.hh?.length)),rate=empty.length/Math.max(1,homes.length)/360;
   for(const b of homes){if(b.hh?.length){b._vacSince=null;b._vac=0;continue;}if(b._vacSince==null)b._vacSince=day();b._vac=(day()-b._vacSince)/360;if(fabricPending(b)||(b._roofMaintainedUntil||0)>day())continue;
     const own=ownerAcct(b,s),up=b.w*b.d*0.03*(W._pl||1),hope=propValue(b)*0.12*(W._pl||1)*Math.pow(0.7,b._vac);
-    const h=heads_(s,h=>TRADE_ARCH[h.tr]&&TRADE_ARCH[h.tr]!==b.arch&&(!h.bh||h.bh.arch!==TRADE_ARCH[h.tr])&&b.arch!=='court'&&b.arch!=='hospital'&&b.arch!=='toll'&&means(h)>=b.w*b.d*0.12*(W._pl||1)).sort((a,c)=>means(c)-means(a))[0];
+    const h=housingRefitAllowed(b)&&heads_(s,h=>housingEligible(b,h)&&TRADE_ARCH[h.tr]&&TRADE_ARCH[h.tr]!==b.arch&&(!h.bh||h.bh.arch!==TRADE_ARCH[h.tr])&&b.arch!=='court'&&b.arch!=='hospital'&&b.arch!=='toll'&&means(h)>=b.w*b.d*0.12*(W._pl||1)).sort((a,c)=>means(c)-means(a))[0];
     if(h){const recipe=constructionRecipe(s,b.w*b.d*0.12*(W._pl||1),Math.max(5,b.w*b.d/6),b.w*b.d*0.025);if(fabricProjectCommission(s,b,{work:'refit',payer:h,occupant:h,arch:TRADE_ARCH[h.tr],...recipe}))continue;}
     if(hope>up){const recipe=constructionRecipe(s,up,10,Math.max(0.25,b.w*b.d*0.01));if(fabricProjectCommission(s,b,{work:'repair',payer:own,...recipe}))continue;}
     if(!(b._fallAt>day())&&chance('sim',rate)){b._fallAt=day()+1;(s._falling||(s._falling=[])).push(b);}

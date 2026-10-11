@@ -38,6 +38,17 @@ Church, residence, grange and guest house/almonry use the shared paid compound p
 
 Canonical buildings supply storage and housing; the compound owns neither a second capacity nor another inventory.
 
+Ordinary daily moves and paid rebuilding share the native household eligibility
+rule: an Abbey roof admits its own actual members or corrodians, while hired
+households retain ordinary lodging. A household with no eligible vacant roof is
+left unhoused rather than assigned somebody else's private dormitory. Existing
+student board reserves actual native room capacity until the scholar leaves.
+Generic vacancy and town-trade refits cannot change an institutional or named
+compound purpose; saved fabric plans enforce the same rule. An empty corporate
+residential roof can still receive an actual owner-funded repair with real timber
+and wages. This does not add recurring upkeep to occupied roofs or nonresidential
+ranges.
+
 The isolated connected-layout batch extends the same shared engine as castles,
 colleges and estates. It prefers a church-relative dormitory and service range,
 then commissions a real chapter house, refectory and four roofed walks around an
