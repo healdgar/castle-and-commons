@@ -334,7 +334,8 @@
     "abbeySkilledRoom|collection:buildings": 1,
     "abbeyApproachSurvey|collection:buildings": 1,
     "abbeySurveyPublic|collection:streets": 1,
-    "abbeyApproachPlan|collection:streets": 1
+    "abbeyApproachPlan|collection:streets": 1,
+    "abbeyCorridorWorldClear|collection:buildings": 1
   },
   "review": "Worker cutover: inspectorCard replaces showInspect scans; visualSettlement transports building IDs only on layout change; installPresentation reattaches display objects; groundPick scans projected churchyards on click; refreshOverlayNow sorts numeric property-value results. Court grazing: one owner pass only when the existing monthly livestock reckoning finds overstocking, plus one holding pass; no per-family search, persistent index or new daily census. Assize receipts use payCrafts' existing payee loop.",
   "reviewedMoves": [
@@ -581,5 +582,21 @@
     "reportedFunctionsWithDirectOrTransitiveSearches": 1423,
     "newRecognizedSiteOccurrences": 0,
     "scope": "All existing counts/key order remain exact. The same proposal-local building/project geometry is bucketed once with unconditional unknown/large/castle rows and numerically sorted native row IDs before exact predicates; no new recognized source traversal or transaction search. Scope certification changes only native synchronous helper entry/exit work; no persistent world/cache root or completed native performance claim."
+  },
+  "reviewedFullCorridorReuse": {
+    "sourceCommit": "f7ff0f7c8bd28b7530378f058ab258fb6100c6b3",
+    "indexSHA256": "8d770c6486263ac85fb3a9ff079be259e4a955ae9841fb5d985a66db72c22fa4",
+    "recognizedSites": 418,
+    "reportedFunctionsWithDirectOrTransitiveSearches": 1429,
+    "newRecognizedSiteOccurrences": 1,
+    "sites": [
+      {
+        "key": "abbeyCorridorWorldClear|collection:buildings",
+        "prior": 0,
+        "current": 1,
+        "reason": "Complete ordered native building/churchyard fallback for the full 2.6-wide proposed approach when helper certification is unavailable. Current certified proposal edges instead query ordered spatial rows and run exact predicates; no transaction-wide actor search."
+      }
+    ],
+    "scope": "Only this actual new recognized occurrence is appended. All existing counts/key order and inventory limits remain; building occurrences rise 191→192. Corridor native scope also reuses current public strips and necessary title/work-right Boolean checks only within one synchronous proposal, never across mutation boundaries/days or retained completion. Full-width route selection intentionally changes the model; native performance/history gates remain pending root work."
   }
 }

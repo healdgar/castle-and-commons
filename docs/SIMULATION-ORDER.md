@@ -228,18 +228,17 @@ refusal reasons and annual/lifetime counters remain worker state and detached
 inspector output. This intentionally adds the accepted own-use mechanics and
 changes affected histories; same-speed/history/save discipline still applies.
 
-The assembled static review at `85f0368` retains 59 phases and 200 edges;
-`simTick` is byte-identical to its parent candidate. All 39 own-use-industry pins
-match exact AST declaration slices. This survey change renews only the existing
-`abbeySitePlan`, `abbeyMillPlan` and founding-quote pins, and separately records
-the nine changed and six new survey/dispatcher/layout bodies. The recognized
-legacy search inventory contains 417 sites across 1423 reported functions:
-191 building, 73 street, 49 folk and 16 owner collection scans; 35 `heads_`,
-22 `workers_`, 16 `headsOf` helper calls and 15 unscoped entries. Four additional
-recognized occurrences cover the ordered geometry snapshot, public strips,
-cached-building traversal beside its mutually exclusive native fallback, and
-street observations on a rejected grant. These are syntactic counts, not
-measured costs or a centuries-per-minute result.
+The assembled static review at `f7ff0f7` retains 59 phases and 200 edges;
+`simTick` is byte-identical to `85f0368`. All 39 own-use-industry pins
+remain exact. The current bundle reviews nine changed and seven new helper
+bodies plus the expanded route certificate; unchanged pins are preserved.
+The recognized legacy search inventory contains 418 sites across 1429 reported
+functions: 192 building, 73 street, 49 folk and 16 owner collection scans;
+35 `heads_`, 22 `workers_`, 16 `headsOf` helper calls and 15 unscoped entries.
+Only one occurrence is new in this bundle: the full ordered building/graveyard
+fallback in `abbeyCorridorWorldClear`. Earlier inventory additions remain
+separately recorded. These are syntactic counts, not measured costs or a
+centuries-per-minute result.
 
 Rural abbey surveys share native ordered building/project geometry only within
 one synchronous proposal, across its existing candidate fields and poses.
@@ -261,36 +260,64 @@ exact source and dependency review separately from historical evidence and
 the current source's pending native speed/save/conservation gates.
 
 The later route adapter shares ghost-free terrain edges, native scope/circuit
-lists and certified flood banks only inside that proposal. Its 53-function
+lists and certified flood banks only inside that proposal. Its current 110-entry
 identity certificate and current world/place/owner/day/size/cell/placed checks
 guard reuse. Each candidate pose keeps a fresh ghost-edge memo; its current
 ghost still uses the native interpolation and strict rotated footprint test.
 First ghost rejection keeps the original paid-road query prefix, while signed
 zero, off-lattice or long spans use the original segment loop. Floods speak for
 another door only after native closure, first-step and search-box certificates.
-Changed inputs supply neither shared terrain nor shared banks.
+Changed inputs supply neither shared terrain nor shared banks. The separate
+full-width corridor also checks actual necessary title/work rights within the
+proposal; final priced whole-footprint permissions and receipts stay current.
 
-This context stays on local service walkers and returns only ordinary
+These contexts stay on local service walkers and return only ordinary
 path/street results. Host route recall accepts no `_em`, `settlement` or
-`placed`, and its own temporary memo carries no `abbeyTerrain`; the added
-`armySegmentClear` branch introduces no ordinary host-memory input. Its earlier
-fixture pin change remains exact. The JSON records the three changed and five new bodies,
-the separate certificate, and one added transitive-search function without
-changing any of the 417 recognized site counts. Current-source generated
-performance and native release gates remain coordinator work.
+`placed`, and its temporary memo carries no `abbeyTerrain`; actual hosts also
+carry no `abbeyCorridor`. The new corridor and heuristic branches introduce no
+host-memory input. Only the existing `armyDetour` and `armySegmentClear`
+fixture pins change in this bundle; `armyLandPath` and every other fixture pin
+remain exact. `Reach` remains a separately AST-pinned service flood helper.
 
-The current spatial adapter bins the same ordered building/project rows once,
+The spatial adapter bins the same ordered building/project rows once,
 retaining unknown, oversized and castle-reservation rows unconditionally.
-Queries deduplicate and sort original row IDs before unchanged exact collision
-checks; invalid or oversized bounds return all rows. No new recognized search
-site or data source enters the day. `LandPath`, `Detour` and `Reach` certify once
-at uninterrupted native entry and restore the guard/memo in `finally` on every
-exit. Planner callbacks run after that scope has ended; standalone edge queries
-keep their full checks. Only the changed host `LandPath`/`Detour` fixture pins
-renew, while the service-only `Reach` body is pinned in the helper contract.
-The previous candidate's fresh performance diagnostic failed at tick 50 under
-the original deadline. This static review claims no current native performance
-clearance and includes no subsequent corridor-aware planner.
+Queries deduplicate and sort original row IDs before exact collision checks;
+invalid or oversized bounds return all rows. `LandPath`, `Detour` and `Reach`
+certify once at uninterrupted native entry and restore the guard/memo/corridor
+in `finally` on every exit. Planner callbacks run after that scope has ended.
+Standalone full-width edges build a cold current survey and title query,
+retaining no old spatial, legal or flood result.
+
+Indirect abbey approaches now search their actual 2.6-metre corridor rather
+than selecting a centerline that final clearance can reject. The native direct
+connector still runs first. The indirect path retains the face, ordinary door,
+and two-metre landing before its route; every searched edge checks current
+buildings, graveyards and pending full footprints, the center and both offset
+terrain/crossing lines, then public-strip subtraction and actual title/work
+rights. A zero-price preflight pays nothing and never grants a licence or
+replaces a tenant. The final whole private union is still priced and acquired
+from the actual named owners before paid building work.
+
+Only these new indirect plans retain plain `site.access.corridorFrom=2`.
+Current validation checks that marker and the exact landing; existing plans
+without it keep their native validation. Corridor edge/claim/public-index/flood
+maps, canonical payer references and helper guards remain inside the current
+synchronous proposal. They enter no world, retained project/site, layout,
+save extras or presentation graph. The plain landing marker saves normally.
+
+Inside a certified Abbey `Detour`, exact heuristic values are reused for the
+same node during that call. Safe integer lattice bounds also permit one actual
+straight/diagonal length per direction class; off-grid endpoints still use
+native distance calls. Heap order, tie-breaks, predecessor updates, visit
+limits and obstacle queries remain unchanged. Ordinary walkers and hosts run
+the original distance queries; these local arrays enter no saved state.
+
+Full corridor width and actual work rights intentionally affect route selection
+and founding outcomes. This carries no old-model 150-day identity claim; the
+current model must still produce identical history at every speed and after
+save/load. Earlier failed native diagnostics establish no clearance of
+`f7ff0f7`. Current-source native performance and release gates remain
+coordinator work.
 
 Foreign population/food and current recruitment run first inside
 `tickExpeditions`, before that phase's actual campaign combat. Recruitment is
