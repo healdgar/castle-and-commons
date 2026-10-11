@@ -133,11 +133,22 @@ live partial day 67 still has every native founding/approach certificate true.
 The 5.687762-second live sample puts 97.9698546% inclusive work in `armyDetour`,
 after the earlier straight-span cost was resolved. Runner totals are
 1308.025605 child CPU/1251.1622995 wall seconds, load 0.474609→1.0, maximum
-RSS 1840044 KB, including generation/audits/saves. An economically derived
-maximum affordable physical path length and necessary landing–goal ellipse
-are being implemented, preserving unknown/cold fallback and final lawful
-licence/payment. No partial67 snapshot becomes a baseline: day-0/day-37 FWS
-remain same-source, and final history/save and release gates remain pending.
+RSS 1840044 KB, including generation/audits/saves. No partial67 snapshot
+becomes a baseline; day-0/day-37 FWS stay tied to that stopped source.
+
+Current `61dd0bb` instead derives a conservative whole-route length from actual
+available purse, minimum endowment, current timber price and adopted labour/
+equipment recipe. Only a registered current native founding quote forwards it;
+a necessary landing–goal ellipse refuses unaffordable target/node queries
+before physical edge discovery. Economic false is never stored as a physical
+obstruction. Unknown/cold provenance retains the full native sequence and all
+survivors retain final current route/title/licence/payment checks. Its fresh
+original-deadline90 feasibility passes: three abbeys/235 projects, cash residual
+at most1.780904312909115e-10, goods/faults clean; day50/day90 tick-audit CPU
+1.607689/2.994492 seconds. Aggregate233.482374 child CPU/220.536047 wall,
+load0.32861→1.16992, RSS1039784 KB includes generation/audits/saves rather than
+browser throughput. The same-source150 speed/history/save and full release
+gates remain pending; neither feasibility nor a focused fixture closes them.
 
 There is also an explicit persistence barrier: `storageOutcomeReady()` can
 return false before incrementing the day while the asynchronous raw journal has
@@ -280,10 +291,11 @@ refusal reasons and annual/lifetime counters remain worker state and detached
 inspector output. This intentionally adds the accepted own-use mechanics and
 changes affected histories; same-speed/history/save discipline still applies.
 
-The assembled static review at `d016a6a` retains 59 phases and 200 edges;
-`simTick` is byte-identical to `219b90e`. All 39 own-use-industry pins remain
-exact. This follow-up reviews six changed bodies, three new helpers and four
-new declarations; unchanged pins are preserved. The recognized legacy search
+The assembled static review at `61dd0bb` retains 59 phases and 200 edges;
+`simTick` is byte-identical to `d016a6a` (and `219b90e`). All 39 own-use-industry
+pins match; only `abbeySitePlan` renews for budget forwarding, preserving the
+other 38. This follow-up reviews seven changed bodies, two new helpers
+and two changed declarations; unchanged pins are preserved. The recognized legacy search
 inventory still contains 418 sites, now across 1430 reported functions:
 192 building, 73 street, 49 folk and 16 owner collection scans; 35 `heads_`,
 22 `workers_`, 16 `headsOf` helper calls and 15 unscoped entries. No recognized
@@ -314,7 +326,7 @@ exact source and dependency review separately from historical evidence and
 the current source's pending native speed/save/conservation gates.
 
 The later route adapter shares ghost-free terrain edges, native scope/circuit
-lists and certified flood banks only inside that proposal. Its current 111-entry
+lists and certified flood banks only inside that proposal. Its current 112-entry
 identity certificate and current world/place/owner/day/size/cell/placed checks
 guard reuse. Each candidate pose keeps a fresh ghost-edge memo; its current
 ghost still uses the native interpolation and strict rotated footprint test.
@@ -394,9 +406,9 @@ the twelve-attempt cap. Uncertain boundaries take the full native route path.
 
 Native layout creation and load register the exact real compound-site closure,
 layout/live/private fit and both spatial hash identities in an external
-WeakMap. No callback is trusted on first use. The current route and approach
-certificates plus 65 additional actual reader identities guard cross-order
-sharing. Changes to world/day/owner/layout/project key/helpers or the real
+WeakMap. No callback is trusted on first use. The current route/approach
+certificates and 67-entry founding-reader list guard cross-order sharing and
+quote-budget use. Changes to world/day/owner/layout/project key/helpers or the real
 actor-binding revision close the holder; it is discarded before `abbeyFound`
 performs its independent current re-quote. Failed contexts enter no save or
 draw root and have no cross-day lifetime.
@@ -413,6 +425,31 @@ queries. Avoided fits and hash stamps are an authorized query-work baseline
 change, with no invented construction or payment and no old-model identity
 claim. The static lazy `LANDV` table may also remain uninitialized until a real
 price query; it later receives the same fixed coefficients.
+
+The founding quote now computes `abbeyFoundLengthLimit` once from the actual
+available purse and the same minimum endowment, timber price and adopted
+construction recipe. It inverts the piecewise church labour/timber cost in the
+whole retained path length, rounds outwards by at least one metre, and confirms
+that upper length with the actual recipe. Nonnegative private licences and
+detours can only add cost; unknown, accessor/custom, nonfinite or unconfirmed
+quotes produce no bound. Native per-field yield, direct access and final gift
+checks remain.
+
+`abbeyFoundBudget` binds that transient quote to the exact world/day/house/
+settlement/layout/placed/actor revision and registered real closure/readers.
+Only the native survey-mode argument chain forwards it. Indirect routing
+subtracts the actual face–door–landing prefix and adds outward slack. Native
+ordered targets still consume their original attempt before a proven
+landing-to-goal distance refusal. In a certified `Detour`, only a local array
+rejects nodes outside the necessary exact-endpoint affordable ellipse;
+uncertain inputs, ordinary hosts and cold/custom contexts retain full search.
+These refusals precede physical queries and never store false in shared edge,
+terrain, corridor or reach caches. A new purse/target/order gets a new local
+bound. Final lawful ground claims, actual prices/receipts and paid work remain
+authoritative; no budget or ellipse array reaches save or presentation roots.
+Only `armyDetour` changes in the 38-entry host fixture; its other 37 pins and
+all castle pins remain exact. This is an authorized planner/model change with
+fresh same-source determinism gates, not an old-model identity claim.
 
 Only these new indirect plans retain plain `site.access.corridorFrom=2`.
 Current validation checks that marker and the exact landing; existing plans
@@ -431,8 +468,8 @@ the original distance queries; these local arrays enter no saved state.
 Full corridor width, actual work rights and incident highway targets
 intentionally affect route selection and founding outcomes. This carries no old-model 150-day identity claim; the
 current model must still produce identical history at every speed and after
-save/load. Earlier failed native diagnostics establish no clearance of
-`d016a6a`. The certified reject-only flood omission has its own current
+save/load. Earlier failed/stopped native diagnostics establish no clearance of
+`61dd0bb`. The certified reject-only flood omission has its own current
 source gates; prior-source evidence is not retagged. Current-source native performance and release gates remain
 coordinator work.
 
