@@ -157,15 +157,27 @@ test('settleParcels marks each building whose lot or castle yard changed, and on
   c.G.buildingDirty.clear();c.settleParcels([b1]);assert.equal(c.G.buildingDirty.size,0,'settling again to the same outlines publishes nothing');
 });
 test('a mill founded, moved or burned after boot gets its wheel and race rebuilt, once',()=>{
-  const keySrc=source.slice(source.indexOf('function millWheelKey(){'),source.indexOf('\nfunction rebuildMillWheels(){'));
+  const keySrc=source.slice(source.indexOf('function millWheelBuildings(s){'),source.indexOf('\nfunction rebuildMillWheels(){'));
   const c=run(keySrc+'\n'+region('function projectStructures(){','function houseTints(){')+'\nfunction rebuildMillWheels(){G.millKey=millWheelKey();G.rebuilt++;}function bldRoom(){}function projectBuildingInstance(){}',
-    {W:{settlements:[{mill:null},{mill:null}],bldList:[]},G:{bodies:{},roofs:{},wheels:[],rebuilt:0,buildingDirty:new Set()}});
+    {W:{settlements:[{mill:null,buildings:[]},{mill:null,buildings:[]}],bldList:[]},G:{bodies:{},roofs:{},wheels:[],rebuilt:0,buildingDirty:new Set()}});
   c.rebuildMillWheels();c.G.rebuilt=0; // boot
-  const mill={idx:4,state:'sound',x:1,z:2,rot:0,millWater:{kind:'river',side:1,offset:5,y:3}};
+  const mill={idx:4,arch:'mill',state:'sound',x:1,z:2,rot:0,millWater:{kind:'river',side:1,offset:5,y:3}};
   c.projectStructures();assert.equal(c.G.rebuilt,0,'nothing dirty, nothing read');
-  c.W.settlements[1].mill=mill;c.G.buildingsDirty=true;c.projectStructures();assert.equal(c.G.rebuilt,1,'a new mill');
+  const s=c.W.settlements[1];s.mill=mill;s.buildings.push(mill);c.G.buildingsDirty=true;c.projectStructures();assert.equal(c.G.rebuilt,1,'a new mill');
+  assert.equal(c.millWheelBuildings(s).length,1,'the public mill is not counted twice through its native building list');
   c.G.buildingDirty.add({idx:9});c.projectStructures();assert.equal(c.G.rebuilt,1,'another building changed: the wheels stand');
-  mill.state='burnt';c.G.buildingDirty.add(mill);c.projectStructures();assert.equal(c.G.rebuilt,2,'the mill burned');
+  mill.x+=3;c.G.buildingDirty.add(mill);c.projectStructures();assert.equal(c.G.rebuilt,2,'the public mill moved');
+  mill.state='burnt';c.G.buildingDirty.add(mill);c.projectStructures();assert.equal(c.G.rebuilt,3,'the public mill burned');
+
+  const own={idx:5,arch:'mill',abbey:'abbey:0',compoundKey:'mill',state:'sound',x:12,z:2,rot:0,w:6,d:6,h:4,y:3,y0:2,millWater:{kind:'river',side:1,offset:5,x:17,z:2,y:3,intake:{x:24,z:2}}};
+  s.buildings.push(own);c.G.buildingDirty.add(own);c.projectStructures();assert.equal(c.G.rebuilt,4,'an additional private abbey mill gets a wheel');
+  assert.equal(s.mill,mill,'the private mill does not replace the public mill');
+  assert.ok(c.millWheelBuildings(s).includes(own),'native wheel selection includes the private building');
+  c.G.buildingDirty.add({idx:9});c.projectStructures();assert.equal(c.G.rebuilt,4,'unrelated private-mill redraw does not rebuild again');
+  own.y0+=.5;c.G.buildingDirty.add(own);c.projectStructures();assert.equal(c.G.rebuilt,5,'the private mill foundation moves its wheel');
+  own.millWater.intake.x+=2;c.G.buildingDirty.add(own);c.projectStructures();assert.equal(c.G.rebuilt,6,'the private mill intake moves its feed race');
+  own.state='burnt';c.G.buildingDirty.add(own);c.projectStructures();assert.equal(c.G.rebuilt,7,'the private mill burned');
+  c.G.buildingDirty.add(own);c.projectStructures();assert.equal(c.G.rebuilt,7,'the same burned state rebuilds once');
 });
 test('rebuildDetails runs real featLots without stubbing and never mutates authoritative land mask',()=>{
   const rebuildDetailsSrc=region('function rebuildDetails(){','/* ---------------- town walls:');

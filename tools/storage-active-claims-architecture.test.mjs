@@ -147,7 +147,16 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // Source review against 877bb3, native government/credit/abbey/equipment/estate fixtures
  // and custody/ground/routing conservation checks renew this source tripwire; the
  // coordinated release gate owns full-world conservation and exact-optimization proofs.
- assert.equal(digest(source.slice(a,b)),"500963bc391f8d182ad2ca34630a7875533a771fb59c72ff60f97d2d69b51c70");
+ // Own-use abbey industries (reviewed d36bf93..2d81f11): this region changes only
+ // hides/leather volume metadata, finite private tannery storage and the rejection
+ // of that compound-only facility by the generic storage-site quote. Existing
+ // custody, claims, titles, purchase completion and quantity writers are unchanged.
+ // New callers were reviewed separately: skins credit only actual slaughtered
+ // beasts to their canonical owner (or funded butcher); tanning purchases and
+ // consumes the abbey's real hides/bark before crediting bounded leather output.
+ // Named present qualified operators, actual wages, paid compound fabric and
+ // private own-use milling retain real actor/title and material provenance.
+ assert.equal(digest(source.slice(a,b)),"e19fb9f6526d155ff92b2b7e6ee4890870262636fd2223c76167eb58574c9987");
  // This explicit worker inspector copies existing balances. Pin the entire line
  // before excluding it so a future mutation cannot hide behind the read exemption.
  const inspectorLine=source.split('\n').find(l=>l.trim().startsWith("if(kind==='household'){const h=W.households.get(payload.id);"));
@@ -183,6 +192,10 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // Free confiscated stock blends zero purchase cost into the Crown’s old reserve by actual quantities.
  // royal-justice.test.mjs covers both ledgers, cost basis, spent evidence, protected stock, shared budgets and coin;
  // the forced-era native world-save fixture covers the real accounts, rulings, circuit and continuation.
- assert.equal(digest(outside),"e779290adad24e64186e55621888d384e5d980a51a361cc647bbf4155d009641");
+ // This batch changes the outside corpus only in abbeySummary: detached scalar
+ // industry totals, reasons and copied operator/power receipts read current stock.
+ // It adds no exemption or stock writer; the explicit household inspector and
+ // storageTitleDirty call count remain pinned unchanged.
+ assert.equal(digest(outside),"7d8cebde348c2ac4b7c899b411ff107a84675ff3ea6fd89fe3e9a6711a04c688");
  assert.equal((source.match(/storageTitleDirty\(/g)||[]).length,3);
 });
