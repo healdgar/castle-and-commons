@@ -44,6 +44,9 @@ assert.ok(fn('serviceRoadPlan').includes(endpointGate));
 // Remove only the new necessary endpoint predicate. Native target order,
 // attempted-target accounting, bounded path search and final clearance remain.
 const oldEndpointService=fn('serviceRoadPlan').replace(endpointGate,'');
+const spanClause=fn('abbeyCorridorSegmentClear').match(/  \/\/ Exact directed spans[^\n]*\n  const C=corridor\.C;[^\n]*\n/)[0];
+const oldSpanSegment=fn('abbeyCorridorSegmentClear').replace(spanClause,'');
+assert.ok(!oldSpanSegment.includes("'span:'"));
 const countedBody=(n,key)=>{const code=fn(n),at=functions.get(n).body.start-functions.get(n).start+1;return code.slice(0,at)+'count.'+key+'++;'+code.slice(at);};
 const countedService=code=>code.replace('attempted.push(q);','attempted.push(q);count.targets.push({street:s.streets.indexOf(q.st),road:W.roads.indexOf(q.road),x:q.x,z:q.z});');
 
@@ -51,8 +54,8 @@ const highwayClause=fn('serviceRoadPlan').match(/  \/\/ An Abbey's rural approac
 const oldServiceRoad=fn('serviceRoadPlan').replace(highwayClause,'').replaceAll('a.st||a.road','a.st').replaceAll('c.st||c.road','c.st').replace('(a.st)===(q.st||q.road)','a.st===q.st').replace("q.road?{path,road:q.road}:{path,street:q.st}","{path,street:q.st}").replace("q.road?{path,road:q.road}:{path,street:q.st}","{path,street:q.st}");
 assert.ok(!oldServiceRoad.includes('q.road')&&!oldServiceRoad.includes('a.road')&&!oldServiceRoad.includes('c.road'));
 
-function setup({old=false,oldService=false,oldFlood=false,oldEndpoint=false,countRoutes=false,prepare='',replaceableDistance=false}={}){
- const count={hypot:0,heightReads:0,reach:0,from:0,closed:0,land:0,targets:[]},math=Object.create(Math);
+function setup({old=false,oldService=false,oldFlood=false,oldEndpoint=false,oldSpan=false,countRoutes=false,countWorld=false,prepare='',replaceableDistance=false}={}){
+ const count={hypot:0,heightReads:0,reach:0,from:0,closed:0,land:0,world:0,ghost:0,targets:[]},math=Object.create(Math);
  math.hypot=(...args)=>{count.hypot++;return Math.hypot(...args);};
  const C=vm.createContext({Math:math,count});
  const run=code=>vm.runInContext(code,C);
@@ -63,7 +66,7 @@ function setup({old=false,oldService=false,oldFlood=false,oldEndpoint=false,coun
  `);
  // Only replacement-reader tests make this lexical binding writable. The
  // captured native function body stays exact; replacing it invalidates proof.
- run(readers.map(n=>n==='armyDetour'&&old?oldDetour:n==='serviceRoadPlan'?(countRoutes?countedService:code=>code)(oldService?oldServiceRoad:oldFlood?oldFloodService:oldEndpoint?oldEndpointService:fn(n)):countRoutes&&['armyReach','armyReachFrom','armyReachClosed','armyLandPath'].includes(n)?countedBody(n,({armyReach:'reach',armyReachFrom:'from',armyReachClosed:'closed',armyLandPath:'land'})[n]):n==='dist2d'&&replaceableDistance?constant(n).replace(/^const /,'let '):native(n)).join('\n'));
+ run(readers.map(n=>n==='armyDetour'&&old?oldDetour:n==='abbeyCorridorSegmentClear'&&oldSpan?oldSpanSegment:n==='serviceRoadPlan'?(countRoutes?countedService:code=>code)(oldService?oldServiceRoad:oldFlood?oldFloodService:oldEndpoint?oldEndpointService:fn(n)):countWorld&&['abbeyCorridorWorldClear','abbeyCorridorGhostClear'].includes(n)?countedBody(n,n==='abbeyCorridorWorldClear'?'world':'ghost'):countRoutes&&['armyReach','armyReachFrom','armyReachClosed','armyLandPath'].includes(n)?countedBody(n,({armyReach:'reach',armyReachFrom:'from',armyReachClosed:'closed',armyLandPath:'land'})[n]):n==='dist2d'&&replaceableDistance?constant(n).replace(/^const /,'let '):native(n)).join('\n'));
  run(['abbeyRouteSurveyNative','abbeyRouteSurveyInputs','abbeyRouteTerrain','abbeyRouteMemo','abbeyTerrainSegmentClear','makeHash'].filter(n=>!readers.includes(n)).map(fn).join('\n'));
  run(`W.rivHash=makeHash(40);s._lay.placed=makeHash(16);onRoad.reach=-1;`);
  if(prepare)run(prepare);
@@ -185,10 +188,10 @@ test('retained landing metadata projects as detached scalar geometry while surve
 
 // Finite controlled native geometry/title fixture: one Crown-held parcel, no
 // generated people, goods, endowment, licence, commissioned project or RNG.
-function highwaySetup({prepare='',oldService=false,oldFlood=false,oldEndpoint=false,countRoutes=false,replaceableDistance=false}={}){
+function highwaySetup({prepare='',oldService=false,oldFlood=false,oldEndpoint=false,oldSpan=false,countRoutes=false,countWorld=false,replaceableDistance=false}={}){
  const extra=['castleFoundationReserved','abbeyAccessEndpoint','lerpPt'].map(fn).join('\n')+'\n'+
   ['STREET_GRAPH_FORT_CONTEXTS','STREET_GRAPH_FORT_NATIVE','ABBEY_APPROACH_SURVEY_NATIVE'].map(constant).join('\n');
- return setup({oldService,oldFlood,oldEndpoint,countRoutes,replaceableDistance,prepare:extra+`
+ return setup({oldService,oldFlood,oldEndpoint,oldSpan,countRoutes,countWorld,replaceableDistance,prepare:extra+`
 const FN=1,FG=SIZE,field={k:0,i:0,j:0,jx:.5,jz:.5,lord:0,own:'crown',wk:'crown'};
   W.houses=[{name:'Crown'},{name:'Other holder',gold:10}];W.projects=[];W.land={F:[field],mask:new Uint8Array(GRID*GRID*4)};
   for(let i=0;i<GRID*GRID;i++)W.land.mask[i*4]=1;
@@ -400,4 +403,64 @@ test('the native nearly-parallel boundary exception and zero-length endpoint ret
   assert.equal(current.run('streetFootprintOverlap(b,{a:{x:3.6,z:0},b:{x:3.6,z:0},hw:1.3},.3)'),true);
   if(p.x!==3.6)assert.equal(current.run('streetFootprintOverlap(b,{a:roadInput.p,b:{x:3.6,z:0},hw:1.3},.3)'),false,'the actual native <1e-9 parallel branch tests the outside start');
  }
+});
+
+function spanFixture(r,{mutation='',enter=true}={}){r.run(`var proposal=abbeyCorridorReady(s,abbeyApproachSurvey(s),'crown',undefined,0,terrain),a=walker();a.abbeyCorridor=proposal;
+  const spanReads=[];${mutation}var spanGate=${enter?'abbeyRouteEnter(a)':'null'};count.world=count.ghost=count.heightReads=0;`);}
+const longP={x:-100.25,z:5.125},longQ={x:20.5,z:5.125};
+function spanCalls(r,P){r.C.spanPoints=P;r.run('var spanAnswers=spanPoints.map(([p,q])=>armySegmentClear(a,p,q));');return r.json('spanAnswers');}
+
+test('exact directed long spans share native ghost-free work without changing path, current graph, RNG or adjacent numeric keys',()=>{
+ const current=highwaySetup({prepare:remoteHighway,countWorld:true}),prior=highwaySetup({prepare:remoteHighway,countWorld:true,oldSpan:true});
+ const graphClass=ast.body.find(n=>n.type==='ClassDeclaration'&&n.id.name==='HistoryGraph');assert.ok(graphClass);
+ for(const r of [current,prior]){r.C.btoa=btoa;r.run(constant('HISTORY_SCRATCH')+'\n'+source.slice(graphClass.start,graphClass.end)+'\n'+fn('sfc32')+'\n'+fn('seedStreams')+`
+  const RS=seedStreams(1001,42);function spanGraph(){const G=new HistoryGraph(),F=G.capture({world:W,rng:RS,hashStamp:HASH_STAMP});return{root:F.root,state:[...G.state],code:G.code};}
+  const initialDice=Object.getOwnPropertyNames(RS).map(k=>[k,RS[k].state()]);`);spanFixture(r);}
+ const nearQ={x:20.500000000000004,z:5.125},adjacent=[{x:0,z:10},{x:2,z:10}],zero=[{x:30,z:10},{x:30,z:10}],calls=[[longP,longQ],[{...longP},{...longQ}],[longQ,longP],[{...longQ},{...longP}],[longP,nearQ],[{...longP},{...nearQ}],adjacent,adjacent,zero,zero];
+ assert.deepEqual(spanCalls(current,calls),spanCalls(prior,calls));assert.deepEqual(current.json('spanAnswers'),calls.map(()=>true));
+ assert.equal(current.count.world,6);assert.equal(prior.count.world,9);assert.equal(current.count.ghost,10);assert.equal(prior.count.ghost,10);
+ assert.equal(current.run('[...proposal.memo.keys()].filter(k=>typeof k==="number").length'),1);
+ assert.deepEqual(current.json('[...proposal.memo.keys()].filter(k=>typeof k==="string")'),['span:-100.25,5.125>20.5,5.125','span:20.5,5.125>-100.25,5.125','span:-100.25,5.125>20.500000000000004,5.125']);
+ for(const r of [current,prior]){r.C.pathPoints=[longP,longQ];r.run('var actualSpanPath=armyLandPath(a,pathPoints);abbeyRouteLeave(a,spanGate);');}
+ assert.deepEqual(current.json('actualSpanPath'),prior.json('actualSpanPath'));assert.deepEqual(current.json('actualSpanPath'),[longP,longQ]);
+ assert.deepEqual(current.json('spanGraph()'),prior.json('spanGraph()'),'full actual world graph and seeded native streams without scratch omission');
+ for(const r of [current,prior]){assert.deepEqual(r.json('Object.getOwnPropertyNames(RS).map(k=>[k,RS[k].state()])'),r.json('initialDice'));assert.equal(r.run('a._em.abbeyRouteGuard===undefined'),true);}
+ assert.equal(current.run('Reflect.ownKeys(W).some(k=>["span","corridor","claims","memo","terrain"].includes(k))||Reflect.ownKeys(s).some(k=>["span","corridor","claims","memo","terrain"].includes(k))'),false);
+});
+
+test('every true cached world span still checks the current proposed ghost and false native rights remain false',()=>{
+ for(const occupied of [false,true]){
+  const prepare=remoteHighway+(occupied?'field.title.work={owner:W.houses[1],beneficiary:null};':''),current=highwaySetup({prepare,countWorld:true}),prior=highwaySetup({prepare,countWorld:true,oldSpan:true});
+  for(const r of [current,prior]){spanFixture(r);r.C.pair=[longP,longQ];r.run(`var ghostAnswers=[];for(const ghost of [{x:0,z:40,w:4,d:4,rot:.2},{x:0,z:5.125,w:4,d:4,rot:.3},{x:0,z:40,w:4,d:4,rot:.4},null]){a.ghost=ghost;ghostAnswers.push(armySegmentClear(a,pair[0],pair[1]));}abbeyRouteLeave(a,spanGate);`);}
+  assert.deepEqual(current.json('ghostAnswers'),prior.json('ghostAnswers'));assert.deepEqual(current.json('ghostAnswers'),occupied?[false,false,false,false]:[true,false,true,true]);
+  assert.equal(current.count.world,1);assert.equal(prior.count.world,4);assert.equal(current.count.ghost,occupied?0:4);assert.equal(prior.count.ghost,occupied?0:4);
+  assert.equal(current.run('proposal.memo.size'),1);assert.equal(current.run('a._em.abbeyRouteGuard===undefined'),true);
+  assert.deepEqual(current.json('field.title'),prior.json('field.title'));assert.equal(current.run('W.projects.length===0&&W.houses[1].gold===10'),true);
+ }
+});
+
+test('long-span unknown coordinates and stale, cold or replaced-native inputs keep the original work and query sequence',()=>{
+ for(const mutation of ['', 'W.clock.day++;','s.owner=1;','s._lay.placed=makeHash(16);','proposal.C.native=false;','proposal.C.day--;',
+  'const actualHeight=hAt;hAt=(...v)=>{spanReads.push(v);return actualHeight(...v);};',
+  'const actualReserved=castleFoundationReserved;castleFoundationReserved=(...v)=>actualReserved(...v);']){
+  const enter=mutation!=='',current=highwaySetup({prepare:remoteHighway,countWorld:true}),prior=highwaySetup({prepare:remoteHighway,countWorld:true,oldSpan:true});
+  for(const r of [current,prior])spanFixture(r,{mutation,enter});
+  assert.deepEqual(spanCalls(current,[[longP,longQ],[longP,longQ]]),spanCalls(prior,[[longP,longQ],[longP,longQ]]),mutation||'outside native scope');
+  assert.equal(current.count.world,2,mutation);assert.equal(prior.count.world,2,mutation);assert.deepEqual(current.json('spanReads'),prior.json('spanReads'),mutation);
+  assert.equal(current.run('[...proposal.memo.keys()].some(k=>typeof k==="string")'),false,mutation);
+  for(const r of [current,prior])r.run('abbeyRouteLeave(a,spanGate);');
+  assert.equal(current.run('a._em.abbeyRouteGuard===undefined'),true,mutation);
+ }
+ for(const pair of [[{x:-0,z:10},{x:20,z:10}],[{x:0,z:10},{x:16400,z:10}],[{x:NaN,z:0},{x:20,z:0}]]){
+  const current=highwaySetup({countWorld:true}),prior=highwaySetup({countWorld:true,oldSpan:true});for(const r of [current,prior])spanFixture(r);
+  assert.deepEqual(spanCalls(current,[pair,pair]),spanCalls(prior,[pair,pair]));assert.equal(current.count.world,2);assert.equal(prior.count.world,2);
+  assert.equal(current.run('[...proposal.memo.keys()].some(k=>typeof k==="string")'),false);
+  for(const r of [current,prior])r.run('abbeyRouteLeave(a,spanGate);');
+ }
+ // A retained operation-local result is never a next-day permission. The real
+ // cold query observes the changed native water and restores the caller's memo.
+ const current=highwaySetup({countWorld:true}),prior=highwaySetup({countWorld:true,oldSpan:true});
+ for(const r of [current,prior]){spanFixture(r);assert.deepEqual(spanCalls(r,[[longP,longQ]]),[true]);r.run('abbeyRouteLeave(a,spanGate);W.clock.day++;heights.fill(0);count.world=0;spanGate=abbeyRouteEnter(a);');}
+ assert.deepEqual(spanCalls(current,[[longP,longQ],[longP,longQ]]),[false,false]);assert.deepEqual(spanCalls(prior,[[longP,longQ],[longP,longQ]]),[false,false]);assert.equal(current.count.world,2);assert.equal(prior.count.world,2);
+ for(const r of [current,prior]){r.run('abbeyRouteLeave(a,spanGate);');assert.equal(r.run('a._em.abbeyRouteGuard===undefined'),true);}
 });
