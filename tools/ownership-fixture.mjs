@@ -8,7 +8,7 @@ names.push('suitMill','millHolder','lordTally','lordSold','lordRot','lordGot','l
 names.push('awayNow','creditAccount','creditCorporateHandover','creditLabel','creditLive','creditKeep','creditBook','creditRecord','creditLandYield','creditRate','creditRefresh','creditReserved','creditFieldOwner','creditPledged','creditPledge','creditLicense','creditBond','creditMortgage','creditAccrue','creditBalance','creditApplied','creditEstate','creditMerge','creditSplit','creditJudgement','creditRentcharge','creditRedeem','forwardSale','creditEarn','forwardOffer','forwardReckon','creditForwards','mintOfficer','mintReceipt','recoinOrder','creditAnnual','creditRoyal','creditRoyalPayments','creditTallage','creditInstitutionDue','tickCredit','creditCmd','creditState','creditHTML');
 const ownership=source.slice(source.indexOf('function oldHouseholdHead('),source.indexOf('function houseFolk(s)'));
 const craftTradesSource=source.match(/^const CRAFT_TRADES=.*$/m)?.[0],craftTrades=craftTradesSource?vm.runInNewContext(craftTradesSource+'\nCRAFT_TRADES'):undefined;
-names.push('courtEnrol','courtHolding','courtLand','courtLord','courtRiot','courtRobbery','courtFelony','courtNeglect','acctLabel','governmentJobAvailable','craftIndex','craftMintRoom','craftMintRoomsDirty','creditContractDue','creditRecover','creditRecoinQuote','personBoardMeal','personBoardRecord','lordHallBoardDeduction');
+names.push('courtEnrol','courtHolding','courtLand','courtLord','courtRiot','courtRobbery','courtFelony','courtNeglect','acctLabel','governmentJobAvailable','craftIndex','craftMintRoom','craftMintRoomsDirty','creditContractDue','creditRecover','creditRecoinQuote','personBoardMeal','personBoardRecord','lordHallBoardDeduction','portHealthPrepare','portQuarantine','portPlagueDeparture','tradePlague');
 const functions=[...names,'publicOrderMen','publicOrderSuppression','estatePressShare','institutionalJobHeld'].map(n=>source.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))','m'))?.[0]||'').join('\n');
 const constants=['GOODS','GOODBASE','NEED','SPOIL','LU','WINTER_HAY','MARGIN','PRODUCE','foodYr','HH_FIELDS','PARTIBLE','ELASTIC','metroOf','CART_MPD','SUIT_MILL','TEN_SHARE','CUSTOM_NAMES','JUSTICE_CUSTOM','EYRE_AD','ROLL_N','FOODS','CRUMB','DEALERS','CUT','TABLE','CARCASS','MILK','isCorp'].map(n=>source.match(new RegExp('^const '+n+'=.*$','m'))?.[0]||'').join('\n');
 
@@ -31,3 +31,12 @@ export function realm({grain=20,fish=20,grainLard=0,fishLard=0,cash=20,crown=0,p
   return {C,W,s,H,run,eval:eval_,coins};
 }
 export const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
+
+// Native consumers need an actual master, room and equipment eligibility. Load
+// these only in workshop/mint fixtures; other fixtures may load the whole section.
+export function nativeCraftConsumerProgram(){
+  const rules=source.slice(source.indexOf('const TECH_RULES=Object.freeze('),source.indexOf('function technologyKey('));
+  const arches=source.match(/^const TRADE_ARCH=.*$/m)?.[0];assert.ok(arches,'missing native craft room types');
+  const N=['technologyKey','technologyCapability','institutionalCapability','technologyEffect','technologyEquipmentAvailable','technologySightFactor','technologyCraftCapacity','technologyCottageHands','technologyMillService','technologyPaperMill','craftPresent','craftRoomValid','craftRoomCapacity','craftHands','craftReceipt','craftTransferReceipt'];
+  return rules+'\n'+arches+'\n'+N.map(n=>{const f=source.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))','m'))?.[0];assert.ok(f,'missing native craft consumer '+n);return f;}).join('\n');
+}

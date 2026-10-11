@@ -40,12 +40,18 @@ test('a purchase transfers seller sale balance directly into buyer pantry',()=>{
 });
 
 test('purchase preserves money, grain keepback, and bread-credit debt',()=>{
-  const r=fixture({households:2,cash:0,grain:12,fish:0});
-  r.eval("mkt(s,'grain').clear();offer(s,'grain',H[0],12);householdAccount(H[0]).assets._keep=4;householdAccount(H[0]).assets.w=100;herdOf(H[1],s).cattle=4;var credit0=creditOf(s,H[1]);const coins0=W.treasury+[...W.households.values()].reduce((n,h)=>n+(h.assets.w||0),0);purchase(s,'grain',H[1],12,1)");
+  const r=fixture({households:2,cash:0,crown:100000,grain:12,fish:0});
+  r.eval("mkt(s,'grain').clear();offer(s,'grain',H[0],12);householdAccount(H[0]).assets._keep=4;transfer('crown',H[0],foodYr()*Math.max(1,householdSize(s,H[0]))+100,'lender endowment',s);s.stores.cattle=4;herdOf(H[1],s).cattle=4;herdSync(s);var credit0=creditOf(s,H[1]);const coins0=W.treasury+[...W.households.values()].reduce((n,h)=>n+(h.assets.w||0),0);purchase(s,'grain',H[1],12,1)");
   const credit=r.eval('credit0');assert.ok(credit>0&&credit<8,'a beast-backed loan smaller than the offer'); // what a lender advances on two beasts' worth (creditOf)
   near(r.eval('purchase.got'),credit);near(held(r,1,'grain'),credit);near(sale(r,0,'grain'),12-credit);
   near(r.eval('H[1]._debt'),credit);assert.ok(r.eval('H[1]._owe.length>0'));
   near(r.eval("W.treasury+[...W.households.values()].reduce((n,h)=>n+(h.assets.w||0),0)"),r.eval('coins0'));
+});
+
+test('bread credit rejects a lender below its actual family reserve without moving money or goods',()=>{
+  const r=fixture({households:2,cash:0,crown:100000,grain:12,fish:0});
+  r.eval("W.houses=[{crown:true},{name:'Empty manor',gold:0}];s.owner=1;mkt(s,'grain').clear();offer(s,'grain',H[0],12);transfer('crown',H[0],foodYr()*Math.max(1,householdSize(s,H[0]))-1,'lender endowment',s);s.stores.cattle=4;herdOf(H[1],s).cattle=4;herdSync(s);const coins0=W.treasury+[...W.households.values()].reduce((n,h)=>n+(h.assets.w||0),0);purchase(s,'grain',H[1],12,1)");
+  near(r.eval('purchase.got'),0);near(held(r,1,'grain'),0);near(sale(r,0,'grain'),12);near(r.eval('H[1]._debt||0'),0);near(r.eval("W.treasury+[...W.households.values()].reduce((n,h)=>n+(h.assets.w||0),0)"),r.eval('coins0'));
 });
 
 test('bulk market fill transfers pro rata without a second pantry credit',()=>{

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import {realm,near} from './ownership-fixture.mjs';
+import {realm,near,nativeCraftConsumerProgram} from './ownership-fixture.mjs';
 import {moneyFlowGap} from './money-flow.mjs';
 import {parse} from './vendor/acorn/acorn.mjs';
 import {inlineGameScript} from './simulation-boundary.mjs';
@@ -140,10 +140,13 @@ test('a forgotten vault is a recorded inflow from beyond the realm\'s reckoning'
   r.eval(`(function(){switch('gold'){${code}}})()`);
   near(r.W.treasury,6000);near(r.eval("W._flow['<forgotten vault']"),5000);r.audit();
 });
-test('debasing the coinage is gathered from those who hold the coin, not conjured',()=>{
-  const r=world({cash:1000});Object.assign(r.C,{realmPop:()=>r.s.pop,inRevolt:()=>false});r.s.owner=0;
-  r.eval(`(()=>{${between("{const tot=realmPop();for(const s of W.settlements)if(!inRevolt(s.owner))levy(s,1800*s.pop/Math.max(1,tot),'crown','debasement');}","}")}})()`);
-  near(r.W.treasury,2800);near(r.H.reduce((t,h)=>t+h.w,0),6000-1800);r.audit();
+test('recoinage changes held pennies through actual paid moneyer work and conserves coin',()=>{
+  const r=world({cash:1000});r.eval(nativeCraftConsumerProgram());
+  r.eval("H[0].tr='smith';const room={idx:0,arch:'smithy',state:'sound',w:8,d:7,s};s.buildings.push(room);W.bldList=[room];s.stores.timber=100;s.stores.tools=100;offer(s,'timber','crown',100);offer(s,'tools','crown',100)");r.snap();
+  assert.equal(r.eval('recoinOrder(.05,.8)'),true);near(r.W.coinWeight,.8);const before=r.purses();
+  r.eval('day=()=>W.recoin.places[0].due;creditAnnual(s)');
+  assert.equal(r.W.recoin.pending,false);assert.equal(r.H[0].office,'moneyer');assert.ok(r.s.mint.recoin>0&&r.W.treasury>1000);near(r.s.mint.struck,6000);near(r.s.stores.timber,88);near(r.s.stores.tools,97.6);near(r.purses(),before);r.audit();
+  const once=r.s.mint.recoin;r.eval('creditAnnual(s)');near(r.s.mint.recoin,once);r.audit();
 });
 test('the miller\'s fee to the lord is paid by the town\'s households in proportion to their means',()=>{
   const r=world({cash:100,gold:[0]});r.H[0].w=300;r.snap();

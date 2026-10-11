@@ -1,14 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {realm,near} from './ownership-fixture.mjs';
+import {realm,near,nativeCraftConsumerProgram} from './ownership-fixture.mjs';
 
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const fn=n=>source.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))','m'))[0];
 const shop=({commodity,cash=6,ore=0,char=0,oreSale=6,timberSale=6,po=1,pt=1}={})=>{
   const r=realm({commodity,households:1,cash,grain:0,fish:0});
+  r.eval(nativeCraftConsumerProgram());
   r.eval(`ownershipTick();H[0].tr='smith';s._smiths=1;s._dyers=0;s._vineHa=0;s.stores.tools=0;s.stores.wool=0;Object.assign(s.px,{ore:${po},timber:${pt},tools:10});s.stores.ore=${ore+oreSale};s.stores.timber=${char+timberSale};addHeld(s,H[0],'ore',${ore});addHeld(s,H[0],'char',${char});offer(s,'ore','crown',${oreSale});offer(s,'timber','crown',${timberSale})`);
   if(commodity)r.eval('storageInit(s)');
+  r.eval("const room={idx:0,arch:'smithy',state:'sound',w:8,d:7,tier:0,s,ownerId:H[0].id,craftMasters:[H[0].id]};s.buildings.push(room);W.bldList=[room];H[0].craft={rank:'master',qualified:true,room:room.idx,employees:[]};");
   const start=source.indexOf('    { // crafts where there are workshops'),end=source.indexOf('    for(const g of GOODS)',start);
   r.eval('globalThis.shopDay=function(s){const si=0,phaseK=commodityActive(s)?s.storage:undefined;'+source.slice(start,end)+'}');
   return r;

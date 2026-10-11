@@ -11,8 +11,8 @@ const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const fn=n=>source.match(new RegExp('^function '+n+'\\b[\\s\\S]*?(?=^function |^const |^let |^/\\*|$(?![\\s\\S]))','m'))?.[0]||assert.fail('no function '+n);
 const line=n=>source.match(new RegExp('^const '+n+'=.*$','m'))?.[0]||assert.fail('no const '+n);
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-9,`${a} != ${b}`);
-const PROGRAM=[fn('sfc32'),fn('seedStreams'),line('isCorp'),line('isHouse'),line('OFFICES'),line('ROLL_N'),
-  ...['lordAcct','houseAcct','corpFound','corpOf','cashRecord','acct','flow','transfer','unearned','means','book','ownerOf','ownerAcct','storageOwnerId',
+const PROGRAM=[fn('sfc32'),fn('seedStreams'),line('isCorp'),line('isHouse'),line('churchForeign'),line('OFFICES'),line('ROLL_N'),
+  ...['foreignAccount','lordAcct','houseAcct','corpFound','corpOf','cashRecord','acct','flow','transfer','unearned','means','book','ownerOf','ownerAcct','storageOwnerId',
     'houseName','lordSeat','lordAt','officeHeld','officeTitle','rollOf','rollAdd','rollTake','accountBalances'].map(fn)].join('\n');
 
 // a realm of three places: the capital (the crown's), a lord's seat and a village of his; one household with a purse
