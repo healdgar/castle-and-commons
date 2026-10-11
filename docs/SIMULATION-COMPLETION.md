@@ -80,7 +80,14 @@ the runner without an active/core checkpoint. It is interrupted evidence, not a
 core pass or a saved day750 world; [HANDOFF.md](HANDOFF.md) records its scope and
 missing timing data. Closed-day checkpointing is required before repeating a
 long campaign. Subsequent README/advisor embedding changes outer HTML only; the
-frozen game script remains byte-identical. The browser worker gate is running.
+frozen game script remains byte-identical. The real-browser worker gate now
+passes: default 9 km/AD1066, eight days plus eight native saved continuation
+days, full worker/main state parity and all ten matching neutral views. The
+unchanged harness uses supported localhost HTTP transport after the file URL
+was blocked before game loading. No assertions or deadlines changed. The rolling
+operable lifecycle/layout phase can publish with genuine current castle imagery
+and a plainly labelled Abbey layout preview; full core/industry, multi-era/
+calibration and held #80/#81/#82 work remain open.
 
 The frozen lifecycle source `99f14a5` (HTML SHA256
 `7aeb74e34ba6d54ac414df12ee60fc44079b9b67537486f07ec2fdc4653d599f`)

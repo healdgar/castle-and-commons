@@ -5,6 +5,31 @@ operable batch and continue until its required behavior is implemented.
 
 ## Current continuation
 
+**Operable phase for publication:** the frozen lifecycle/connected-layout game
+script has passed the full check inventory, 150-day same-history/save proof and
+the current real-browser worker/reference gate. The latter runs default 9 km,
+AD1066, eight days and eight saved continuation days in all four drivers, with
+all ten views matching and leaving world/RNG/commands/annals/settings/storage
+sequence unchanged. Worker/main advancement took `8.455/8.229` seconds, resumed
+advancement `8.784/8.901` seconds; worker heartbeat maxima were `31/21` ms.
+These software-browser timings do not establish the century-per-minute target
+or a previous-build improvement. Wrapper CPU `1.896054` / wall `194.589973`
+seconds, load `0.0→1.183105`, RSS `164788` KB; Chrome descendants may be excluded.
+The unchanged harness uses its supported localhost HTTP transport because the
+test browser blocked file URLs before loading any game. That stopped file run
+and an initial output-directory setup refusal remain separate failure evidence;
+no simulation assertions or deadlines were relaxed.
+
+The new Abbey image is an explicitly labelled completed-layout preview using
+the current native geometry/rendering functions, not a simulated completed
+Abbey. Correctly framed, textured views show all five rooms, 64 cloister piers
+and four roof parts with no browser errors. The source game remains byte-identical
+to the frozen proof; README/advisor text and screenshots are release-only changes.
+This rolling operable phase does not close the full institution contract:
+completed core/industry and multi-era/calibration campaigns remain continuation
+gates, and held #80/#81/#82 code is outside this publication. Finish these with
+durable checkpoints rather than holding all reviewable improvements indefinitely.
+
 **Current image correction (11 October):** the user's old-image report is valid.
 The fresh current-source castle capture passes and is now tracked as
 `assets/screenshots/castle-1200.png`; [SCREENSHOTS.md](SCREENSHOTS.md) records its
