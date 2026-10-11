@@ -15,7 +15,7 @@ const native=n=>functions.has(n)?fn(n):constant(n);
 const layout=functions.get('layoutSettlement'),live=layout.body.body.flatMap(n=>n.type==='VariableDeclaration'?n.declarations:[]).find(d=>d.id.name==='liveOps');
 const planSite=live.init.properties.find(p=>p.key.name==='planSite');assert.ok(planSite.method);
 const names=['projectReservationPublic','projectReservationPolys','projectReservationSetback','projectSiteReserved','compoundPolys','compoundPolygonDifference','obbCorners','wallRadAt','streetFootprintOverlap','inPolyXZ','graveyardPolygonsOverlap','segDist','segSegDist','dist2d','lerp','clamp','serviceDoor','locW','castleFoundationReserved','abbeySurveyBounds','abbeySurveyBoxesMayHit','abbeySurveyUnion','abbeySurveyIndexRange','abbeySurveyIndex','abbeySurveyIndexRows','abbeySurveyReserved','abbeyPublicStreet','abbeyAccessEndpointValid','abbeyApproachSurveyNative','abbeyRouteSurveyNative','abbeyRouteTerrain','abbeyApproachSurvey','abbeyApproachClear','institutionFoundationPath','storageGroundClaim','roadProjectValidate','day'];
-function setup({cold=false}={}){
+function setup({cold=false,countEdges=false}={}){
  const C=vm.createContext(),run=s=>vm.runInContext(s,C),json=s=>JSON.parse(run('JSON.stringify('+s+')'));
  run(`const SIZE=640,CELL=40;const s={owner:0,pos:{x:0,z:0},radius:80,buildings:[],streets:[],places:[],_lay:{placed:{near:()=>[]}}},t={owner:0,pos:{x:200,z:0},buildings:[],streets:[],_lay:{placed:{near:()=>[]}}};
  const W={clock:{day:1},settlements:[s,t],projects:[],roads:[],houses:[]};
@@ -25,7 +25,10 @@ function setup({cold=false}={}){
  const streetAccessAt=()=>true,armyObstacle=()=>false,armySegmentClear=()=>true,houseAtWar=()=>false;
  const HW=2,laneBlockers=()=>[],planCellOK=()=>true,riverAt=()=>false,lakeAt=()=>false,liveB=()=>s.buildings;
  `);
- run(names.map(native).join('\n'));
+ // Controlled edge-read instrumentation precedes immutable identity capture;
+ // no runtime reader is replaced during the counted reservation query.
+ if(countEdges)run('let exactEdgeCalls=0;');
+ run(names.map(n=>countEdges&&n==='segSegDist'?fn(n).replace('{','{exactEdgeCalls++;'):native(n)).join('\n'));
  run(`const liveOps={${source.slice(planSite.start,planSite.end)}};s._lay.live=liveOps;`);
  if(!cold)run(['ABBEY_APPROACH_SURVEY_CURRENT','ABBEY_APPROACH_SURVEY_NATIVE','PROJECT_RESERVATION_BOUNDS_NATIVE'].map(constant).join('\n'));
  return{run,json};
@@ -102,8 +105,8 @@ const frozenReserved=`function frozenProjectSiteReserved(s,q){
     const paths=p.type==='compound'&&p.adapter==='abbey'&&p.site.accessMode==='abbey-rural'?projectReservationSetback(p.site):compoundPolys({path:p.site.path,paths:p.site.paths,pathWidth:p.site.pathWidth}),C=publicPolys.length?projectReservationPolys(q,publicPolys):candidate;if(C.some(P=>paths.some(Q=>graveyardPolygonsOverlap(P,Q))))return true;
   }return false;
 }`;
-function pair(code,{cold=false,readonly=true}={}){
- const results=[];for(const current of[false,true]){const r=setup({cold});r.run(frozenReserved);r.run(code);const before=r.json('W');
+function pair(code,{cold=false,readonly=true,countEdges=false}={}){
+ const results=[];for(const current of[false,true]){const r=setup({cold,countEdges});r.run(frozenReserved);r.run(code);const before=r.json('W');
   let value,error;try{value=r.run((current?'projectSiteReserved':'frozenProjectSiteReserved')+'(s,join)');}catch(e){error={name:e.name,message:e.message};}
   results.push({r,value,error});if(readonly)assert.deepEqual(r.json('W'),before,'reservation query leaves the complete supplied world and RNG untouched');}
  assert.equal(results[1].value,results[0].value);assert.deepEqual(results[1].error,results[0].error);assert.deepEqual(results[1].r.json('W'),results[0].r.json('W'));return results;
@@ -123,12 +126,11 @@ test('native and cold bounds retain exact containment, crossing, touching and st
  for(const cold of[false,true])for(const[A,B,expected]of shapes){const P=pair(`join.kind='square';join.site={poly:${A}};const other={type:'plan',kind:'square',si:1,site:{poly:${B}}};W.projects=[join,other];W.treasury=17;W.randomState={gen:[1,2,3,4],sim:[9,8,7,6]};`,{cold});assert.equal(P[1].value,expected,A+' / '+B);}
 });
 
-test('far native pending footprints skip exact edge work while retaining every world field',()=>{
+test('controlled native-body instrumentation counts skipped distant edge pairs without replacing arithmetic readers',()=>{
  const P=pair(`join.kind='square';join.site={poly:obbCorners(0,0,10,10,0)};
-  W.projects=[join,...Array.from({length:32},(_,k)=>({type:'plan',kind:'square',si:k%2,site:{poly:obbCorners(2000+k*20,2000,10,10,0)}}))];
-  let hypotCalls=0;const originalHypot=Math.hypot;Math.hypot=(...args)=>{hypotCalls++;return originalHypot(...args);};`);
- assert.equal(P[1].value,false);assert.ok(P[0].r.run('hypotCalls')>=32*16*4,'the frozen query performs the actual segment-distance work');
- assert.equal(P[1].r.run('hypotCalls'),0,'only conservatively disjoint pairs are removed');
+  W.projects=[join,...Array.from({length:32},(_,k)=>({type:'plan',kind:'square',si:k%2,site:{poly:obbCorners(2000+k*20,2000,10,10,0)}}))];`,{countEdges:true});
+ assert.equal(P[1].value,false);assert.ok(P[0].r.run('exactEdgeCalls')>=32*16,'the frozen query performs the actual ordered edge-pair work');
+ assert.equal(P[1].r.run('exactEdgeCalls'),0,'only conservatively disjoint pairs are removed');
  assert.equal(P[1].r.run('Object.isFrozen(PROJECT_RESERVATION_BOUNDS_NATIVE)'),true);
 });
 
@@ -145,16 +147,29 @@ test('nonfinite, large, degenerate, accessor and custom-array polygons retain th
   '(()=>{const P=obbCorners(2000,2000,4,4,0);P[Symbol.iterator]=function*(){reads.push("iterator");yield*Array.prototype[Symbol.iterator].call(this);};return P;})()',
   '(()=>{class OtherArray extends Array{};return OtherArray.from(obbCorners(2000,2000,4,4,0));})()',
  ];
- for(const shape of shapes){const P=pair(`let reads=[],hypotCalls=0;const originalHypot=Math.hypot;Math.hypot=(...args)=>{hypotCalls++;return originalHypot(...args);};join.kind='square';join.site={poly:${shape}};W.projects=[join,{type:'plan',kind:'square',si:1,site:{poly:obbCorners(0,0,2,2,0)}}];`);
-  assert.deepEqual(P[1].r.json('reads'),P[0].r.json('reads'),shape);assert.equal(P[1].r.run('hypotCalls'),P[0].r.run('hypotCalls'),shape);}
+ for(const shape of shapes){const P=pair(`let reads=[];join.kind='square';join.site={poly:${shape}};W.projects=[join,{type:'plan',kind:'square',si:1,site:{poly:obbCorners(0,0,2,2,0)}}];`,{countEdges:true});
+  assert.deepEqual(P[1].r.json('reads'),P[0].r.json('reads'),shape);assert.equal(P[1].r.run('exactEdgeCalls'),P[0].r.run('exactEdgeCalls'),shape);}
 });
 
 test('replaced geometry or overlap readers force the frozen ordered predicate path',()=>{
  for(const name of['projectReservationPublic','projectReservationPolys','projectReservationSetback','compoundPolys','compoundPolygonDifference','obbCorners','wallRadAt','graveyardPolygonsOverlap','inPolyXZ','segSegDist','segDist','abbeySurveyBounds','abbeySurveyBoxesMayHit']){
-  const P=pair(`let helperCalls=0,hypotCalls=0;const originalHypot=Math.hypot;Math.hypot=(...args)=>{hypotCalls++;return originalHypot(...args);};const original=${name};${name}=(...args)=>{helperCalls++;return original(...args);};join.kind='square';join.site={poly:obbCorners(2000,2000,4,4,0)};W.projects=[join,{type:'plan',kind:'square',si:1,site:{poly:obbCorners(0,0,2,2,0)}}];`);
-  assert.equal(P[1].r.run('helperCalls'),P[0].r.run('helperCalls'),name);assert.equal(P[1].r.run('hypotCalls'),P[0].r.run('hypotCalls'),name);
+  const P=pair(`let helperCalls=0;const original=${name};${name}=(...args)=>{helperCalls++;return original(...args);};join.kind='square';join.site={poly:obbCorners(2000,2000,4,4,0)};W.projects=[join,{type:'plan',kind:'square',si:1,site:{poly:obbCorners(0,0,2,2,0)}}];`,{countEdges:true});
+  assert.equal(P[1].r.run('helperCalls'),P[0].r.run('helperCalls'),name);assert.equal(P[1].r.run('exactEdgeCalls'),P[0].r.run('exactEdgeCalls'),name);
  }
  const P=pair(`abbeySurveyBoxesMayHit=()=>false;join.kind='square';join.site={poly:obbCorners(0,0,2,2,0)};W.projects=[join,{type:'plan',kind:'square',si:1,site:{poly:obbCorners(0,0,2,2,0)}}];`);assert.equal(P[1].value,true,'a foreign bounds callback cannot manufacture clearance');
+});
+
+test('replaced finite, range and exact arithmetic builtins retain the frozen predicate and callback counts',()=>{
+ for(const builtin of['Number.isFinite','Math.abs','Math.hypot','Math.min','Math.max']){
+  const P=pair(`join.kind='square';join.site={poly:obbCorners(2000000,2000000,4,4,0)};W.projects=[join,{type:'plan',kind:'square',si:1,site:{poly:obbCorners(0,0,2,2,0)}}];
+   let builtinCalls=0;const originalBuiltin=${builtin};${builtin}=(...args)=>{builtinCalls++;return originalBuiltin(...args);};`,{countEdges:true});
+  assert.equal(P[1].r.run('builtinCalls'),P[0].r.run('builtinCalls'),builtin+' must not acquire additional bounds reads');
+  assert.equal(P[1].r.run('exactEdgeCalls'),P[0].r.run('exactEdgeCalls'),builtin+' must retain every original edge pair');
+ }
+ const P=pair(`join.kind='square';join.site={poly:obbCorners(2000,2000,4,4,0)};W.projects=[join,{type:'plan',kind:'square',si:1,site:{poly:obbCorners(0,0,2,2,0)}}];
+  let hypotCalls=0;Math.hypot=()=>{hypotCalls++;return 0;};`,{countEdges:true});
+ assert.equal(P[1].value,true,'a replaced exact distance predicate can make distant native edges overlap');
+ assert.equal(P[1].r.run('hypotCalls'),P[0].r.run('hypotCalls'));assert.equal(P[1].r.run('exactEdgeCalls'),P[0].r.run('exactEdgeCalls'));
 });
 
 test('endpoint and public-clipping read order precedes bounds and is retained across native and cold calls',()=>{
