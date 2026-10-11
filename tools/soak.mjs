@@ -159,6 +159,8 @@ const HARNESS=`(()=>{if(window.__soak)return 'ok';
     for(const c of W.abbeys||[])by.abbeys+=coin(c.gold);for(const c of W.guilds||[])by.guilds+=coin(c.gold);for(const c of W.churchBodies||[])if(!c.foreign)by.churchBodies+=coin(c.gold); // each abbey's and guild's chest, once (#35, #43)
     for(const s of W.settlements){for(const p of s.folk||[])P(p);by.murage+=coin(s.murage);by.pool+=coin(s._poolCash);for(const v of Object.values(s._poolBy||{}))by.pool+=coin(v);}
     for(const a of W.armies||[])for(const p of a.men||[])P(p);for(const t of W.travellers||[])P(t&&t.p?t.p:t);for(const l of W.levies||[])P(l&&l.p?l.p:l);
+    by.companies=0;for(const c of W.companies||[]){by.companies+=coin(c.gold);for(const p of c.men||[])P(p);}by.orders=coin(W.chivalricOrder?.gold);
+    for(const q of W.knighthood?.tourneys||[])by.escrow+=coin(q.gold);for(const e of W.expeditions||[]){if(!e.foreign)by.escrow+=coin(e.gold);for(const p of e.army?.men||[])P(p);}
     const chs=new Set();for(const b of W.bldList)if(b&&b.ch&&!chs.has(b.ch)){chs.add(b.ch);by.church+=coin(b.ch.fund);}
     for(const q of W.projects||[])if(q.type==='persuade'&&q.lever==='gold')by.escrow+=coin(q.pay);
     let t=0;for(const k in by)t+=by[k];return {t,by,bad};};
