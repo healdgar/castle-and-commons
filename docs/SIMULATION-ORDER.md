@@ -108,7 +108,9 @@ cash, goods, reserved ground and records; tomorrow must see those changes, and
 `commoditySettleAll(true)` must follow the last stock writer. Moving a costly
 phase earlier does not remove that dependency or reduce its total work.
 
-Current `af07d28` also keeps a paid pending private footprint and approach reserved against later public street/quarter/square/wall and road proposals. Validation runs before commissioning or further material/work payment and again at completion. Only a proved current retained public endpoint segment allows a connecting road/street overlap; the existing two-metre native fit margin is clearance, not extra claimed or paid land. The day602 nonpublic wedge remains refused. Actual funded unsuccessful purchases feed the unchanged monthly `reprice` formula on the next genuine market day; repricing creates no goods, payment or work. Fresh `af07d28` 90-day feasibility and 150-day full-world/globals/layouts/closure-code/every-RNG history at all seven speeds pass, with 906 raw outcomes and clean cash/goods/faults. Actual day-37 full-graph/exact-resave and 113-day/678-raw continuation also pass. The runner used 2252.874268 child CPU/2108.689493 wall seconds; audited fixed-speed-5/variable-speed steps cost 397.092032/396.617865 seconds on this same candidate, not a previous-source comparison or browser throughput result. Paid core/industry, full suite, worker, era, current drawing and release gates remain pending. The shared connected-layout phase and held reservation bounds optimization are not yet in this frozen HTML. Frozen `61dd0bb`’s later core was deliberately stopped at audited closed660, with four abbeys and a completed Benedictine church; the exact actual church-only draw is not full-core/industry completion.
+The current connected-layout and lifecycle continuation retains these reservations and adds actual paid internal walks, corporate church fabric, private-purpose occupancy, exact school reopening and retained castle/Abbey rebuilding. Current authority, grant, parent/prerequisite, ground and reserve checks precede payment; canonical completion alone restores a component or binds a new layout preference. Active recovery authority never enters a geometry permission cache: retained repair/root contexts take the live cold query, and a stale supplied survey loses its terrain/world/field memos before reuse. The daily construction crew budget is recorded separately as #80; this batch does not close it. Fresh coupled suite, same-source history/save, paid core/industry, worker, eras, drawing and release gates remain pending.
+
+Frozen `af07d28` keeps paid pending private footprints/approaches reserved against later public proposals. Only a proved existing public endpoint permits the actual connecting overlap; its two-metre fit margin is clearance rather than additional titled land, and the day602 private wedge remains refused. Its native 90/150 all-speed/full-graph/every-RNG and exact day 37 resave/113-day continuation pass with 906 raw outcomes and clean money/goods/faults. The later unassisted core was stopped at audited closed 720, four Abbeys/two completed churches; no core or industry pass is claimed. Frozen connected-layout `55b32a9` compares only audited closed 60/366 raw outcomes; it was deliberately stopped for lifecycle repairs, not validated through 150. Frozen `61dd0bb`’s actual closed 660 church-only draw remains separate from core/industry completion. None of this predecessor evidence is retagged as the assembled continuation.
 
 Frozen `219b90e` exceeded the original 120-second deadline in partial day
 50 after 49 closed days. Its later 5.396-second live CPU sample put 99.27% in
@@ -150,7 +152,7 @@ at most1.780904312909115e-10, goods/faults clean; day50/day90 tick-audit CPU
 1.607689/2.994492 seconds. Aggregate233.482374 child CPU/220.536047 wall,
 load0.32861→1.16992, RSS1039784 KB includes generation/audits/saves rather than
 browser throughput. The same-source150 gate now passes complete world/globals/
-layouts/closure-code/every-RNG history at all seven speeds with906 raw outcomes.
+layouts/closure-code/every-RNG history at all seven speeds with 906 raw outcomes.
 Day37 full-graph/exact-resave and113-day/678raw continuation also pass, with
 clean cash/goods/faults. The runner uses1822.352379 child CPU/1679.469807 wall
 seconds, load0.730957→1.013672, RSS1911716 KB. Audited fixed-speed5/variable-speed
@@ -301,23 +303,11 @@ refusal reasons and annual/lifetime counters remain worker state and detached
 inspector output. This intentionally adds the accepted own-use mechanics and
 changes affected histories; same-speed/history/save discipline still applies.
 
-The assembled static review at `af07d28` retains 59 phases and 200 edges;
-`simTick` is byte-identical to `61dd0bb`, `d016a6a` and `219b90e`. All 39
-own-use-industry pins, 41 castle fixture pins and 38 army fixture pins stay
-unchanged. This follow-up reviews seven changed existing bodies, exactly four
-new pure reservation helpers and two changed declarations. Their insertion
-alone changes the managed-core source hash; existing quantity, cash, title,
-custody and payment writers, inspector and outside writer corpus remain exact.
-The recognized legacy search inventory still contains 418 sites, now across
-1434 reported functions: 192 building, 73 street, 49 folk and 16 owner collection
-scans; 35 `heads_`, 22 `workers_`, 16 `headsOf` helper calls and 15 unscoped
-entries. Every existing count key/order/limit is unchanged. The four newly
-search-reaching names are `fits`, `projectReservationPublic`,
-`projectSiteReserved` and `castleFoundationReserved`; this is transitive source
-reach, not four new broad scans. The ordered pending-project reservation pass
-is explicitly inventoried alongside earlier indexed geometry scans, since
-projects lie outside the legacy scanner vocabulary. These are syntactic counts,
-not measured costs or a centuries-per-minute result.
+The assembled static review retains 59 phases and 200 edges; `simTick` is byte-identical to the earlier institution dispatch. The finite source review adds connected compound geometry/actual parent access, native patron transfers, purpose-safe housing and reserved scholar slots, canonical paid church fabric and retained recovery. Only changed AST bodies/declarations are renewed, with all unaffected pins and named-source evidence preserved. The first-castle failed survey still reads its own ordered geometry loop rather than the recovery join authority; its 49-reader certificate remains sufficient. Host routes now include the two pure covered-court/point readers because completed courts block actual piers instead of a filled rectangle. The Abbey approach/route certificates add those same real readers; recovery contexts bypass indexed geometry and scoped corridor truth before their certified tail.
+
+The recognized legacy inventory contains 421 sites across 1466 direct-or-transitive-search functions. Relative to the prior 418-site inventory, the exact changes are one drawing-only covered-court building pass, one local rebuilding street pass, one retained-castle benefit query and one castle caller building query, with the old Abbey fabric building search replaced by its canonical compound component. Every other count key, ordering and limit is retained. Pending-project and component/connection lookups remain explicitly reviewed outside the scanner vocabulary; these syntactic counts do not measure cost or prove centuries-per-minute throughput.
+
+Inside the existing `tickProjects`, current target/payer/title, retained parent/prerequisite and ground validate before actual reserve/material/wage payment; final validation precedes canonical completion, occupancy and mask rebuilding. Daily `tickCastles` selects paid retained component recovery before normal upgrades, and replaces a missing keep only inside its actual surviving ring with a fully funded lawful approach. `tickChurches→tickChurchBodies→abbeyFabric` uses the full adopted labour/timber/stone/land quote and a real corporate food reserve. `tickAbbeys` attempts necessary actual prerequisite recovery before its competing-project refusal; a partly paid daughter keeps its original contract, while permanent parent loss abandons it without free refund or rebinding. Generic housing/refit decisions preserve current institutional purpose and actual reserved scholar rooms. No extra phase or arbitrary cadence is added.
 
 Rural abbey surveys share native ordered building/project geometry within one
 synchronous proposal, across its existing candidate fields and poses. Daily

@@ -193,7 +193,11 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // only inside one certified synchronous validation. Reciprocal fit setbacks
  // grant no extra land. Existing cash, goods, title, custody and payment writers,
  // the external corpus, inspector and title-dirty count remain unchanged.
- assert.equal(digest(source.slice(a,b)),"8fb8455cc3eb9f9009b9f36b3d00a039deb22ba74667df2143c3398a7af59c59");
+ // Reviewed assembled lifecycle: actual canonical gifts, native paid recovery
+ // authority/reserves/fabric consumers, pure private-purpose housing predicates,
+ // guarded reservation bounds and completion-only connection metadata. Existing
+ // cash/goods/title writers remain native; source-specific gates are separate.
+ assert.equal(digest(source.slice(a,b)),"002b36e7973b16f37a9f7d3438caeeda5d186809361a018b4181210ee9f9dff1");
  // This explicit worker inspector copies existing balances. Pin the entire line
  // before excluding it so a future mutation cannot hide behind the read exemption.
  const inspectorLine=source.split('\n').find(l=>l.trim().startsWith("if(kind==='household'){const h=W.households.get(payload.id);"));
@@ -241,7 +245,10 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // ABBEY_APPROACH_SURVEY_NATIVE constant holds geometry function identities,
  // not native account/state/stock; it adds no corpus exemption. The pure geometry
  // contexts and unchanged public projection require no private-field expansion.
- assert.equal(digest(outside),"ccf4ba853e32b844c98cf2e7767ac540e42205e29353e17410f6f12a2319092c");
+ // The only new outside corpus line is readonly abbeySummary: copied current
+ // layout, meal, chapter and connected-component geometry metadata. The other
+ // 51 lines, explicit inspector and title-dirty count remain byte-identical.
+ assert.equal(digest(outside),"6b051b7bb494a0e07a4a389ead649eadc0081066e3e8020c04dcab6b01c16686");
  assert.equal((source.match(/storageTitleDirty\(/g)||[]).length,3);
 });
 

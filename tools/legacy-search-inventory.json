@@ -8,7 +8,6 @@
     "abbeyBuildings|collection:buildings": 1,
     "abbeyCapacity|collection:buildings": 1,
     "abbeyCrop|collection:buildings": 1,
-    "abbeyFabric|collection:buildings": 1,
     "abbeyLaterLease|helper:workers_": 1,
     "abbeyLeaseVacancies|helper:workers_": 1,
     "abbeyLeaseYield|collection:buildings": 1,
@@ -33,7 +32,7 @@
     "builtReach|collection:buildings": 1,
     "casDesc|collection:buildings": 1,
     "casKeep|collection:buildings": 1,
-    "casNext|collection:buildings": 1,
+    "casNext|collection:buildings": 2,
     "castleCompound|collection:buildings": 1,
     "castleCompoundComplete|collection:buildings": 1,
     "castleCompoundSite|collection:buildings": 1,
@@ -335,7 +334,10 @@
     "abbeyApproachSurvey|collection:buildings": 1,
     "abbeySurveyPublic|collection:streets": 1,
     "abbeyApproachPlan|collection:streets": 1,
-    "abbeyCorridorWorldClear|collection:buildings": 1
+    "abbeyCorridorWorldClear|collection:buildings": 1,
+    "compoundRebuildAccess|collection:streets": 1,
+    "rebuildRoadMesh|collection:buildings": 1,
+    "tickCastles|collection:buildings": 1
   },
   "review": "Worker cutover: inspectorCard replaces showInspect scans; visualSettlement transports building IDs only on layout change; installPresentation reattaches display objects; groundPick scans projected churchyards on click; refreshOverlayNow sorts numeric property-value results. Court grazing: one owner pass only when the existing monthly livestock reckoning finds overstocking, plus one holding pass; no per-family search, persistent index or new daily census. Assize receipts use payCrafts' existing payee loop.",
   "reviewedMoves": [
@@ -666,5 +668,69 @@
       "scope": "Once per actual public proposal/retained validation, native order and self/dead exclusion before any new commissioning/payment. Current endpoint geometry only exempts actual already-public joins; private structures/approaches remain protected."
     },
     "scope": "Exactly four new geometry-only helpers and the current public endpoint query chain. Every recognized count/key/order/limit and unrelated reviewed record stays exact. Reprice changes one funded-demand predicate and adds no search or cadence. Local joins Map is confined to one certified uninterrupted Abbey validation and is never saved/projected. Current native/release gates remain pending; no prior-source proof or throughput result is retagged."
+  },
+  "connectedCompoundLayoutReview": {
+    "commit": "99f14a55b230d5b933f29ee3404bb0372cde8db9",
+    "index_sha256": "7aeb74e34ba6d54ac414df12ee60fc44079b9b67537486f07ec2fdc4653d599f",
+    "recognizedSites": 421,
+    "functionsWithDirectOrTransitiveSearches": 1466,
+    "changedCountKeys": [
+      "compoundRebuildAccess|collection:streets",
+      "rebuildRoadMesh|collection:buildings",
+      "casNext|collection:buildings",
+      "tickCastles|collection:buildings"
+    ],
+    "retiredCountKeys": [
+      "abbeyFabric|collection:buildings"
+    ],
+    "newHelpers": [
+      "compoundCourtGeometry",
+      "compoundPointObstacle",
+      "compoundStructureOverlap",
+      "compoundBuilding",
+      "compoundOwnerAccount",
+      "compoundBuildingOwned",
+      "compoundLayoutPoses",
+      "compoundLayoutRoute",
+      "compoundConnectionValid",
+      "compoundConnectionClear",
+      "compoundConnectionRouteClear",
+      "compoundConnectionPlan",
+      "compoundCourtStreetCompatible",
+      "compoundBindConnection",
+      "compoundConnectionRecipe",
+      "compoundPatronRecipient",
+      "compoundPatronQuote",
+      "compoundPatronGift",
+      "compoundRebuildOwner",
+      "compoundRebuildReserve",
+      "compoundRebuildAccess",
+      "compoundRebuildDependent",
+      "compoundRebuildReservationJoin",
+      "compoundRebuildStreetCompatible",
+      "compoundRebuildValidate",
+      "compoundRebuildProposal",
+      "compoundRebuildStage",
+      "fabricProjectReserve",
+      "housingEligible",
+      "housingSlots",
+      "housingRefitAllowed",
+      "compoundCourtSurface",
+      "castleRetainedKeepSite",
+      "castleRetainedKeepProposal",
+      "churchFabricFrontageCompatible",
+      "drawCompoundCourt",
+      "abbeyConnectedSpec",
+      "abbeyConnectedAnchor",
+      "abbeyConnectedPlan",
+      "abbeyChapter",
+      "abbeyRefectory",
+      "abbeyGiftQuote",
+      "abbeyPlayerGift",
+      "abbeyGiftHTML",
+      "abbeyChurchFabricReserve",
+      "abbeyChurchFabricValidate"
+    ],
+    "scope": "Only the four reviewed added occurrences and retired Abbey fabric building query change; all unrelated recognized keys/counts/limits remain unchanged. Actual compound connections use native component/building/title/street identities and operation-local private member graphs. Exact reservation bounds remain one synchronous current-project traversal with cold accessor/helper/array/arithmetic fallback. Patron gifts reach existing quote/account helpers but add no recognized traversal, phase, cadence or persistent geometry permission. Current source native/release gates pending; frozen af07 evidence is not retagged."
   }
 }
