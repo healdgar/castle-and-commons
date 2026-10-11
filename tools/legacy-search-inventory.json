@@ -458,7 +458,7 @@
   },
   "review20261011AbbeyIndustries": {
     "baseCommit": "7460fbcffb81bfdfd1ee2a055a75acdce249c298",
-    "isolatedSourceSha256": "ad3f91962465dd3344bccec0d7aeecf818fd99e60a4e95f7c3d66850dd1dce0f",
+    "isolatedSourceSha256": "8e374db064e0aa27e6318f6364d93f9c7adf6bf2ebcb8f642a328a2a3ac60e3d",
     "reviewedFunctionSha256": {
       "slaughterSkins": "a2ef1d682174fb36bd92afd3b78529b738875c585c16c28be584dd52e20f82cd",
       "herdTake": "ba7669bf3022d2a6819791abd648aebb407375b09bd54ffa43513ef875f6194b",
@@ -497,7 +497,8 @@
       "millWheelKey": "44d65ce9eaba2eb15225a073a9cfd1a6428cd164ed77feb48d229602ab9c2e35",
       "rebuildMillWheels": "f5a0813dd9f74ed209d9602db937cba478d9d303ea1141c320313c267efbc0b2",
       "storageSiteQuote": "a8e944bd641af141f6d3a0108989e4755c28b072e0f7062c4d3af488ff5a4062",
-      "technologyWindmillProposal": "48b594b4da0db07118f0f67b5148dfce4a9b779b7b74f9e9cff1e2245c4c427a"
+      "technologyWindmillProposal": "48b594b4da0db07118f0f67b5148dfce4a9b779b7b74f9e9cff1e2245c4c427a",
+      "craftRoomValid": "7f64f2cc1a20e744b9d46058bd146206bea5f4e9e15968e998a62ebf40a7f854"
     },
     "reviewedKeys": [
       "millWheelBuildings|collection:buildings",
