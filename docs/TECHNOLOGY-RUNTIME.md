@@ -165,3 +165,12 @@ and `licensedCredit` (1066), with date aliases `moneyer850` and
 merchant enforcement (1285, prerequisite royal bench), not the earlier ordinary
 loan bond. Finance adapters still require actual funded moneyers, metal, lenders,
 contracts and licence payments. Knowledge creates none of them.
+
+The craft batch adds merchantGuild1080/craftGuild1150, and the knightly adapter
+keys knightService1066, scutage1100, tournament1100, licensedTourney1194,
+mercenaryCompany1100, chivalricOrder1348 and foreignExpedition1095. All are
+ordinary canonical knowledge/adoption capabilities with explicit prerequisite
+rules. They authorize actual contracts, licences and service; they create no
+people, equipment or free income. `licensedTourney` requires both tournament
+practice and the actual royal-eyre knowledge seam. Ordinary early martial
+hosting remains the pre-existing native system.

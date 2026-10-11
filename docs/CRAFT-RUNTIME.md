@@ -1,0 +1,69 @@
+# Crafts, apprenticeship and guilds
+
+Issue #43 uses native residents, households, work rooms and corporate accounts.
+Existing opening craftsmen inherit their actual trade and occupied or leased
+workshop. Nobody arrives with a new purse or a second family.
+
+Daily craft decisions follow paid learning and local technology uptake at the
+start of `tickEconomy`, before production. `peoplePrepare` must already have
+prepared the native person index and household accounts. `craftIndex` retains
+local candidates, trade groups and measured rooms by native population revision
+and year. It scans no other settlement. `W.apprentices` contains only active
+native person IDs; the completed contract remains on the person.
+
+- A seven-year apprenticeship is an explicit contract custom. It names a living
+  local master; the family pays that master's premium. Family apprentices pay
+  no one twice. Days of actual master work and a present pupil accrue service and
+  hand skill; Sunday and absence do neither. Completion requires both service
+  and achieved skill. A dead or departed master ends the contract without a
+  fabricated qualification or refund. Mature workers may retrain only when the
+  actual alternative occupation would pay substantially better.
+- Independent masters have a real sound work room and pay its actual owner for
+  any separate workshop lease. New entry requires achieved ability, affordable
+  guild entry and rent, and an income that can repay these costs. Native
+  residential `capOf` is unchanged; `craftRoomCapacity` measures work benches.
+- Journeymen are existing qualified native household heads. A master hires only
+  when his recorded actual receipts and measured benches can support the
+  worker's bread and foregone earnings. Daily actual wages set `paidDay` and a
+  worked fraction. Monthly `payCrafts` credits independent shops, with paid
+  hands affecting their share; hired people receive no second independent
+  share. A missing room or purse closes the actual employment.
+- `institutionalJobHeld(p)` excludes actual teaching, enrolled study, clerical,
+  estate, abbey, apprentice and employee contracts from a second full job.
+  Independent masters remain available to native construction employers.
+  `buildWorks` records only the actual net receipts of its named workers.
+- Guilds require locally adopted merchant/craft-guild knowledge. A charter is
+  worthwhile when the native trade's income dilution exceeds each master's
+  actual share of its price. Masters fund a zero-start corporate chest, which
+  pays the actual lord or chartered commune and a named literate writer. The
+  licence custom is six months' bread per founder; writing uses the writer's
+  actual foregone-work cost. No crown subsidy or prosperity stamp remains.
+- A new entrant pays one year's measured income dilution to the chest. Explicit
+  charter ordinances allow one apprentice per master and quality of 0.35 KCr;
+  quarterage is 1/48 of actual sold work. These are in-world customs, rather
+  than price remedies. No guild fixes goods prices. Quarterly searches fine
+  only actual members with actual sold work below that quality ordinance.
+- Every 90 days the actual chest pays needy members, recorded member burials,
+  the parish fund, real guildhall rent/upkeep and goods and services for a
+  feast. Feast drink is purchased and consumed; ordinary family bread remains
+  a single native household meal. An empty membership transfers its remaining
+  cash to its parish or actual lord before dissolution.
+
+`craftState`, `craftPlaceHTML` and `craftGuildsHTML` are read-only worker reports.
+The journaled `s-guild` command permits or refuses an actual charter purchase
+without granting a free institution. Private simulation fields are `W.guilds`,
+`W.apprentices`, `W._craftDay`, settlement `guildIds`, `guildPolicy`, `_craftIndex`,
+`_craftOpening`, building `craftMasters`, and person `craft`/`apprentice`. Reports
+return scalar receipts and native IDs, never account or people graphs.
+
+The physical machine adapter remains the next operable chunk. Paid journeyman
+hands already affect service receipts; this chunk does not claim an installed
+loom, furnace or mill machine. Guild resistance to a particular machine also
+awaits a real machine quote; knowledge by itself installs no equipment.
+
+Light evidence: inline JavaScript syntax and `tools/guilds.test.mjs`, six focused
+fixtures covering real premiums/wages, takings and chest conservation, measured
+entry/dilution, paid quality searches, exclusivity and pure reads. Root alone
+runs the combined source, projection, replay and economic gates. Trade history
+changes intentionally from the old instant trade switch and foreign-master
+premium; it remains independent of browser speed and rendering.

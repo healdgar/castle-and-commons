@@ -930,6 +930,15 @@ const TECH_RULES=Object.freeze({
   loom:{name:'Horizontal treadle loom',year:1050,needs:[],kind:'cloth',gain:0.3},
   crossbow:{name:'Crossbow',year:1050,needs:[],kind:'war',gain:0.1},
   licensedCredit:{name:'Licensed commercial credit',year:1066,needs:[],kind:'law',gain:0.1},
+  knightService:{name:'Feudal knight service',year:1066,needs:[],kind:'war',gain:0.1},
+  merchantGuild:{name:'Chartered merchant guild',year:1080,needs:[],kind:'law',gain:0.1},
+  scutage:{name:'Commutation of knight service',year:1100,needs:['knightService'],kind:'law',gain:0.1},
+  tournament:{name:'Organised tournament',year:1100,needs:['knightService'],kind:'war',gain:0.1},
+  mercenaryCompany:{name:'Contracted mercenary company',year:1100,needs:['knightService'],kind:'war',gain:0.1},
+  foreignExpedition:{name:'Vowed foreign expedition',year:1095,needs:['knightService'],kind:'war',gain:0.1},
+  craftGuild:{name:'Chartered craft guild',year:1150,needs:[],kind:'law',gain:0.1},
+  licensedTourney:{name:'Licensed tournament ground',year:1194,needs:['tournament','royalEyre'],kind:'law',gain:0.1},
+  chivalricOrder:{name:'Royal chivalric order',year:1348,needs:['knightService'],kind:'war',gain:0.1},
   merchantBond:{name:'Statute merchant enforcement',year:1285,needs:['royalBench'],kind:'law',gain:0.1},
   sheriff:{name:'Sheriff and shire administration',year:1066,needs:[],kind:'law',gain:0.1},
   hundred:{name:'Hundred court',year:1066,needs:[],kind:'law',gain:0.1},
@@ -983,7 +992,7 @@ const TECH_RULES=Object.freeze({
   printing:{name:'Printing press',year:1450,needs:['paperMill'],kind:'learning',gain:0.5}
 });
 const TECH_KEYS=Object.keys(TECH_RULES).sort((a,b)=>TECH_RULES[a].year-TECH_RULES[b].year||(a<b?-1:a>b?1:0));
-const TECH_ALIASES={moneyer850:'moneyer',licensedCredit1066:'licensedCredit',merchantBond1285:'merchantBond',commune1070:'commune',royalBench1170:'royalBench',parliament1265:'parliament',sheriff1066:'sheriff',hundred1066:'hundred',royalEyre1166:'royalEyre',augustinian1100:'augustinian',cistercian1128:'cistercian',benedictine910:'benedictine',concentricCastle:'castleOuterCurtain',threeFieldRotation:'threeField',treadwheelCrane:'crane',stoneVault:'gothic',school:'benedictine'};
+const TECH_ALIASES={knightService1066:'knightService',scutage1100:'scutage',tournament1100:'tournament',licensedTourney1194:'licensedTourney',mercenaryCompany1100:'mercenaryCompany',chivalricOrder1348:'chivalricOrder',foreignExpedition1095:'foreignExpedition',merchantGuild1080:'merchantGuild',craftGuild1150:'craftGuild',moneyer850:'moneyer',licensedCredit1066:'licensedCredit',merchantBond1285:'merchantBond',commune1070:'commune',royalBench1170:'royalBench',parliament1265:'parliament',sheriff1066:'sheriff',hundred1066:'hundred',royalEyre1166:'royalEyre',augustinian1100:'augustinian',cistercian1128:'cistercian',benedictine910:'benedictine',concentricCastle:'castleOuterCurtain',threeFieldRotation:'threeField',treadwheelCrane:'crane',stoneVault:'gothic',school:'benedictine'};
 function technologyKey(key){return TECH_ALIASES[key]||key;}
 function initTechnology(){
   if(W.technology)return W.technology;
@@ -3896,7 +3905,7 @@ function eduPlace(s){
 function educate(p,a,s,noble){
   if(a<5)return;
   const pl=a<21?1:a<35?0.55:0.25,w=trait(p,GW),dl=trait(p,GD),book=Math.exp(0.35*w+0.25*dl)*pl,hand=Math.exp(0.12*w+0.3*dl)*pl,
-    body=hand*Math.exp(0.2*trait(p,GV)+0.12*trait(p,GB)),m=p.sx!=='f'&&p.sex!=='f',sk=p.sk,ad=AD(),opening=day()===0,L=(k,o,apt)=>{if(!opening&&[KL,KR,KS,KLaw].includes(k))return;if(o>0)sk[k]+=Math.min(0.5,o*apt)*(1-sk[k]);};
+    body=hand*Math.exp(0.2*trait(p,GV)+0.12*trait(p,GB)),m=p.sx!=='f'&&p.sex!=='f',sk=p.sk,ad=AD(),opening=day()===0,L=(k,o,apt)=>{if(!opening&&[KL,KR,KS,KLaw,KCr].includes(k))return;if(o>0)sk[k]+=Math.min(0.5,o*apt)*(1-sk[k]);};
   if(noble){const r=p.role||'',rule=r==='head'||r==='monarch'||r==='heir'||r==='spouse'||r==='consort';
     L(KL,(a<18?0.12:0.03)+(ad>=1100?0.06:0)+(r==='High Priest'||r==='Prophet'?0.2:0),book);
     L(KR,0.04+(rule&&a>=20?0.05:0)+(r==='Master of Coin'?0.25:0),book);
@@ -3924,7 +3933,7 @@ function learningHead(p){return p?._hh?.head&&!p._hh.head.dead?p._hh.head:p;}
 function learningPayer(p){return p?.gn!==undefined&&!p.merc?p._hh||null:p;}
 function learningFamilySize(s,p){const A=learningPayer(p);return A?.household?A.population?.get(s)||[...A.members].filter(q=>!q.dead&&W.settlements[q.si]===s).length:1;}
 function learningRoster(s){
-  const I={masters:[],pupils:[],scholars:[]};for(const p of s.folk||[]){if(p.dead||p.outlawCampId||p.estateOffice)continue;const a=ageYrs(p);
+  const I={masters:[],pupils:[],scholars:[]};for(const p of s.folk||[]){if(p.dead||p.outlawCampId||institutionalJobHeld(p))continue;const a=ageYrs(p);
     if(a>=18&&a<70&&p.sk?.[KL]>=0.2&&p.tutorMaster===undefined&&learningHead(p)===p&&learningPayer(p))I.masters.push(p);
     if(a>=14&&a<30&&!p.office&&!p.sp&&p.schoolMaster===undefined&&p.sk?.[KL]>=0.15)I.scholars.push(p);
     if(a>=7&&a<24&&!p.office&&!p.sp&&p.schoolMaster===undefined&&!(p.sk?.[KL]>=0.45))I.pupils.push(p);}return I;
@@ -4111,7 +4120,93 @@ function learningPlaceHTML(s){return(s.schoolIds||[]).map(id=>W.schools?.[id]).f
 function learningSchoolsHTML(){const T=learningState();let h='<div class="dhead">Funded schools</div>';for(const S of T.schools)h+=`<div class="note">${esc(W.settlements[S.si].name)} · ${esc(S.masterName)} · ${S.gone?'closed: '+esc(S.reason):S.pupils.length+' pupils'} · ${S.fees.toFixed(1)} tuition / ${S.stipends.toFixed(1)} stipends received · ${S.graduates} graduates</div>`;
   for(const U of T.universities)h+=`<div class="note">University at ${esc(W.settlements[U.si].name)} · ${U.active?U.masters.length+' paid masters':'teaching suspended'} · ${U.board.toFixed(1)} board / ${U.lodging.toFixed(1)} lodging paid locally · ${U.graduates} graduates</div>`;
   for(const T0 of T.tutors)h+=`<div class="note">${esc(T0.masterName)}, tutor at ${esc(W.settlements[T0.si].name)} · ${T0.gone?'closed: '+esc(T0.reason):T0.pupils.length+' noble pupils'} · ${T0.paid.toFixed(1)} received</div>`;
-  if(sovOn())for(const [si,s]of W.settlements.entries()){if(s.owner!==plyH())continue;h+=`<div class="note">${esc(s.name)} · ${(s.schoolAllowance||0).toFixed(1)} gold a year to actual schoolmasters</div><div class="pbrow">`;for(const[v,label]of[[0,'Stop'],[foodYr()*5,'Support'],[foodYr()*15,'Endow']])h+=`<button class="cbtn" data-cmd="s-school" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;h+='</div><div class="pbrow">';for(const[v,label]of[[0,'Stop tutor'],[foodYr()*5,'Hire tutor']])h+=`<button class="cbtn" data-cmd="s-tutor" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;if(institutionalCapability(s,'college').available)h+=`<button class="cbtn" data-cmd="s-college" data-arg="${si}:classroom">Build college classroom</button><button class="cbtn" data-cmd="s-college" data-arg="${si}:residence">Build scholars’ lodging</button>`;h+='</div>';}return h;}
+  if(sovOn())for(const [si,s]of W.settlements.entries()){if(s.owner!==plyH())continue;h+=`<div class="note">${esc(s.name)} · ${(s.schoolAllowance||0).toFixed(1)} gold a year to actual schoolmasters</div><div class="pbrow">`;for(const[v,label]of[[0,'Stop'],[foodYr()*5,'Support'],[foodYr()*15,'Endow']])h+=`<button class="cbtn" data-cmd="s-school" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;h+='</div><div class="pbrow">';for(const[v,label]of[[0,'Stop tutor'],[foodYr()*5,'Hire tutor']])h+=`<button class="cbtn" data-cmd="s-tutor" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;if(institutionalCapability(s,'college').available)h+=`<button class="cbtn" data-cmd="s-college" data-arg="${si}:classroom">Build college classroom</button><button class="cbtn" data-cmd="s-college" data-arg="${si}:residence">Build scholars’ lodging</button>`;h+='</div>';}return h+craftGuildsHTML();}
+
+/* CRAFT LADDER (#43): one native person, one job; shops, contracts and guild
+   chests are paid from actual takings. Opening craftsmen inherit their existing
+   occupation, while every subsequent premium has a living local recipient. */
+function institutionalJobHeld(p){return !!p&&!p.dead&&(!!p.estateOffice||!!p.abbeyJob||p.schoolMaster!==undefined||p.tutorMaster!==undefined||!!p.office&&p.office!=='warden'||!!p.study&&!p.study.closed||!!p.apprentice&&!p.apprentice.closed||p.craft?.employer!=null);}
+const CRAFT_TRADES=new Set(['smith','baker','butcher','brewer','cook','miller','carpenter','mason','thatcher','cooper','potter','weaver','dyer','tailor','shoemaker','tanner','glover','chandler','merchant','spicer','roper','salter','wheelwright','bowyer','fletcher']);
+function craftPresent(s,p){return !!p&&!p.dead&&!p.outlawCampId&&W.settlements[p.si]===s&&!(p.away&&day()<p.away.until)&&!p.estateOffice&&!p.abbeyJob&&p.schoolMaster===undefined&&p.tutorMaster===undefined&&(!p.office||p.office==='warden')&&(!p.study||p.study.closed);}
+function craftIndex(s){const revision=W._folkRevision||0,y=year(),old=s._craftIndex;if(old&&old.revision===revision&&old.year===y)return old;
+  const I={revision,year:y,heads:[],young:[],trades:new Map(),rooms:new Map()};for(const p of s.folk||[]){if(p.dead||p.outlawCampId)continue;const a=ageYrs(p);if(a>=14&&a<24&&!p.trChosen)I.young.push(p);if(p._hh?.head!==p||a<18)continue;I.heads.push(p);if(CRAFT_TRADES.has(p.tr)){const L=I.trades.get(p.tr)||[];L.push(p);I.trades.set(p.tr,L);}}
+  for(const b of s.buildings||[])if(!b.removed&&b.state==='sound'){const L=I.rooms.get(b.arch)||[];L.push(b);I.rooms.set(b.arch,L);}return s._craftIndex=I;
+}
+function craftRoomValid(s,b,tr){if(!b||b.removed||b.state!=='sound'||b.s&&b.s!==s)return false;const arch=TRADE_ARCH[tr];if(arch)return b.arch===arch||tr==='weaver'&&['house','longhouse','cot','shop','burgher'].includes(b.arch);if(tr==='miller')return b===s.mill||b.arch==='mill';return ['house','longhouse','burgher','shop','hall','cot'].includes(b.arch);}
+function craftRoomCapacity(b){return Math.max(1,Math.floor((b.w||8)*(b.d||7)*0.35/10))*(1+(b.tier||0));} // work benches, never residential capacity
+function craftRoomOwner(s,b){if(b.title?.owner)return b.title.owner;const k=b.ownerId;if(k==='lord')return lordAcct(s);if(k==='town')return s;if(k==='church')return b.ch?b:null;const c=corpOf(k);return c&&!c.gone?c:learningPerson(k)||null;}
+function craftRoomQuote(s,p,tr){const I=craftIndex(s),own=p.bh&&craftRoomValid(s,p.bh,tr)?[p.bh]:[],arch=TRADE_ARCH[tr],rooms=[...own,...(arch?I.rooms.get(arch)||[]:I.rooms.get('shop')||[])];if(tr==='miller'&&s.mill)rooms.push(s.mill);
+  for(const b of rooms){if(!craftRoomValid(s,b,tr))continue;const used=(b.craftMasters||[]).filter(id=>{const q=learningPerson(id);return q&&!q.dead&&q.craft?.rank==='master'&&q.craft.room===b.idx;});if(!used.includes(p.id)&&used.length>=craftRoomCapacity(b))continue;const owner=craftRoomOwner(s,b);if(!owner)continue;
+    const rent=b===p.bh||accountOwner(owner)===accountOwner(p)?0:Math.max(0,b._rent??rentDue(s,p))/craftRoomCapacity(b)/360;return{b,owner,rent};}return null;
+}
+function craftReceipt(s,p,v){if(!(v>0)||!p?.craft||p.craft.rank!=='master'||p.craft.employer!=null)return;p.craft.takings=(p.craft.takings||0)+v;p.craft.lastWorkDay=day();p.craft.lastWorkMonth=Math.floor(day()/30);}
+function craftTransferReceipt(x,v,why,town){const p=x?.household?x.head:x;if(!(v>0)||!p?.craft||!town||p.craft.rank!=='master')return;const g=PRODUCE[p.tr];if(g&&why===g)craftReceipt(town,p,v);}
+function craftWorking(s,p){if(!craftPresent(s,p)||p.craft?.rank!=='master'||p.craft.employer!=null)return false;const b=W.bldList?.[p.craft.room];if(!craftRoomValid(s,b,p.tr))return false;
+  if(day()%7===0)return false;const x=stockOf(s,p).held;if(p.tr==='smith'&&(x.ore||0)>0&&(x.char||0)>0||['weaver','dyer'].includes(p.tr)&&(x.wool||0)>0)return true;return p.craft.lastWorkDay!==undefined&&day()-p.craft.lastWorkDay<=30;
+}
+function craftGuild(s,tr){return(s.guildIds||[]).map(id=>W.guilds?.[id]).find(g=>g&&!g.gone&&g.trade===tr)||null;}
+function craftEntryFine(s,tr,n){const e=s._job?.[tr];if(!e||!(e.sum>0)||!(n>0))return 0;return e.sum/n-e.sum/(n+1);} // one year's dilution, the guild's recorded custom
+function craftMasterQuote(s,p,tr=p.tr){if(!craftPresent(s,p)||p.apprentice&&!p.apprentice.closed||p.craft?.employer!=null||learningHead(p)!==p||ageYrs(p)<18||!CRAFT_TRADES.has(tr))return null;
+  if(p.craft?.rank!=='master'&&!(p.craft?.qualified||p.sk?.[KCr]>=0.45))return null;const room=craftRoomQuote(s,p,tr);if(!room)return null;const g=craftGuild(s,tr),fine=g?craftEntryFine(s,tr,g.members.filter(id=>!learningPerson(id)?.dead).length):0,annual=tradeIncome(s,tr),cost=fine+room.rent*360;
+  return annual>cost&&learningSpare(s,p)>=fine+room.rent*30?{s,p,tr,room,g,fine,annual}:null;
+}
+function craftMasterCommission(Q){if(!Q)return false;const{s,p,tr,room,g,fine}=Q;if(g&&fine>0&&transfer(p,g,fine,'guild entry fine',s)+1e-9<fine)return false;const prior=p.tr;p.tr=tr;p.trChosen=true;p.craft={...(p.craft||{}),rank:'master',room:room.b.idx,qualified:true,opened:day(),rent:room.rent,employees:[]};delete p.craft.employer;
+  if(!(room.b.craftMasters||[]).includes(p.id))(room.b.craftMasters||(room.b.craftMasters=[])).push(p.id);if(g&&!g.members.includes(p.id)){g.members.push(p.id);p.craft.guild=g.id;g.entryReceipts+=fine;}delete s._craftIndex;s._tcY=-1;marketTradeIndexInvalidate();if(prior!==tr)life(p,`Opened a ${tr}'s workshop at ${s.name}`);return true;
+}
+function craftOpening(s){if(s._craftOpening)return;s._craftOpening=true;for(const p of craftIndex(s).heads){if(!CRAFT_TRADES.has(p.tr)||institutionalJobHeld(p))continue;const Q=craftRoomQuote(s,p,p.tr);p.craft={rank:Q?'master':'journeyman',qualified:true,inherited:true,opened:day(),takings:0,employees:[]};if(Q){p.craft.room=Q.b.idx;p.craft.rent=Q.rent;(Q.b.craftMasters||(Q.b.craftMasters=[])).push(p.id);}}delete s._craftIndex;}
+function craftApprenticeQuote(s,p,master,tr){if(!craftPresent(s,p)||institutionalJobHeld(p)||ageYrs(p)<14||ageYrs(p)>=40||!craftWorking(s,master)||master.tr!==tr||p===master||!CRAFT_TRADES.has(tr))return null;
+  const g=craftGuild(s,tr),active=(master.craft.apprentices||[]).filter(id=>!learningPerson(id)?.apprentice?.closed),limit=g?.ordinances.apprenticesPerMaster??craftRoomCapacity(W.bldList[master.craft.room]);if(active.length>=limit)return null;if(p.trChosen&&!(learningHead(p)===p&&tradeIncome(s,tr)>tradeIncome(s,p.tr)*1.8&&!(p.craft?.rank==='master'&&craftWorking(s,p))))return null;const head=learningHead(p),home=accountOwner(head)===accountOwner(master),premium=home?0:learningTeacherCost(s,master)*360*0.15,annual=tradeIncome(s,tr),here=tradeIncome(s,p.tr);
+  if(!home&&(!(annual>here+premium/7)||learningSpare(s,head)<premium))return null;return{s,p,master,tr,head,premium};
+}
+function craftApprenticeCommission(Q){if(!Q)return false;const{s,p,master,tr,head,premium}=Q,paid=premium?transfer(head,master,premium,'apprenticeship',s):0;if(paid+1e-9<premium)return false;
+  const a={master:master.id,trade:tr,si:p.si,start:day(),term:7*360,served:0,premium:paid,priorTrade:p.tr,closed:false,graduated:false};p.apprentice=a;p.trChosen=true;(master.craft.apprentices||(master.craft.apprentices=[])).push(p.id);(W.apprentices||(W.apprentices=[])).push(p.id);life(p,`Apprenticed to ${folkName(master)} as a ${tr} for seven years`);life(master,`Took ${folkName(p)} as an apprentice`);return true;
+}
+function craftApprenticeClose(s,p,reason,graduate=false){const a=p.apprentice;if(!a||a.closed)return;a.closed=true;a.reason=reason;a.end=day();a.graduated=graduate;p.craft={rank:'journeyman',qualified:graduate,trade:a.trade,served:a.served,takings:0,employees:[]};p.tr=a.trade;life(p,graduate?`Completed the ${a.trade}'s apprenticeship`:`Apprenticeship ended: ${reason}`);delete s._craftIndex;s._tcY=-1;marketTradeIndexInvalidate();}
+function craftApprenticeTick(p){const a=p?.apprentice;if(!a||a.closed)return;const s=W.settlements[a.si],m=learningPerson(a.master);if(p.dead||!s||!m||m.dead||W.settlements[p.si]!==s||W.settlements[m.si]!==s){craftApprenticeClose(s||W.settlements[p.si],p,'master or pupil left');return;}
+  if(!craftPresent(s,p)||!craftWorking(s,m))return;a.served++;const aptitude=Math.exp(0.12*trait(p,GW)+0.3*trait(p,GD)),sk=p.sk[KCr]||0,lesson=(0.12+0.08*(m.sk?.[KCr]||0))*aptitude/360;p.sk[KCr]+=Math.min(1-sk,lesson*(1-sk));
+  if(day()-a.start>=a.term&&a.served>=a.term*6/7&&p.sk[KCr]>=0.45)craftApprenticeClose(s,p,'qualified after actual service',true);
+}
+function craftWage(s,p,tr){return Math.max(learningFamilySize(s,p)*foodYr()/360,tradeIncome(s,p.tr||'labourer')/360,tradeIncome(s,tr)/360);} // bread and the worker's foregone work, never a credited forecast
+function craftEmployeeClose(s,p,reason){if(p.craft?.employer==null)return;const m=learningPerson(p.craft.employer),tr=p.craft.priorTrade;delete p.craft.employer;p.craft.reason=reason;p.craft.ended=day();if(tr)p.tr=tr;if(m?.craft)m.craft.employees=(m.craft.employees||[]).filter(id=>id!==p.id);delete s._craftIndex;}
+function craftHireQuote(s,m,p){if(!craftPresent(s,m)||m.craft?.rank!=='master'||!craftPresent(s,p)||institutionalJobHeld(p)||learningHead(p)!==p||p===m||p.craft?.rank==='master'||p.craft?.rank!=='journeyman'||!p.craft.qualified||p.tr!==m.tr)return null;
+  const room=W.bldList[m.craft.room],hands=1+(m.craft.employees||[]).length;if(!craftRoomValid(s,room,m.tr)||hands>=craftRoomCapacity(room))return null;const wage=craftWage(s,p,m.tr),receipts=m.craft.lastWorkDay!==undefined&&day()-m.craft.lastWorkDay<=30?m.craft.takings/Math.max(30,day()-m.craft.opened+1):0,own=learningTeacherCost(s,m);
+  return receipts>own+wage*hands&&learningSpare(s,m)>=wage*30?{s,m,p,wage}:null;
+}
+function craftHire(Q){if(!Q)return false;const{s,m,p,wage}=Q;p.craft={...p.craft,employer:m.id,priorTrade:p.tr,wage,started:day(),paid:0,paidDay:-1,fraction:0};(m.craft.employees||(m.craft.employees=[])).push(p.id);life(p,`Hired by ${folkName(m)} as a ${m.tr}'s journeyman`);return true;}
+function craftEmployeeTick(s,p){const c=p.craft,m=learningPerson(c?.employer);if(c?.employer==null)return;if(!craftPresent(s,p)||!craftPresent(s,m)||m.craft?.rank!=='master'||!craftRoomValid(s,W.bldList[m.craft.room],m.tr)){craftEmployeeClose(s,p,'employment or workshop lost');return;}
+  c.fraction=0;if(day()%7===0)return;const paid=transfer(m,p,Math.min(c.wage,learningSpare(s,m)),'journeyman wages',s);if(!(paid>0)){craftEmployeeClose(s,p,'master cannot pay');return;}c.paid+=paid;c.paidDay=day();c.fraction=Math.min(1,paid/c.wage);const skill=p.sk[KCr]||0;p.sk[KCr]+=0.08/360*c.fraction*(1-skill);
+}
+function craftHands(s,p){let n=1;for(const id of p.craft?.employees||[]){const q=learningPerson(id);if(craftPresent(s,q)&&q.craft.employer===p.id&&q.craft.paidDay===day())n+=q.craft.fraction||0;}return n;}
+function craftWeight(s,p){const base=(TRADE_W[p.tr]||0.5)*(1+0.3*(p.bh&&!p.bh.removed?p.bh.tier:0))*(0.8+0.2*(p.sk?.[KCr]||0));return base*(p.craft?.rank==='master'?craftHands(s,p):1);}
+function craftGuildQuote(s,tr){if(craftGuild(s,tr)||s.guildPolicy?.[tr]===false||s.kind==='village'||s.siegeBy||!institutionalCapability(s,tr==='merchant'?'merchantGuild':'craftGuild').available)return null;const masters=(craftIndex(s).trades.get(tr)||[]).filter(p=>craftPresent(s,p)&&p.craft?.rank==='master'),n=masters.length;if(n<2)return null;
+  const clerk=craftIndex(s).heads.filter(p=>craftPresent(s,p)&&p.sk?.[KL]>=0.2&&p.sk?.[KR]>=0.2&&!institutionalJobHeld(p)).sort((a,b)=>(b.sk[KL]+b.sk[KR])-(a.sk[KL]+a.sk[KR])||a.id-b.id)[0];if(!clerk)return null;const licence=foodYr()*n*0.5,writing=learningTeacherCost(s,clerk)*30,price=licence+writing,dilution=craftEntryFine(s,tr,n),contribution=price/n;
+  if(!(dilution>contribution)||masters.some(p=>learningSpare(s,p)<contribution))return null;return{s,tr,masters,clerk,issuer:s.commune?s:lordAcct(s),licence,writing,price,contribution,dilution};
+}
+function craftGuildFound(Q){if(!Q)return null;const{s,tr,masters,clerk,issuer,licence,writing}=Q,g=corpFound('guild',{name:`The ${tr}s of ${s.name}`,si:W.settlements.indexOf(s),trade:tr,members:masters.map(p=>p.id),wardens:[],charterDay:day(),issuer:s.commune?'town':s.owner,entryReceipts:0,dues:0,fines:0,relief:0,feast:0,parish:0,upkeep:0,nextQuarter:day()+90,ordinances:{apprenticesPerMaster:1,quality:0.35,quarterageRate:1/48},charterPrice:Q.price});
+  let receipts=0;for(const p of masters)receipts+=transfer(p,g,Q.contribution,'guild charter contribution',s);if(receipts+1e-8<Q.price){for(const p of masters)transfer(g,p,receipts/masters.length,'guild charter refund',s);g.gone=true;return null;}transfer(g,issuer,licence,'guild charter licence',s);transfer(g,clerk,writing,'guild charter writing',s);
+  const w=masters.filter(p=>!p.office).sort((a,b)=>(b.sk?.[KR]||0)-(a.sk?.[KR]||0)||a.id-b.id)[0];if(w){w.office='warden';w.officeFor=g.storageOwnerId;g.wardens.push(w.id);}for(const p of masters){p.craft.guild=g.id;p.craft.quarterTakings=p.craft.takings||0;}(s.guildIds||(s.guildIds=[])).push(g.id);emit('trade',3,s.pos,`The ${tr}s of ${s.name} buy a charter from ${s.commune?'their commune':'their lord'}.`);return g;
+}
+function craftGuildSpend(s,g){let spare=means(g);if(!(spare>0))return;const members=g.members.map(learningPerson).filter(p=>p&&!p.dead),poor=members.filter(p=>means(p)<Math.max(1,learningFamilySize(s,p))*foodYr()/12).sort((a,b)=>means(a)-means(b)||a.id-b.id);
+  for(const p of poor){const need=Math.max(0,learningFamilySize(s,p)*foodYr()/12-means(p)),v=transfer(g,p,Math.min(need,spare),'guild alms',s);g.relief+=v;spare-=v;if(!(spare>0))break;}if(!(spare>0))return;
+  const church=parishOf(s);if(church?.ch){const v=transfer(g,church,Math.min(spare/4,foodYr()/12),'guild chantry and parish gift',s);g.parish+=v;spare-=v;}
+  const hall=(s.buildings||[]).find(b=>!b.removed&&b.state==='sound'&&b.arch==='guildhall'&&(b.ownerId===g.storageOwnerId||b.ownerId==='town'));if(hall){const owner=craftRoomOwner(s,hall),rent=owner&&accountOwner(owner)!==accountOwner(g)?Math.min(spare/4,Math.max(0,hall._rent||0)/4):0;if(rent>0){const paid=transfer(g,owner,rent,'guildhall rent',s);g.upkeep+=paid;spare-=paid;}const v=buildWorks(s,Math.min(spare/4,(hall.w||8)*(hall.d||7)*0.001),g,'guildhall upkeep');g.upkeep+=v;spare-=v;}
+  const q=Math.min(members.length*NEED.wine*90,spare/Math.max(1e-9,price(s,'wine')));if(q>0){const cash=purchase(s,'wine',g,q),got=purchase.got;commodityCreditPurchase(s,g,'wine',got);consumeOwned(s,g,'wine',got);g.feast+=cash;const service=craftWork(s,g,['cook','brewer'],Math.min(means(g),cash*.25));g.feast+=service;} // the quarterly feast adds drink; members' normal bread is counted only at home
+}
+function craftGuildTick(g){if(!g||g.gone||day()<g.nextQuarter)return;const s=W.settlements[g.si];g.nextQuarter=day()+90;const church=parishOf(s);for(const id of g.members){const p=learningPerson(id);if(p?.dead&&church?.ch&&!(g.buried||[]).includes(id)){const paid=transfer(g,church,Math.min(means(g),foodYr()/12),'guild member burial',s);if(paid>0){g.funerals=(g.funerals||0)+paid;(g.buried||(g.buried=[])).push(id);}}}g.members=g.members.filter(id=>{const p=learningPerson(id);return p&&!p.dead&&p.craft?.guild===g.id&&p.craft.rank==='master';});if(!g.members.length){transfer(g,church?.ch?church:lordAcct(s),means(g),'dissolved guild chest',s);g.gone=true;return;}g.entryFine=craftEntryFine(s,g.trade,g.members.length);
+  for(const id of g.members){const p=learningPerson(id),dues=Math.max(0,(p.craft.takings||0)-(p.craft.quarterTakings||0));p.craft.quarterTakings=p.craft.takings||0;const quarterage=dues*g.ordinances.quarterageRate;g.dues+=transfer(p,g,Math.min(quarterage,learningSpare(s,p)),'guild quarterage',s);if(dues>0&&p.sk?.[KCr]<g.ordinances.quality){const fine=dues*(g.ordinances.quality-p.sk[KCr]);g.fines+=transfer(p,g,Math.min(fine,learningSpare(s,p)),'guild search fine',s);}} // dues and searches follow recorded sold work; the quality is an explicit guild ordinance
+  craftGuildSpend(s,g);
+}
+function craftRecruit(s){const I=craftIndex(s),students=[...I.young,...I.heads.filter(p=>ageYrs(p)>=24&&ageYrs(p)<40&&!craftWorking(s,p))];for(const p of students){if(!craftPresent(s,p)||institutionalJobHeld(p))continue;let best=null;for(const [tr,masters]of I.trades){for(const m of masters){const Q=craftApprenticeQuote(s,p,m,tr);if(Q&&(!best||tradeIncome(s,tr)-Q.premium/7>tradeIncome(s,best.tr)-best.premium/7))best=Q;}}if(best)craftApprenticeCommission(best);}
+  for(const p of I.heads){if(!craftPresent(s,p)||!p.craft||p.craft.employer||p.apprentice&&!p.apprentice.closed)continue;if(p.craft.rank==='journeyman'){const Q=craftMasterQuote(s,p);if(Q){craftMasterCommission(Q);continue;}for(const m of I.trades.get(p.tr)||[]){const Q2=craftHireQuote(s,m,p);if(Q2){craftHire(Q2);break;}}}}
+}
+function tickCrafts(){if(W._craftDay===day())return;W._craftDay=day();for(const s of W.settlements){if(!s.folk?.length)continue;craftOpening(s);for(const p of craftIndex(s).heads){if(p.craft?.employer!=null){craftEmployeeTick(s,p);continue;}if(p.craft?.rank==='master'){const b=W.bldList[p.craft.room];if(!craftRoomValid(s,b,p.tr)){p.craft.rank='journeyman';delete s._craftIndex;continue;}const Q=craftRoomQuote(s,p,p.tr);if(!Q){p.craft.rank='journeyman';continue;}if(Q.rent>0&&transfer(p,Q.owner,Math.min(Q.rent,learningSpare(s,p)),'shop rent',s)+1e-9<Q.rent){p.craft.rank='journeyman';continue;}if(craftWorking(s,p))p.sk[KCr]+=0.05/360*(1-p.sk[KCr]);}}
+    if(!s.siegeBy)craftRecruit(s);for(const tr of craftIndex(s).trades.keys()){const Q=craftGuildQuote(s,tr);if(Q)craftGuildFound(Q);}}
+  for(const id of W.apprentices||[])craftApprenticeTick(learningPerson(id));if(W.apprentices)W.apprentices=W.apprentices.filter(id=>{const p=learningPerson(id);return p&&!p.dead&&!p.apprentice?.closed;});for(const g of W.guilds||[])craftGuildTick(g);
+}
+function craftGuildCmd(arg){const[si,tr,on,...rest]=String(arg).split(':'),s=W.settlements[+si];if(rest.length||!s||!sovOn()||s.owner!==plyH()||!CRAFT_TRADES.has(tr)||!['grant','refuse'].includes(on))return false;(s.guildPolicy||(s.guildPolicy={}))[tr]=on==='grant';if(on==='grant'){const Q=craftGuildQuote(s,tr);if(Q)craftGuildFound(Q);}return true;}
+function craftState(){return{guilds:(W.guilds||[]).map(g=>({id:g.id,name:g.name,si:g.si,trade:g.trade,gone:!!g.gone,gold:g.gold,members:g.members?.slice()||[],entryFine:g.entryFine||0,dues:g.dues||0,fines:g.fines||0,relief:g.relief||0,feast:g.feast||0,parish:g.parish||0})),apprentices:(W.apprentices||[]).map(id=>learningPerson(id)).filter(p=>p?.apprentice&&!p.apprentice.closed).map(p=>({person:p.id,name:folkName(p),si:p.si,master:p.apprentice.master,trade:p.apprentice.trade,served:p.apprentice.served,premium:p.apprentice.premium}))};}
+function craftPlaceHTML(s){const G=(s.guildIds||[]).map(id=>W.guilds?.[id]).filter(g=>g&&!g.gone),masters=(s.folk||[]).filter(p=>!p.dead&&p.craft?.rank==='master').length,workers=(s.folk||[]).filter(p=>!p.dead&&p.craft?.employer!=null).length,apprentices=(s.folk||[]).filter(p=>!p.dead&&p.apprentice&&!p.apprentice.closed).length;return `${masters} masters · ${workers} wage-paid journeymen · ${apprentices} apprentices`+(G.length?' · '+G.map(g=>`${esc(g.name)}: ${g.gold.toFixed(1)} in the chest, ${g.relief.toFixed(1)} alms`).join('; '):'');}
+function craftGuildsHTML(){const T=craftState();let h='<div class="dhead">Crafts and guilds</div>';for(const g of T.guilds)if(!g.gone)h+=`<div class="note">${esc(g.name)} · ${g.members.length} masters · ${g.gold.toFixed(1)} chest · ${g.dues.toFixed(1)} dues · ${g.relief.toFixed(1)} alms · ${g.feast.toFixed(1)} feast spending</div>`;if(sovOn())for(const[si,s]of W.settlements.entries())if(s.owner===plyH()&&s.kind!=='village'){for(const tr of new Set((s.folk||[]).filter(p=>!p.dead&&p.craft?.rank==='master').map(p=>p.tr)))if(!craftGuild(s,tr))h+=`<div class="note">${esc(s.name)} · ${esc(tr)} charter ${s.guildPolicy?.[tr]===false?'refused':'permitted'}</div><div class="pbrow"><button class="cbtn" data-cmd="s-guild" data-arg="${si}:${tr}:grant">Permit charter purchase</button><button class="cbtn" data-cmd="s-guild" data-arg="${si}:${tr}:refuse">Refuse charter</button></div>`;}return h;}
 
 /* the rank-and-file notables share the folk's make-up */
 function endow(n,ma,pa){ // a notable's nature and nurture: parents' blood, a lord's table, a lord's tutors
@@ -10994,6 +11089,7 @@ function inspectorCard(pk,full=false){
     {const w=Object.keys(s.works||{}).map(k=>({mill:'a mill',granary:'a granary',market:'a chartered market'}[k])).filter(Boolean);if(s.clearUntil>day())w.push('assarters at work');if(w.length)h+=row('Works',w.join(', '));}
     {const T=s.buildings.filter(tollStands);if(T.length)h+=row('Tolls',T.map(b=>{const r=b.st&&W.roads[b.st.ri],o=r&&W.settlements[r.a===W.settlements.indexOf(s)?r.b:r.a];return `${o?'on the road to '+esc(o.name):'off the king\'s roads'}, for ${esc(detailTollOwner(b,s))}: ${Math.round(b._tkY||0)} last year, ${Math.round(b._tk||0)} this${tollKeeper(b)?'':' (no keeper: the carts go by free)'}`;}).join('; ')+` · ${+(customOf(s,'toll')*100).toFixed(1)}% of each load's worth`);}
     {const L=learningPlaceHTML(s);if(L)h+=row('Funded schools',L);}
+    h+=row('Crafts and guilds',craftPlaceHTML(s));
     for(const[k,v]of manorLines(s))h+=row(k,v);
     if(s.infected>0.5)h+=row('Plague',Math.round(s.infected)+' sick, '+Math.round(s.plagueDead)+' dead');
     if(s.siegeBy)h+=row('Under siege by',s.siegeBy.houseName);
@@ -13315,11 +13411,12 @@ function provision(s,heads,size){ // the month's necessaries, bought as each hou
           if(!(got>0))continue;D[k]=(D[k]||0)+got;S[k]=(S[k]||0)+got; // a sale at the market's price, as the drovers' are
           const q=got*CARCASS[k];if(s.storage)storageBindGood(s,'meat');s.stores.meat=(s.stores.meat||0)+q;offer(s,'meat',h,q,c/q);h._inc=(h._inc||0)-c;}}}}
   }
-function payCrafts(s,heads){ // the crafts and trades take in what the town's families paid them this month, a better shop and a better hand taking more
-  const C=heads.filter(h=>h.schoolMaster===undefined&&h.tutorMaster===undefined&&!tills(h,s)&&h.tr&&!PRODUCE[h.tr]),wt=h=>(TRADE_W[h.tr]||0.5)*(1+0.3*(h.bh&&!h.bh.removed?h.bh.tier:0))*(0.8+0.2*(h.sk?h.sk[KCr]||0:0));let tw=0;for(const h of C)tw+=wt(h);
+function payCrafts(s,heads){ // actual craft takings go to independent shops; hired journeymen receive their master's recorded wages
+  const C=heads.filter(h=>(typeof institutionalJobHeld!=='function'||!institutionalJobHeld(h))&&!tills(h,s)&&h.tr&&!PRODUCE[h.tr]),wt=h=>typeof craftWeight==='function'?craftWeight(s,h):(TRADE_W[h.tr]||0.5)*(1+0.3*(h.bh&&!h.bh.removed?h.bh.tier:0))*(0.8+0.2*(h.sk?h.sk[KCr]||0:0));let tw=0;for(const h of C)tw+=wt(h);
   let cash=s._poolCash||0;const P=s._poolBy||{};s._poolBy={};
-  for(const tr in P){const T2=C.filter(h=>h.tr===tr);let t2=0;for(const h of T2)t2+=wt(h);if(t2>0)for(const h of T2){const v=P[tr]*wt(h)/t2;acct(h,v);if(tr==='baker'||tr==='brewer')courtAssize(s,h,v);}else cash+=P[tr];} // what was paid for baking goes to the bakers, for shoes to the shoemakers; the assize records those actual bread and ale receipts
-  if(cash>0){if(tw>0)for(const h of C)acct(h,cash*wt(h)/tw);else acct(lordAcct(s),cash,'Unclaimed craft payments',s);}s._poolCash=0;}
+  const receipt=(h,v)=>{acct(h,v);if(typeof craftReceipt==='function')craftReceipt(s,h,v);if(h.tr==='baker'||h.tr==='brewer')courtAssize(s,h,v);};
+  for(const tr in P){const T2=C.filter(h=>h.tr===tr);let t2=0;for(const h of T2)t2+=wt(h);if(t2>0)for(const h of T2)receipt(h,P[tr]*wt(h)/t2);else cash+=P[tr];}
+  if(cash>0){if(tw>0)for(const h of C)receipt(h,cash*wt(h)/tw);else acct(lordAcct(s),cash,'Unclaimed craft payments',s);}s._poolCash=0;}
 function reprice(s){ // each price rises when buyers wanted more than was sold, and moves against the stock for sale: above half a year of what is wanted it falls, below it rises
   const P=s.px||(s.px={}),D=s._dem||{},S=s._sold||{},E=s._dAvg||(s._dAvg={}),Y=s._dYr||(s._dYr={});
   const L=s._lostM||{};s._lostM={};const PY=s._pxY||(s._pxY={});s._pxN=(s._pxN||0)+1;
@@ -13483,6 +13580,7 @@ function tickTrade(){
 function tickEconomy(){
   if(typeof tickLearning==='function')tickLearning();
   if(typeof tickTechnology==='function')tickTechnology();
+  if(typeof tickCrafts==='function')tickCrafts();
   const si=seasonIdx(),seasonF=[0.7,1.1,1.6,0.08][si];
   for(const s of W.settlements){
     storageInit(s);const phaseK=commodityActive(s)?s.storage:undefined;
@@ -15929,7 +16027,7 @@ function cashRecord(x,v,why,town){ // bounded annual totals at the payment, only
   B.closing=cash;const key=why||(v>0?'Other receipts':'Other payments'),L=v>0?B.receipts:B.payments;L[key]=(L[key]||0)+Math.abs(v);
   if(town&&x!==town){let T=B.towns.get(town);if(!T)B.towns.set(town,T={receipts:{},payments:{}});const M=v>0?T.receipts:T.payments;M[key]=(M[key]||0)+Math.abs(v);}
 }
-function acct(x,v,why,town){if(!Number.isFinite(v)){if(v===v)return;flow('!nan',1);return;} // (a sum that is not a number is a fault, counted, never paid)
+function acct(x,v,why,town){if(v>0&&x?.household&&typeof craftTransferReceipt==='function')craftTransferReceipt(x,v,why,town);if(!Number.isFinite(v)){if(v===v)return;flow('!nan',1);return;} // (a sum that is not a number is a fault, counted, never paid)
   if(x&&x.household){if(x.successors){for(const[to,f]of x.successors)acct(to,v*f,why,town);return;}x.assets.w=(x.assets.w||0)+v;if(v>0)x.assets._inc=(x.assets._inc||0)+v;return;}
   if(x&&x.gn!==undefined&&!x.merc){if(x.dead&&x._estateShares&&v>0){for(const[to,f]of x._estateShares)acct(to,v*f,why,town);}else acct(householdAccount(x),v,why,town);return;}
   if(!v||!x||x==='out'){if(v&&!x)flow('<>lost',v);return;}
@@ -15993,13 +16091,13 @@ function clearMarket(s,g,orders,p){if(commodityActive(s)&&!BEASTS.includes(g))re
   orders.forEach(([b],i)=>{if(!(res[i]>0)||!fill)return;const t=res[i]*fill;got[i]+=t;if(s.storage){let left=t;for(const l of custody){if(l.owner!==null||!(l.qty>0))continue;const q=Math.min(left,l.qty);s.storage.transfer(l,accountOwner(b),q,'held');left-=q;if(!(left>0))break;}}acct(b,-t*p,g,s);});
   const D=s._dem||(s._dem={}),S=s._sold||(s._sold={});D[g]=(D[g]||0)+Dt;S[g]=(S[g]||0)+got.reduce((a,b)=>a+b,0);return got;}
 function heads_(s,pred){if(!s.folk)return [];const out=[];for(const h of householdsOf(s)){const p=h.head;if(p&&!p.dead&&!p.role&&pred(p))out.push(p);}return out;}
-function workers_(s,pred){if(!s.folk)return [];const out=[];for(const h of householdsOf(s)){const p=h.head;if(p&&!p.dead&&!p.role&&!p.outlawCampId&&pred(p))out.push(p);}return out;}
+function workers_(s,pred){if(!s.folk)return [];const out=[];for(const h of householdsOf(s)){const p=h.head;if(p&&!p.dead&&!p.role&&!p.outlawCampId&&(typeof institutionalJobHeld!=='function'||!institutionalJobHeld(p))&&pred(p))out.push(p);}return out;}
 const HUNGRY_HANDS={meal:0,at:new WeakMap()}; // each place's hungry households, in the order of its households, kept from one meal to the next: hunger changes only at a meal (eatHouseholds), and a change of members or heads makes a new household list; not world state
 function hungryHands(s){ // the place's hungry heads who would take a day's hire, as dayHands(s,heads_(s,()=>true)) finds them, without a scan of every head on every works bill (#23)
   if(!s.folk)return [];const H=householdsOf(s),rev=W._folkRevision||0;let C=HUNGRY_HANDS.at.get(s);
   if(!C||C.of!==H||C.meal!==HUNGRY_HANDS.meal||C.rev!==rev){const hh=[];for(const h of H){const p=h.head;if(p&&(!p._hh||(p._hh.hunger||0)>0))hh.push(h);}C={of:H,meal:HUNGRY_HANDS.meal,rev,hh};HUNGRY_HANDS.at.set(s,C);}
-  const out=[];for(const h of C.hh){const p=h.head;if(p&&!p.dead&&!p.role&&!p.outlawCampId&&(householdAccount(p)?.hunger||0)>0)out.push(p);}return out;}
-function dayHands(s,heads,also){const out=[];for(const h of heads){if(h.dead||h.role||h.outlawCampId)continue;if((householdAccount(h)?.hunger||0)>0||also&&also(h))out.push(h);}return out;} // who comes out for a day's hire: the hungry of the place first of all (#23), and those whose living it is
+  const out=[];for(const h of C.hh){const p=h.head;if(p&&!p.dead&&!p.role&&!p.outlawCampId&&(typeof institutionalJobHeld!=='function'||!institutionalJobHeld(p))&&(householdAccount(p)?.hunger||0)>0)out.push(p);}return out;}
+function dayHands(s,heads,also){const out=[];for(const h of heads){if(h.dead||h.role||h.outlawCampId||typeof institutionalJobHeld==='function'&&institutionalJobHeld(h))continue;if((householdAccount(h)?.hunger||0)>0||also&&also(h))out.push(h);}return out;} // who comes out for a day's hire: the hungry of the place first of all (#23), and those whose living it is
 function payWatch(s,young,v,payer){ // a garrison's month: its posts are taken by the men whose own work earns them less than a watchman's wage, the poorest first; the rest of the posts are filled from the other young men of the place (#23: the pay was shared among every young man alike)
   const men=Math.max(1,Math.round(s.garrison||0));if(!(v>0)||!young.length)return payAmong(young,v,payer,'garrisons',s);const wage=v/men,takers=[];
   for(const h of young){const A=householdAccount(h),earn=(A&&A.assets._incY!=null?A.assets._incY:tradeIncome(s,h.tr))/12;if(earn<wage)takers.push([earn,h]);}
@@ -16017,8 +16115,8 @@ function buildWorks(s,cost,payer,why){ // building work: wages to the masons, ca
     if(!own){want();const o=W.settlements.filter(x=>x!==s&&x.folk).sort((a,c)=>dist2d(a.pos.x,a.pos.z,s.pos.x,s.pos.z)-dist2d(c.pos.x,c.pos.z,s.pos.x,s.pos.z)).find(x=>workers_(x,h=>h.tr==='mason'||h.tr==='carpenter').length);if(o){B=workers_(o,h=>h.tr==='mason'||h.tr==='carpenter'||h.tr==='thatcher');if(!C.length)C=workers_(o,h=>h.tr==='carter');}}
     if(!B.length)B=workers_(s,()=>true);K={own,B,C};if(Q)Q.works=K;}
   else if(!K.own)want();
-  const before=payer&&payer!=='out'?means(payer):null,{B,C}=K,H=hungryHands(s),lab=H.length?cost*0.25:0; /* the labourers who dig and carry for the masons: the hungry of the place, hired by the day (#23; paid in coin: works are paid from a purse, and the payer's corn may be the very load being carted) */
-  let paid=payAmong(B,(cost-lab)*(C.length?0.75:1),payer,why,s);if(C.length)paid+=payAmong(C,(cost-lab)*0.25,payer,why,s);if(lab>0)paid+=payAmong(H,lab,payer,why,s);return before===null?paid:Math.max(0,before-means(payer));} // only money actually paid advances a funded foundation
+  const before=payer&&payer!=='out'?means(payer):null,{B,C}=K,H=hungryHands(s),craftBefore=typeof craftReceipt==='function'?new Map([...B,...C,...H].map(p=>[p,means(p)])):null,lab=H.length?cost*0.25:0; /* the labourers who dig and carry for the masons: the hungry of the place, hired by the day (#23; paid in coin: works are paid from a purse, and the payer's corn may be the very load being carted) */
+  let paid=payAmong(B,(cost-lab)*(C.length?0.75:1),payer,why,s);if(C.length)paid+=payAmong(C,(cost-lab)*0.25,payer,why,s);if(lab>0)paid+=payAmong(H,lab,payer,why,s);if(craftBefore)for(const[p,m]of craftBefore)craftReceipt(W.settlements[p.si]||s,p,Math.max(0,means(p)-m));return before===null?paid:Math.max(0,before-means(payer));} // only money actually paid advances a funded foundation
 function levy(s,v,to,why){ // a rate laid on the households by their means; returns what was gathered
   if(!(v>0))return 0;const H=heads_(s,h=>(h.w||0)>0);let tw=0;for(const h of H)tw+=h.w;if(tw<=0)return 0;let got=0;for(const h of H){const x=Math.min(h.w,v*h.w/tw);got+=transfer(h,to,x,why,s);}return got;}
 function compensate(payer,b,s,c){const hh=b.hh||[],own=ownerAcct(b,s);transfer(payer,own,hh.length?c*0.85:c,'works',s);for(const h of hh)transfer(payer,h,c*0.15/hh.length,'works',s);} // a house pulled down for a work: the owner has most of the price, the tenants something to go (the whole of it, with none)
@@ -16153,7 +16251,7 @@ function tickHouseholds(){
   Ss.forEach((s,si)=>{if(!due[si]||!s.folk||!s.folk.length)return;
     const pr=g=>price(s,g)/GOODBASE[g];let pool=0;const lux={};
     // grown children set up house
-    for(const p of s.folk){if(p.dead||p.outlawCampId||p.own||p.sp)continue;const a=ageYrs(p);if(a<18)continue;const par=householdHead(p);if(par===p)continue;
+    for(const p of s.folk){if(p.dead||p.outlawCampId||p.own||p.sp||institutionalJobHeld(p))continue;const a=ageYrs(p);if(a<18)continue;const par=householdHead(p);if(par===p)continue;
       const earn=tradeIncome(s,p.tr);if(a>=26||earn>foodYr()*1.6&&(a>=20||frand()<0.25)){const gift=Math.max(0,Math.min((par.w||0)*0.15,foodYr()*2));householdPortion(p);par.w=(par.w||0)-gift;p.w=(p.w||0)+gift;life(p,`Set up house at ${s.name}`);
         // where to set up: here, or a place with better work and a better chance of a match, if the road is worth it
         const kin=kinOf(p),val=o=>Math.max(tradeIncome(o,p.tr),tradeIncome(o,'carter'))+youngPull(o)+amenity(o,p,null)+living(o)+kinNear(o,kin)-(o.hunger||0)*foodYr()*4; // work, a match, safety, how folk live there, and how near one's own
@@ -16187,14 +16285,7 @@ function tickHouseholds(){
     }
     s._lux=lux; // what they wanted and could not get: the price rises, and the carters will hear of it
     s._poolLast=pool; // next year's living of the crafts
-    // the young choose a trade; a man whose trade has failed him turns to another
-    const opts=[...new Set([...tradesOf(s),'ploughman',...Object.keys(s._job||{}).filter(tr=>tr!=='labourer')])],val=tr=>tradeIncome(s,tr); // the trades the place has, and those it lacked hands for
-    for(const p of s.folk){if(p.dead||p.trChosen||p.study&&!p.study.closed)continue;const a=ageYrs(p);if(a<14||a>=17)continue;const head=householdHead(p);
-      let best=null,bv=-1e9;for(const tr of opts){const fee=tr===p.tr||TILLERS.has(tr)||tr==='carter'||tr==='woodcutter'?0:foodYr()*1.2,can=(head.w||0)>=fee;if(!can)continue;
-        const e=s._job&&s._job[tr],v=(val(tr)+foodYr()*2*(e&&e.n?e.fill:1))*(tr===p.tr?1.15:1)*(0.85+0.3*frand())-fee/6;if(v>bv){bv=v;best=[tr,fee];}} // what it pays, and how its households live; the father's trade is the one he knows // the father's trade is learned at home; any other costs an apprenticeship
-      if(best&&best[1]>0){const M2=heads.filter(q=>q.tr===best[0]&&q!==head);const mst=M2.length?M2[Math.floor(frand()*M2.length)]:'out';transfer(head,mst,best[1],'apprenticeship');life(p,`Apprenticed as a ${best[0]}${mst!=='out'?' to '+folkName(mst):', away from home'}`);if(mst!=='out')life(mst,`Took ${folkName(p)} as an apprentice`);}else if(best)life(p,`Learned the ${best[0]}'s trade at home`);if(best)p.tr=best[0];p.trChosen=true;} // the master who takes him is paid; with none here, he goes away to learn
-    for(const h of heads){if(h.role||h.outlawCampId||ageYrs(h)>40)continue;const here=val(h.tr);let best=null,bv=here*1.8;for(const tr of opts){const v=val(tr);if(v>bv&&(h.w||0)>foodYr()*1.5){bv=v;best=tr;}}
-      if(best&&frand()<0.3){const M2=heads.filter(q=>q.tr===best&&q!==h);transfer(h,M2.length?M2[Math.floor(frand()*M2.length)]:'out',foodYr()*1.5,'apprenticeship');life(h,`Gave up the ${h.tr||'labouring'} life to become a ${best}`);h.tr=best;if(h.sp&&!h.sp.dead)h.sp.tr=best;}}
+    // Trade entry now follows actual daily master contracts in tickCrafts; no absent master is paid.
     // a family goes where it would do better, if the road is worth it (one choice in a few years)
     if(!W.prehistory||AD()>=W.startAD)for(const h of heads)familyMove(s,si,h,Ss); // (one choice in a few years)
     // homes out on the land
@@ -16210,7 +16301,7 @@ function tickHouseholds(){
       if(!s._farmNote&&!W.prehistory){s._farmNote=1;emit('trade',2,{x:b.x,z:b.z},`${folkName(h)} of ${s.name} builds ${site.kind==='farm'?'a farmstead out among his fields':site.kind==='wood'?'a hut at the edge of the wood':'a hut by the water'}, and moves his household there.`);}}
     s._poolLast=pool;s._poolCash=(s._poolCash||0)+pool;});} // what was spent with the crafts is theirs, paid out with the year's account
 function familyMove(s,si,h,Ss){ // a family goes where it would do better, if the road is worth it: its own year's earnings here (the trade's, until it has a record) against its trade's living there (#23: the trade's average here, so a family earning nothing in a busy trade never thought of leaving)
-  if(h.role||h.outlawCampId||(h._movedY||-99)>year()-5||s.siegeBy)return false;const mem=hhMembers(s,h);if(!mem.length||mem.some(p=>p.outlawCampId))return false;
+  if(h.role||h.outlawCampId||institutionalJobHeld(h)||(h._movedY||-99)>year()-5||s.siegeBy)return false;const mem=hhMembers(s,h);if(!mem.length||mem.some(p=>p.outlawCampId))return false;
       const kin=[...new Set([...kinOf(h),...(h.sp?kinOf(h.sp):[])])],skip=new Set(mem);
       const A=householdAccount(h),here=(A&&A.assets._incY!=null?A.assets._incY:tradeIncome(s,h.tr))+amenity(s,h,mem)+living(s)+kinNear(s,kin,skip)-rentOfHome(s,h)-((s.raidedUntil>day()||s.siegeBy)?foodYr()*2:0)-(s.hunger||0)*foodYr()*4;let best=-1,bg=0,roots;
       for(let j=0;j<Ss.length;j++){const o=Ss[j];if(j===si||o.siegeBy||closedToTrade(o))continue;const d=dist2d(s.pos.x,s.pos.z,o.pos.x,o.pos.z);if(d>7000*MAPK)continue;
@@ -17045,10 +17136,9 @@ function courtDilemma(){
       opts:[{label:`Find for ${A.name}`,act:()=>{A.loyalty=clamp(A.loyalty+10,0,100);Bh.loyalty=clamp(Bh.loyalty-12,0,100);emit('crown',4,W.capital.pos,`The crown finds for ${A.name} in the matter of the water-meadows; ${Bh.name} leaves court in a fury.`);}},
             {label:`Find for ${Bh.name}`,act:()=>{Bh.loyalty=clamp(Bh.loyalty+10,0,100);A.loyalty=clamp(A.loyalty-12,0,100);emit('crown',4,W.capital.pos,`The crown finds for ${Bh.name} in the matter of the water-meadows; ${A.name} leaves court in a fury.`);}},
             {label:'Divide the meadows between them',act:()=>{A.loyalty=clamp(A.loyalty-3,0,100);Bh.loyalty=clamp(Bh.loyalty-3,0,100);W.legitimacy=clamp(W.legitimacy+2,0,100);emit('crown',3,W.capital.pos,`The crown divides the disputed meadows; neither ${A.name} nor ${Bh.name} is pleased, but the realm calls it just.`);}}]};},
-    ()=>({key:'guild',title:'The merchant guilds seek a charter',pos:W.capital.pos,
-      text:'The guildmasters would pay for royal privileges and roads kept safe: markets would flourish in every town.',
-      opts:[{label:'Grant the charter and fund the roads',cost:500,act:()=>{W.settlements.forEach(x=>x.prosperity=clamp(x.prosperity+6,1,100));emit('trade',4,W.capital.pos,'The crown grants the guilds their charter; new fairs are proclaimed in every market town.');}},
-            {label:'Refuse — the guilds grow too proud',act:()=>{}}]}),
+    ()=>{const Q=W.settlements.map(s=>craftGuildQuote(s,'merchant')).find(Boolean);if(!Q)return null;return{key:'guild',title:`The merchants of ${Q.s.name} seek a charter`,pos:Q.s.pos,
+      text:`Their actual masters offer ${Q.price.toFixed(1)} gold for the licence and its written charter. Their own purses pay the lord and the clerk.`,
+      opts:[{label:'Permit them to buy the charter',act:()=>craftGuildCmd(`${W.settlements.indexOf(Q.s)}:merchant:grant`)},{label:'Refuse the charter',act:()=>craftGuildCmd(`${W.settlements.indexOf(Q.s)}:merchant:refuse`)}]};},
     ()=>({key:'shrine',title:'The High Priest asks for a shrine',pos:W.capital.pos,
       text:`A relic has been found near ${S.name}. The High Priest would raise a shrine over it, and pilgrims would bless the crown that built it.`,
       opts:[{label:'Raise the shrine',cost:800,act:()=>{W.legitimacy=clamp(W.legitimacy+6,0,100);W.settlements.forEach(x=>x.unrest=clamp(x.unrest-5,0,100));emit('crown',4,S.pos,`A shrine is raised over the relic near ${S.name}; pilgrims come from every corner of the realm.`);}},
@@ -17839,6 +17929,7 @@ function runCmd(cmd,arg){
     case 's-school':learningCmd(arg);break;
     case 's-tutor':tutorCmd(arg);break;
     case 's-college':collegeCmd(arg);break;
+    case 's-guild':craftGuildCmd(arg);break;
     case 's-custom':case 's-svc':manorCmd(cmd,arg);break; // the customs of a manor, and its services commuted or kept in hand (#36)
     case 'a-order':case 'a-road':case 'a-raft':case 'a-objective':case 'a-hold':case 'a-release':case 'a-disband':case 'a-split':case 'a-merge':case 'a-garrison':armyCmd(cmd.slice(2),arg);break;
   }
@@ -20156,6 +20247,7 @@ function workerCommandTarget(e){
       }
       if(c==='p-manumit'){if(!/^\d+$/.test(a)||!workerCommandId(+a)||!(W._pm||folkIndex()).has(+a))throw Error('Invalid freedom command');return 'worker';}
       if(c==='s-school'||c==='s-learning'||c==='s-tutor'){const [si,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||v===undefined||v.trim()===''||!Number.isFinite(+v)||+v<0)throw Error('Invalid learning command');return 'worker';}
+      if(c==='s-guild'){const[si,tr,on,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!CRAFT_TRADES.has(tr)||!['grant','refuse'].includes(on))throw Error('Invalid guild command');return 'worker';}
       if(c==='s-college'){const[si,key,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!['classroom','residence'].includes(key))throw Error('Invalid college command');return 'worker';}
       if(c==='s-justice'){const [si,k,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||k!=='cap'||!/^\d+(\.\d+)?$/.test(v||'')||+v>1)throw Error('Invalid justice command');return 'worker';}
       if(c==='c-eyre'){if(a!=='')throw Error('Invalid eyre command');return 'worker';}
