@@ -7,8 +7,12 @@ workshop. Nobody arrives with a new purse or a second family.
 Daily craft decisions follow paid learning and local technology uptake at the
 start of `tickEconomy`, before production. `peoplePrepare` must already have
 prepared the native person index and household accounts. `craftIndex` retains
-local candidates, trade groups and measured rooms by native population revision
-and year. It scans no other settlement. `W.apprentices` contains only active
+local people and trade groups by native population revision and year. Actual
+building-array or count changes refresh rooms, mills, lockhouses, lodging and
+mint premises in one native fabric pass while retaining those people rosters.
+The private `fabricBuildings` marker belongs to `_craftIndex`; a pure query
+always builds a fresh result and never updates that marker or any retained
+roster. It scans no other settlement. `W.apprentices` contains only active
 native person IDs; the completed contract remains on the person.
 
 Actual household-head and institutional trade changes also invalidate that
