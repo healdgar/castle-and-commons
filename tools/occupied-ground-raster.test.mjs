@@ -94,3 +94,17 @@ test('missing native capture and cold predicate or coordinate overrides preserve
  }
  const r=realm();assert.equal(r.run('Object.isFrozen(OCCUPIED_GROUND_NATIVE)'),true);
 });
+
+test('custom polygon array methods and indexed accessors retain the native rectangle result and query prefix',()=>{
+ for(const extra of [
+  `P.some=()=>true;`,
+  `let visits=0;Object.defineProperty(P,0,{get(){visits++;return first;}});`,
+  `let visits=0;Object.defineProperty(P,'some',{get(){visits++;return Array.prototype.some;}});`,
+  `const some=Array.prototype.some;Array.prototype.some=function(...args){return some.apply(this,args);};`,
+  `const iterator=Array.prototype[Symbol.iterator];Array.prototype[Symbol.iterator]=function(){return iterator.call(this);};`
+ ]){
+  const r=realm(30,24),result=r.compare(`const P=obbCorners(0,0,2.6,SIZE*.8,Math.PI/4),first=P[0];${extra}`);
+  assert.equal(result.current.candidates,result.old.candidates,extra);assert.equal(result.current.edges,result.old.edges,extra);assert.equal(result.current.boxes,result.old.boxes,extra);
+  if(extra.includes('visits')){r.run('visits=0;rectangleGroundCells(P);');const before=r.run('visits');r.run('visits=0;occupiedGroundCells(P);');assert.equal(r.run('visits'),before,'the eligibility guard invokes no array accessors');}
+ }
+});
