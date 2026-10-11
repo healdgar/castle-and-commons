@@ -60,8 +60,12 @@ function realm(html,kind){
     function means(){return 1000;}function lordAcct(){return{gold:1000};}`;
   // The host metrics object must be available before the extracted helpers execute.
   const bodies=['homeScore','houseFolk','moveIn','houseBuyer','ownerOf'].map(name=>declaration(html,name));
+  // The current housing model reserves actual scholar board; these ordinary
+  // fixture homes have no boarders, so the original selection remains comparable.
+  for(const name of ['learningHouseholdSlots','learningLodgingUsed'])if(source.includes('function '+name+'('))bodies.unshift(declaration(source,name));
+  const householdSize=source.match(/^const HOUSEHOLD=[^\n]*/m)?.[0];
   const readBody=html.includes('function lvReadNative(')?declaration(html,'lvReadNative'):'';
-  const code=[prelude,...bodies,nativeRead(html),readBody,';globalThis.api={houseFolk,moveIn,houseBuyer,ownerOf,homeScore,lvReadNative};'].join('\n');
+  const code=[prelude,householdSize,...bodies,nativeRead(html),readBody,';globalThis.api={houseFolk,moveIn,houseBuyer,ownerOf,homeScore,lvReadNative};'].join('\n');
   const c=vm.createContext({s,W,metrics});vm.runInContext(code,c,{filename:`live-property-batching-${kind}.js`});
   return{s,W,metrics,c,api:c.api};
 }

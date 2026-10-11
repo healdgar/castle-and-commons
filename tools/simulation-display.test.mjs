@@ -285,7 +285,7 @@ test('affected neighbor coverage includes footprint-dependent range beyond 90m',
   assert.equal(localOLot,fullOLot,'Local settlement of [m] must match full solve for neighbor o at 128m');
 });
 
-test('settleParcels reuses existing settlement layout indexes and tickGrowth batches changes',()=>{
+test('settleParcels reuses layout indexes and paid proposals leave parcel changes to completion',()=>{
   const parcelsSrc=source.slice(source.indexOf('function ensureBldList(){'),source.indexOf('\n/* ---------------- end parcel settlement',source.indexOf('function ensureBldList(){')));
   let makeHashCalls=0;
   const s={
@@ -310,20 +310,22 @@ test('settleParcels reuses existing settlement layout indexes and tickGrowth bat
   c.settleParcels([b]);
   assert.equal(makeHashCalls,0,'settleParcels must reuse s._lay.placed and s._lay.segH without calling makeHash');
 
-  // Daily occupancy is a wrapper; the paid housing and widening helpers keep batched parcel settlement.
+  // Daily decisions commission retained work; only actual completion settles
+  // its changed native fabric, using the existing layout indexes checked above.
   const growthSrc=region('function tickGrowth(){','function tickGrowthHousing(s){');
   const housingSrc=region('function tickGrowthHousing(s){','function tickGrowthWiden(s){');
   const widenSrc=region('function tickGrowthWiden(s){','function tickGrowthVacancy(s){');
   assert.ok(growthSrc.includes('moveIn(s);tickFalling(s);'));
-  assert.ok(growthSrc.includes('if(sixDay)tickGrowthHousing(s);'));
+  assert.ok(growthSrc.includes('tickGrowthHousing(s);'));
   assert.ok(growthSrc.includes('tickGrowthWiden(s);tickGrowthVacancy(s);'));
-  assert.ok(growthSrc.includes('if(sixDay)tickGrowthFabric(s);'));
-  assert.ok(housingSrc.includes('const newBlds=[];'));
-  assert.ok(housingSrc.includes('if(newBlds.length)settleParcels(newBlds);'));
-  assert.ok(widenSrc.includes('const widened=[];'));
-  assert.ok(widenSrc.includes('if(widened.length)settleParcels(widened);'));
-  assert.ok(!housingSrc.includes('settleParcels([b]);'),'housing must not settle individual parcels in loops');
-  assert.ok(!widenSrc.includes('settleParcels([b]);'),'widening must not settle individual parcels in loops');
+  assert.ok(growthSrc.includes('tickGrowthFabric(s);'));
+  assert.doesNotMatch(growthSrc,/sixDay|%6/,'structural decisions have no six-day throttle');
+  for(const [kind,body]of [['housing',housingSrc],['widening',widenSrc]]){
+    assert.ok(body.includes('fabricProjectCommission('),kind+' commissions paid work');
+    assert.ok(!body.includes('settleParcels('),kind+' cannot change parcels before completion');
+  }
+  const start=source.indexOf('function fabricProjectComplete('),end=source.indexOf('\nfunction ',start+1),complete=source.slice(start,end);
+  assert.ok(complete.includes('settleParcels([b])'),'completed actual native fabric settles its changed parcel');
 });
 
 test('new village creation and demolition settle affected parcels without renderer fallback',()=>{

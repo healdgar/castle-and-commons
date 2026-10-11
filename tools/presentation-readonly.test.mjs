@@ -106,7 +106,7 @@ test('opening-capacity failure note reads the stored worker result and projects 
   assert.match(inspector,/const note=openingCapacityNote\(s\);if\(note\)h\+=row\('Opening housing',note\)/);
   assert.match(source,/\['Population','Unrest','Opening housing'\]\.includes\(r\.firstElementChild\?\.textContent\)/);
   const projection=source.slice(source.indexOf('function visualSettlement('),source.indexOf('\nfunction visualField('));
-  assert.match(projection,/visualRecord\(s,'[^']* openingCapacity',m\)/);
+  assert.match(projection,/visualRecord\(s,'[^']*\bopeningCapacity\b[^']*',m\)/);
   assert.match(source,/const report=\{si,heads:heads\.size,\.\.\.result\};W\.openingCapacity\.push\(report\);if\(report\.exhausted\)s\.openingCapacity=report/);
   assert.match(source,/const refreshExtent=\(\)=>\{s\.extentR=extent\(0\.92\);s\.radius=s\.extentR\+30;if\(!s\.wallRad\)s\.wallR=s\.extentR\+20;s\.paveR=isVil\?0:extent\(0\.45\);\}/);
   assert.match(source,/s\._lay\?\.refreshExtent\?\.\(\);\s*const report=/);

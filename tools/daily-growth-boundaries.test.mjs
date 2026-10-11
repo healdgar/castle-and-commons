@@ -9,13 +9,13 @@ const declaration=name=>source.match(new RegExp(`^const ${name}=[^\\n]*`,'m'))?.
 const growthWrapper=fn('tickGrowth');
 assert.ok(growthWrapper,'tickGrowth wrapper must exist');
 
-test('occupancy and due falls are daily while paid housing and fabric work remain six-day',()=>{
-  const selected=new Set([0,1,5,6,7,361]),events=new Map(),annualDays=Array.from({length:362},()=>({widen:[],vacancy:[]}));
-  const counts=Array.from({length:362},()=>({moveIn:0,fall:0,housing:0,widen:0,vacancy:0,fabric:0}));
+test('occupancy, due falls and structural decisions run in dependency order every day',()=>{
+  const selected=new Set([0,1,5,6,7,361]),events=new Map(),decisionDays=Array.from({length:362},()=>({widen:[],vacancy:[]}));
+  const counts=Array.from({length:362},()=>({moveIn:0,fall:0,housing:0,widen:0,vacancy:0,fabric:0,newTown:0,lane:0,wall:0,reuse:0}));
   let today=0;
   const record=(kind,s)=>{
     counts[s.index][kind]++;
-    if(kind==='widen'||kind==='vacancy')annualDays[s.index][kind].push(today);
+    if(kind==='widen'||kind==='vacancy')decisionDays[s.index][kind].push(today);
     if(selected.has(s.index)){
       const key=`${today}:${s.index}`,list=events.get(key)||[];
       list.push(kind);events.set(key,list);
@@ -26,7 +26,9 @@ test('occupancy and due falls are daily while paid housing and fabric work remai
     W,day:()=>today,
     moveIn:s=>record('moveIn',s),tickFalling:s=>record('fall',s),
     tickGrowthHousing:s=>record('housing',s),tickGrowthWiden:s=>record('widen',s),
-    tickGrowthVacancy:s=>record('vacancy',s),tickGrowthFabric:s=>record('fabric',s)
+    tickGrowthVacancy:s=>record('vacancy',s),tickGrowthFabric:s=>record('fabric',s),
+    newTownStreetProposal:s=>record('newTown',s),publicLaneProposal:s=>record('lane',s),
+    townWallProposal:s=>record('wall',s),tickTownReuse:s=>record('reuse',s)
   });
   vm.runInContext(growthWrapper,c);
   for(today=1;today<=360;today++)c.tickGrowth();
@@ -35,18 +37,17 @@ test('occupancy and due falls are daily while paid housing and fabric work remai
     const n=counts[index];
     assert.equal(n.moveIn,360,`daily occupancy for settlement ${index}`);
     assert.equal(n.fall,360,`daily falls for settlement ${index}`);
-    assert.equal(n.housing,60,`paid housing remains six-day for settlement ${index}`);
-    assert.equal(n.fabric,60,`fabric work remains six-day for settlement ${index}`);
-    assert.equal(n.widen,1,`one annual widening assessment for settlement ${index}`);
-    assert.equal(n.vacancy,1,`one annual vacancy assessment for settlement ${index}`);
-    const due=(index*29)%360||360;
-    assert.deepEqual(annualDays[index].widen,[due]);
-    assert.deepEqual(annualDays[index].vacancy,[due]);
+    assert.equal(n.housing,360,`daily housing decision for settlement ${index}`);
+    assert.equal(n.fabric,360,`daily fabric decision for settlement ${index}`);
+    assert.equal(n.widen,360,`daily widening decision for settlement ${index}`);
+    assert.equal(n.vacancy,360,`daily vacancy decision for settlement ${index}`);
+    const due=Array.from({length:360},(_,i)=>i+1);
+    assert.deepEqual(decisionDays[index].widen,due);
+    assert.deepEqual(decisionDays[index].vacancy,due);
+    for(const kind of ['newTown','lane','wall','reuse'])assert.equal(n[kind],360,kind+' is daily for settlement '+index);
   }
-  assert.deepEqual(events.get('174:6'),['moveIn','fall','housing','widen','vacancy','fabric']);
-  assert.deepEqual(events.get('29:1'),['moveIn','fall','widen','vacancy']);
-  assert.deepEqual(events.get('29:361'),['moveIn','fall','widen','vacancy']);
-  assert.deepEqual(events.get('6:0'),['moveIn','fall','housing','fabric']);
+  const order=['moveIn','fall','housing','widen','vacancy','fabric','newTown','lane','wall','reuse'];
+  for(const key of ['174:6','29:1','29:361','6:0'])assert.deepEqual(events.get(key),order,key+' keeps the same daily order');
 });
 
 function occupancyHarness({heads,roof,dayValue=4}){
@@ -57,10 +58,8 @@ function occupancyHarness({heads,roof,dayValue=4}){
     heads_:(s,pred)=>(s.heads||[]).filter(h=>!pred||pred(h)),
     capOf:()=>1,workOf:()=>({x:0,z:0}),homeScore:()=>1,
     updateBuildingInstance:b=>{c.updated.push(b);},
-    tickGrowthHousing(){throw Error('housing must not run off its six-day cadence');},
-    tickGrowthWiden(){throw Error('widening must not run off its annual date');},
-    tickGrowthVacancy(){throw Error('vacancy assessment must not run off its annual date');},
-    tickGrowthFabric(){throw Error('fabric work must not run off its six-day cadence');},
+    tickGrowthHousing(){},tickGrowthWiden(){},tickGrowthVacancy(){},tickGrowthFabric(){},
+    newTownStreetProposal(){},publicLaneProposal(){},townWallProposal(){},tickTownReuse(){},
     chance:()=>{draws.push('chance');throw Error('occupancy/falls must not draw RNG');},
     frand:()=>{draws.push('frand');throw Error('occupancy/falls must not draw RNG');},
     randi:()=>{draws.push('randi');throw Error('occupancy/falls must not draw RNG');},

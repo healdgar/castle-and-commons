@@ -66,7 +66,7 @@ test('inner-wall demolition keeps storming the outer circuit instead of extendin
     wallDamage:()=>0,fortOf:()=>({mult:1}),takeSettlement:()=>{throw Error('inner-wall objective must not capture the town');},
     siegeRadius:()=>80,hash01:()=>0.4});
   // Stubs for the bounded late-tick paths; the test exercises the real siege decision branch.
-  vm.runInContext(src,c);
+  vm.runInContext(extract('technologyArmyEquipmentFactor')+'\n'+src,c);
   assert.doesNotThrow(()=>c.tickMilitary());
   assert.equal(a.siegeUntil,6,'the siege proceeds to the breach resolution, rather than waiting another 30 days');
   assert.equal(s.owner,2);assert.equal(a.objective.kind,'demolish');
@@ -84,7 +84,7 @@ test('destroying a selected building after the final defence burns it, then with
     liftSiege:()=>{},marchArmy:()=>{},vacantResidentialChanged:()=>{},updateBuildingInstance:()=>{},igniteFire:()=>{},
     seasonIdx:()=>0,fortCenter:x=>x.pos,fortCircuits:()=>[],armySettlementIndex:()=>({bySettlement:new Map()}),
     dist2d:()=>0,refreshOverlay:()=>{},siegeRadius:()=>80,hash01:()=>0.4});
-  vm.runInContext(src,c);c.tickMilitary();
+  vm.runInContext(extract('technologyArmyEquipmentFactor')+'\n'+src,c);c.tickMilitary();
   assert.equal(b.state,'burning');assert.equal(s.owner,2);assert.equal(captures,0);
   assert.equal(a.state,'idle');assert.equal(a.objective,null);assert.equal(s.siegeBy,null);
 });
