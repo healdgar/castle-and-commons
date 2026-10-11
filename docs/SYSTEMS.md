@@ -218,6 +218,8 @@ These rules apply to all nine.
 
 ## 2. #35 Monasteries, abbeys and nunneries
 
+**Current visual scope.** The implemented core church, residential range and grange are separately placed functional building models. Recognizable cloister architecture and a finished claustral ensemble are not implemented yet; the design below describes their intended historical setting. The frozen `61dd0bb` native core run was deliberately stopped at audited closed day660, with four abbeys and at least one completed Benedictine church. Its church-only draw preserves the exact saved/source graph and every RNG stream, with all textures ready and no errors; it is not a full-core or industry pass.
+
 **1. History.**
 - Benedictine houses were refounded from the 10th century (Cluny 910; the English reform c. 960). The Cistercians, from 1098 (England 1128), farmed granges with lay brothers and sold wool forward to Flemish and Italian merchants; Pegolotti's list of c. 1320 names some 200 English houses.
 - Augustinian canons spread in the 12th century. Nunneries made up about a seventh of houses and were poorer. Friars came in the 13th century (the game draws friaries).
