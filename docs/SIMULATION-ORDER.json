@@ -2851,8 +2851,8 @@
       "scope": "These legacy quantity/cadence debts remain outside the new-institution conversion. The full older simulation is not claimed to make every ordinary decision daily."
     },
     "assembled_source_review": {
-      "commit": "972beba59615cbded06f491fb83386e3f2d0ec28",
-      "index_sha256": "6f6338d102abce2ef8599017efb22b6bb537976414e268c3c4c316f3f3eb0826",
+      "commit": "85f0368acfd1dac6f4a57801fbd36c75b310e08a",
+      "index_sha256": "15bb3e2856cd37bc9cebb60a884f684ca7237af24c38c7b47be572b5f2c0d477",
       "top_level_phases": 59,
       "prerequisite_edges": 200,
       "own_use_hashes": {
@@ -2918,7 +2918,7 @@
         "canonical_ownership": "Whole living households set movingTo before departure, suppressing native household splitting. Their actual H/assets/member identities remain one account; native arriveHousehold moves existing goods after all living arrivals. Returning survivors use another real journey. Shared board receipts prevent repeated meals; native profession and service checks occur only after actual arrival and ordinary canonical room assignment.",
         "search_scope": "Qualification rosters use eight nearest native craft indexes and at most twelve current qualified candidates per place/job; current rights, exclusive jobs, purses, rooms, project/physical service and income gain are rechecked. The private WeakMap is rebuilt after loading; offer records hold plain observations plus canonical person/household/member references, not callbacks or duplicate goods."
       },
-      "current_source_validation_scope": "Static review only at 972beba, plus one focused source-pin case. Current source native/history/save/worker/conservation/performance gates remain serialized root work. Earlier-source results and focused survey/codec/recruitment/route checks do not establish a full release pass of this source.",
+      "current_source_validation_scope": "Static review only at 85f0368, plus one focused source-pin case. Current native/performance/history/save/worker/conservation gates remain serialized root work. Earlier-source fixtures and the failed prior performance diagnostic are not a full pass of this source; the proposed later corridor-aware planner is outside this candidate.",
       "survey_optimization": {
         "commit": "cd8217867c9249909d7d4ced6be4fcf08f7e42e6",
         "index_sha256": "fc6caef1eac3b29054a2b3d4b15f939dbe5f43c7e67bf1a1f22dce8d54271b2f",
@@ -2927,20 +2927,20 @@
           "compoundProjectCommission": "1646de1d076746bc39bad35d79637a09addcc1b29048539b3f1d22fa5737734d",
           "compoundProjectTick": "f54bc14162e5c48078bb917f49e1be871860eae935852730fb8f0aadb9b26160",
           "abbeySurveyBounds": "b4d1f6f1fd6362a2ac97f79fa68b5c8b821ab8490dcc8c9526e623ec2174efdc",
-          "abbeySurveyBoxesMayHit": "e4cb661ed636e90886a52a7fb0fb48f56e459022f7248cb518991bf248d698e6",
+          "abbeySurveyBoxesMayHit": "dca90696378831e7470d9d390baa77dbcb713359019829d8c0d07906bb83ab19",
           "abbeyApproachSurveyNative": "cccbf33200a571f8adc6c253eb0362fa5e625d5a5b1f00d0af931fde97f77502",
-          "abbeyApproachSurvey": "331120ef12ee9663eef2bd858caea23c97eebba8d45013a0405802cb49dc6825",
-          "abbeySurveyReserved": "b74e28c46275fea9041febf083a213d8ff6753a6229d728fce2fbe9d0f0000b0",
+          "abbeyApproachSurvey": "52747da2dbb3d30e9515fd27160ae52223877d0c4fdfd8bff2fd02f37ece1df8",
+          "abbeySurveyReserved": "86034ff63ec90aa5b7b2c1ffbd2eca08545822890cac9522d1600a60ff9479f3",
           "abbeySurveyPublic": "296726f1a811cb6d6d847aa75fdf76db2853471b2ee5f9289e2d83739be11c37",
           "abbeyApproachPrivate": "70b91009aea0e12fe92988da390781ff2a6aec0de1021c4d9e6ebdcb75191548",
-          "abbeyApproachClear": "5f44e4d6a99a11c68e08bc6bad1027b9dca905dd79189cb03af368436e4d4f86",
+          "abbeyApproachClear": "c25eac6bdca49a5bbc8511a9460cb64e23fa5416521cd61ce3f227ad43ed4ef8",
           "abbeyApproachPlan": "ba207c5fac07636bb8f3884326d0636c5dd7411ba952b12117204a19016bb9d6",
           "abbeySitePlan": "730949464ba5cda7e6a36105f64d908d752381ca7b52e40c06e4b77fd23cabc5",
           "abbeyFoundPlan": "639f028dea779e69fd0616d356e36d6e5af1722de02aa45a6564b7d2e93e4b28",
           "abbeyMillPlan": "25c505d9ffa034cd57db5edd8b42f22f975666ff2e6eb29f3eb59bf1f3fc619f"
         },
         "reviewed_variable_declaration_sha256": {
-          "ABBEY_APPROACH_SURVEY_CURRENT": "35f911d97483c8345049ecca3dc58742f273c708f40c5009161c2733c3e067a7",
+          "ABBEY_APPROACH_SURVEY_CURRENT": "d6fdd539f42be7018d79fee35844280acbeb5e38e18b82f56db7a2ec0c84b954",
           "ABBEY_APPROACH_SURVEY_NATIVE": "633c65227d8b3af820b2f5c487a1550a62553a72f8f8c18383fb11339fa23ef3"
         },
         "hash_scope": "Exact Acorn FunctionDeclaration slices for the nine changed and six new top-level bodies; exact complete VariableDeclaration slices for the two new helper-identity certificate declarations. Only abbeySitePlan, abbeyMillPlan and abbeyFoundPlan also replace an existing pin; no unrelated pin is renewed.",
@@ -2959,25 +2959,26 @@
         "save_boundary": "The context, part boxes/public strips and synchronous groundLegal callback are local stack records, never written into W, retained site/project, layout history roots or presentation DTOs. The static frozen helper-reference certificate also enters no history/save root.",
         "land_value_initialization": "Early clearance or grant rejection can skip landPrice and therefore delay landValue lazy initialization of the static LANDV coefficient table. LANDV is outside HISTORY.roots() and worldSaveEncode extras; subsequent landValue fills the same fixed coefficients. This intentionally changed query timing is recorded, not normalized away or presented as old-model full-graph identity.",
         "validation_scope": "Static dependency/source-pin/search review plus the focused inventory gate only. No original-candidate 150-day identity assertion applies to the authorized query-order change; same-source speed/save/conservation/native completion remain serialized root release gates.",
-        "current_pin_commit": "972beba59615cbded06f491fb83386e3f2d0ec28",
-        "current_pin_index_sha256": "6f6338d102abce2ef8599017efb22b6bb537976414e268c3c4c316f3f3eb0826",
-        "route_review_update": "The native terrain handoff changes only abbeyApproachSurvey and abbeyApproachPlan in this existing 15-body group. Their exact pins now describe 972beba; the other 13 function pins and both certificate declaration pins remain exact. The initial cd82178 source/order review remains historical."
+        "current_pin_commit": "85f0368acfd1dac6f4a57801fbd36c75b310e08a",
+        "current_pin_index_sha256": "15bb3e2856cd37bc9cebb60a884f684ca7237af24c38c7b47be572b5f2c0d477",
+        "route_review_update": "Historical 972beba handoff changed only abbeyApproachSurvey/Plan; their then-current pins were reviewed separately. The subsequent spatial/scoped review below owns current affected pins. The original cd82178 source/query-order review remains historical.",
+        "spatial_review_update": "This 85f0368 change renews only abbeySurveyBoxesMayHit, abbeyApproachSurvey, abbeySurveyReserved and abbeyApproachClear plus ABBEY_APPROACH_SURVEY_CURRENT in the existing group. The other eleven function pins and unchanged native certificate declaration remain exact."
       },
       "native_proposal_route_reuse": {
         "commit": "972beba59615cbded06f491fb83386e3f2d0ec28",
         "index_sha256": "6f6338d102abce2ef8599017efb22b6bb537976414e268c3c4c316f3f3eb0826",
         "reviewed_function_sha256": {
-          "abbeyRouteSurveyNative": "029dabd754be82e9412a089db07beff73e691ec0a27e060ee5ff6634adaa568a",
-          "abbeyRouteSurveyInputs": "9ffa0420b613c5c64c5eeab21e9db1f9dccb017ee42777d1cc66979e92c7b4c2",
+          "abbeyRouteSurveyNative": "7b15ff3b1cefde8b10cfabc7a562f808acad6e017e5d10bbcf726b86d23b1e26",
+          "abbeyRouteSurveyInputs": "ef42e1eb4946a4e37a79238923404cdfef0af6e84c091316850bdc5e47f47fb1",
           "abbeyRouteTerrain": "aebb99adf5542d90dc05c413f79e1cc6f68cc44974a5d24cd4dac1a8a3b90e4f",
           "abbeyRouteMemo": "b94257ac41bbb9c5a99fc793aecc6d95c585f672d090597551d06377f098301a",
-          "abbeyTerrainSegmentClear": "dd470e61d0d34710d5f8a7935e2609ec5d8c4ba2faa1a32c236004096d4bfa02",
-          "abbeyApproachSurvey": "331120ef12ee9663eef2bd858caea23c97eebba8d45013a0405802cb49dc6825",
+          "abbeyTerrainSegmentClear": "ac74619a54bce9c7f76c80b54b1f5d2ec94f21d5d07c0ba50b30bf489f354b57",
+          "abbeyApproachSurvey": "52747da2dbb3d30e9515fd27160ae52223877d0c4fdfd8bff2fd02f37ece1df8",
           "abbeyApproachPlan": "ba207c5fac07636bb8f3884326d0636c5dd7411ba952b12117204a19016bb9d6",
           "armySegmentClear": "4dc1c5bd1b960f100ebcc6040da728de8597edef0dd2ea61bbd6ecf80d480700"
         },
         "reviewed_variable_declaration_sha256": {
-          "ABBEY_ROUTE_SURVEY_NATIVE": "f5756242886abf01d89f1c8a6a6bb545205ab5a5c1cce0c6f7b68e84e94eeaff"
+          "ABBEY_ROUTE_SURVEY_NATIVE": "18013a2a6e9e86aab4225988e0dee6e945e230d5f3e887c3f7dee8187d676ce2"
         },
         "changed_existing_functions": [
           "abbeyApproachSurvey",
@@ -2992,6 +2993,8 @@
           "abbeyTerrainSegmentClear"
         ],
         "certified_native_functions": [
+          "abbeyRouteEnter",
+          "abbeyRouteLeave",
           "serviceRoadPlan",
           "armyLandPath",
           "armyDetour",
@@ -3047,15 +3050,101 @@
         "top_level_phases": 59,
         "prerequisite_edges": 200,
         "dispatch_scope": "simTick is byte-identical to the parent candidate; the existing 59 phases and 200 edges validate. This adds only synchronous helper work inside the current abbey proposal; daily eligibility, titles, payment and retained completion order are unchanged.",
-        "inputs": "The exact current world and settlement identity, Object.is house owner, current placed hash identity, day, SIZE and CELL plus all 51 native routing/obstacle/terrain/fortification/hostility/helper identities. Context creation requires each actual placed hash to expose native historyCells Map and finite near.cell; otherwise no shared terrain is supplied. Invalid proposal inputs cause both a fresh ordinary pose memo and no retained flood banks.",
+        "inputs": "The exact current world and settlement identity, Object.is house owner, current placed hash identity, day, SIZE and CELL plus all 53 native routing/obstacle/terrain/fortification/hostility/helper identities. Context creation requires each actual placed hash to expose native historyCells Map and finite near.cell; otherwise no shared terrain is supplied. Invalid proposal inputs cause both a fresh ordinary pose memo and no retained flood banks.",
         "helper_data_dependencies": "The same synchronous proposal reads hAt terrain cells, river lines, paid/walked road bounds and lines, native domain-neighbor scope, current building hash entries, lakes, current circuits/ramps/ditches/gates/damage, actual owner/war/service hostility and slope/crossing clearance. Scope and circuit lists share the existing native memo maps only while no world geometry/ownership/military input changes within the proposal. No permissions, payer, food, wage, price, skill or outcome is memoized.",
         "memo_partition": "Every serviceRoadPlan pose receives a fresh Map for its own ghost-blocked lattice edges. Only its scopes/circuits maps and abbeyTerrain reference point into this proposal context. The separate context memo stores ghost-free truth for directed adjacent even-integer lattice coordinates in [-16384,16382]; signed zero, off-lattice, zero/long spans fall through to the unchanged native segment loop. Keys encode source and direction without aliasing reverse edges.",
         "ghost_and_native_prefix": "Each current ghost is sampled at the same one-meter interpolation steps and rotated strict 0.6 footprint padding as armyObstacle. A first ghost hit with no ghost-free result falls through to the original segment read prefix, retaining actual lazy paid-road bounds; later cached ghost-free truth never bypasses the current ghost. Wrong walker house/placed/requireRoadCrossing/waterClearance=2.3/raft or memo-map identities runs the native segment query without a context.",
         "flood_banks": "Only complete native ghost-free armyReach floods become retained banks after armyReachClosed certifies closure. armyReachFrom certifies every possible first step of a new door; armyReachCovers certifies full detour-box containment before an unreachable result can suppress a target. Existing target order, actual endpoint/clearance/licence callbacks, and full-search fallback remain authoritative.",
-        "army_memory_scope": "Ordinary armyLandPath recall requires !a._em&&!a.settlement&&!a.placed. Its own temporary memo has no abbeyTerrain. Therefore armySegmentClear added no new ordinary host route-read input: only its source pin changes in army-route-memory.test.mjs; all 37 other reviewed search/helper pins remain unchanged. This is distinct from the new service-only proposal context and its 51-function identity certificate.",
+        "army_memory_scope": "Ordinary armyLandPath recall requires !a._em&&!a.settlement&&!a.placed. Its own temporary memo has no abbeyTerrain, so all new guarded LandPath/Detour/Reach entry branches skip for hosts. The army-route fixture renews only existing LandPath/Detour pins in this batch; its prior SegmentClear pin and other 35 host search/helper pins remain exact. Reach is not a host reader; its changed scoped-entry body is pinned in the helper contract below.",
         "save_boundary": "C.terrain, memo scopes/circuits/edge entries and banks remain within one synchronous proposal. A newly allocated pose memo attaches abbeyTerrain only to serviceRoadPlan local walkers; the routine returns plain path/street, not the walker or callback. No W, actual army, retained site/project, history/layout root or presentation field acquires the context.",
         "legacy_search_inventory": "417 recognized sites and all pattern counters unchanged; 1423 functions reported with direct/transitive searches, one more than cd82178. No new repeated transaction scan or persistent cache root.",
-        "validation_scope": "Static source/dependency/certificate/search/pin review and the one focused source-pin case only. Existing small native-source route comparisons remain separate fixture evidence; root alone runs current-source generated performance, speed/save/conservation and full gates. No old-model 150-day identity claim."
+        "validation_scope": "Static source/dependency/certificate/search/pin review and the one focused source-pin case only. Existing small native-source route comparisons remain separate fixture evidence; root alone runs current-source generated performance, speed/save/conservation and full gates. No old-model 150-day identity claim.",
+        "current_pin_commit": "85f0368acfd1dac6f4a57801fbd36c75b310e08a",
+        "current_pin_index_sha256": "15bb3e2856cd37bc9cebb60a884f684ca7237af24c38c7b47be572b5f2c0d477",
+        "scoped_review_update": "The scoped certificate renews only abbeyRouteSurveyNative, abbeyRouteSurveyInputs, abbeyTerrainSegmentClear and abbeyApproachSurvey in this eight-body group, plus ABBEY_ROUTE_SURVEY_NATIVE. The other four function pins remain exact. Current helper identities include RouteEnter/Leave; authorization/query-order and native fallback rules remain as previously recorded."
+      },
+      "spatial_scoped_route_review": {
+        "commit": "85f0368acfd1dac6f4a57801fbd36c75b310e08a",
+        "index_sha256": "15bb3e2856cd37bc9cebb60a884f684ca7237af24c38c7b47be572b5f2c0d477",
+        "reviewed_function_sha256": {
+          "abbeySurveyBoxesMayHit": "dca90696378831e7470d9d390baa77dbcb713359019829d8c0d07906bb83ab19",
+          "abbeyRouteSurveyNative": "7b15ff3b1cefde8b10cfabc7a562f808acad6e017e5d10bbcf726b86d23b1e26",
+          "abbeyRouteSurveyInputs": "ef42e1eb4946a4e37a79238923404cdfef0af6e84c091316850bdc5e47f47fb1",
+          "abbeyTerrainSegmentClear": "ac74619a54bce9c7f76c80b54b1f5d2ec94f21d5d07c0ba50b30bf489f354b57",
+          "abbeyApproachSurvey": "52747da2dbb3d30e9515fd27160ae52223877d0c4fdfd8bff2fd02f37ece1df8",
+          "abbeySurveyReserved": "86034ff63ec90aa5b7b2c1ffbd2eca08545822890cac9522d1600a60ff9479f3",
+          "abbeyApproachClear": "c25eac6bdca49a5bbc8511a9460cb64e23fa5416521cd61ce3f227ad43ed4ef8",
+          "armyDetour": "33ceb8e75055acebe9784414f37e6ace9ce5974d586c9880c54203138e649e22",
+          "armyLandPath": "78604eac5bdc22fa94a39bd27204e9defbbeb2dcaadfac17b180ef60daf6d862",
+          "armyReach": "7edc76769d817a929347d53d5cbf43ae29ca41a4a89af1904369965e386b6ffa",
+          "abbeySurveyUnion": "c31668e7132fe0e65e3b4c0d8fd80f89fdfbe4cb4903f2518d0aa19733737be9",
+          "abbeySurveyIndexRange": "abead366d1f84c1e65e4ebe00f09c5fcbe8ea01549f3e5c370d05f0e2f9b8894",
+          "abbeySurveyIndex": "29ae6483524334b05661f291cdb02042764b9c1944a577f6701691680b6fe409",
+          "abbeySurveyIndexRows": "5d27486674d844145ca9c2b2aaa26abd84eb66dce0ea43fb124d0f0312853d7d",
+          "abbeyRouteEnter": "f31211f76e6efc7f099f5403e305636ea0182dab8b8db3b01ce0e91a1a09debd",
+          "abbeyRouteLeave": "72ebe9901a1a66d1486b01758a0eb70f0907e6b7a994c0e1843e29695ea05288"
+        },
+        "reviewed_variable_declaration_sha256": {
+          "ABBEY_APPROACH_SURVEY_CURRENT": "d6fdd539f42be7018d79fee35844280acbeb5e38e18b82f56db7a2ec0c84b954",
+          "ABBEY_ROUTE_SURVEY_NATIVE": "18013a2a6e9e86aab4225988e0dee6e945e230d5f3e887c3f7dee8187d676ce2"
+        },
+        "changed_functions": [
+          "abbeySurveyBoxesMayHit",
+          "abbeyRouteSurveyNative",
+          "abbeyRouteSurveyInputs",
+          "abbeyTerrainSegmentClear",
+          "abbeyApproachSurvey",
+          "abbeySurveyReserved",
+          "abbeyApproachClear",
+          "armyDetour",
+          "armyLandPath",
+          "armyReach"
+        ],
+        "new_helpers": [
+          "abbeySurveyUnion",
+          "abbeySurveyIndexRange",
+          "abbeySurveyIndex",
+          "abbeySurveyIndexRows",
+          "abbeyRouteEnter",
+          "abbeyRouteLeave"
+        ],
+        "approach_certificate_functions": [
+          "abbeySurveyBounds",
+          "abbeySurveyBoxesMayHit",
+          "abbeySurveyUnion",
+          "abbeySurveyIndexRange",
+          "abbeySurveyIndex",
+          "abbeySurveyIndexRows",
+          "compoundPolys",
+          "compoundPolygonDifference",
+          "obbCorners",
+          "graveyardPolygonsOverlap",
+          "inPolyXZ",
+          "segDist",
+          "segSegDist",
+          "streetFootprintOverlap",
+          "castleFoundationReserved",
+          "dist2d",
+          "clamp",
+          "abbeyPublicStreet",
+          "abbeyAccessEndpointValid",
+          "streetAccessAt",
+          "armyObstacle",
+          "armySegmentClear",
+          "wallRadAt"
+        ],
+        "top_level_phases": 59,
+        "prerequisite_edges": 200,
+        "dispatch_scope": "simTick is byte-identical to the parent candidate. Existing 59 phases and 200 prerequisites validate. Only helper work inside the same synchronous proposal changes; no daily cadence, payment, authority or completion boundary moves.",
+        "spatial_inputs": "The same operation-local ordered rows already reviewed: each building footprint union with active graveyard, and every pending project polygon/full-ward polygon union. No new economic, actor, custody, title or map-source dependency. Clear and Reserved keep their actual predicate inputs and current native fallbacks.",
+        "spatial_order": "128-unit bins encode bounded integer x/z as i*65536+j+32768 without key collision. Row ranges over 64 bins, missing/invalid bounds, out-of-range coordinates and explicitly loose castle reservations go into unconditional free rows. Unknown/oversized query bounds return all native rows. Candidate IDs deduplicate then numerically sort before row retrieval, preserving original authoritative order. No native row order or tie-break changes.",
+        "spatial_clearance": "Indexed building queries union corridor polygon and segment boxes and expand by sqrt(2)*1.6 plus epsilon, then run unchanged exact rotated footprint/churchyard tests. Project/reservation queries expand by 0.01 plus epsilon before exact polygon/castle/path tests. Row indexing itself expands by epsilon. Nonfinite or negative padding conservatively falls back; allocation-free BoxesMayHit preserves the previous numeric guards and inequalities.",
+        "scoped_certificate": "RouteEnter checks the full 53-function certificate at native armyLandPath/armyDetour/armyReach entry. Nested native searches may reuse the existing guard only with the same terrain and current cheap world/settlement/owner/placed/day/SIZE/CELL inputs. Only uninterrupted native synchronous search bodies use certified=true; no serviceRoadPlan accept/publicAccess callback runs under this guard. Direct standalone segment calls retain the full certificate check.",
+        "scoped_restoration": "LandPath, Detour and Reach install the scope inside their actual entry boundaries and leave in finally on every return or exception. A rejected certificate swaps the local walker to a fresh cold memo and restores its previous memo on exit. A valid scope records the current ghost identity/rotation and exact straight/diagonal adjacent-lattice sample counts; the standalone ghost/query checks remain authoritative. Nested valid entries preserve the outer guard.",
+        "host_scope": "Ordinary hosts carry no abbeyTerrain, so guarded scope entry is skipped and the same native search/route-read inputs remain. Only existing armyLandPath/armyDetour fixture pins renew; armyReach is separately pinned here because service walkers, not hosts, use that flood helper. Existing path/draw/RNG behavior is not certified merely by updating pins.",
+        "save_boundary": "The bucket maps/free row IDs and abbeyRouteGuard belong only to the synchronous C and locally allocated walker memo. finally removes/restores the guard before a route result or callback reaches the caller. No context is written into W, actual army/site/project, layout roots, save extras or presentation DTOs. No managed stock/payment writer changes.",
+        "search_inventory": "417 recognized sites and 1423 functions with direct/transitive searches, all pattern counters and inventory limits unchanged; no introduced or retired recognized occurrences. Existing indexed and fallback rows remain visible syntactically; helpers add no new transaction-wide search.",
+        "validation_scope": "Static exact dependency/certificate/pin/search review plus one focused army source-pin case only. The prior 972beba fresh performance diagnostic failed at tick 50 under the original deadline; it establishes no current performance clearance. Root alone runs this candidate native diagnostic and release gates. A proposed later corridor-aware planner is not part of this source or proof."
       }
     }
   }

@@ -228,7 +228,7 @@ refusal reasons and annual/lifetime counters remain worker state and detached
 inspector output. This intentionally adds the accepted own-use mechanics and
 changes affected histories; same-speed/history/save discipline still applies.
 
-The assembled static review at `972beba` retains 59 phases and 200 edges;
+The assembled static review at `85f0368` retains 59 phases and 200 edges;
 `simTick` is byte-identical to its parent candidate. All 39 own-use-industry pins
 match exact AST declaration slices. This survey change renews only the existing
 `abbeySitePlan`, `abbeyMillPlan` and founding-quote pins, and separately records
@@ -261,7 +261,7 @@ exact source and dependency review separately from historical evidence and
 the current source's pending native speed/save/conservation gates.
 
 The later route adapter shares ghost-free terrain edges, native scope/circuit
-lists and certified flood banks only inside that proposal. Its 51-function
+lists and certified flood banks only inside that proposal. Its 53-function
 identity certificate and current world/place/owner/day/size/cell/placed checks
 guard reuse. Each candidate pose keeps a fresh ghost-edge memo; its current
 ghost still uses the native interpolation and strict rotated footprint test.
@@ -273,11 +273,24 @@ Changed inputs supply neither shared terrain nor shared banks.
 This context stays on local service walkers and returns only ordinary
 path/street results. Host route recall accepts no `_em`, `settlement` or
 `placed`, and its own temporary memo carries no `abbeyTerrain`; the added
-`armySegmentClear` branch introduces no ordinary host-memory input. Only that
-fixture pin changes. The JSON records the three changed and five new bodies,
+`armySegmentClear` branch introduces no ordinary host-memory input. Its earlier
+fixture pin change remains exact. The JSON records the three changed and five new bodies,
 the separate certificate, and one added transitive-search function without
 changing any of the 417 recognized site counts. Current-source generated
 performance and native release gates remain coordinator work.
+
+The current spatial adapter bins the same ordered building/project rows once,
+retaining unknown, oversized and castle-reservation rows unconditionally.
+Queries deduplicate and sort original row IDs before unchanged exact collision
+checks; invalid or oversized bounds return all rows. No new recognized search
+site or data source enters the day. `LandPath`, `Detour` and `Reach` certify once
+at uninterrupted native entry and restore the guard/memo in `finally` on every
+exit. Planner callbacks run after that scope has ended; standalone edge queries
+keep their full checks. Only the changed host `LandPath`/`Detour` fixture pins
+renew, while the service-only `Reach` body is pinned in the helper contract.
+The previous candidate's fresh performance diagnostic failed at tick 50 under
+the original deadline. This static review claims no current native performance
+clearance and includes no subsequent corridor-aware planner.
 
 Foreign population/food and current recruitment run first inside
 `tickExpeditions`, before that phase's actual campaign combat. Recruitment is

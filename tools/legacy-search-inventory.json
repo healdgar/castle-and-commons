@@ -573,5 +573,13 @@
     "reportedFunctionsWithDirectOrTransitiveSearches": 1423,
     "newRecognizedSiteOccurrences": 0,
     "scope": "Existing recognized counts and key order are unchanged. The five new proposal-local helpers add one function with a transitive search, using native domain scopes/circuit lists and current paid-road queries once per actual edge. The context is not retained between proposals or copied into W/site/project; each ghost pose retains its own edge memo and all current legal/payment queries stay native."
+  },
+  "reviewedSpatialScopedReuse": {
+    "sourceCommit": "85f0368acfd1dac6f4a57801fbd36c75b310e08a",
+    "indexSHA256": "15bb3e2856cd37bc9cebb60a884f684ca7237af24c38c7b47be572b5f2c0d477",
+    "recognizedSites": 417,
+    "reportedFunctionsWithDirectOrTransitiveSearches": 1423,
+    "newRecognizedSiteOccurrences": 0,
+    "scope": "All existing counts/key order remain exact. The same proposal-local building/project geometry is bucketed once with unconditional unknown/large/castle rows and numerically sorted native row IDs before exact predicates; no new recognized source traversal or transaction search. Scope certification changes only native synchronous helper entry/exit work; no persistent world/cache root or completed native performance claim."
   }
 }
