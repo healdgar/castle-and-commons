@@ -120,7 +120,6 @@ const SCENES=[ // what, setup, route, change, whether the answer must change ('k
   ['peace made',HOSTILE,S4,'W.feuds=[]',true],
   ['the town changes hands',HOSTILE,S4,'W.settlements[1].owner=0',true],
   ['a rising ends','W.war={rebel:1}',S4,'W.war=null',true],
-  ['a lord starts royal service','W.war={rebel:1,service:{}};host.house=2',S4,'W.war.service[2]={kind:"service",complete:false}',true],
   ['a lord completes royal service','W.war={rebel:1,service:{2:{kind:"service",complete:false}}};host.house=2',S4,'W.war.service[2].complete=true',true],
   ['the host changes sides','W.war={rebel:1}',S4,'host.house=1',true],
   ['a breach',HOSTILE,S4,'W.settlements[1].wallDmg=new Float32Array(144).fill(0.7)',true],
@@ -155,6 +154,14 @@ for(const [what,setup,P,change,differs] of SCENES)test('the memory sees '+what,(
   const after=ask(off);for(const c of[on,check]){assert.equal(ask(c),after);assert.equal(count(c)[0],differs==='kept'?2:1,differs==='kept'?'the memory answers':'a fresh search');}
   if(differs===true)assert.notEqual(after,first,'the change alters the way');
   for(const c of[on,check])assert.equal(vm.runInContext('bounds()',c),vm.runInContext('bounds()',off));
+});
+test('starting actual royal service closes hostile gates and the resulting detour is remembered',()=>{
+  const off=realm('off'),on=realm('on'),check=realm('verify'),ask=c=>vm.runInContext(`march(${S4},true)`,c),count=c=>JSON.parse(vm.runInContext('JSON.stringify([ARMY_ROUTES.hits,ARMY_ROUTES.kept])',c));
+  for(const c of[off,on,check])vm.runInContext('W.war={rebel:1,service:{}};host.house=2',c);
+  const open=ask(off);for(const c of[on,check]){assert.equal(ask(c),open);assert.deepEqual(count(c),[0,0],'open gates need no detour');}
+  for(const c of[off,on,check]){vm.runInContext('W.war.service[2]={kind:"service",complete:false}',c);assert.equal(vm.runInContext('hostileTo(host,W.settlements[1])',c),true);}
+  const closed=ask(off);assert.notEqual(closed,open,'actual service changes the native gate boundary');
+  for(const c of[on,check]){assert.equal(ask(c),closed);assert.deepEqual(count(c),[0,1],'the new hostile-gate detour is kept');assert.equal(ask(c),closed);assert.deepEqual(count(c),[1,1],'the actual detour is recalled and verified');assert.equal(vm.runInContext('bounds()',c),vm.runInContext('bounds()',off));}
 });
 test('a route opens at once when a bridge is built, and far changes keep the memory',()=>{
   const c=realm('verify'),P=JSON.stringify([{x:-60,z:-150},{x:60,z:-150}]),stats=()=>JSON.parse(vm.runInContext('JSON.stringify([ARMY_ROUTES.hits,ARMY_ROUTES.misses])',c));
