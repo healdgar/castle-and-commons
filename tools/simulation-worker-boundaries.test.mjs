@@ -175,7 +175,7 @@ test('a day on which nothing a structure is drawn from changed publishes no stre
   const quiet=vm.runInContext('(()=>{flag();return workerPresentation(false)})()',c);
   assert.equal(quiet.settlements[0].streets,undefined,'streets as the screen has them stay home');assert.equal(quiet.settlements[0].places,undefined);assert.equal(quiet.roads,undefined);
   assert.equal(quiet.caravans[0].poly,undefined,'a caravan crosses once with its road');assert.equal(quiet.caravans[0].qty,3);assert.equal(quiet.memorials,undefined);
-  assert.deepEqual({...quiet.dirty,orders:undefined,armies:undefined,herds:undefined},{structures:false,buildings:false,walls:false,details:false,roads:false,labels:false,herds:undefined,orders:undefined,armies:undefined});
+  assert.deepEqual({...quiet.dirty,orders:undefined,armies:undefined,herds:undefined},{structures:false,buildings:false,walls:false,details:false,roads:false,labels:false,hydraulics:false,herds:undefined,orders:undefined,armies:undefined});
   const moved=vm.runInContext('(()=>{W.settlements[0].streets.push({pts:[{x:60,z:0},{x:70,z:9}],hw:2,kind:"lane",name:"New",hidden:false});flag();return workerPresentation(false)})()',c);
   assert.equal(moved.settlements[0].streets.length,3,'a changed list crosses whole');assert.equal(moved.settlements[0].places,undefined);assert.equal(moved.dirty.structures,true);assert.equal(moved.dirty.roads,true);assert.equal(moved.roads,undefined);
   const road=vm.runInContext('(()=>{W.roads[0].cond=.5;flag();return workerPresentation(false)})()',c);
