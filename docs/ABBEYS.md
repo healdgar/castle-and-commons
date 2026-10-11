@@ -75,3 +75,9 @@ person until the origin claimant has released that person through #42. A
 religious role does not erase a personal bond or create a free second identity.
 
 The reviewed native-siting repair shares the original eight deterministic ground poses between ordinary ranges and own-use windmills. A church at a granted field centroid no longer prevents trying its existing bounded offsets. Whole-footprint title, public access, live wind/water power, qualified operators, reserves, actual materials and paid completion still gate the result. The focused industry file passes 28 checks; generated-world operability remains a release gate.
+
+## Generated-world access and recruitment gate
+
+The current c2059ac generated-world continuation reaches audited day626 with no abbey and no simulation faults. A readonly census of the first12 lawful fields and all original8 church poses finds nearest public-street distances of about784 m for the Crown,219 m at Grispont and153 m at Berg-le-Gué. The32 m town-storage approach is therefore an actual rural foundation gap (#69); public endpoints also cannot require grant of the whole public/tenant parcel. Bounded native road/street routes need retained endpoint identity, lawful corridor rights distinct from the actual building grant, exact project reservations and paid route work. The repair cannot invent a tenant's consent.
+
+These villages have no qualified tanner at that boundary; actual free qualified heads remain in the capital and Pontepino. Abbey-specific recruitment needs a funded native household journey, real payable roof, beneficial livelihood or actual profession, and arrival before service (#70). Existing sparse batch wages cannot promise a full-time salary, and no operator is fabricated. Root will repeat native paid construction and working industries on the changed source. A day626 diagnostic save also reveals a native petition closure registration gap (#71); no late failed-world snapshot was produced.

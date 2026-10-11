@@ -6,6 +6,8 @@ The app remains a single HTML file with no build step.
 
 ## Exact fast forward (current priority, 2026-10-10)
 
+The current c2059ac native exactness gate passes150 days at all seven speeds, full authoritative graph/every RNG and906 accepted raw rows, with actual day38/day91 commands. Native day37 load/resave and113-day continuation reproduce678 rows exactly. Audited step CPU is1212.71 s for the controlled original selectors versus366.45 s optimized; complete comparison/replay costs2992.80 child CPU/2853.52 wall seconds, load0.57→1.05. Both contain the same intentional model changes and cache maintenance. This includes inventory/audit/serialization and does not measure browser persistence or centuries-per-minute throughput. The subsequent Abbey gate stops by coordinator decision after audited day626 because of proven rural-access/recruitment gaps, rather than waiting on an impossible short-street recipe. Native petition snapshot failure is also recorded (#69–71).
+
 The 11 October institution batch is assembled and being gated. Its frozen
 `d36bf93` correctness suite finished 196 files with 1,916 passes and two fixture
 failures: 2,683.46 aggregate child CPU seconds, 1,704.25 wall seconds, load
