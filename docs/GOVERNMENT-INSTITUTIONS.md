@@ -54,6 +54,8 @@ and buys actual bread and craft service at the capital. Visiting lords buy
 board from their own house purse; the next hall budget deducts those actual
 board bills. Their seat's servants remain at the seat.
 
+`governmentMeals` runs after actual abbey hospitality and before population/household meals. It reads already-scheduled actual lord arrivals/stays and existing bench/burgess visits, never commissions a new journey or sitting. A remote non-lord guest must retain its real return leg at the host; outbound transit, cancelled travel, death and the return date grant no destination meal. An actual current-day person receipt records only food consumed from the named payer's purchased stock. Partial school, abbey, government and cargo meals fill the same single person need. Home household provisioning/eating and the exact travelling head's own-seat hall deduct that food, including local hosted meals; no proxy retinue travels or eats at the host. Late justice still decides authoritative arrival/return, fees, hearings and consent. Early tournament and military cargo consumers use the same receipt. This intentionally corrects same-day food timing without changing native identities.
+
 Before parliament is learned/adopted, the ruler can order a subsidy. Once it
 is available, the weighted deterministic votes of actual attending lords and
 burgesses decide. A refusal or a sitting with no eligible attendees creates
