@@ -944,6 +944,7 @@ const TECH_RULES=Object.freeze({
   gothic:{name:'Gothic vault and buttress',year:1140,needs:['stoneKeep'],kind:'building',gain:0.1},
   fullingMill:{name:'Fulling mill',year:1150,needs:['watermill'],kind:'cloth',gain:0.3},
   university:{name:'University',year:1150,needs:[],kind:'learning',gain:0.2},
+  college:{name:'Endowed college',year:1264,needs:['university'],kind:'learning',gain:0.1},
   stoneCurtain:{name:'Stone curtain',year:1150,needs:['stoneKeep'],kind:'building',gain:0.1},
   royalEyre:{name:'Royal eyre',year:1166,needs:['romanLaw'],kind:'law',gain:0.1},
   royalBench:{name:'Royal bench',year:1170,needs:['romanLaw'],kind:'law',gain:0.1},
@@ -1017,7 +1018,7 @@ function technologyActors(s){
 }
 function technologySchoolMaster(s,p){
   if(p.office!=='master')return false;
-  const a=typeof p.officeFor==='string'?corpOf(p.officeFor):null,binding=a?.school||s.school,school=binding?.schoolId!==undefined?W.schools?.[binding.schoolId]:p.schoolMaster!==undefined?W.schools?.[p.schoolMaster]:binding||(W.schools||[]).find(x=>!x.gone&&x.si===p.si&&x.master===p.id);
+  const a=typeof p.officeFor==='string'?corpOf(p.officeFor):null,binding=a?.school||s.school,school=p.tutorMaster!==undefined?W.tutors?.[p.tutorMaster]:binding?.schoolId!==undefined?W.schools?.[binding.schoolId]:p.schoolMaster!==undefined?W.schools?.[p.schoolMaster]:binding||(W.schools||[]).find(x=>!x.gone&&x.si===p.si&&x.master===p.id);
   if(!school||school.gone||school.master!==p.id&&!school.staff?.includes(p.id)||!school.building||school.building.removed||school.building.state!=='sound')return false;
   const contract=school.contracts?.[p.id]||school.contract;return !!(contract&&contract.master===p.id&&contract.active!==false&&contract.paid>0&&contract.lastPaidDay>=day()-1);
 }
@@ -3924,7 +3925,7 @@ function learningPayer(p){return p?.gn!==undefined&&!p.merc?p._hh||null:p;}
 function learningFamilySize(s,p){const A=learningPayer(p);return A?.household?A.population?.get(s)||[...A.members].filter(q=>!q.dead&&W.settlements[q.si]===s).length:1;}
 function learningRoster(s){
   const I={masters:[],pupils:[],scholars:[]};for(const p of s.folk||[]){if(p.dead||p.outlawCampId||p.estateOffice)continue;const a=ageYrs(p);
-    if(a>=18&&a<70&&p.sk?.[KL]>=0.2&&learningHead(p)===p&&learningPayer(p))I.masters.push(p);
+    if(a>=18&&a<70&&p.sk?.[KL]>=0.2&&p.tutorMaster===undefined&&learningHead(p)===p&&learningPayer(p))I.masters.push(p);
     if(a>=14&&a<30&&!p.office&&!p.sp&&p.schoolMaster===undefined&&p.sk?.[KL]>=0.15)I.scholars.push(p);
     if(a>=7&&a<24&&!p.office&&!p.sp&&p.schoolMaster===undefined&&!(p.sk?.[KL]>=0.45))I.pupils.push(p);}return I;
 }
@@ -3966,7 +3967,7 @@ function abbeySchoolEligibility(a,s){
 }
 function learningSchoolCommission(Q){
   if(!Q||!learningPresent(Q.s,Q.master)||!Q.b||Q.b.removed||Q.b.state!=='sound')return null;
-  const L=W.schools||(W.schools=[]),S={id:L.length,si:Q.master.si,kind:Q.ownerId?'abbey':Q.b.cathedral?'cathedral':'parish',ownerId:Q.ownerId,building:Q.b,master:Q.master.id,masterName:folkName(Q.master),capacity:Q.capacity,fee:Q.fee,minimum:Q.wage,pupils:[],opened:day(),gone:false,fees:0,stipends:0,lessons:0,graduates:0,contract:{master:Q.master.id,paid:0,lastPaidDay:-1,active:true}};L.push(S);
+  const L=W.schools||(W.schools=[]),S={id:L.length,si:Q.master.si,kind:Q.ownerId?'abbey':Q.b.college?'college':Q.b.cathedral?'cathedral':'parish',ownerId:Q.ownerId,building:Q.b,master:Q.master.id,masterName:folkName(Q.master),capacity:Q.capacity,fee:Q.fee,minimum:Q.wage,pupils:[],opened:day(),gone:false,fees:0,stipends:0,lessons:0,graduates:0,contract:{master:Q.master.id,paid:0,lastPaidDay:-1,active:true}};L.push(S);
   const p=Q.master;S.previous={tr:p.tr,office:p.office,officeFor:p.officeFor};p.schoolTrade=p.tr;p.tr='schoolmaster';p.office='master';p.officeFor=Q.ownerId||'school:'+S.id;p.schoolMaster=S.id;
   (Q.s.schoolIds||(Q.s.schoolIds=[])).push(S.id);if(!Q.s.school)Q.s.school=S;if(Q.ownerId){const a=corpOf(Q.ownerId);if(a?.school)a.school.schoolId=S.id;}
   for(const q of Q.pupils)learningEnrol(S,q.p);delete Q.s._learningIndex;technologyActorsDirty(Q.s);householdHeadsChanged(Q.s);emit('trade',3,Q.s.pos,`${S.masterName} opens a funded ${S.kind} school at ${Q.s.name}.`);return S;
@@ -4001,9 +4002,9 @@ function learningSchoolTick(S){
 }
 function tickLearning(){
   if(W._learningDay===day())return;W._learningDay=day();
-  for(const s of W.settlements){if(!s.folk?.length||s.siegeBy)continue;for(const b of learningRooms(s)){const Q=learningRoomQuote(s,b);if(Q)learningSchoolCommission(Q);}}
+  for(const s of W.settlements){if(!s.folk?.length||s.siegeBy)continue;for(const b of [...learningRooms(s),...(s.buildings||[]).filter(b=>b.college&&b.compoundKey==='classroom'&&!b.removed&&b.state==='sound')]){const Q=learningRoomQuote(s,b);if(Q)learningSchoolCommission(Q);}}
   for(const a of W.abbeys||[]){if(a.gone||a.school?.building===undefined||a.school.schoolId!==undefined)continue;const s=W.settlements[a.si],b=W.bldList?.[a.school.building],Q=learningRoomQuote(s,b,a.storageOwnerId);if(Q)learningSchoolCommission(Q);}
-  tickUniversities();for(const S of W.schools||[])learningSchoolTick(S);
+  tickUniversities();for(const S of W.schools||[])learningSchoolTick(S);tickTutors();tickColleges();
 }
 /* A university is a company of paid masters, not a new population. Visiting
    scholars stay on their family's roll and pay for the actual room and board. */
@@ -4070,12 +4071,47 @@ function tickUniversities(){
   W.schoolLodgings=(W.schoolLodgings||[]).filter(idx=>{const b=W.bldList[idx];if(!b)return false;b.schoolBoarders=(b.schoolBoarders||[]).filter(id=>{const p=learningPerson(id);return p&&!p.dead&&p.study?.journey&&day()<p.study.journey.leave;});return b.schoolBoarders.length>0;});
 }
 
+/* A patron may build a college, but every room remains native paid fabric.
+   Teaching and residential purposes use the same actual building references. */
+function collegeGroundValue(site){if(!W.land)return 0;const ground=compoundGround(site),cells=ground.cells.filter(c=>W.land.mask[c*4+2]!==255),areas=occupiedGroundAreas(cells);let value=0;for(const[F,area]of areas)value+=landPrice(F)*area/Math.max(1,F.area||area);return value;}
+function collegePlanQuote(s,key='classroom'){
+  if(!s||s.siegeBy||!institutionalCapability(s,'college').available||!['classroom','residence'].includes(key)||!s._lay?.live?.compoundSite)return null;
+  const C=(s.compounds||[]).find(C=>C.kind==='college'&&C.ownerId===s.owner&&!C.gone);if(C&&compoundHas(C,key)||C&&(W.projects||[]).some(q=>!q.dead&&q.compoundId===C.id))return null;
+  const b=key==='classroom'?{arch:'hall',tier:0,w:12,d:8}:{arch:'hospital',tier:1,w:14,d:10},payer=houseAcct(s.owner),method=constructionTechnologyRecipe(s,'timber'),base=foodYr()*(key==='classroom'?3:6),labour=base*method.laborFactor,timber=(key==='classroom'?22:36)+method.timber,stone=key==='classroom'?0:8;
+  const anchor=(s.schoolIds||[]).map(id=>W.schools?.[id]).find(S=>S&&!S.gone)?.building||s.pos,sites=[];for(let k=0;k<16;k++){const a=k*Math.PI/4,r=30+Math.floor(k/8)*22,raw={key,arch:b.arch,tier:b.tier,hm:1,f:{x:anchor.x+Math.cos(a)*r,z:anchor.z+Math.sin(a)*r,w:b.w,d:b.d,rot:a}},site=s._lay.live.compoundSite(raw,'survey','lord');if(!site)continue;
+    const land=collegeGroundValue(site),q={site,arch:b.arch,land},ground=storageGroundClaim(s,q,payer);if(!ground.ok)continue;const cost=labour+timber*price(s,'timber')+stone*price(s,'stone')+land;if(learningSpare(s,payer)<cost)continue;sites.push({adapter:'college',key,title:key==='classroom'?'college classroom':'scholars’ lodging',payerId:s.owner,founder:s.owner,groundRequired:true,site,land,labour,timber,stone,days:Math.ceil((key==='classroom'?90:150)*method.laborFactor),purposes:key==='classroom'?['school']:['residential','hospitality'],cost});}
+  if(key==='residence'&&(!C||!compoundHas(C,'classroom')))return null;
+  return sites.sort((a,b)=>a.cost-b.cost||a.site.f.x-b.site.f.x||a.site.f.z-b.site.f.z)[0]||null;
+}
+function collegeCommission(s,key='classroom'){const Q=collegePlanQuote(s,key);if(!Q)return null;const C=compoundEnsure(s,'college',s.owner);return compoundProjectCommission(s,C,Q);}
+function collegeCompoundValidate(q,s,C){if(s.owner!==q.founder||C.ownerId!==q.founder)return{ok:false,abandon:true,reason:'the college founder no longer holds the place'};if(s.siegeBy)return{ok:false,reason:'the site is besieged'};if(q.key==='residence'&&!compoundHas(C,'classroom'))return{ok:false,reason:'the college classroom is not complete'};if(!s._lay?.live?.compoundSite(q.site,'validate','lord',q))return{ok:false,reason:'the footprint or approach is obstructed'};return{ok:true};}
+function collegeCompoundComplete(q,s,C){if(!collegeCompoundValidate(q,s,C).ok)return false;const b=s._lay.live.compoundSite(q.site,'complete','lord',q);if(!b)return false;b.ownerId='lord';b.inst=true;b.college=C.id;b.compoundKey=q.key;b.nm=s.name+' '+q.title;bindPropertyRights(s);markOccupiedGround(s,compoundGround(q.site).polys);syncLive(s);compoundBindBuilding(C,b,q.purposes);updateBuildingInstance(b);G.detDirty=true;emit('trade',3,b,`${s.name} completes its ${q.title}, paid by ${s.owner?'its lord':'the crown'}.`);return true;}
+function collegeCmd(arg){const[si,key,...rest]=String(arg).split(':'),s=W.settlements[+si];if(rest.length||!s||!sovOn()||s.owner!==plyH())return false;return !!collegeCommission(s,key);}
+function tickColleges(){for(const s of W.settlements){if(!institutionalCapability(s,'college').available||s.siegeBy)continue;const C=(s.compounds||[]).find(C=>C.kind==='college'&&C.ownerId===s.owner&&!C.gone),schools=(s.schoolIds||[]).map(id=>W.schools?.[id]).filter(S=>S&&!S.gone);if(!schools.length)continue;const cost=schools.reduce((t,S)=>t+S.minimum*360,0),spare=(s.schoolAllowance||0)-cost,key=C&&compoundHas(C,'classroom')?'residence':'classroom';if(C&&compoundHas(C,key)||!(spare>0))continue;
+  const Q=collegePlanQuote(s,key);if(Q&&spare*5>=Q.cost)compoundProjectCommission(s,C||compoundEnsure(s,'college',s.owner),Q);}}
+function learningTutorQuote(s){
+  if(s.siegeBy||s.tutor!==undefined&&!W.tutors?.[s.tutor]?.gone||!(s.tutorAllowance>0))return null;const pupils=livingNotableCandidates(n=>n.alive&&n.house===s.owner&&ageOf(n)>=5&&ageOf(n)<25&&n.sk&&!(n.fp?.away&&day()<n.fp.away.until)&&!W.armies.some(a=>!a.gone&&a.commander===n.id)),room=pupils.map(notableResidence).find(R=>R?.s===s&&R.b&&!R.b.removed&&R.b.state==='sound')?.b;if(!room)return null;
+  const master=learningIndex(s).masters.filter(p=>learningPresent(s,p)&&!p.office&&!p.role&&p.schoolMaster===undefined&&p.tutorMaster===undefined).sort((a,b)=>b.sk[KL]-a.sk[KL]||a.id-b.id)[0];if(!master)return null;const can=pupils.filter(n=>[KL,KR,KS,KLaw].some(k=>master.sk[k]>n.sk[k]));if(!can.length)return null;const wage=learningTeacherCost(s,master),payer=houseAcct(s.owner);return s.tutorAllowance/360>=wage&&learningSpare(s,payer)>=wage?{s,room,master,pupils:can,wage,payer}:null;
+}
+function learningTutorCommission(Q){if(!Q)return null;const L=W.tutors||(W.tutors=[]),p=Q.master,T={id:L.length,si:p.si,house:Q.s.owner,building:Q.room,master:p.id,masterName:folkName(p),pupils:Q.pupils.map(n=>n.id),opened:day(),paid:0,lessons:0,gone:false,contract:{master:p.id,paid:0,lastPaidDay:-1,active:true},previous:{tr:p.tr,office:p.office,officeFor:p.officeFor}};L.push(T);Q.s.tutor=T.id;p.schoolTrade=p.tr;p.tr='schoolmaster';p.office='master';p.officeFor=T.house;p.tutorMaster=T.id;delete Q.s._learningIndex;technologyActorsDirty(Q.s);householdHeadsChanged(Q.s);return T;}
+function learningTutorClose(T,reason){if(T.gone)return;T.gone=true;T.reason=reason;T.closed=day();T.contract.active=false;const p=learningPerson(T.master),s=W.settlements[T.si];if(p&&p.tutorMaster===T.id){delete p.tutorMaster;delete p.schoolTrade;p.tr=T.previous.tr;p.office=T.previous.office;p.officeFor=T.previous.officeFor;}delete s._learningIndex;technologyActorsDirty(s);householdHeadsChanged(s);}
+function tickTutors(){
+  for(const s of W.settlements){const Q=learningTutorQuote(s);if(Q)learningTutorCommission(Q);}
+  for(const T of W.tutors||[]){if(T.gone)continue;const s=W.settlements[T.si],master=learningPerson(T.master);if(!master||!learningPresent(s,master)||master.tutorMaster!==T.id||s.owner!==T.house||T.building.removed||T.building.state!=='sound'){learningTutorClose(T,'the patron, master or room is unavailable');continue;}if(s.siegeBy)continue;
+    T.pupils=T.pupils.filter(id=>{const n=notableById(id),R=n?.alive&&notableResidence(n);return n?.alive&&ageOf(n)<25&&R?.s===s&&R.b===T.building;});if(!T.pupils.length){learningTutorClose(T,'the household no longer needs a tutor');continue;}
+    const wage=learningTeacherCost(s,master),payer=houseAcct(T.house);if((s.tutorAllowance||0)/360<wage||learningSpare(s,payer)<wage){learningTutorClose(T,'the patron can no longer support the master');continue;}
+    const receipt=transfer(payer,master,wage,'tutor',s);T.paid+=receipt;T.contract.paid+=receipt;if(receipt>0)T.contract.lastPaidDay=day();technologyRecordTeaching(s,master,receipt);if(day()%7===0||!(receipt>0))continue;
+    for(const id of T.pupils){const n=notableById(id);if(n.fp?.away&&day()<n.fp.away.until||W.armies.some(a=>!a.gone&&a.commander===n.id))continue;const age=ageOf(n),apt=Math.exp(.35*trait(n,GW)+.25*trait(n,GD))*(age<21?1:.55),fraction=Math.min(1,receipt/wage);for(const[k,rate]of[[KL,.22],[KR,.16],[KS,.12],[KLaw,.12]])if(master.sk[k]>n.sk[k])n.sk[k]+=Math.min(master.sk[k]-n.sk[k],rate/360*apt*fraction*master.sk[k]*(1-n.sk[k]));n.tutored={master:T.master,paid:(n.tutored?.paid||0)+receipt/T.pupils.length,lessons:(n.tutored?.lessons||0)+fraction,day:day()};T.lessons+=fraction;}}
+}
+function tutorCmd(arg){const[si,value,...rest]=String(arg).split(':'),s=W.settlements[+si],annual=+value;if(rest.length||!s||!sovOn()||s.owner!==plyH()||!Number.isFinite(annual)||annual<0)return false;s.tutorAllowance=annual;G.ordersDirty=true;return true;}
+
 function learningCmd(arg){const[si,value,...rest]=String(arg).split(':'),s=W.settlements[+si],annual=+value;if(rest.length||!s||!sovOn()||s.owner!==plyH()||!Number.isFinite(annual)||annual<0)return false;s.schoolAllowance=annual;G.ordersDirty=true;return true;}
-function learningState(){return{schools:(W.schools||[]).map(S=>({id:S.id,si:S.si,kind:S.kind,ownerId:S.ownerId,building:S.building.idx,master:S.master,masterName:S.masterName,capacity:S.capacity,pupils:S.pupils.slice(),fees:S.fees,stipends:S.stipends,lessons:S.lessons,graduates:S.graduates,opened:S.opened,closed:S.closed,reason:S.reason,gone:S.gone})),universities:(W.universities||[]).map(U=>({id:U.id,si:U.si,school:U.school,masters:U.masters.slice(),formed:U.formed,active:U.active,fees:U.fees,stipends:U.stipends,board:U.board,lodging:U.lodging,graduates:U.graduates}))};}
+function learningState(){return{schools:(W.schools||[]).map(S=>({id:S.id,si:S.si,kind:S.kind,ownerId:S.ownerId,building:S.building.idx,master:S.master,masterName:S.masterName,capacity:S.capacity,pupils:S.pupils.slice(),fees:S.fees,stipends:S.stipends,lessons:S.lessons,graduates:S.graduates,opened:S.opened,closed:S.closed,reason:S.reason,gone:S.gone})),tutors:(W.tutors||[]).map(T=>({id:T.id,si:T.si,house:T.house,master:T.master,masterName:T.masterName,pupils:T.pupils.slice(),building:T.building.idx,paid:T.paid,lessons:T.lessons,gone:T.gone,reason:T.reason})),universities:(W.universities||[]).map(U=>({id:U.id,si:U.si,school:U.school,masters:U.masters.slice(),formed:U.formed,active:U.active,fees:U.fees,stipends:U.stipends,board:U.board,lodging:U.lodging,graduates:U.graduates}))};}
 function learningPlaceHTML(s){return(s.schoolIds||[]).map(id=>W.schools?.[id]).filter(S=>S&&!S.gone).map(S=>`${esc(S.masterName)} · ${S.pupils.length} pupils · ${S.graduates} graduates · ${S.fees.toFixed(1)} tuition received`).join('; ');}
 function learningSchoolsHTML(){const T=learningState();let h='<div class="dhead">Funded schools</div>';for(const S of T.schools)h+=`<div class="note">${esc(W.settlements[S.si].name)} · ${esc(S.masterName)} · ${S.gone?'closed: '+esc(S.reason):S.pupils.length+' pupils'} · ${S.fees.toFixed(1)} tuition / ${S.stipends.toFixed(1)} stipends received · ${S.graduates} graduates</div>`;
   for(const U of T.universities)h+=`<div class="note">University at ${esc(W.settlements[U.si].name)} · ${U.active?U.masters.length+' paid masters':'teaching suspended'} · ${U.board.toFixed(1)} board / ${U.lodging.toFixed(1)} lodging paid locally · ${U.graduates} graduates</div>`;
-  if(sovOn())for(const [si,s]of W.settlements.entries()){if(s.owner!==plyH())continue;h+=`<div class="note">${esc(s.name)} · ${(s.schoolAllowance||0).toFixed(1)} gold a year to actual schoolmasters</div><div class="pbrow">`;for(const[v,label]of[[0,'Stop'],[foodYr()*5,'Support'],[foodYr()*15,'Endow']])h+=`<button class="cbtn" data-cmd="s-school" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;h+='</div>';}return h;}
+  for(const T0 of T.tutors)h+=`<div class="note">${esc(T0.masterName)}, tutor at ${esc(W.settlements[T0.si].name)} · ${T0.gone?'closed: '+esc(T0.reason):T0.pupils.length+' noble pupils'} · ${T0.paid.toFixed(1)} received</div>`;
+  if(sovOn())for(const [si,s]of W.settlements.entries()){if(s.owner!==plyH())continue;h+=`<div class="note">${esc(s.name)} · ${(s.schoolAllowance||0).toFixed(1)} gold a year to actual schoolmasters</div><div class="pbrow">`;for(const[v,label]of[[0,'Stop'],[foodYr()*5,'Support'],[foodYr()*15,'Endow']])h+=`<button class="cbtn" data-cmd="s-school" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;h+='</div><div class="pbrow">';for(const[v,label]of[[0,'Stop tutor'],[foodYr()*5,'Hire tutor']])h+=`<button class="cbtn" data-cmd="s-tutor" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;if(institutionalCapability(s,'college').available)h+=`<button class="cbtn" data-cmd="s-college" data-arg="${si}:classroom">Build college classroom</button><button class="cbtn" data-cmd="s-college" data-arg="${si}:residence">Build scholars’ lodging</button>`;h+='</div>';}return h;}
 
 /* the rank-and-file notables share the folk's make-up */
 function endow(n,ma,pa){ // a notable's nature and nurture: parents' blood, a lord's table, a lord's tutors
@@ -5329,8 +5365,8 @@ function compoundComponentPresent(C,c){const s=W.settlements[C.si];if(!s)return 
 function compoundCircuit(s,key){return key==='town'?s:key==='outer'?s.cas?.outerWall:key==='bailey'?s.bailey:key==='hill'?s.hillCastle:key==='ward'?s.ward:key==='motte'?s.motte:null;}
 function compoundGround(site){const polys=[...(site?.polys||[])];if(site?.yard?.poly)polys.push(site.yard.poly);if(site?.poly?.length>2)polys.push(site.poly);if(site?.f)polys.push(obbCorners(site.f.x,site.f.z,site.f.w,site.f.d,site.f.rot));if(site?.ring){const R=site.ring;polys.push(Array.from({length:64},(_,k)=>{const a=k/64*Math.PI*2,r=wallRadAt(R,a);return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};}));}for(const P of site?.paths||(site?.path?[site.path]:[]))for(let k=1;k<P.length;k++){const a=P[k-1],b=P[k];polys.push(obbCorners((a.x+b.x)/2,(a.z+b.z)/2,site.pathWidth||2.6,dist2d(a.x,a.z,b.x,b.z),Math.atan2(b.x-a.x,b.z-a.z)));}return{polys,cells:[...new Set(polys.flatMap(occupiedGroundCells))]};}
 function compoundProjectPayer(q){return typeof q.payerId==='number'?purseAcct(q.payerId):q.payerId==='crown'?'crown':corpOf(q.payerId);}
-function compoundProjectValidate(q,s,C){if(!C||C.ownerId!==q.ownerId)return{ok:false,abandon:true,reason:'institution-lost'};for(const need of q.requires||[])if(!compoundHas(C,typeof need==='string'?need:need.key,typeof need==='string'?null:need.purpose))return{ok:false,reason:typeof need==='string'?'prerequisite':'capability-prerequisite'};if(q.adapter==='castle')return castleCompoundValidate(q,s,C);if(q.adapter==='abbey'&&typeof abbeyCompoundValidate==='function')return abbeyCompoundValidate(q,s,C);return{ok:false,abandon:true,reason:'unknown-adapter'};}
-function compoundProjectCommission(s,C,plan){if(!C||C.si!==W.settlements.indexOf(s)||!plan?.key||!Number.isFinite(plan.labour)||!(plan.labour>0)||!Number.isFinite(plan.days)||!(plan.days>0)||!['castle','abbey'].includes(plan.adapter))return null;
+function compoundProjectValidate(q,s,C){if(!C||C.ownerId!==q.ownerId)return{ok:false,abandon:true,reason:'institution-lost'};for(const need of q.requires||[])if(!compoundHas(C,typeof need==='string'?need:need.key,typeof need==='string'?null:need.purpose))return{ok:false,reason:typeof need==='string'?'prerequisite':'capability-prerequisite'};if(q.groundRequired){const G=storageGroundClaim(s,q,compoundProjectPayer(q));if(!G.ok)return{ok:false,reason:G.reason||'ground-title'};}if(q.adapter==='college')return collegeCompoundValidate(q,s,C);if(q.adapter==='castle')return castleCompoundValidate(q,s,C);if(q.adapter==='abbey'&&typeof abbeyCompoundValidate==='function')return abbeyCompoundValidate(q,s,C);return{ok:false,abandon:true,reason:'unknown-adapter'};}
+function compoundProjectCommission(s,C,plan){if(!C||C.si!==W.settlements.indexOf(s)||!plan?.key||!Number.isFinite(plan.labour)||!(plan.labour>0)||!Number.isFinite(plan.days)||!(plan.days>0)||!['castle','abbey','college'].includes(plan.adapter))return null;
   if((W.projects||[]).some(q=>q.type==='compound'&&!q.dead&&q.compoundId===C.id))return null;
   const q={...plan,type:'compound',compoundId:C.id,si:C.si,ownerId:C.ownerId,payerId:plan.payerId??C.ownerId,start:day(),worked:0,done:0,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,dead:false,stalled:false,status:'building'};
   const payer=compoundProjectPayer(q),v=compoundProjectValidate(q,s,C);if(!payer||!v?.ok)return null;
@@ -5340,10 +5376,11 @@ function compoundProjectTick(q){if(q.dead)return;const s=W.settlements[q.si],C=s
   const stall=reason=>{q.stalled=true;q.reason=reason;q.status='stalled';};
   if(!s||!payer||v?.abandon){q.dead=true;q.status='abandoned';q.reason=v?.reason||'payer-lost';if(C){C.stage=C.components.some(c=>compoundComponentPresent(C,c))?'standing':'empty';if(q.adapter==='castle')C.ownerId=s.owner;}return;}if(!v?.ok){stall(v?.reason||'site-obstructed');return;}
   const share=Math.min(1,Math.max(0,q.days-q.worked)),bill=share*q.labour/q.days;if(means(payer)<bill){stall('funds');return;}
+  if(q.groundRequired){const ground=storageGroundClaim(s,q,payer);if(!storageGroundPay(q,s,payer,ground).ok){stall(ground.reason||'land');return;}}
   if(!constructionProjectMaterials(q,s,payer,{workReserve:bill})){stall('materials');return;}
-  const P=constructionProjectPaidWork(q,s,payer,q.adapter==='castle'?'castle works':'abbey works',{share,fullPayTolerance:1e-9});if(!P.complete&&!P.paid){stall(P.reason||'workers');return;}q.stalled=false;q.reason=null;q.status='building';if(!P.complete)return;
+  const P=constructionProjectPaidWork(q,s,payer,q.adapter==='castle'?'castle works':q.adapter==='college'?'college works':'abbey works',{share,fullPayTolerance:1e-9});if(!P.complete&&!P.paid){stall(P.reason||'workers');return;}q.stalled=false;q.reason=null;q.status='building';if(!P.complete)return;
   const final=compoundProjectValidate(q,s,C);if(!final?.ok){stall(final?.reason||'site-obstructed');return;}
-  const complete=q.adapter==='castle'?castleCompoundComplete(q,s,C):typeof abbeyCompoundComplete==='function'&&abbeyCompoundComplete(q,s,C);if(!complete){stall('site-obstructed');return;}q.dead=true;q.status='completed';C.stage='standing';G.ordersDirty=true;
+  const complete=q.adapter==='college'?collegeCompoundComplete(q,s,C):q.adapter==='castle'?castleCompoundComplete(q,s,C):typeof abbeyCompoundComplete==='function'&&abbeyCompoundComplete(q,s,C);if(!complete){stall('site-obstructed');return;}q.dead=true;q.status='completed';C.stage='standing';G.ordersDirty=true;
 }
 function compoundMaterialDemand(s,g){const si=W.settlements.indexOf(s);let n=0;for(const q of W.projects||[])if(q.type==='compound'&&!q.dead&&q.si===si)n+=Math.max(0,(q[g]||0)-(q[g+'Installed']||0));return n;}
 
@@ -13279,7 +13316,7 @@ function provision(s,heads,size){ // the month's necessaries, bought as each hou
           const q=got*CARCASS[k];if(s.storage)storageBindGood(s,'meat');s.stores.meat=(s.stores.meat||0)+q;offer(s,'meat',h,q,c/q);h._inc=(h._inc||0)-c;}}}}
   }
 function payCrafts(s,heads){ // the crafts and trades take in what the town's families paid them this month, a better shop and a better hand taking more
-  const C=heads.filter(h=>h.schoolMaster===undefined&&!tills(h,s)&&h.tr&&!PRODUCE[h.tr]),wt=h=>(TRADE_W[h.tr]||0.5)*(1+0.3*(h.bh&&!h.bh.removed?h.bh.tier:0))*(0.8+0.2*(h.sk?h.sk[KCr]||0:0));let tw=0;for(const h of C)tw+=wt(h);
+  const C=heads.filter(h=>h.schoolMaster===undefined&&h.tutorMaster===undefined&&!tills(h,s)&&h.tr&&!PRODUCE[h.tr]),wt=h=>(TRADE_W[h.tr]||0.5)*(1+0.3*(h.bh&&!h.bh.removed?h.bh.tier:0))*(0.8+0.2*(h.sk?h.sk[KCr]||0:0));let tw=0;for(const h of C)tw+=wt(h);
   let cash=s._poolCash||0;const P=s._poolBy||{};s._poolBy={};
   for(const tr in P){const T2=C.filter(h=>h.tr===tr);let t2=0;for(const h of T2)t2+=wt(h);if(t2>0)for(const h of T2){const v=P[tr]*wt(h)/t2;acct(h,v);if(tr==='baker'||tr==='brewer')courtAssize(s,h,v);}else cash+=P[tr];} // what was paid for baking goes to the bakers, for shoes to the shoemakers; the assize records those actual bread and ale receipts
   if(cash>0){if(tw>0)for(const h of C)acct(h,cash*wt(h)/tw);else acct(lordAcct(s),cash,'Unclaimed craft payments',s);}s._poolCash=0;}
@@ -17800,6 +17837,8 @@ function runCmd(cmd,arg){
     case 's-learning':technologyCmd(arg);break;
     case 'p-manumit':freedomCmd(arg);break;
     case 's-school':learningCmd(arg);break;
+    case 's-tutor':tutorCmd(arg);break;
+    case 's-college':collegeCmd(arg);break;
     case 's-custom':case 's-svc':manorCmd(cmd,arg);break; // the customs of a manor, and its services commuted or kept in hand (#36)
     case 'a-order':case 'a-road':case 'a-raft':case 'a-objective':case 'a-hold':case 'a-release':case 'a-disband':case 'a-split':case 'a-merge':case 'a-garrison':armyCmd(cmd.slice(2),arg);break;
   }
@@ -20116,7 +20155,8 @@ function workerCommandTarget(e){
         const [si,k,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!WORKS.some(w=>w[0]===k))throw Error('Invalid works command');return 'worker';
       }
       if(c==='p-manumit'){if(!/^\d+$/.test(a)||!workerCommandId(+a)||!(W._pm||folkIndex()).has(+a))throw Error('Invalid freedom command');return 'worker';}
-      if(c==='s-school'||c==='s-learning'){const [si,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||v===undefined||v.trim()===''||!Number.isFinite(+v)||+v<0)throw Error('Invalid learning command');return 'worker';}
+      if(c==='s-school'||c==='s-learning'||c==='s-tutor'){const [si,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||v===undefined||v.trim()===''||!Number.isFinite(+v)||+v<0)throw Error('Invalid learning command');return 'worker';}
+      if(c==='s-college'){const[si,key,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!['classroom','residence'].includes(key))throw Error('Invalid college command');return 'worker';}
       if(c==='s-justice'){const [si,k,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||k!=='cap'||!/^\d+(\.\d+)?$/.test(v||'')||+v>1)throw Error('Invalid justice command');return 'worker';}
       if(c==='c-eyre'){if(a!=='')throw Error('Invalid eyre command');return 'worker';}
       if(c==='c-estates'||c==='c-subsidy-rate'){if(!/^\d+(\.\d+)?$/.test(a)||!(+a>0&&+a<=1))throw Error('Invalid estates command');return 'worker';}

@@ -1,8 +1,8 @@
 # Funded learning (#40)
 
 Local parish, cathedral and abbey schooling, four-master universities and
-travelling scholars with actual destination board/lodging are operative. Paid
-college construction and noble tutors are the next slice.
+travelling scholars with actual destination board/lodging, paid colleges and
+named native tutors for noble children are operative.
 
 ## Actual actors and cash
 
@@ -69,8 +69,7 @@ Sunday, bread/rent protection, truthful closure, pure reads, post-opening remova
 of unsupported calendar education, and actual graduate qualifications. Root's
 serialized native worker/replay/economy gates remain necessary before release.
 
-Next: paid college classrooms/residential buildings and native noble tutors;
-abbey scholar board requires an explicit contract admitted by native abbey home
+Abbey scholar board requires an explicit contract admitted by native abbey home
 allocation, with member/corrody capacity honored. No hall acquires invented room.
 
 ## Universities and visiting scholars
@@ -111,3 +110,44 @@ The university report exposes named masters, real board/rent receipts and actual
 graduate counts as a pure DTO. Added focused cases cover four separate paid
 masters, unavailable-master closure, family-retaining journeys, destination food
 and rent, exactly one home absence, and room-loss return without skill gain.
+
+## Colleges and household tutors
+
+Endowed colleges require actual `college` knowledge/adoption (historical gate
+1264, prerequisite university). `s-college` commissions a native hall classroom
+or, after that actual classroom, a native residential hospital range. Colleges
+are owned/funded by the actual local crown/lord; no new chest is seeded. A patron
+may commission them directly. Daily automatic eligibility compares the owner's
+actual annual school allowance left after living teachers with a five-year
+construction cost; no estimated benefit is credited as income.
+
+A bounded sixteen-site survey uses the same native compound footprint/access
+validator. Fixed plans save true material quantities, ground value, labour and
+paid days. Shared construction asks current exact ground rights and named ground
+payments (`groundRequired`) before materials/work; `storageGroundClaim` must
+retain root's site-aware footprint-plus-approach implementation, not its older
+nominal-ARCH-box variant. Existing occupied holdings cannot be erased by a
+college. Timber recipe improvements are quoted/purchased once. Siege, title,
+blocked access, funds, crew and materials can stall or abandon real sunk work.
+Completion uses native building identity/title/occupied ground/instances and
+multi-purpose component references. The hall gives teaching space only; the
+hospital's actual `capOf` is the only source of new lodging.
+
+The journaled `s-tutor` annual allowance hires one existing skilled native adult
+for a noble household only when its actual children, surveyed sound keep/hall,
+allowance and real chest surplus support his bread and foregone trade. The same
+native tutor receives real daily transfers, has his dated teaching contract and
+leaves ordinary craft shares while employed. Only present actual noble children
+receive lessons bounded by that tutor's real skills; armies/absence/Sunday give
+no lessons. `technologySchoolMaster` reads this actual tutor contract as another
+supported native teacher. Room/patron/master/funding loss closes the contract and
+restores the native teacher's previous work; no guessed tutor proficiency is
+added. `W.tutors`, `s.tutor`, `s.tutorAllowance`, person `tutorMaster`, notable
+`tutored` and the native college tag are private simulation records. Court and
+adviser reports contain only native ids and actual payments.
+
+Added focused cases check a named paid tutor's actual noble skills, conserved
+money, technology receipt evidence and room-loss closure; college quotes require
+knowledge/cash and a completed prerequisite, create no buildings/compound on
+read, and enforce ruler ownership. Native geometry/ground/work/completion,
+speed/replay/save/projection and multi-era economy are root's serialized gates.
