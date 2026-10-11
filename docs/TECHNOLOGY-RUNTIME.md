@@ -128,21 +128,27 @@ Already operative:
 - Castle/abbey/government adapters consume capability methods above; methods
   create eligibility, never free buildings, members, grants or court receipts.
 
-Next paid adapters (#40/#43/#41/#39) still must supply physical effects:
+Paid equipment now supplies native farm, workshop, powered-mill, paper,
+teaching and carrier effects (see [EQUIPMENT-RUNTIME.md](EQUIPMENT-RUNTIME.md)).
+It requires actual recipes, makers, named payers and completed records. Smiths
+and weavers process only their actual present work capacity; current paid
+journeymen and available cottage hands replace anonymous town-wide capacity.
+Local adoption alone changes none of these quantities.
 
-| Consumer | Actual evidence and query |
+| Consumer | Running evidence or remaining boundary |
 |---|---|
-| Loom, spinning, fulling, blast furnace | Named real craft contracts, paid native recipes, completed workshop/mill equipment; apply `technologyEffect` to working capacity/output, not price |
-| Heavy plough, horse collar, horseshoe | Real soil, household team/equipment, fodder and paid tools; add their yield/haul effects without applying free place-wide multipliers |
-| Post windmill | Sound paid native mill on a suitable wind site, actual miller/grain/multure, then its real grinding capacity |
-| Universities, paper, spectacles, clocks, printing | Funded masters/admissions and real buildings/inputs/output; count their actual teaching or books through receipt/equipment contracts |
-| Crossbow, longbow, plate, trebuchet, gunpowder/cannon | Paid real arms and crew bound to actual garrison/army records; equipment effect at combat/siege consumers |
-| Rudder, cog, compass, charts, carrack | Paid built/fitted native ships with actual equipment; capacity/routing/wreck effects at the existing shipping consumer |
-| Numerals, bills, double entry | Real clerk/merchant/account contracts and claims; no invented errors or remote coin transfer until #38 provides them |
-| Quarantine, canal lock | An actual port policy/closure or paid canal/lock operation; no inert date multiplier |
+| Loom, spinning, fulling, blast furnace, saw and hammer | Completed paid native machine, eligible actual master or present miller, today's paid hands or actual per-use mill receipts |
+| Heavy plough, horse collar, horseshoe | Actual fitted household equipment, held teams and available family labour; native field share and carriage time use these inputs |
+| Funded universities, paper, spectacles, clocks, printing | Actual masters, pupils and rooms; paper has one commodity ledger and printed lessons consume purchased sheets |
+| Rudder, cog, compass, charts, carrack | Paid actual boatman equipment changes his real native trip time/freight; native cargo limits and wreck rules are unchanged |
+| Crossbow, longbow, plate, ram, trebuchet, cannon | Paid actual army recipe and recorded living holders; `technologyArmyEquipmentFactor` is the battle/siege adapter contract |
+| Post windmill | Still requires a paid suitable native mill site and actual grinding/multure consumer |
+| Numerals, bills, double entry | Finance clients must use actual clerk/merchant claims; no simulated accounting errors or free remote payments |
+| Quarantine, canal lock | Still require actual port closure or paid native canal/lock operations |
 
 `technologyEffect(s,key,operation)` returns one unless the method is available
-**and** the operation records installed `equipment[key]` or `techEquipment[key]`.
+**and** the operation records `techEquipment[key].installed === true` (or the matching native
+`equipment` record). Bare flags confer no physical effect.
 The records must refer to actual paid/completed equipment produced by the owning
 adapter; knowledge must never fill these fields. It exposes only quantity
 factors for native operations. `technologyState` is a pure JSON DTO; the court
@@ -174,3 +180,12 @@ rules. They authorize actual contracts, licences and service; they create no
 people, equipment or free income. `licensedTourney` requires both tournament
 practice and the actual royal-eyre knowledge seam. Ordinary early martial
 hosting remains the pre-existing native system.
+
+
+Paid foundation clients now have genuine local rules for `quarry850` (the older
+`quarry950` alias remains compatible), `franciscan1210`, `dominican1216`,
+`stoneWharf1250` and `starCitadel1500`. Quarrying is inherited baseline knowledge
+in the 850 opening, not a claim that stone extraction was invented in 950.
+Military-order clients use `hospitalOrder1113` and `templeOrder1119`, each
+requiring actual foreign-expedition knowledge. Suppression and lawful asset
+succession belong to the actual Church/foreign adapter, not knowledge deletion.

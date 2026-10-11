@@ -877,8 +877,8 @@ function realCultAt(x,z){ // the tongue of the nearest historic town reachable o
     for(let h=0;h<q.length;h++){const c=q[h],cx=c%GRID,cz=(c/GRID)|0;for(const[dx,dz]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=cx+dx,nz=cz+dz;if(!inB(nx,nz))continue;const n=cIdx(nx,nz);if(C[n]>=0||W.water[n]===1)continue;C[n]=C[c];q.push(n);}}
     W.cultMap=C;}
   const k=W.cultMap[cIdx(toCell(x),toCell(z))];return k>=0?W.cultIds[k]:null;}
-const GOODS=['grain','fish','timber','ore','tools','cloth','wine','wool','sheep','cattle','horses','swine','spice','silk','stone','hay','meat'];
-const GOODBASE={grain:2,fish:2.5,timber:3,ore:5,tools:9,cloth:7,wine:8,wool:4,sheep:3,cattle:12,horses:25,swine:4,spice:40,silk:30,stone:2.5,hay:1.2,meat:3}; // spice and silk come only by the great ships; beasts are goods like any other: driven to market along the roads. Meat (salted: bacon, salt beef and mutton) opens near its beast's price by the carcass (CARCASS: an ox's 4 at 12, a pig's 1.5 at 4, a sheep's 0.6 at 3): a starting value the market then moves
+const GOODS=['paper','grain','fish','timber','ore','tools','cloth','wine','wool','sheep','cattle','horses','swine','spice','silk','stone','hay','meat'];
+const GOODBASE={paper:2,grain:2,fish:2.5,timber:3,ore:5,tools:9,cloth:7,wine:8,wool:4,sheep:3,cattle:12,horses:25,swine:4,spice:40,silk:30,stone:2.5,hay:1.2,meat:3}; // spice and silk come only by the great ships; beasts are goods like any other: driven to market along the roads. Meat (salted: bacon, salt beef and mutton) opens near its beast's price by the carcass (CARCASS: an ox's 4 at 12, a pig's 1.5 at 4, a sheep's 0.6 at 3): a starting value the market then moves
 const SEASONS=['Spring','Summer','Autumn','Winter'];
 const SEASONGLYPH=['❀','☀','⚘','❄'];
 const CART_MPD=500,BARGE_MPD=700,COG_MPD=2800,MARCH_MPD=400,FIELD_MPD=250; /* one scale for every traveller: the map's distances stand for a realm ~40x larger (9 km of map ~ 360 km), so each moves at its real pace in km a day divided by 40 — ox-cart 20 km, host 16 on the road and 10 across country, barge 28, cog 110, great ship 140, envoy 60, dragon 320. Towns and houses are drawn true size, so the townsfolk keep true time: a walk across town is half an hour. */ // metres a day: carts on the road, barges, cogs, a host on the road and across country — one clock for all
@@ -919,12 +919,14 @@ function constructionCapability(s,method,ad=AD()){
 /* TECHNOLOGY: information belongs to the realm; work, property and equipment
    still belong to their real owners. A known method never creates its building. */
 const TECH_RULES=Object.freeze({
+  siegeEngine:{name:'Ram and mining siege kit',year:850,needs:[],kind:'war',gain:.1},
   timberPalisade:{name:'Timber palisade',year:550,needs:[],kind:'war',gain:0.1},
   estateWinepress:{name:'Manorial wine press',year:850,needs:[],kind:'estate',estate:'winepress',gain:0.1},
   estateDovecote:{name:'Dovecote',year:1066,needs:[],kind:'estate',estate:'dovecote',gain:0.1},
   estateWarren:{name:'Rabbit warren',year:1150,needs:[],kind:'estate',estate:'warren',gain:0.1},
   estatePark:{name:'Enclosed deer park',year:1066,needs:[],kind:'estate',estate:'park',gain:0.1},
   estateFishpond:{name:'Managed fishpond',year:1066,needs:[],kind:'estate',estate:'fishpond',gain:0.1},
+  quarry:{name:'Stone quarrying',year:850,needs:[],kind:'building',gain:.1},
   watermill:{name:'Water mill',year:850,needs:[],kind:'mill',gain:0.2},
   moneyer:{name:'Moneyer and mint administration',year:850,needs:[],kind:'law',gain:0.1},
   heavyPlough:{name:'Heavy mouldboard plough',year:850,needs:[],kind:'farm',gain:0.2},
@@ -940,6 +942,12 @@ const TECH_RULES=Object.freeze({
   scutage:{name:'Commutation of knight service',year:1100,needs:['knightService'],kind:'law',gain:0.1},
   tournament:{name:'Organised tournament',year:1100,needs:['knightService'],kind:'war',gain:0.1},
   mercenaryCompany:{name:'Contracted mercenary company',year:1100,needs:['knightService'],kind:'war',gain:0.1},
+  franciscan:{name:'Franciscan friars',year:1210,needs:['benedictine'],kind:'religious',gain:.1},
+  dominican:{name:'Dominican friars',year:1216,needs:['benedictine'],kind:'religious',gain:.1},
+  stoneWharf:{name:'Stone waterfront wharf',year:1250,needs:['houseMasonry'],kind:'building',gain:.1},
+  starCitadel:{name:'Artillery star citadel',year:1500,needs:['gunpowder','siegeCannon'],kind:'building',gain:.2},
+  hospitalOrder:{name:'Order of the Hospital',year:1113,needs:['foreignExpedition'],kind:'religious',gain:.1},
+  templeOrder:{name:'Order of the Temple',year:1119,needs:['foreignExpedition'],kind:'religious',gain:.1},
   foreignExpedition:{name:'Vowed foreign expedition',year:1095,needs:['knightService'],kind:'war',gain:0.1},
   craftGuild:{name:'Chartered craft guild',year:1150,needs:[],kind:'law',gain:0.1},
   licensedTourney:{name:'Licensed tournament ground',year:1194,needs:['tournament','royalEyre'],kind:'law',gain:0.1},
@@ -997,7 +1005,7 @@ const TECH_RULES=Object.freeze({
   printing:{name:'Printing press',year:1450,needs:['paperMill'],kind:'learning',gain:0.5}
 });
 const TECH_KEYS=Object.keys(TECH_RULES).sort((a,b)=>TECH_RULES[a].year-TECH_RULES[b].year||(a<b?-1:a>b?1:0));
-const TECH_ALIASES={knightService1066:'knightService',scutage1100:'scutage',tournament1100:'tournament',licensedTourney1194:'licensedTourney',mercenaryCompany1100:'mercenaryCompany',chivalricOrder1348:'chivalricOrder',foreignExpedition1095:'foreignExpedition',merchantGuild1080:'merchantGuild',craftGuild1150:'craftGuild',moneyer850:'moneyer',licensedCredit1066:'licensedCredit',merchantBond1285:'merchantBond',commune1070:'commune',royalBench1170:'royalBench',parliament1265:'parliament',sheriff1066:'sheriff',hundred1066:'hundred',royalEyre1166:'royalEyre',augustinian1100:'augustinian',cistercian1128:'cistercian',benedictine910:'benedictine',concentricCastle:'castleOuterCurtain',threeFieldRotation:'threeField',treadwheelCrane:'crane',stoneVault:'gothic',school:'benedictine'};
+const TECH_ALIASES={siegeEngine850:'siegeEngine',quarry850:'quarry',quarry950:'quarry',franciscan1210:'franciscan',dominican1216:'dominican',stoneWharf1250:'stoneWharf',starCitadel1500:'starCitadel',hospitalOrder1113:'hospitalOrder',templeOrder1119:'templeOrder',knightService1066:'knightService',scutage1100:'scutage',tournament1100:'tournament',licensedTourney1194:'licensedTourney',mercenaryCompany1100:'mercenaryCompany',chivalricOrder1348:'chivalricOrder',foreignExpedition1095:'foreignExpedition',merchantGuild1080:'merchantGuild',craftGuild1150:'craftGuild',moneyer850:'moneyer',licensedCredit1066:'licensedCredit',merchantBond1285:'merchantBond',commune1070:'commune',royalBench1170:'royalBench',parliament1265:'parliament',sheriff1066:'sheriff',hundred1066:'hundred',royalEyre1166:'royalEyre',augustinian1100:'augustinian',cistercian1128:'cistercian',benedictine910:'benedictine',concentricCastle:'castleOuterCurtain',threeFieldRotation:'threeField',treadwheelCrane:'crane',stoneVault:'gothic',school:'benedictine'};
 function technologyKey(key){return TECH_ALIASES[key]||key;}
 function initTechnology(){
   if(W.technology)return W.technology;
@@ -1112,8 +1120,8 @@ function constructionTechnologyRecipe(s,material='timber'){
 function constructionLaborFactor(s,material='timber'){return constructionTechnologyRecipe(s,material).laborFactor;}
 function technologyEffect(s,key,operation){
   key=technologyKey(key);if(!technologyCapability(s,key).available)return 1;
-  const equipment=operation?.equipment?.[key]||operation?.techEquipment?.[key];if(!equipment)return 1;
-  const effects={loom:1.3,spinningWheel:1.5,fullingMill:1.3,blastFurnace:1.5,horseCollar:1.5,crossbow:1.1,longbow:1.15,plateArmour:1.1,trebuchet:1.8,siegeCannon:4,cog:1.2,rudder:1.1,compass:1.1,portolan:1.1,carrack:1.2};return effects[key]||1;
+  const equipment=operation?.equipment?.[key]||operation?.techEquipment?.[key];if(!equipment?.installed)return 1;
+  const effects={clock:1.1,loom:1.3,spinningWheel:1.5,fullingMill:1.3,tripHammer:1.4,sawmill:1.25,blastFurnace:1.5,horseCollar:1.5,crossbow:1.1,longbow:1.15,plateArmour:1.1,trebuchet:1.8,siegeCannon:4,cog:1.2,rudder:1.1,compass:1.1,portolan:1.1,carrack:1.2};return effects[key]||1;
 }
 function technologyCmd(arg){
   const [si,value]=String(arg).split(':'),s=W.settlements[+si],annual=+value;if(!s||!sovOn()||s.owner!==plyH()||!Number.isFinite(annual)||annual<0)return false;
@@ -3940,7 +3948,7 @@ function learningPayer(p){return p?.gn!==undefined&&!p.merc?p._hh||null:p;}
 function learningFamilySize(s,p){const A=learningPayer(p);return A?.household?A.population?.get(s)||[...A.members].filter(q=>!q.dead&&W.settlements[q.si]===s).length:1;}
 function learningRoster(s){
   const I={masters:[],pupils:[],scholars:[]};for(const p of s.folk||[]){if(p.dead||p.outlawCampId||institutionalJobHeld(p))continue;const a=ageYrs(p);
-    if(a>=18&&a<70&&p.sk?.[KL]>=0.2&&p.tutorMaster===undefined&&learningHead(p)===p&&learningPayer(p))I.masters.push(p);
+    if(a>=18&&(a<70||a<85&&typeof technologyEquipmentAvailable==='function'&&technologyEquipmentAvailable(s,'spectacles',p))&&p.sk?.[KL]>=0.2&&p.tutorMaster===undefined&&learningHead(p)===p&&learningPayer(p))I.masters.push(p);
     if(a>=14&&a<30&&!p.office&&!p.sp&&p.schoolMaster===undefined&&p.sk?.[KL]>=0.15)I.scholars.push(p);
     if(a>=7&&a<24&&!p.office&&!p.sp&&p.schoolMaster===undefined&&!(p.sk?.[KL]>=0.45))I.pupils.push(p);}return I;
 }
@@ -3996,7 +4004,7 @@ function learningSchoolClose(S,why){
 function learningLesson(S,p,master,fraction){
   if(!(fraction>0)||!learningPresent(W.settlements[S.si],p)||!learningPresent(W.settlements[S.si],master))return false;
   const pl=ageYrs(p)<21?1:ageYrs(p)<35?0.55:0.25,apt=Math.exp(0.35*trait(p,GW)+0.25*trait(p,GD))*pl;
-  for(const[k,rate]of [[KL,0.22],[KR,0.16],[KS,0.12],[KLaw,0.12]]){const own=p.sk[k]||0,skill=master.sk[k]||0;if(skill>own)p.sk[k]+=Math.min(skill-own,rate/360*apt*fraction*skill*(1-own));}
+  for(const[k,rate]of [[KL,0.22],[KR,0.16],[KS,0.12],[KLaw,0.12]]){const own=p.sk[k]||0,skill=master.sk[k]||0;if(skill>own)p.sk[k]+=Math.min(skill-own,rate/360*apt*fraction*skill*(1-own)*technologySightFactor(W.settlements[S.si],master)*(S.printedFactor||1)*technologyEffect(W.settlements[S.si],'clock',S.building));}
   p.study.lastLessonDay=day();p.study.lessons+=fraction;S.lessons+=fraction;return true;
 }
 function learningGraduate(S,p){
@@ -4013,7 +4021,7 @@ function learningSchoolTick(S){
   let paid=0;const receipts=new Array(staff.length).fill(0);for(const Q of can){let got=0;for(let i=0;i<staff.length;i++){const receipt=transfer(Q.payer,staff[i],Q.fee*wages[i]/wage,'schooling',s);receipts[i]+=receipt;got+=receipt;}Q.p.study.paid+=got;S.fees+=got;Q.receipt=got;paid+=got;}
   let stipend=0;for(let i=0;i<staff.length;i++){const receipt=grant>0?transfer(patron,staff[i],grant*wages[i]/wage,'school stipend',s):0;receipts[i]+=receipt;stipend+=receipt;const contract=S.contracts?.[staff[i].id]||S.contract;contract.paid+=receipts[i];if(receipts[i]>0)contract.lastPaidDay=day();technologyRecordTeaching(s,staff[i],receipts[i]);}paid+=stipend;S.stipends+=stipend;
   if(S.contracts){S.contract.paid+=paid;if(paid>0)S.contract.lastPaidDay=day();const U=W.universities[S.university];U.fees+=can.reduce((t,Q)=>t+Q.receipt,0);U.stipends+=stipend;const was=U.active;U.active=staff.length>=4&&receipts.every(v=>v>0);if(U.active&&!was&&!U.announced){U.announced=true;emit('trade',3,s.pos,`Four supported masters gather at ${s.name}; their company is called a university.`);}}
-  const delivered=Math.min(1,paid/Math.max(1e-9,wage));if(day()%7!==0)for(const Q of can){const family=Q.fee>0?Math.min(delivered,Q.receipt/Q.fee):delivered;let taught=false;for(let i=0;i<staff.length;i++){const fraction=Math.min(family,receipts[i]/Math.max(1e-9,wages[i]))/staff.length;if(learningLesson(S,Q.p,staff[i],fraction))taught=true;}if(taught)learningGraduate(S,Q.p);}S.pupils=S.pupils.filter(id=>!learningPerson(id)?.study?.closed);
+  S.printedFactor=technologyPrintedLesson(S,master);const delivered=Math.min(1,paid/Math.max(1e-9,wage));if(day()%7!==0)for(const Q of can){const family=Q.fee>0?Math.min(delivered,Q.receipt/Q.fee):delivered;let taught=false;for(let i=0;i<staff.length;i++){const fraction=Math.min(family,receipts[i]/Math.max(1e-9,wages[i]))/staff.length;if(learningLesson(S,Q.p,staff[i],fraction))taught=true;}if(taught)learningGraduate(S,Q.p);}S.pupils=S.pupils.filter(id=>!learningPerson(id)?.study?.closed);
 }
 function tickLearning(){
   if(W._learningDay===day())return;W._learningDay=day();
@@ -4126,17 +4134,17 @@ function learningPlaceHTML(s){return(s.schoolIds||[]).map(id=>W.schools?.[id]).f
 function learningSchoolsHTML(){const T=learningState();let h='<div class="dhead">Funded schools</div>';for(const S of T.schools)h+=`<div class="note">${esc(W.settlements[S.si].name)} · ${esc(S.masterName)} · ${S.gone?'closed: '+esc(S.reason):S.pupils.length+' pupils'} · ${S.fees.toFixed(1)} tuition / ${S.stipends.toFixed(1)} stipends received · ${S.graduates} graduates</div>`;
   for(const U of T.universities)h+=`<div class="note">University at ${esc(W.settlements[U.si].name)} · ${U.active?U.masters.length+' paid masters':'teaching suspended'} · ${U.board.toFixed(1)} board / ${U.lodging.toFixed(1)} lodging paid locally · ${U.graduates} graduates</div>`;
   for(const T0 of T.tutors)h+=`<div class="note">${esc(T0.masterName)}, tutor at ${esc(W.settlements[T0.si].name)} · ${T0.gone?'closed: '+esc(T0.reason):T0.pupils.length+' noble pupils'} · ${T0.paid.toFixed(1)} received</div>`;
-  if(sovOn())for(const [si,s]of W.settlements.entries()){if(s.owner!==plyH())continue;h+=`<div class="note">${esc(s.name)} · ${(s.schoolAllowance||0).toFixed(1)} gold a year to actual schoolmasters</div><div class="pbrow">`;for(const[v,label]of[[0,'Stop'],[foodYr()*5,'Support'],[foodYr()*15,'Endow']])h+=`<button class="cbtn" data-cmd="s-school" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;h+='</div><div class="pbrow">';for(const[v,label]of[[0,'Stop tutor'],[foodYr()*5,'Hire tutor']])h+=`<button class="cbtn" data-cmd="s-tutor" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;if(institutionalCapability(s,'college').available)h+=`<button class="cbtn" data-cmd="s-college" data-arg="${si}:classroom">Build college classroom</button><button class="cbtn" data-cmd="s-college" data-arg="${si}:residence">Build scholars’ lodging</button>`;h+='</div>';}return h+craftGuildsHTML();}
+  if(sovOn())for(const [si,s]of W.settlements.entries()){if(s.owner!==plyH())continue;h+=`<div class="note">${esc(s.name)} · ${(s.schoolAllowance||0).toFixed(1)} gold a year to actual schoolmasters</div><div class="pbrow">`;for(const[v,label]of[[0,'Stop'],[foodYr()*5,'Support'],[foodYr()*15,'Endow']])h+=`<button class="cbtn" data-cmd="s-school" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;h+='</div><div class="pbrow">';for(const[v,label]of[[0,'Stop tutor'],[foodYr()*5,'Hire tutor']])h+=`<button class="cbtn" data-cmd="s-tutor" data-arg="${si}:${v}">${label} · ${v.toFixed(1)} a year</button>`;if(institutionalCapability(s,'college').available)h+=`<button class="cbtn" data-cmd="s-college" data-arg="${si}:classroom">Build college classroom</button><button class="cbtn" data-cmd="s-college" data-arg="${si}:residence">Build scholars’ lodging</button>`;h+='</div>';}if(sovOn())for(const s of W.settlements)if(s.owner===plyH())h+=technologyEquipmentHTML(s);return h+craftGuildsHTML();}
 
 /* CRAFT LADDER (#43): one native person, one job; shops, contracts and guild
    chests are paid from actual takings. Opening craftsmen inherit their existing
    occupation, while every subsequent premium has a living local recipient. */
-function institutionalJobHeld(p){return !!p&&!p.dead&&(!!p.estateOffice||!!p.abbeyJob||p.schoolMaster!==undefined||p.tutorMaster!==undefined||!!p.office&&p.office!=='warden'||!!p.study&&!p.study.closed||!!p.apprentice&&!p.apprentice.closed||p.craft?.employer!=null);}
+function institutionalJobHeld(p){return !!p&&!p.dead&&(!!p.estateOffice||!!p.abbeyJob||!!p.outlawCampId||!!p.role&&p.abbey==null||p.schoolMaster!==undefined||p.tutorMaster!==undefined||!!p.office&&p.office!=='warden'||!!p.study&&!p.study.closed||!!p.apprentice&&!p.apprentice.closed||p.craft?.employer!=null);}
 const CRAFT_TRADES=new Set(['smith','baker','butcher','brewer','cook','miller','carpenter','mason','thatcher','cooper','potter','weaver','dyer','tailor','shoemaker','tanner','glover','chandler','merchant','spicer','roper','salter','wheelwright','bowyer','fletcher']);
-function craftPresent(s,p){return !!p&&!p.dead&&!p.outlawCampId&&W.settlements[p.si]===s&&!(p.away&&day()<p.away.until)&&!p.estateOffice&&!p.abbeyJob&&p.schoolMaster===undefined&&p.tutorMaster===undefined&&(!p.office||p.office==='warden')&&(!p.study||p.study.closed);}
-function craftIndex(s){const revision=W._folkRevision||0,y=year(),old=s._craftIndex;if(old&&old.revision===revision&&old.year===y)return old;
+function craftPresent(s,p){return !!p&&!p.dead&&!p.role&&!p.outlawCampId&&W.settlements[p.si]===s&&!(p.away&&day()<p.away.until)&&!p.estateOffice&&!p.abbeyJob&&p.schoolMaster===undefined&&p.tutorMaster===undefined&&(!p.office||p.office==='warden')&&(!p.study||p.study.closed);}
+function craftIndex(s,pure=false){const revision=W._folkRevision||0,y=year(),old=s._craftIndex;if(!pure&&old&&old.revision===revision&&old.year===y)return old;
   const I={revision,year:y,heads:[],young:[],trades:new Map(),rooms:new Map()};for(const p of s.folk||[]){if(p.dead||p.outlawCampId)continue;const a=ageYrs(p);if(a>=14&&a<24&&!p.trChosen)I.young.push(p);if(p._hh?.head!==p||a<18)continue;I.heads.push(p);if(CRAFT_TRADES.has(p.tr)){const L=I.trades.get(p.tr)||[];L.push(p);I.trades.set(p.tr,L);}}
-  for(const b of s.buildings||[])if(!b.removed&&b.state==='sound'){const L=I.rooms.get(b.arch)||[];L.push(b);I.rooms.set(b.arch,L);}return s._craftIndex=I;
+  for(const b of s.buildings||[])if(!b.removed&&b.state==='sound'){const L=I.rooms.get(b.arch)||[];L.push(b);I.rooms.set(b.arch,L);}return pure?I:(s._craftIndex=I);
 }
 function craftRoomValid(s,b,tr){if(!b||b.removed||b.state!=='sound'||b.s&&b.s!==s)return false;const arch=TRADE_ARCH[tr];if(arch)return b.arch===arch||tr==='weaver'&&['house','longhouse','cot','shop','burgher'].includes(b.arch);if(tr==='miller')return b===s.mill||b.arch==='mill';return ['house','longhouse','burgher','shop','hall','cot'].includes(b.arch);}
 function craftRoomCapacity(b){return Math.max(1,Math.floor((b.w||8)*(b.d||7)*0.35/10))*(1+(b.tier||0));} // work benches, never residential capacity
@@ -4183,7 +4191,7 @@ function craftEmployeeTick(s,p){const c=p.craft,m=learningPerson(c?.employer);if
   c.fraction=0;if(day()%7===0)return;const paid=transfer(m,p,Math.min(c.wage,learningSpare(s,m)),'journeyman wages',s);if(!(paid>0)){craftEmployeeClose(s,p,'master cannot pay');return;}c.paid+=paid;c.paidDay=day();c.fraction=Math.min(1,paid/c.wage);const skill=p.sk[KCr]||0;p.sk[KCr]+=0.08/360*c.fraction*(1-skill);
 }
 function craftHands(s,p){let n=1;for(const id of p.craft?.employees||[]){const q=learningPerson(id);if(craftPresent(s,q)&&q.craft.employer===p.id&&q.craft.paidDay===day())n+=q.craft.fraction||0;}return n;}
-function craftWeight(s,p){const base=(TRADE_W[p.tr]||0.5)*(1+0.3*(p.bh&&!p.bh.removed?p.bh.tier:0))*(0.8+0.2*(p.sk?.[KCr]||0));return base*(p.craft?.rank==='master'?craftHands(s,p):1);}
+function craftWeight(s,p){const base=(TRADE_W[p.tr]||0.5)*(1+0.3*(p.bh&&!p.bh.removed?p.bh.tier:0))*(0.8+0.2*(p.sk?.[KCr]||0));return base*(p.craft?.rank==='master'?craftHands(s,p):1)*(typeof technologySightFactor==='function'?technologySightFactor(s,p):1);}
 function craftGuildQuote(s,tr){if(craftGuild(s,tr)||s.guildPolicy?.[tr]===false||s.kind==='village'||s.siegeBy||!institutionalCapability(s,tr==='merchant'?'merchantGuild':'craftGuild').available)return null;const masters=(craftIndex(s).trades.get(tr)||[]).filter(p=>craftPresent(s,p)&&p.craft?.rank==='master'),n=masters.length;if(n<2)return null;
   const clerk=craftIndex(s).heads.filter(p=>craftPresent(s,p)&&p.sk?.[KL]>=0.2&&p.sk?.[KR]>=0.2&&!institutionalJobHeld(p)).sort((a,b)=>(b.sk[KL]+b.sk[KR])-(a.sk[KL]+a.sk[KR])||a.id-b.id)[0];if(!clerk)return null;const licence=foodYr()*n*0.5,writing=learningTeacherCost(s,clerk)*30,price=licence+writing,dilution=craftEntryFine(s,tr,n),contribution=price/n;
   if(!(dilution>contribution)||masters.some(p=>learningSpare(s,p)<contribution))return null;return{s,tr,masters,clerk,issuer:s.commune?s:lordAcct(s),licence,writing,price,contribution,dilution};
@@ -4213,6 +4221,101 @@ function craftGuildCmd(arg){const[si,tr,on,...rest]=String(arg).split(':'),s=W.s
 function craftState(){return{guilds:(W.guilds||[]).map(g=>({id:g.id,name:g.name,si:g.si,trade:g.trade,gone:!!g.gone,gold:g.gold,members:g.members?.slice()||[],entryFine:g.entryFine||0,dues:g.dues||0,fines:g.fines||0,relief:g.relief||0,feast:g.feast||0,parish:g.parish||0})),apprentices:(W.apprentices||[]).map(id=>learningPerson(id)).filter(p=>p?.apprentice&&!p.apprentice.closed).map(p=>({person:p.id,name:folkName(p),si:p.si,master:p.apprentice.master,trade:p.apprentice.trade,served:p.apprentice.served,premium:p.apprentice.premium}))};}
 function craftPlaceHTML(s){const G=(s.guildIds||[]).map(id=>W.guilds?.[id]).filter(g=>g&&!g.gone),masters=(s.folk||[]).filter(p=>!p.dead&&p.craft?.rank==='master').length,workers=(s.folk||[]).filter(p=>!p.dead&&p.craft?.employer!=null).length,apprentices=(s.folk||[]).filter(p=>!p.dead&&p.apprentice&&!p.apprentice.closed).length;return `${masters} masters · ${workers} wage-paid journeymen · ${apprentices} apprentices`+(G.length?' · '+G.map(g=>`${esc(g.name)}: ${g.gold.toFixed(1)} in the chest, ${g.relief.toFixed(1)} alms`).join('; '):'');}
 function craftGuildsHTML(){const T=craftState();let h='<div class="dhead">Crafts and guilds</div>';for(const g of T.guilds)if(!g.gone)h+=`<div class="note">${esc(g.name)} · ${g.members.length} masters · ${g.gold.toFixed(1)} chest · ${g.dues.toFixed(1)} dues · ${g.relief.toFixed(1)} alms · ${g.feast.toFixed(1)} feast spending</div>`;if(sovOn())for(const[si,s]of W.settlements.entries())if(s.owner===plyH()&&s.kind!=='village'){for(const tr of new Set((s.folk||[]).filter(p=>!p.dead&&p.craft?.rank==='master').map(p=>p.tr)))if(!craftGuild(s,tr))h+=`<div class="note">${esc(s.name)} · ${esc(tr)} charter ${s.guildPolicy?.[tr]===false?'refused':'permitted'}</div><div class="pbrow"><button class="cbtn" data-cmd="s-guild" data-arg="${si}:${tr}:grant">Permit charter purchase</button><button class="cbtn" data-cmd="s-guild" data-arg="${si}:${tr}:refuse">Refuse charter</button></div>`;}return h;}
+
+/* EQUIPMENT: knowledge authorizes a fixed paid recipe; it supplies neither the
+   machine nor its operator. Projects retain their original price and labour. */
+const TECH_EQUIPMENT=Object.freeze({
+  siegeEngine:{kind:'army',crew:['carpenter','mason'],goods:{timber:24,tools:4},work:2,days:25,gain:.2},
+  trebuchet:{kind:'army',crew:['carpenter','mason'],goods:{timber:40,tools:6,stone:6},work:3,days:35,gain:.8},
+  siegeCannon:{kind:'army',crew:['smith'],goods:{ore:40,tools:8,timber:20,stone:10},work:5,days:60,gain:3},
+  crossbow:{kind:'army',crew:['bowyer','fletcher'],goods:{timber:10,tools:20},work:2,days:30,gain:.1,individual:true},
+  longbow:{kind:'army',crew:['bowyer','fletcher'],goods:{timber:30,tools:5},work:1,days:20,gain:.15,individual:true},
+  plateArmour:{kind:'army',crew:['smith'],goods:{ore:80,tools:20,timber:20},work:8,days:60,gain:.1,individual:true},
+  heavyPlough:{kind:'person',crew:['carpenter','smith'],goods:{timber:4,tools:2},work:1/12,days:7,gain:.2},
+  horseshoe:{kind:'person',crew:['smith'],goods:{tools:.5},work:1/60,days:2,gain:.1},
+  horseCollar:{kind:'person',crew:['tailor','shoemaker'],goods:{cloth:2,tools:1,timber:1},work:1/30,days:4,gain:.5},
+  loom:{kind:'building',crew:['carpenter'],goods:{timber:8,tools:2},work:1/6,days:12,gain:.3},
+  fullingMill:{kind:'building',crew:['carpenter','mason'],goods:{timber:24,stone:8,tools:4},work:.5,days:30,gain:.3},
+  tripHammer:{kind:'building',crew:['carpenter','mason','smith'],goods:{timber:18,stone:12,tools:6},work:.5,days:30,gain:.4},
+  sawmill:{kind:'building',crew:['carpenter','smith'],goods:{timber:18,stone:8,tools:5},work:.5,days:25,gain:.25},
+  spinningWheel:{kind:'building',crew:['carpenter'],goods:{timber:4,tools:1},work:1/12,days:7,gain:.5},
+  blastFurnace:{kind:'building',crew:['mason','smith'],goods:{stone:24,timber:12,tools:6},work:1,days:60,gain:.5},
+  paperMill:{kind:'building',crew:['carpenter','mason'],goods:{timber:20,stone:8,tools:4},work:.5,days:30,gain:.2},
+  spectacles:{kind:'person',crew:['smith'],goods:{tools:.2},work:1/20,days:3,gain:.1},
+  clock:{kind:'building',crew:['smith','carpenter'],goods:{tools:4,ore:4,timber:6},work:1,days:30,gain:.1},
+  printing:{kind:'building',crew:['carpenter','smith'],goods:{timber:12,tools:6,cloth:1},work:2,days:45,gain:.5},
+  rudder:{kind:'person',crew:['carpenter'],goods:{timber:12,tools:2},work:.5,days:12,gain:.1},
+  cog:{kind:'person',crew:['carpenter'],goods:{timber:60,tools:10,cloth:10},work:6,days:60,gain:.2,bundled:['rudder']},
+  compass:{kind:'person',crew:['smith'],goods:{tools:.5},work:1/10,days:5,gain:.1},
+  portolan:{kind:'person',crew:['merchant','schoolmaster'],goods:{paper:2},work:.2,days:7,gain:.1},
+  carrack:{kind:'person',crew:['carpenter'],goods:{timber:100,tools:20,cloth:18},work:10,days:90,gain:.2,bundled:['cog','rudder']}
+});
+function technologyEquipmentTarget(s,target){if(!target)return null;if(target.kind==='building'){const b=W.bldList?.[target.id];return b&&!b.removed&&b.state==='sound'&&(!b.s||b.s===s)?b:null;}if(target.kind==='person'){const p=learningPerson(target.id);return p&&!p.dead&&W.settlements[p.si]===s?p:null;}if(target.kind==='army'){const a=W.armies?.find(a=>a.id===target.id);return a&&!a.gone?a:null;}if(target.kind==='settlement')return W.settlements[target.id]===s?s:null;return null;}
+function technologyEquipmentPayerKey(payer){const a=accountOwner(payer);if(a?.household)return{kind:'household',id:a.id};if(a==='crown')return{kind:'house',id:0};const hi=W.houses.indexOf(a);if(hi>=0)return{kind:'house',id:hi};if(a?.storageOwnerId&&corpOf(a.storageOwnerId)===a)return{kind:'corp',id:a.storageOwnerId};return null;}
+function technologyEquipmentPayer(key){if(!key)return null;if(key.kind==='household')return W.households?.get(key.id)||null;if(key.kind==='house')return houseAcct(key.id);if(key.kind==='corp'){const c=corpOf(key.id);return c&&!c.gone?c:null;}return null;}
+function technologyEquipmentSpare(s,payer){const a=accountOwner(payer);if(a?.household)return Math.max(0,means(a)-Math.max(1,a.population?.get(s)||0)*foodYr()-(a.head?rentDue(s,a.head):0));const hi=a==='crown'?0:W.houses.indexOf(a);return Math.max(0,means(a)-(hi>=0?chestReserve(hi):0));}
+function technologyEquipmentFarms(s,pure=true){const old=s._equipmentFarms;if(old?.day===day())return old;const byWorker=new Map();for(const f of s.furl||[])if(f.state===LS.TILLED&&ARABLE.has(f.kind)){const r=byWorker.get(f.wk)||{area:0};r.area+=f.area;byWorker.set(f.wk,r);}const I={day:day(),byWorker};if(!pure)s._equipmentFarms=I;return I;}
+function technologyFarmHands(s,A){if(!A?.household)return 0;let n=0;for(const p of A.members)if(!p.dead&&!p.role&&!p.outlawCampId&&W.settlements[p.si]===s&&ageYrs(p)>=14&&!(p.away&&day()<p.away.until)&&!institutionalJobHeld(p))n++;return n;}
+function technologyEquipmentUse(s,key,op,payer){const r=TECH_EQUIPMENT[key];if(!r||!op)return false;if(r.kind==='army')return !op.gone&&(W.settlements[op.home]===s||W.settlements[op.at]===s)&&(op.men||[]).some(p=>p&&!p.dead);if(r.kind==='person'){
+    if(['heavyPlough','horseshoe','horseCollar'].includes(key)){const A=op._hh,x=s._owners?.get(A)?.animals||{},f=!!technologyEquipmentFarms(s).byWorker.get(op.id)&&technologyFarmHands(s,A)>0;return key==='heavyPlough'?f&&(x.cattle||0)>=2:key==='horseCollar'?f&&(x.horses||0)>=1:(x.horses||0)>=1;}
+    if(key==='spectacles')return ageYrs(op)>=45&&(op.office==='master'||op.craft?.rank==='master'||op.office==='clerk');
+    return !!s.harbor&&['boatman','merchant'].includes(op.tr)&&learningHead(op)===op&&!institutionalJobHeld(op);
+  }
+  if(['fullingMill','tripHammer','sawmill','paperMill'].includes(key))return op===s.mill&&waterMill(s)&&!!craftRoomOwner(s,op);
+  if(['printing','clock'].includes(key))return(W.schools||[]).some(S=>!S.gone&&S.building===op&&S.contract.paid>0);
+  if(key==='blastFurnace')return op.arch==='smithy'&&(op.craftMasters||[]).some(id=>craftPresent(s,learningPerson(id))&&learningPerson(id).tr==='smith');
+  return ['dyer','burgher','shop','house','longhouse','cot'].includes(op.arch)&&(op.craftMasters||[]).some(id=>{const p=learningPerson(id);return craftPresent(s,p)&&['weaver','dyer'].includes(p.tr);});
+}
+function technologyEquipmentPrice(s,g){return s.px?.[g]??price0(s,g);} // a quote never initializes the market's price cache
+function technologyEquipmentIncome(s,tr){const counts={};for(const p of craftIndex(s,true).heads)if(p.tr)counts[p.tr]=(counts[p.tr]||0)+1;return tradeIncome(s,tr,counts);}
+function technologyEquipmentBenefit(s,key,op){const r=TECH_EQUIPMENT[key];if(!r)return 0;if(r.kind==='army')return (op.men||[]).filter(p=>p&&!p.dead).length*foodYr()*r.gain;const p=op._hh?op:(op.craftMasters||[]).map(learningPerson).find(p=>p&&!p.dead),actual=p?.craft?.takings? p.craft.takings*360/Math.max(360,day()-(p.craft.opened||0)+1):0;
+  if(['heavyPlough','horseCollar'].includes(key)){const area=technologyEquipmentFarms(s).byWorker.get(op.id)?.area||0;return area*(s._gYield||0)*.87*360*technologyEquipmentPrice(s,'grain')*r.gain;}
+  if(key==='horseshoe')return Math.max(actual,technologyEquipmentIncome(s,op.tr))*r.gain;
+  if(['rudder','cog','compass','portolan','carrack'].includes(key))return Math.max(actual,technologyEquipmentIncome(s,op.tr))*r.gain;
+  if(key==='spectacles')return(op.schoolMaster!==undefined?W.schools?.[op.schoolMaster]?.fees||0:actual)*Math.max(0,1-technologySightFactor(s,op))*r.gain;
+  if(['printing','clock'].includes(key))return(W.schools||[]).filter(S=>!S.gone&&S.building===op).reduce((t,S)=>t+(S.fees+S.stipends)*360/Math.max(360,day()-S.opened+1),0)*r.gain;
+  if(key==='paperMill')return(s.schoolIds||[]).map(id=>W.schools?.[id]).filter(S=>S&&!S.gone).reduce((t,S)=>t+S.pupils.length,0)*.001*360*technologyEquipmentPrice(s,'paper');
+  if(key==='sawmill')return(s.res?.forest||0)*.05*360*technologyEquipmentPrice(s,'timber')*r.gain;
+  if(key==='tripHammer')return(s._smiths||0)*.45*.8*360*technologyEquipmentPrice(s,'tools')*r.gain;
+  if(key==='fullingMill')return(s._dyers||0)*.5*.8*360*technologyEquipmentPrice(s,'cloth')*r.gain;
+  return actual*r.gain;
+}
+function technologyEquipmentQuote(s,key,target,payer){key=technologyKey(key);const r=TECH_EQUIPMENT[key],op=technologyEquipmentTarget(s,target);if(!r||r.kind!==target?.kind||s.siegeBy||!technologyCapability(s,key).available||!technologyEquipmentUse(s,key,op,payer)||op.techEquipment?.[key]?.installed||(W.projects||[]).some(q=>q.type==='equipment'&&!q.dead&&q.si===W.settlements.indexOf(s)&&q.method===key&&q.target.kind===target.kind&&q.target.id===target.id))return null;
+  const payerKey=technologyEquipmentPayerKey(payer);if(!payerKey)return null;const holders=r.individual?(op.men||[]).filter(p=>p&&!p.dead&&(key==='plateArmour'?p.sk?.[KRi]>=.45:p.sk?.[KA]>=.1)).map(p=>p.id):[],scale=r.individual?holders.length/100:1;if(!(scale>0))return null;const labour=foodYr()*r.work*scale,goods=Object.fromEntries(Object.entries(r.goods).map(([g,n])=>[g,n*scale])),cost=labour+Object.entries(goods).reduce((t,[g,q])=>t+q*technologyEquipmentPrice(s,g),0),benefit=technologyEquipmentBenefit(s,key,op),spare=technologyEquipmentSpare(s,payer);
+  if(!(spare>=cost))return null;return{si:W.settlements.indexOf(s),method:key,target:{...target},payerKey,goods,labour,holders,days:Math.max(1,Math.ceil(r.days*scale)),cost,benefit,profitable:benefit*5>cost};
+}
+function technologyEquipmentCommission(Q){if(!Q||!technologyEquipmentTarget(W.settlements[Q.si],Q.target)||!technologyEquipmentPayer(Q.payerKey))return null;const q={...Q,type:'equipment',title:TECH_RULES[Q.method].name,started:day(),done:0,worked:0,paid:0,materialPaid:0,installedGoods:{},dead:false};(W.projects||(W.projects=[])).push(q);G.ordersDirty=true;return q;}
+function technologyEquipmentMaterials(q,s,payer){let ready=true;const reserve=q.labour/q.days;for(const[g,total]of Object.entries(q.goods)){const need=Math.max(0,total-(q.installedGoods[g]||0));if(!(need>0))continue;let used=consumeOwnStock(s,payer,g,need),wanted=Math.min(need-used,Math.max(0,means(payer)-reserve)/Math.max(1e-9,price(s,g)));if(wanted>0){const before=means(payer);used+=buyBuildingMaterial(s,g,payer,wanted);q.materialPaid+=Math.max(0,before-means(payer));}q.installedGoods[g]=(q.installedGoods[g]||0)+used;if(q.installedGoods[g]+1e-9<total)ready=false;}return ready;}
+function technologyEquipmentTick(q){const s=W.settlements[q.si],op=s&&technologyEquipmentTarget(s,q.target),payer=technologyEquipmentPayer(q.payerKey);if(!s||!op||!payer||!technologyEquipmentUse(s,q.method,op,payer)){q.dead=true;q.reason='native site, purpose or owner lost';return;}if(s.siegeBy){q.stalled=true;return;}const r=TECH_EQUIPMENT[q.method],crew=workers_(s,p=>r.crew.includes(p.tr));if(!crew.length){q.stalled=true;q.reason='no actual machine makers';return;}if(!technologyEquipmentMaterials(q,s,payer)){q.stalled=true;q.reason='materials';return;}
+  const due=Math.min(1,q.days-q.worked)*q.labour/q.days,budget=Math.min(due,technologyEquipmentSpare(s,payer));if(!(budget>0)){q.stalled=true;q.reason='funds';return;}let paid=0,selfWork=0;for(const p of crew){const share=budget/crew.length;if(accountOwner(payer)===accountOwner(p)){selfWork+=share;continue;}const v=transfer(payer,p,share,'equipment making',s);paid+=v;craftReceipt(s,p,v);}if(!(paid+selfWork>0)){q.stalled=true;q.reason='unpaid makers';return;}q.paid+=paid;q.selfWorked=(q.selfWorked||0)+selfWork/(q.labour/q.days);q.worked=Math.min(q.days,q.worked+(paid+selfWork)/(q.labour/q.days));q.done=q.worked/q.days;q.stalled=false;delete q.reason;
+  if(q.worked+1e-9>=q.days){const M=op.techEquipment||(op.techEquipment={}),record={day:day(),payerKey:{...q.payerKey},projectDay:q.started,installed:true,materials:{...q.installedGoods},paid:q.paid+q.materialPaid,selfWorked:q.selfWorked||0,holders:q.holders?.slice()||[]};M[q.method]=record;if(['siegeEngine','trebuchet','siegeCannon'].includes(q.method))M.siegeEngine={...record,method:q.method};for(const key of r.bundled||[])M[key]={...record,bundled:q.method};q.dead=true;q.complete=true;emit('trade',2,s.pos,`${s.name} completes a paid ${TECH_RULES[q.method].name.toLowerCase()}.`);}
+}
+function technologyEquipmentCandidates(s,pure=false){const I=craftIndex(s,pure),farms=technologyEquipmentFarms(s,pure),L=[];for(const p of I.heads){if(p.dead||p.estateOffice||p.abbeyJob||p.role&&p.abbey==null)continue;const animals=s._owners?.get(p._hh)?.animals||{};if(farms.byWorker.has(p.id)&&(animals.cattle||0)>=2)L.push({key:'heavyPlough',target:{kind:'person',id:p.id},payer:p});if((animals.horses||0)>0){L.push({key:'horseshoe',target:{kind:'person',id:p.id},payer:p});if(farms.byWorker.has(p.id))L.push({key:'horseCollar',target:{kind:'person',id:p.id},payer:p});}if(ageYrs(p)>=45&&(p.office==='master'||p.office==='clerk'||p.craft?.rank==='master'))L.push({key:'spectacles',target:{kind:'person',id:p.id},payer:p});if(s.harbor&&['boatman','merchant'].includes(p.tr))for(const key of['rudder','cog','compass','portolan','carrack'])L.push({key,target:{kind:'person',id:p.id},payer:p});}
+  for(const p of I.heads)if(p.craft?.rank==='master'){const b=W.bldList[p.craft.room];if(!b)continue;for(const key of p.tr==='smith'?['blastFurnace']:['weaver','dyer'].includes(p.tr)?['loom','spinningWheel']:[])L.push({key,target:{kind:'building',id:b.idx},payer:p});}
+  if(waterMill(s))for(const key of['fullingMill','tripHammer','sawmill','paperMill'])L.push({key,target:{kind:'building',id:s.mill.idx},payer:craftRoomOwner(s,s.mill)});
+  for(const id of s.schoolIds||[]){const S=W.schools?.[id];if(!S||S.gone)continue;const master=learningPerson(S.master);for(const key of['printing','clock'])L.push({key,target:{kind:'building',id:S.building.idx},payer:master});L.push({key:'spectacles',target:{kind:'person',id:master.id},payer:master});}return L;
+}
+function tickTechnologyEquipment(){if(W._equipmentDay===day())return;W._equipmentDay=day();for(const s of W.settlements){if(!s.folk?.length||s.siegeBy)continue;for(const x of technologyEquipmentCandidates(s)){const Q=technologyEquipmentQuote(s,x.key,x.target,x.payer);if(Q?.profitable)technologyEquipmentCommission(Q);}}}
+function technologyArmyEquipmentFactor(s,a,mode='combat'){let factor=1;const living=(a.men||[]).filter(p=>p&&!p.dead),ids=new Set(living.map(p=>p.id));for(const key of mode==='siege'?['trebuchet','siegeCannon']:['crossbow','longbow','plateArmour']){const equipment=a.techEquipment?.[key];if(!equipment?.installed)continue;const gain=technologyEffect(s,key,a)-1,share=mode==='siege'?1:(equipment.holders||[]).filter(id=>ids.has(id)).length/Math.max(1,living.length);factor*=1+gain*share;}return factor;}
+function technologyEquipmentAvailable(s,key,op){return !!op?.techEquipment?.[technologyKey(key)]?.installed&&technologyCapability(s,key).available;}
+function technologySightFactor(s,p){const strain=Math.max(0,ageYrs(p)-45)/35;return technologyEquipmentAvailable(s,'spectacles',p)?1:1/(1+strain*strain);}
+function technologyCraftCapacity(s,o,tr){const p=o?.household?o.head:o;if(!p||!craftPresent(s,p)||p.craft?.employer!=null||p.craft?.rank!=='master'||(tr==='smith'?p.tr!=='smith':!['weaver','dyer'].includes(p.tr)))return 0;const b=W.bldList[p.craft.room];if(!craftRoomValid(s,b,p.tr))return 0;const hands=Math.min(craftHands(s,p),craftRoomCapacity(b)),base=tr==='smith'?.45:.5,factor=tr==='smith'?technologyEffect(s,'blastFurnace',b):technologyEffect(s,'loom',b)*technologyEffect(s,'spinningWheel',b);return base*(1+(b.tier||0)*.5)*hands*factor*technologySightFactor(s,p);}
+function technologyDraftTeams(s){let ox=0,horses=0;for(const A of s.households||[]){const p=A.head,x=s._owners?.get(A)?.animals||{};if(!p||p.dead||!technologyFarmHands(s,A))continue;ox+=(x.cattle||0)*.6*(technologyEquipmentAvailable(s,'heavyPlough',p)?.2:0);horses+=(x.horses||0)*.4*(technologyEffect(s,'horseCollar',p)-1);}return{extraOx:ox,extraHorses:horses};}
+function technologyFarmEquipmentYield(s){let total=0,worked=0;for(const[id,f]of technologyEquipmentFarms(s).byWorker){total+=f.area;const p=learningPerson(id),x=p?._hh&&s._owners?.get(p._hh)?.animals;if(p&&x?.cattle>=2&&technologyFarmHands(s,p._hh)>0&&technologyEquipmentAvailable(s,'heavyPlough',p))worked+=f.area;}return total>0?1+worked/total*.1:1;}
+function technologyCottageHands(s,o){if(!o?.household)return 0;let n=0;for(const p of o.members)if(!p.dead&&!p.role&&!p.outlawCampId&&W.settlements[p.si]===s&&ageYrs(p)>=8&&!(p.away&&day()<p.away.until)&&!institutionalJobHeld(p))n++;return n;}
+function technologyMillOperator(s){return craftIndex(s).heads.find(p=>craftPresent(s,p)&&p.tr==='miller'&&!institutionalJobHeld(p))||null;}
+function technologyMillService(s,key,payer,quantity,good){if(!(quantity>0)||!technologyEquipmentAvailable(s,key,s.mill)||!waterMill(s))return 0;const operator=technologyMillOperator(s);if(!operator)return 0;const rates={fullingMill:1,tripHammer:1,sawmill:3,paperMill:.5},rate=rates[key]||1,m=s.mill;if(m.poweredDay?.day!==day())m.poweredDay={day:day(),used:0};const possible=Math.min(quantity,Math.max(0,1-m.poweredDay.used)*rate);if(!(possible>0))return 0;
+  const owner=millHolder(m,s),self=accountOwner(payer)===accountOwner(operator),sameOwner=accountOwner(owner)===accountOwner(operator),fee=possible*.8*price(s,good)*.1;let fraction=1,paid=0;if(self){if(!sameOwner){const rent=fee*.25;paid=transfer(payer,owner,Math.min(rent,learningSpare(s,payer)),'powered mill rent',s);fraction=rent>0?Math.min(1,paid/rent):1;}}else{const due=Math.min(fee,learningSpare(s,payer));if(!(due>0))return 0;paid=sameOwner?transfer(payer,operator,due,'powered mill work',s):transfer(payer,operator,due*.75,'powered mill work',s)+transfer(payer,owner,due*.25,'powered mill rent',s);fraction=Math.min(1,paid/fee);} // self-work uses the actual present operator's time; it records no invented wage
+  const worked=possible*fraction;m.poweredDay.used+=worked/rate;(m.poweredWork||(m.poweredWork={}))[key]=(m.poweredWork[key]||0)+worked;return worked/quantity;}
+function technologyForestMillFactor(s){if(!technologyEquipmentAvailable(s,'sawmill',s.mill)||!waterMill(s))return 1;const people=craftIndex(s).heads.filter(p=>craftPresent(s,p)&&!institutionalJobHeld(p)&&['woodcutter','forester'].includes(p.tr));if(!people.length)return 1;let worked=0;const more=(s.res?.forest||0)*.05*.25/people.length;for(const p of people)worked+=technologyMillService(s,'sawmill',p,more,'timber');return 1+.25*worked/people.length;}
+function technologyMillEffect(s,key){return waterMill(s)&&technologyEquipmentAvailable(s,key,s.mill)?technologyEffect(s,key,s.mill):1;}
+function technologyPaperMill(s){if(!waterMill(s)||!technologyEquipmentAvailable(s,'paperMill',s.mill))return;const p=technologyMillOperator(s);if(!p)return;const pricePaper=price(s,'paper'),inputs=price(s,'cloth')*.2+price(s,'timber')*.1;if(!(pricePaper>inputs))return;const wanted=(s._dem?.paper||0)+(s._dAvg?.paper||0)+(s.schoolIds||[]).reduce((t,id)=>t+(W.schools?.[id]?.gone?0:W.schools?.[id]?.pupils.length||0)*.001,0);if(!(wanted>0))return;
+  const q=Math.min(.5,wanted,technologyEquipmentSpare(s,p)/Math.max(1e-9,inputs));for(const[g,n]of[['cloth',q*.2],['timber',q*.1]]){purchase(s,g,p,Math.max(0,n-(pantry(s,p)[g]||0)));commodityCreditPurchase(s,p,g,purchase.got);}let out=Math.min(q,(pantry(s,p).cloth||0)/.2,(pantry(s,p).timber||0)/.1);if(!(out>0))return;out*=technologyMillService(s,'paperMill',p,out,'paper');if(!(out>0))return;consumeOwned(s,p,'cloth',out*.2);consumeOwned(s,p,'timber',out*.1);s.stores.paper=(s.stores.paper||0)+out;offer(s,'paper',p,out,inputs);craftReceipt(s,p,0);s.mill.paperMade=(s.mill.paperMade||0)+out;
+}
+function technologyPrintedLesson(S,master){const s=W.settlements[S.si];if(!technologyEquipmentAvailable(s,'printing',S.building)||day()%7===0)return 1;const need=Math.max(1,S.pupils.length)*.001,quantity=Math.min(need,learningSpare(s,master)/Math.max(1e-9,price(s,'paper')));if(!(quantity>0))return 1;purchase(s,'paper',master,quantity);const got=purchase.got;commodityCreditPurchase(s,master,'paper',got);const used=consumeOwned(s,master,'paper',got);S.paperUsed=(S.paperUsed||0)+used;return 1+.5*Math.min(1,used/need);}
+function technologyTravelFactor(s,p,mode){if(mode==='cart'){const x=s._owners?.get(p?._hh)?.animals||{};return(x.horses||0)>0?technologyEffect(s,'horseCollar',p)*(technologyEquipmentAvailable(s,'horseshoe',p)?1.1:1):1;}return technologyEffect(s,'rudder',p)*technologyEffect(s,'compass',p)*technologyEffect(s,'portolan',p);}
+function technologyEquipmentCmd(arg){const[si,key,kind,id,...rest]=String(arg).split(':'),s=W.settlements[+si];if(rest.length||!s||!sovOn()||s.owner!==plyH()||!TECH_EQUIPMENT[key]||!['building','person'].includes(kind)||!/^\d+$/.test(id||''))return false;const target={kind,id:+id},Q=technologyEquipmentQuote(s,key,target,houseAcct(plyH()));return !!technologyEquipmentCommission(Q);}
+function technologyEquipmentHTML(s){let h='';const si=W.settlements.indexOf(s);for(const x of technologyEquipmentCandidates(s,true)){const op=technologyEquipmentTarget(s,x.target);if(op?.techEquipment?.[x.key]?.installed){h+=`<div class="note">${esc(TECH_RULES[x.key].name)} installed · ${(op.techEquipment[x.key].paid||0).toFixed(1)} actually paid</div>`;continue;}if(!sovOn()||s.owner!==plyH())continue;const Q=technologyEquipmentQuote(s,x.key,x.target,houseAcct(plyH()));if(Q)h+=`<button class="cbtn" data-cmd="s-equipment" data-arg="${si}:${x.key}:${x.target.kind}:${x.target.id}">Fund ${esc(TECH_RULES[x.key].name)} · ${Q.cost.toFixed(1)}</button>`;}return h;}
 
 /* the rank-and-file notables share the folk's make-up */
 function endow(n,ma,pa){ // a notable's nature and nurture: parents' blood, a lord's table, a lord's tutors
@@ -11718,6 +11821,7 @@ function tickProjects(){ // daily: the works go forward as far as they are paid 
   const L=W.projects;if(!L||!L.length)return;
   const n0=L.length,st0=L.map(q=>!!q.stalled).join();
   for(let i=L.length-1;i>=0;i--){const q=L[i];
+    if(q.type==='equipment'){technologyEquipmentTick(q);if(q.dead){L.splice(i,1);G.ordersDirty=true;}continue;}
     if(q.type==='fabric'){fabricProjectTick(q);if(q.dead){L.splice(i,1);G.ordersDirty=true;}continue;}
     if(q.type==='compound'){compoundProjectTick(q);if(q.dead){L.splice(i,1);G.ordersDirty=true;}continue;}
     if(q.type==='castle'){castleFoundationTick(q);if(q.dead){if(q.compoundId){const C=compoundOf(W.settlements[q.si],q.compoundId);if(C)C.stage=C.components.length?'standing':'empty';}L.splice(i,1);G.ordersDirty=true;}continue;}
@@ -12843,7 +12947,7 @@ function tickLivestock(){
         ()=>`The ${M.murrainK==='cattle'?'kine':'sheep'} of ${s.name} sicken and die where they stand. The herdsmen cannot say why.`,
         ()=>`${M.murrainK==='cattle'?'Cattle-plague':'The rot'} at ${s.name}: the byres are emptied and the smoke of the pyres hangs over the fields.`]));}
     herdSync(s);herdProduce(s); // milk, fleeces and homespun remain their producer's
-    const teams=St.cattle*0.6+St.horses*0.4,need=g.till/6;const pl=need>0?Math.min(1,teams/need):1;s.ploughF=pl+(1-pl)*HAND_TILTH; // the plough wants its teams: what they cannot reach is dug by hand, at a spade's yield (#23: a clamp let spare teams add a twentieth)
+    const equipmentTeams=technologyDraftTeams(s),teams=St.cattle*0.6+St.horses*0.4+equipmentTeams.extraOx+equipmentTeams.extraHorses,need=g.till/6;const pl=need>0?Math.min(1,teams/need):1;s.ploughF=pl+(1-pl)*HAND_TILTH; // the plough wants its teams: what they cannot reach is dug by hand, at a spade's yield (#23: a clamp let spare teams add a twentieth)
   });
   if(!W.prehistory&&G.herdMesh)G.herdsDirty=true;} // the flocks are laid out again when someone is near enough to see them
 const grazed=f=>{const s=W.settlements[f.dom];if(s&&s.hm)return (s.hm.press||0)>0.25; // grass the beasts keep short does not go back to scrub
@@ -13445,7 +13549,7 @@ function withdrawObjectiveArmy(a,s){const o=a&&a.objective;if(!o||o.si!==W.settl
   const kind=o.kind,done=finishArmyObjective(a,s);s.siegeBy=null;a.siegeArc=null;liftSiege(a);a.state='idle';a.hold=true;a.why=done?`${kind} objective fulfilled at ${s.name}`:`${kind} objective ended at ${s.name}`;
   if(a.home!=null&&a.home!==a.at)marchArmy(a,a.home);emit('war',done?7:3,s.pos,done?`${a.name} completes its appointed work at ${s.name} and withdraws without taking the town.`:`${a.name} cannot complete its appointed work at ${s.name} and withdraws.`);return true;}
 const SPOIL={grain:0.0003,fish:0.012,timber:0.0001,ore:0,tools:0.00005,cloth:0.0001,wine:0.0002,wool:0.0002,spice:0.0001,silk:0.00005,stone:0,hay:0.0006,meat:0.0003}; // the share lost each day in store (as the store keeps it: four times this in the open yard, two-thirds in a warehouse). Meat is salted flesh in the barrel, which keeps as grain in the sack keeps: in the yard a fifth is lost in half a year, so the Martinmas pork lasts the winter into Lent
-const NEED={grain:0.007,fish:0.003,timber:0.0006,ore:0.0002,tools:0.0004,cloth:0.0005,wine:0.0004,wool:0,sheep:0,cattle:0,horses:0,swine:0,spice:0.00004,silk:0.00003,stone:0.00002,hay:0,meat:0}; // the herds and the wool are wanted by what a place keeps and spins, not eaten by the head; meat is wanted only as one of the foods
+const NEED={paper:0,grain:0.007,fish:0.003,timber:0.0006,ore:0.0002,tools:0.0004,cloth:0.0005,wine:0.0004,wool:0,sheep:0,cattle:0,horses:0,swine:0,spice:0.00004,silk:0.00003,stone:0.00002,hay:0,meat:0}; // the herds and the wool are wanted by what a place keeps and spins, not eaten by the head; meat is wanted only as one of the foods
 const FOODS=['grain','fish','meat'],FOOD=NEED.grain+NEED.fish+NEED.meat,SALTING=0.05,FRESH=7; // the foods, one for one against a soul's need of a day (FOOD): bread, fish and meat (the user, 2026-10-08), each bought by its price (provision). A household or a lord's larder salting its Martinmas flesh buys the salt from the salter: about a bushel to four or five pigs, a few pence against their shillings, a twentieth of the meat's worth with his work; fresh, it keeps a week in the November cold, the days of the pig-feast
 const CRUMB=Object.fromEntries([...GOODS.filter(g=>!BEASTS.includes(g)),'char'].map(g=>[g,(FOODS.includes(g)?FOOD:FOOD*GOODBASE.grain/GOODBASE[g==='char'?'timber':g])/100])); // the least anyone keeps or sells: a mouthful, a hundredth of a soul's day of food, or the same worth at base prices of any other good (charcoal as its timber). A store that falls below it is crumbs and sweepings, lost as spoiled (commoditySpoil; the user, 2026-10-08). A soul's whole day was the line first: a family's last crusts and the leavings of its own grain on sale fell under it daily and were thrown away, and famine rose (batch 10b's gate: 1001 sea's second year 0.09 → 0.19)
 function foodIn(x){let n=0;for(const g of FOODS)n+=x[g]||0;return n;} // the food in a larder or a place's stores
@@ -13469,7 +13573,7 @@ function ladeOut(c,o,quiet,actors){ladeOut.why=null;const mode=c.sea||c.river?'b
   c.m=m;c.cost=purchase(o,c.good,m,want);const got=purchase.got;
   if(!o.storage||BEASTS.includes(c.good))o.stores[c.good]+=want-got;if(got<=0.5){if(!o.storage||BEASTS.includes(c.good)){o.stores[c.good]+=got;if(got>0)offer(o,c.good,m,got);}else if(got>0){commodityCreditPurchase(o,m,c.good,got);}ladeOut.why='market';return null;} // nothing for sale at the price: no load (what was taken goes back)
   c.qty=got;storageCargoOut(c,o,true);c.value*=got/want;c.fee=freight(o,got,c.len,mode);c.drv=drv;c.crew=drv;if(m!=='out'&&m.gn!==undefined)m._inc=(m._inc||0)-c.cost; // his outlay
-  const trip=Math.max(0.5,c.arriveDay-c.departDay),dest=W.settlements[c.dest];drv.away={until:c.arriveDay+trip,what:`${c.sea?'master of a cog':c.river?'on a barge':'carting'} ${c.good} to ${dest?dest.name:'market'}, and back`};
+  const travelFactor=technologyTravelFactor(o,drv,c.sea?'sea':mode),hull=c.sea?technologyEffect(o,'cog',drv)*technologyEffect(o,'carrack',drv):1;c.arriveDay=c.departDay+(c.arriveDay-c.departDay)/travelFactor;c.fee/=hull;const trip=Math.max(0.5,c.arriveDay-c.departDay),dest=W.settlements[c.dest];drv.away={until:c.arriveDay+trip,what:`${c.sea?'master of a cog':c.river?'on a barge':'carting'} ${c.good} to ${dest?dest.name:'market'}, and back`};
   (o._loads||(o._loads={}))[mode]=(o._loads[mode]||0)+1;
   life(drv,`${mode==='cart'?'Carted':'Shipped'} ${Math.round(got)} ${c.good} from ${o.name} to ${dest?dest.name:'market'}${m!==drv&&m!=='out'?' for '+folkName(m):''}`);if(m!=='out'&&m!==drv)life(m,`Sent ${Math.round(got)} ${c.good} to ${dest?dest.name:'market'}`);return c;}
 function ladeIn(c,d){if(typeof technologyContact==='function')technologyContact(W.settlements[c.origin],d);let m=c.m||'out';if(m!=='out'&&m.dead)m=lordAcct(W.settlements[c.origin]); // a merchant who died on the road: his goods to his lord
@@ -13879,24 +13983,25 @@ function tickEconomy(){
   if(typeof tickLearning==='function')tickLearning();
   if(typeof tickTechnology==='function')tickTechnology();
   if(typeof tickCrafts==='function')tickCrafts();
+  if(typeof tickTechnologyEquipment==='function')tickTechnologyEquipment();
   const si=seasonIdx(),seasonF=[0.7,1.1,1.6,0.08][si];
   for(const s of W.settlements){
     storageInit(s);const phaseK=commodityActive(s)?s.storage:undefined;
     const workF=clamp(s.pop/(s.pop+s.plagueDead+1),0.4,1)*(s.siegeBy?0.15:1),P0=['grain','fish','timber','ore'].map(g=>phaseK?phaseK.quantity(null,g,'unassigned'):s.stores[g]);
-    if(W.land&&s._bearA==null)landYield(s);s.stores.grain+=(s._gYield&&s._bearA!=null?s._gYield*Math.max(0,s._bearA-(s._abbeyArea||0)):s.res.farm*0.92)*(typeof technologyFarmYield==='function'?technologyFarmYield(s):1)*seasonF*MOD.harvest*(W.drought?0.35:1)*workF*(s.works&&s.works.mill?1.2:1)*(s.ploughF??1); // too little land under the plough, crops burned, or too few beasts to draw the plough
+    if(W.land&&s._bearA==null)landYield(s);s.stores.grain+=(s._gYield&&s._bearA!=null?s._gYield*Math.max(0,s._bearA-(s._abbeyArea||0)):s.res.farm*0.92)*(typeof technologyFarmYield==='function'?technologyFarmYield(s):1)*technologyFarmEquipmentYield(s)*seasonF*MOD.harvest*(W.drought?0.35:1)*workF*(s.works&&s.works.mill?1.2:1)*(s.ploughF??1); // too little land under the plough, crops burned, or too few beasts to draw the plough
     s.stores.fish+=s.res.fish*0.8*workF;
-    s.stores.timber+=s.res.forest*0.05*workF*(s._wcF??1)*(waterMill(s)&&typeof technologyCapability==='function'&&technologyCapability(s,'sawmill').available&&s.mill?.techEquipment?.sawmill?1.25:1); // the woodcutters' axes; and a water-driven saw more
+    s.stores.timber+=s.res.forest*0.05*workF*(s._wcF??1)*technologyForestMillFactor(s); // the woodcutters' axes; and a water-driven saw more
     s.stores.ore+=s.res.ore*0.05*workF;
     ['grain','fish','timber','ore'].forEach((g,i)=>made(s,g,(phaseK?phaseK.quantity(null,g,'unassigned'):s.stores[g])-P0[i])); // credit actual unassigned production; summing all owners before and after can invent a rounding excess
     if(W.abbeys?.length){abbeyCrop(s,seasonF*MOD.harvest*(W.drought?0.35:1)*workF*(s.works&&s.works.mill?1.2:1)*(s.ploughF??1));abbeyFish(s,workF);}
     if(s._shopY!==year()){s._shopY=year();let sm=0,dy=0;for(const b of s.buildings)if(b.state==='sound'&&!b.removed){if(b.arch==='smithy')sm+=1+b.tier*0.5;else if(b.arch==='dyer')dy+=1+b.tier*0.5;}
       let vine=0;for(const f of s.furl||[])if(f.kind===LK.VINE&&f.state===LS.TILLED)vine+=f.area;s._smiths=sm;s._dyers=dy;s._vineHa=vine/1e4;} // the workshops and vineyards the place has, counted once a year
     { // crafts where there are workshops and the stuff to work: iron and charcoal into tools at the smithies, wool into cloth at the looms (every cottage spins and weaves a little), grapes into wine
-      initOwnership(s);const smCap=s._smiths*0.45*(waterMill(s)&&typeof technologyCapability==='function'&&technologyCapability(s,'tripHammer').available&&s.mill?.techEquipment?.tripHammer?1.4:1),wvCap=s._dyers*0.5+s.pop*0.0008;
-      const noSm=phaseK&&!(commodityAnyHeld(phaseK,'ore')&&commodityAnyHeld(phaseK,'char')),noWv=phaseK&&!commodityAnyHeld(phaseK,'wool'),owners=noSm&&noWv?[]:[...s._owners],sm=noSm?[]:owners.filter(([,x])=>(x.held.ore||0)>0&&(x.held.char||0)>0),wv=noWv?[]:owners.filter(([,x])=>(x.held.wool||0)>0); // no owner holds the stuff: nothing to scan
-      for(const[o,x]of sm){const c=Math.max(0,Math.min((x.held.ore||0)/0.6,(x.held.char||0)/0.6,s.stores.ore/0.6,s.stores.timber/0.6,smCap/Math.max(1,sm.length)));
-        consumeOwned(s,o,'ore',c*0.6);consumeOwned(s,o,'char',c*0.6);s.stores.tools+=c*0.8;offer(s,'tools',o,c*0.8,0.75*(price(s,'ore')+price(s,'timber')));}
-      for(const[o,x]of wv){const w=Math.max(0,Math.min(x.held.wool||0,s.stores.wool||0,wvCap/Math.max(1,wv.length)));consumeOwned(s,o,'wool',w);s.stores.cloth+=w*0.8;offer(s,'cloth',o,w*0.8,price(s,'wool')/0.8);}
+      initOwnership(s);const noSm=phaseK&&!(commodityAnyHeld(phaseK,'ore')&&commodityAnyHeld(phaseK,'char')),noWv=phaseK&&!commodityAnyHeld(phaseK,'wool'),owners=noSm&&noWv?[]:[...s._owners],sm=noSm?[]:owners.filter(([,x])=>(x.held.ore||0)>0&&(x.held.char||0)>0),wv=noWv?[]:owners.filter(([,x])=>(x.held.wool||0)>0);
+      for(const[o,x]of sm){const cap=technologyCraftCapacity(s,o,'smith'),more=Math.max(0,Math.min(cap*.4,(x.held.ore||0)/.6-cap,(x.held.char||0)/.6-cap)),mill=technologyMillService(s,'tripHammer',o,more,'tools'),c=Math.max(0,Math.min((x.held.ore||0)/.6,(x.held.char||0)/.6,s.stores.ore/.6,s.stores.timber/.6,cap+more*mill));
+        consumeOwned(s,o,'ore',c*.6);consumeOwned(s,o,'char',c*.6);s.stores.tools+=c*.8;offer(s,'tools',o,c*.8,.75*(price(s,'ore')+price(s,'timber')));}
+      for(const[o,x]of wv){const base=technologyCraftCapacity(s,o,'weaver')+technologyCottageHands(s,o)*.0008,more=Math.max(0,Math.min(base*.3,(x.held.wool||0)-base)),mill=technologyMillService(s,'fullingMill',o,more,'cloth'),w=Math.max(0,Math.min(x.held.wool||0,s.stores.wool||0,base+more*mill));consumeOwned(s,o,'wool',w);s.stores.cloth+=w*.8;offer(s,'cloth',o,w*.8,price(s,'wool')/.8);}
+      technologyPaperMill(s);
       if(si===2){s.stores.wine+=s._vineHa*0.05*workF;made(s,'wine',s._vineHa*0.05*workF);} // the vintage, in the autumn
     }
     for(const g of GOODS){
@@ -18385,6 +18490,7 @@ function runCmd(cmd,arg){
     case 's-tutor':tutorCmd(arg);break;
     case 's-college':collegeCmd(arg);break;
     case 's-guild':craftGuildCmd(arg);break;
+    case 's-equipment':technologyEquipmentCmd(arg);break;
     case 's-custom':case 's-svc':manorCmd(cmd,arg);break; // the customs of a manor, and its services commuted or kept in hand (#36)
     case 'a-order':case 'a-road':case 'a-raft':case 'a-objective':case 'a-hold':case 'a-release':case 'a-disband':case 'a-split':case 'a-merge':case 'a-garrison':armyCmd(cmd.slice(2),arg);break;
   }
@@ -20703,6 +20809,7 @@ function workerCommandTarget(e){
       }
       if(c==='p-manumit'){if(!/^\d+$/.test(a)||!workerCommandId(+a)||!(W._pm||folkIndex()).has(+a))throw Error('Invalid freedom command');return 'worker';}
       if(c==='s-school'||c==='s-learning'||c==='s-tutor'){const [si,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||v===undefined||v.trim()===''||!Number.isFinite(+v)||+v<0)throw Error('Invalid learning command');return 'worker';}
+      if(c==='s-equipment'){const[si,k,t,id,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!Object.hasOwn(TECH_EQUIPMENT,k)||!['building','person'].includes(t)||!/^\d+$/.test(id||''))throw Error('Invalid equipment command');return 'worker';}
       if(c==='s-guild'){const[si,tr,on,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!CRAFT_TRADES.has(tr)||!['grant','refuse'].includes(on))throw Error('Invalid guild command');return 'worker';}
       if(c==='s-college'){const[si,key,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!['classroom','residence'].includes(key))throw Error('Invalid college command');return 'worker';}
       if(c==='s-justice'){const [si,k,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||k!=='cap'||!/^\d+(\.\d+)?$/.test(v||'')||+v>1)throw Error('Invalid justice command');return 'worker';}

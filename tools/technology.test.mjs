@@ -76,7 +76,7 @@ test('three-field knowledge changes cropped fraction/field records, while machin
   assert.equal(f.eval('technologyFarmYield(s)'),1);assert.equal(f.s.furl[0].rotation,3);assert.equal(f.writes,2);
   const late=fixture(1350);late.eval('initTechnology();technologyPlace(s)');
   assert.equal(late.eval('technologyEffect(s,"loom",{})'),1);
-  assert.equal(late.eval('technologyEffect(s,"loom",{techEquipment:{loom:true}})'),1.3);
+  assert.equal(late.eval('technologyEffect(s,"loom",{techEquipment:{loom:{installed:true}}})'),1.3);
   near(late.eval('constructionTechnologyRecipe(s,"masonry").laborFactor'),0.72);
   assert.equal(late.eval('constructionTechnologyRecipe(s,"masonry").timber'),22);
 });

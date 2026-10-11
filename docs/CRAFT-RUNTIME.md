@@ -56,10 +56,13 @@ without granting a free institution. Private simulation fields are `W.guilds`,
 `_craftOpening`, building `craftMasters`, and person `craft`/`apprentice`. Reports
 return scalar receipts and native IDs, never account or people graphs.
 
-The physical machine adapter remains the next operable chunk. Paid journeyman
-hands already affect service receipts; this chunk does not claim an installed
-loom, furnace or mill machine. Guild resistance to a particular machine also
-awaits a real machine quote; knowledge by itself installs no equipment.
+The [physical machine adapter](EQUIPMENT-RUNTIME.md) now binds native smith and
+weaver processing to actual master rooms and today's paid journeyman fractions.
+Available native household members provide cottage weaving. Actual military,
+foreign, outlaw and religious roles cannot continue their previous private
+workshop work. Paid installed machinery changes working capacity only when its
+actual inputs and operator exist. Guild resistance to a particular machine
+remains a separate policy consumer; knowledge by itself installs no equipment.
 
 Light evidence: inline JavaScript syntax and `tools/guilds.test.mjs`, six focused
 fixtures covering real premiums/wages, takings and chest conservation, measured
