@@ -37,6 +37,14 @@ Courts, credit, schools, guilds, lordly service and productive estates share the
 same households and economy. Knowledge and local adoption govern which
 institutions, materials and methods are available.
 
+Inspect a town’s religious houses and court roll, or follow an abbey’s members,
+grants, stores and building works. Town charters, the sheriff and capital bench,
+consent for extraordinary taxes, lending and coinage sit alongside schools,
+guilds and knightly service. Abbey mills and tanneries grind their own grain
+and turn hides into leather using actual supplies and workers. The
+[player guide](docs/UI-GUIDE.md#institutions-and-learning) shows where to find
+these reports and orders.
+
 ## Run it
 
 Open `index.html` in a browser with `assets/` beside it, or put both on any

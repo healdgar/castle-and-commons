@@ -28,11 +28,12 @@ Keys: `Space` pause, `1`–`5` the speeds above, `L` Life pace.
 **Menu** opens the realm's panels; each opens in the one card beside the map:
 
 - **Crown**: to watch, choose a campaign (100, 200 or 400 years) and take the
-  crown or a great house. When you rule it is the court, in four views:
+  crown or a great house. When you rule it is the court, in five views:
   *Overview* (revenue, the campaign's paths, ambitions), *Governance* (your
   towns' orders, works and storage), *Orders* (decrees, the war council, your
-  hosts) and *Houses* (honour, hostage, match, attaint; a lord's neighbours
-  and the throne).
+  hosts), *Houses* (honour, hostage, match, attaint; a lord's neighbours
+  and the throne) and *Learning* (known methods, patronage, schools and
+  available equipment).
 - **Realm**: the seed and fate of this realm, Reforge (a new realm, ending
   this one), the parchment map, day and night, labels, watch mode, the great
   houses and the line of succession (click a name to inspect it).
@@ -113,7 +114,8 @@ of the household's coin, goods and beasts at joining. Unpaid road upkeep
 presents the responsible payer's actual shortfall. There are at most 64
 recent held cases per place; earlier presentments are counted by kind.
 
-From AD 1166, two lettered heads of the capital serve as royal justices.
+From AD 1166, once royal justice is known and adopted, two lettered heads
+of the capital can serve as royal justices.
 The clerk reviews the rolls monthly; a circuit rides when real receipts
 and chattels exceed the fees and travel, with coin beyond the Crown's
 reserve to pay them. Each sitting hears the town and its nearest villages.
@@ -136,8 +138,9 @@ customary twentieth of bakers' and brewers' recorded payments for that
 work, within the same spare-purse cap. It is a licence, not a claim that
 loaves are short weight. Trespass and assize are amerced or pardoned once,
 without a debt or forced beast sale. The roll shows the harm or receipts,
-amercements by kind and the next great court. The capital’s bench and
-sheriff’s courts remain to come.
+amercements by kind and the next great court. Hundred and sheriff’s courts
+and the capital bench also hear qualifying business when their institutions
+are available and officers can be paid.
 
 ## Cards
 
@@ -156,6 +159,42 @@ custom) and what of its mending was paid last year, and from the tolls.
 
 To march a host (an army): open its card, choose **Orders → Order a march**,
 then click a town, an enemy host to attack, or open ground to camp.
+
+## Institutions and learning
+
+- **Find a religious house:** open a settlement card and follow a name under
+  **Religious houses**. The abbey card shows its abbot or abbess,
+  members, paid servants, granted land, stores, charity and own-use production.
+  Its **Buildings** links open the actual buildings; **Works** shows paid
+  construction and stalled work. **Diocese** opens the local Church body’s
+  officer, chest and court cases.
+- **Endow an abbey or nunnery:** while ruling, find **Religious foundations**
+  under **Menu → Crown → Houses** for the Crown, or **Orders** for a great
+  house. The buttons use your capital or house seat. Founding needs a pious
+  or sufficiently learned ruler, positive income, coin beyond the military
+  reserve, suitable unheld land and a clear church site. The religious order
+  must be known and adopted there. A date or a visible button alone does not
+  guarantee a foundation. After the endowment, the house pays for its own
+  buildings, staff, food and expansion.
+- **Follow town government:** a settlement’s **Court** link opens its roll.
+  **Offer a fee-farm charter** appears for eligible towns; while ruling that
+  town, it can grant a mayor and town administration when recorded business,
+  the public chest and an available resident support the charter. The annual
+  payment and arrears then appear on the town card. The Crown panel’s
+  **Shire, bench and estates** shows paid court business and subsidy grants;
+  **Summon estates for a subsidy** requests an extraordinary levy. Once
+  parliament is available, attending lords and burgesses must consent.
+- **Support learning:** **Menu → Crown → Learning** shows known methods,
+  their uptake across the realm and discovery prerequisites. **Patronage**,
+  **Funded schools** and tutor controls set allowances for your places;
+  unspent money stays in your purse. Teaching needs real teachers, rooms and
+  affordable support. College and equipment orders still need the appropriate
+  knowledge, site, funds, materials and workers.
+- **Inspect obligations and finance:** while ruling the Crown, **Credit and
+  coin** contains lending policy and coinage controls. **Knightly obligations**
+  appears for both Crown and great-house rulers. Household cards show their
+  actual loans; settlement cards show funded schools, crafts, guilds and the
+  lord’s estate. **Kingdom accounts** records receipts and payments.
 
 ## Choosing a place on the map
 
