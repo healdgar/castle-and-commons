@@ -11,7 +11,7 @@ export function abbeyNativeStateExpression(id=null){return `(()=>{
   return {day:day(),ad:AD(),coin:accountBalances().total,flow:{...W._flow},people:W.settlements.reduce((n,s)=>n+(s.folk||[]).filter(p=>!p.dead).length,0),abbeys:A.map(a=>{
     const s=W.settlements[a.si],x=s._owners?.get(a),B=abbeyBuildings(a),P=abbeyPeople(a);
     return {id:a.id,si:a.si,key:a.storageOwnerId,name:a.name,order:a.order,gold:a.gold,formed:a.formed,
-      members:P.map(p=>({id:p.id,household:p._hh?.id,role:p.role,home:p.bh?.idx??null,hunger:p._hh?.hunger||0})),
+      members:P.map(p=>({id:p.id,household:p._hh?.id,role:p.role,home:p.bh?.idx??null,housed:!!(p.bh&&!p.bh.removed&&p.bh.state==='sound'&&p.bh.abbey===a.storageOwnerId&&RESID.has(p.bh.arch)),hunger:p._hh?.hunger||0})),
       buildings:B.map(b=>({idx:b.idx,key:b.compoundKey,arch:b.arch,state:b.state,owner:b.ownerId})),
       fields:abbeyFields(a).map(f=>({k:f.k,owner:f.own,worker:f.wk,state:f.state,area:f.area})),
       goods:{held:{...x?.held},sale:{...x?.sale},animals:{...x?.animals}},crop:a.crop||0,foodGiven:a.foodGiven||0,wages:a.wages||0,
@@ -55,7 +55,7 @@ export async function finishNativeAbbey({read,step,id,maxDays=2160}){
   let last=null;
   for(let i=0;i<=maxDays;i++){
     last=(await read(abbeyNativeStateExpression(id))).abbeys[0];
-    if(last&&last.members.length&&last.buildings.some(b=>b.key==='church')&&last.buildings.some(b=>b.key==='residence')&&last.buildings.some(b=>b.key==='grange')&&last.crop>0&&last.foodGiven>0&&last.fields.every(f=>f.owner===last.key))return last;
+    if(last&&last.members.length&&last.members.every(p=>p.housed)&&last.buildings.some(b=>b.key==='church')&&last.buildings.some(b=>b.key==='residence')&&last.buildings.some(b=>b.key==='grange')&&last.crop>0&&last.foodGiven>0&&last.fields.every(f=>f.owner===last.key))return last;
     if(i<maxDays)await step();
   }
   throw Error('Native abbey has not reached actual housed membership, paid grange output and native meals: '+JSON.stringify(last));
