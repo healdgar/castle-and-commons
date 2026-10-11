@@ -159,3 +159,13 @@ and one destination-room rent and actual host-service receipt are paid per day.
 The current meal survives same-day graduation/return and leaves home mouths
 exactly once; yesterday's receipt supplies no food today. This is actual food
 already consumed, not a second inventory or guaranteed future meal.
+
+Visiting lodging candidates share `craftIndex`'s single native ordered building
+pass. Repeated scholar decisions validate current room state, actual household
+and scholar occupancy, and canonical title without rediscovering every town
+building. An actual building-count change rebuilds the private candidate index;
+paid conversions/repairs already invalidate it. Symbolic lord/church/town titles
+resolve actual native payees through `craftRoomOwner`; an unowned legacy inn
+retains its actual resident-host household fallback. No title or purse is changed
+by the quote. The private index's `lodgings` references and `buildingCount` belong
+to simulation only, under the existing `_craftIndex` projection exclusion.

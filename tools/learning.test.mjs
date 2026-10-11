@@ -113,3 +113,19 @@ test('an already fed visiting scholar still pays one actual lodging bill without
   assert.equal(f.eval('learningScholarBoard(school,H[7])'),true);near(f.s.stores.grain,food);near(U.board,0);assert.ok(U.lodging>0);near(f.scholar.study.journey.boarded,1);near(f.coins(),coins);const rent=U.lodging;
   assert.equal(f.eval('learningScholarBoard(school,H[7])'),true);near(U.lodging,rent);near(f.s.stores.grain,food);
 });
+
+
+for(const symbolic of ['lord','church'])test(`a scholar's symbolic ${symbolic} lodging title resolves an actual rent recipient`,()=>{
+  const f=universityFixture();f.inn.title={owner:symbolic};f.inn.ownerId=symbolic;if(symbolic==='church')f.inn.ch={fund:0};f.C.inn=f.inn;const Q=f.eval('learningLodgingQuote(s,H[7])');assert.ok(Q);assert.equal(Q.owner,symbolic==='lord'?'crown':f.inn);const title=f.inn.title;
+  f.setDay(3);f.eval('tickLearning()');assert.equal(f.scholar.study.journey.owner,Q.owner);const coins=f.coins()+(f.inn.ch?.fund||0);f.setDay(4);f.eval('tickLearning()');assert.ok(f.scholar.study.journey.lodgingPaid>0);if(symbolic==='church')assert.ok(f.inn.ch.fund>0);near(f.coins()+(f.inn.ch?.fund||0),coins);assert.equal(f.inn.title,title);assert.equal(f.inn.title.owner,symbolic);
+});
+
+test('a legacy unowned inn still pays its actual resident host household',()=>{
+  const f=fixture(),b={idx:1,arch:'inn',state:'sound',w:12,d:10,tier:0,hh:[f.parent],_rent:360,s:f.s};f.parent.bh=b;f.s.buildings.push(b);f.W.bldList.push(b);const coins=f.coins(),Q=f.eval('learningLodgingQuote(s,H[2])');assert.ok(Q);assert.equal(Q.owner,f.parent._hh);assert.equal(Q.host,f.parent);near(f.coins(),coins);assert.equal(b.title,undefined);assert.equal(b.ownerId,undefined);
+});
+
+test('indexed lodging keeps native order and revalidates current room state, capacity and newly built candidates',()=>{
+  const f=fixture(),a={idx:1,arch:'inn',state:'sound',w:6,d:10,tier:0,hh:[],title:{owner:'crown'},_rent:360,s:f.s},b={idx:2,arch:'hospital',state:'sound',w:6,d:10,tier:0,hh:[],title:{owner:'crown'},_rent:360,s:f.s};f.s.buildings.push(a,b);f.W.bldList.push(a,b);let scans=0;const buildings=f.s.buildings;f.s.buildings=new Proxy(buildings,{get:(target,key)=>{if(key===Symbol.iterator)scans++;return Reflect.get(target,key);}});
+  assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,a);assert.equal(scans,1);for(let i=0;i<4;i++)assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,a);assert.equal(scans,1,'prospective students share one native ordered building pass');a.state='ruin';assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,b);a.state='sound';a.hh=[f.parent];f.parent.bh=a;assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,b,'a currently occupied native household slot cannot be offered');b.removed=true;assert.equal(f.eval('learningLodgingQuote(s,H[2])'),null);assert.equal(scans,1);
+  const c={idx:3,arch:'inn',state:'sound',w:6,d:10,tier:0,hh:[],title:{owner:'crown'},_rent:360,s:f.s};buildings.push(c);f.W.bldList.push(c);assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,c);assert.equal(scans,2,'a real added building invalidates the structural candidate index immediately');assert.equal(f.eval('learningLodgingQuote(s,H[2])').b,c);assert.equal(scans,2);
+});
