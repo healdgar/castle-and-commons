@@ -148,3 +148,20 @@ adapter; knowledge must never fill these fields. It exposes only quantity
 factors for native operations. `technologyState` is a pure JSON DTO; the court
 Learning view and adviser `game:state {path:'technology'}` read it. No projection
 changes staffing, receipts, adoption or RNG.
+
+## Funded-school adapter and public business
+
+The #40 local-school adapter now supplies `W.schools` contracts with real tuition,
+stipends and lessons (see [LEARNING-RUNTIME.md](LEARNING-RUNTIME.md)). An abbey's
+`school.schoolId` resolves that single record; person `schoolMaster` resolves its
+actual master, building and receipt. School receipt registration precedes the
+daily technology update. No labels or unstaffed classroom imply a supported
+master. Actual Augustinian canons/priors join monks/nuns/abbots/abbesses as native
+religious knowledge sources.
+
+Public-business capabilities include `moneyer` (850 baseline mint administration)
+and `licensedCredit` (1066), with date aliases `moneyer850` and
+`licensedCredit1066`. `merchantBond` / `merchantBond1285` is enhanced statute
+merchant enforcement (1285, prerequisite royal bench), not the earlier ordinary
+loan bond. Finance adapters still require actual funded moneyers, metal, lenders,
+contracts and licence payments. Knowledge creates none of them.
