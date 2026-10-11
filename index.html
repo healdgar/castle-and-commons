@@ -3875,7 +3875,7 @@ const folkName=p=>p.gn+(famName(p)?' '+famName(p):'');
    of OFFICES), and p.officeFor, whom he serves: a house's index (0 the crown), an abbey's or guild's key ('abbey:3'), or none for his
    own place's office (a moneyer, a mayor). Being a head he still eats, marries and dies with his household; the office lapses with him
    and his master fills it again. Great officers (an abbot, a justice) enter the annals with a role of their own; a justice keeps his real household. */
-const OFFICES={steward:'steward',clerk:'clerk',justice:'justice',bailiff:'bailiff',moneyer:'moneyer',collector:'collector',master:'schoolmaster',warden:'warden',cellarer:'cellarer',mayor:'mayor',lender:'lender',sheriff:'sheriff',burgess:'burgess',benchJustice:'justice of the bench',bishop:'bishop',dean:'dean'};
+const OFFICES={steward:'steward',clerk:'clerk',justice:'justice',bailiff:'bailiff',moneyer:'moneyer',collector:'collector',master:'schoolmaster',warden:'warden',cellarer:'cellarer',mayor:'mayor',lender:'lender',sheriff:'sheriff',burgess:'burgess',benchJustice:'justice of the bench',bishop:'bishop',dean:'dean',chaplain:'chaplain'};
 function officeHeld(p){return p&&!p.dead&&p.office&&Object.hasOwn(OFFICES,p.office)?p.office:null;}
 function officeTitle(p){const o=officeHeld(p);if(!o)return null;const f=p.officeFor,c=corpOf(f),who=typeof f==='number'?houseName(f):c?c.name:W.settlements[p.si]?.name;return OFFICES[o]+(who?' of '+who:'');} // "steward of House Gamsburg"
 /* one soul */
@@ -10789,6 +10789,7 @@ function accountBalances(town=null){
     for(const b of s.buildings||[])if(b.ch&&!churches.has(b.ch)){churches.add(b.ch);by.church+=b.ch.fund||0;}}
   if(!town){for(const a of W.armies||[])for(const p of a.men||[])person(p);for(const t of W.travellers||[])person(t.p||t);for(const t of W.levies||[])person(t.p||t);
     for(const q of W.projects||[])if(q.type==='persuade'&&q.lever==='gold')by.escrow+=q.pay||0;}
+  if(!town){if(W.companies)by.companies=W.companies.reduce((v,c)=>v+(c.gold||0),0);if(W.chivalricOrder)by.orders=W.chivalricOrder.gold||0;by.escrow+=(W.knighthood?.tourneys||[]).reduce((v,q)=>v+(q.gold||0),0);for(const C of W.companies||[])for(const p of C.men||[])person(p);}
   const goods=new Map();
   for(const s of places){for(const [g,n]of Object.entries(s.stores||{})){const v=goods.get(g)||{stored:0,sale:0,transit:0};v.stored+=n||0;goods.set(g,v);}
     for(const x of s._owners?.values()||[])for(const g of BEASTS){const q=x.sale?.[g]||0;if(!q)continue;const v=goods.get(g)||{stored:0,sale:0,transit:0};v.sale+=q;goods.set(g,v);}
@@ -12035,11 +12036,11 @@ function settleTracks(){
 const FEUD_NAMES=['Feud','Border War','War of the Marches','Quarrel'];
 function atWar(h1,h2){
   if(h1==null||h2==null||h1<0||h2<0||h1===h2)return false;
-  if(W.war&&((h1===0&&inRevolt(h2))||(h2===0&&inRevolt(h1))))return true;
+  if(W.war){const royal=hi=>hi===0||W.war.service?.[hi]?.kind==='service'&&!W.war.service[hi].complete;if(royal(h1)&&inRevolt(h2)||royal(h2)&&inRevolt(h1))return true;}
   return (W.feuds||[]).some(f=>(f.a===h1&&f.b===h2)||(f.a===h2&&f.b===h1));
 }
-function houseAtWar(hi){return (W.war&&(hi===0||inRevolt(hi)))||(W.feuds||[]).some(f=>f.a===hi||f.b===hi);}
-function inRebellion(a,b){return !!W.war&&(a.house===0||inRevolt(a.house))&&(b==null||b.house===0||inRevolt(b.house));}
+function houseAtWar(hi){return (W.war&&(hi===0||inRevolt(hi)||W.war.service?.[hi]?.kind==='service'&&!W.war.service[hi].complete))||(W.feuds||[]).some(f=>f.a===hi||f.b===hi);}
+function inRebellion(a,b){const royal=hi=>hi===0||W.war?.service?.[hi]?.kind==='service'&&!W.war.service[hi].complete;return !!W.war&&(royal(a.house)||inRevolt(a.house))&&(b==null||royal(b.house)||inRevolt(b.house));}
 function lordColor(hi){const h=W.houses[hi];return h?h.sigilHue[0]:0x888888;}
 
 function setLord(f,hi,held){
@@ -12183,12 +12184,12 @@ function tickDomains(){ // monthly: owners, hosts, the frontier, and private war
     const stew=stewardship(notableById(h.head));let castellans=0,hosts=0,gar=0;
     for(const s of own){if(s===seatS)continue;const v=(2*PL()+rentOf(s)*(0.25+0.65*far(s)))/stew,C=heads_(s,()=>true).sort((a,c)=>(c.w||0)-(a.w||0)); // the castellan's household, the steadiest in the place
       if(!C[0])continue;const pv=Math.min(v,Math.max(0,means(h)));castellans+=pv;transfer(h,C[0],pv,'castellans',s); /* a fief no one lives in keeps no castellan (#23: his fee went out of the realm) */}
-    for(const a of W.armies)if(a.house===hi&&!a.gone){const v=hostPay(a);hosts+=v;soldiersPay(a,v,h);}
+    for(const a of W.armies)if(a.house===hi&&!a.gone&&!a.company){const v=hostPay(a);hosts+=v;soldiersPay(a,v,h);}
     for(const s of own){const v=Math.min(watchPay(s),Math.max(0,means(h)));gar+=v;payWatch(s,heads_(s,q=>ageYrs(q)<50),v,h);} // every garrison wants its pay: to the households its men come from
     for(const s of own){const need=garrisonNeed(s)*1.1; // a garrison beyond what the town needs goes home unless the enemy is at the gate
       if(!s.siegeBy&&s.garrison>need*1.2){const go=(s.garrison-need)*0.15;s.garrison-=go;s.pop+=go*0.8;}}
     { // the lord's household: servants and retainers, his hall's bread and wine, cloth for the household, spice and silk for his table, bought at his seat; a great house spends as it holds
-      const inc=h._inc||0,net=(h.gold||0)-g0;h._inc=0;h._incA=h._incA==null?inc:h._incA*5/6+inc/6;h._netA=h._netA==null?net:h._netA*5/6+net/6; /* the month's revenue, and what it left after the hosts, garrisons and castellans, each reckoned over half a year */const G0=Math.max(0,h.gold||0),T=seatS,spend=Math.max(0,clamp(h._netA+(G0-3*h._incA)/12,0,G0)-(h._courtBoardMonth||0));h._courtBoardMonth=0;h._courtDaysMonth=0; /* the hall lives on what its months leave over, one with another, and draws down what lies beyond a quarter's revenue (or saves toward it): rents came at the quarter days, and a great house lived from one to the next (#23: it spent each good month's surplus and bore each bad month's loss from its chest, which ran the chest dry) */if(T&&spend>0){const sv0=heads_(T,q=>ageYrs(q)<50&&!tills(q,T)),sv=sv0.length?sv0.slice(0,Math.max(1,Math.ceil(sv0.length*0.1))):heads_(T,()=>true).slice(0,6);liveries(T,sv,spend*0.4,h); /* the servants' wage: part in the lord's own food where it would spoil unsold (#36), the rest in coin */
+      const inc=h._inc||0,net=(h.gold||0)-g0;h._inc=0;h._incA=h._incA==null?inc:h._incA*5/6+inc/6;h._netA=h._netA==null?net:h._netA*5/6+net/6; /* the month's revenue, and what it left after the hosts, garrisons and castellans, each reckoned over half a year */if(typeof knightMonthly==='function')knightMonthly(h,Math.max(0,net));const G0=Math.max(0,h.gold||0),T=seatS,spend=Math.max(0,clamp(h._netA+(G0-3*h._incA)/12,0,G0)-(h._courtBoardMonth||0));h._courtBoardMonth=0;h._courtDaysMonth=0; /* the hall lives on what its months leave over, one with another, and draws down what lies beyond a quarter's revenue (or saves toward it): rents came at the quarter days, and a great house lived from one to the next (#23: it spent each good month's surplus and bore each bad month's loss from its chest, which ran the chest dry) */if(T&&spend>0){const sv0=heads_(T,q=>ageYrs(q)<50&&!tills(q,T)),sv=sv0.length?sv0.slice(0,Math.max(1,Math.ceil(sv0.length*0.1))):heads_(T,()=>true).slice(0,6);liveries(T,sv,spend*0.4,h); /* the servants' wage: part in the lord's own food where it would spoil unsold (#36), the rest in coin */
         const Ld=pantry(T,h),hallN=6+sv.length;h._hallN=hallN;let paid=0;const Cp=W.capital,cd=Cp&&Cp!==T?dist2d(Cp.pos.x,Cp.pos.z,T.pos.x,T.pos.z)*1.2:0;for(const[g,f,x]of[['grain',0.25,1.5],['wine',0.15,8],['cloth',0.1,4],['spice',0.05,20],['silk',0.05,20]]){const v=spend*f,p=price(T,g);const pc=cd&&g!=='grain'&&commodityActive(Cp)&&commodityActive(T)?price(Cp,g)+freight(Cp,1,cd,'cart'):Infinity; /* wine, cloth, spice and silk the steward buys at the court's market when they cost less there with their carriage home (#23: a lord bought only at his seat, so the capital's dealers and carters never saw his silver) */
           if(pc<p&&avail(Cp,g,price(Cp,g))>0){const bought=purchase(Cp,g,h,Math.min(v/pc,hallN*NEED[g]*30*x)),got=purchase.got;commodityCreditPurchase(Cp,h,g,got);paid+=bought;if(got>0){storageMovePurchased(Cp,T,h,g,got);const fr=freight(Cp,got,cd,'cart');buildWorks(Cp,fr,h,'carriage');paid+=fr;}continue;}
           if(!(p>0))continue;paid+=purchase(T,g,h,Math.min(v/p,hallN*NEED[g]*30*x));commodityCreditPurchase(T,h,g,purchase.got);} /* the hall eats and wears what its people need (the family, a servant from each household it keeps, guests at the board): cheap bread is not eaten twice over */
@@ -13649,7 +13650,7 @@ function tickCaravans(){
 }
 function tickUpkeep(){
   // treasury upkeep drains — the predator on hoarding
-  for(const a of W.armies)if(a.house===0&&!a.gone)a._payOwed=(a._payOwed||0)+hostPay(a)/30; // the crown pays its own hosts by the head, at a lord's rate (#23: it paid six times a lord's, by the day)
+  for(const a of W.armies)if(a.house===0&&!a.gone&&!a.company)a._payOwed=(a._payOwed||0)+hostPay(a)/30; // the crown pays its own hosts by the head, at a lord's rate (#23: it paid six times a lord's, by the day)
   for(const s of W.settlements)if(s.owner===0)s._watchOwed=(s._watchOwed||0)+watchPay(s)/30; // the crown keeps its own garrisons at a lord's rate (#23: it paid nearly twice); a lord keeps his
   if(day()%30===0){for(const a of W.armies)if(a._payOwed>0&&!a.gone){soldiersPay(a,a._payOwed,houseAcct(a.house));a._payOwed=0;}
     for(const s of W.settlements)if(s._watchOwed>0){const v=Math.min(s._watchOwed,Math.max(0,means(lordAcct(s))));payWatch(s,heads_(s,h=>ageYrs(h)<50),v,lordAcct(s));s._watchOwed-=v;}} // paid monthly, to the men's households
@@ -13973,11 +13974,11 @@ function killNotable(n,cause,silent){
   if(n.spouse){const sp=notableById(n.spouse);if(sp){sp.lastSpouse=n.id;n.lastSpouse=sp.id;sp.spouse=null;}}
   if(wasMonarch)succession();
   else if(n.role==='head'&&h){
-    const heir=n.heirs.map(notableById).find(k=>k&&k.alive&&ageOf(k)>=16);
-    if(heir){heir.role='head';h.head=heir.id;heir.agenda=n.agenda;
+    const heir=n.heirs.map(notableById).find(k=>k&&k.alive);
+    if(heir){heir.role='head';h.head=heir.id;heir.agenda=n.agenda;if(typeof knightSuccession==='function')knightSuccession(h,n,heir);
       const younger=n.heirs.map(notableById).find(k=>k&&k.alive&&k!==heir&&ageOf(k)>=16&&k.sex==='m');
       if(younger)partition(n.house,younger);}
-    else{const any=W.notables.find(m=>m.alive&&m.house===n.house&&ageOf(m)>=16);if(any){any.role='head';h.head=any.id;}
+    else{const any=W.notables.find(m=>m.alive&&m.house===n.house&&ageOf(m)>=16);if(any){any.role='head';h.head=any.id;if(typeof knightSuccession==='function')knightSuccession(h,n,any);}
       else if(!W.notables.some(m=>m.alive&&m.house===n.house)&&n.house>0){ // the line is ended: its fiefs escheat to the crown
         const lands=W.settlements.filter(s=>s.owner===n.house);for(const s of lands){s.owner=0;syncOwner(s);}
         h.exiled=true;h.extinct=true;h.exiledDay=day();escheat(h);refreshOverlay(); // its hosts in the field fight on until they are paid off
@@ -14451,6 +14452,7 @@ function closestApproach(a,b){ // two hosts moving straight over the day (from y
   const t=vv>1e-6?clamp(-(dx0*vx+dz0*vz)/vv,0,1):1,px=p0.x+(p1.x-p0.x)*t,pz=p0.z+(p1.z-p0.z)*t,qx=q0.x+(q1.x-q0.x)*t,qz=q0.z+(q1.z-q0.z)*t;
   return {d:Math.hypot(px-qx,pz-qz),x:(px+qx)/2,z:(pz+qz)/2};}
 function tickMilitary(){
+  if(typeof tickKnighthood==='function')tickKnighthood();
   for(const a of W.armies)if(!a.gone)a.fatigue=clamp((a.fatigue||0)+(a.state==='march'?(a.field||a.fieldTo?0.09:0.06):a.state==='battle'?0:-0.12)+(a.supply<=0?0.02:0),0,1); // legs worn by the march, rested in camp
   for(const a of W.armies)if(!a.gone&&a.men){rollLiving(a);if(a.men.length!==Math.round(a.strength)&&a.state!=='battle')musterSync(a);} // the dead struck off first: today's battles weigh only living men
   if(!W.war&&W.armies.length===0)return;
@@ -14475,7 +14477,7 @@ function tickMilitary(){
       else if(!a.hold){routHome(a,'too few to take the town');if(a.gone)continue;} // too few to try it: back to its own
       else if(!a._weakNote){a._weakNote=1;emit('war',4,a._spos,`${a.name} is too weak to invest ${W.settlements[a.at].name}, and awaits your word.`);}
     }
-    if(a.state==='idle'&&!a.hold&&!a.field){const m=armiesAtSettlement(a.at).find(b=>b!==a&&!b.gone&&!b.field&&b.house===a.house&&b.state==='idle'&&!b.hold&&b.side===a.side&&(b.standing||!a.standing));
+    if(a.state==='idle'&&!a.hold&&!a.field){const m=armiesAtSettlement(a.at).find(b=>b!==a&&!b.gone&&!b.field&&b.house===a.house&&b.state==='idle'&&!b.hold&&b.side===a.side&&!b.company&&!a.company&&(b.standing||!a.standing));
       if(m){m.strength+=a.strength;m.supply=Math.min(m.supply,a.supply);if(a.men){(m.men||(m.men=[])).push(...a.men);a.men=[];}a.strength=0;disbandArmy(a);continue;}} // two bands of one lord in one camp march as one
     if(a.state==='idle'&&a.nextOrder!=null){const t=a.nextOrder;a.nextOrder=null;if(marchArmy(a,t)===false&&W.settlements[t])emit('war',3,a._spos,`${a.name} cannot reach ${W.settlements[t].name} by the roads or fords now open.`);} // an order kept while it fled: told if it fails
     if(a.state==='idle'&&houseAtWar(a.house)&&!a.hold&&a.supply>=35&&!(a.holdUntil>day())&&(inRebellion(a)||fitToCampaign(a))){
@@ -14754,7 +14756,7 @@ function splitArmy(a){ // half the host marches under its own banner and captain
   const cap=W.notables.find(m=>m.alive&&m.house===a.house&&ageOf(m)>=16&&m.id!==a.commander&&m.role!=='monarch'&&!W.armies.some(x=>!x.gone&&x.commander===m.id));b.commander=cap?cap.id:null;
   if(a.state==='siege'){b.state='idle';b.siegeUntil=0;}
   makeArmyFlag(b);W.armies.push(b);return b;}
-function mergeArmies(a,b){ // two hosts of one lord, camped together, become one
+function mergeArmies(a,b){if(a.company||b.company)return false; // two hosts of one lord, camped together, become one
   if(!a||!b||a===b||a.gone||b.gone||a.house!==b.house||a.state==='battle'||b.state==='battle')return false;
   const pa=armySimPos(a),pb=armySimPos(b);if(dist2d(pa.x,pa.z,pb.x,pb.z)>250)return false;
   const wa=a.strength,wb=b.strength;a.morale=(a.morale*wa+b.morale*wb)/(wa+wb);a.supply=((a.supply??100)*wa+(b.supply??100)*wb)/(wa+wb);a.strength=wa+wb;
@@ -14763,6 +14765,7 @@ function mergeArmies(a,b){ // two hosts of one lord, camped together, become one
   dropArmyFlag(b);dropMarker(b);b.gone=true;W.armies=W.armies.filter(x=>x!==b);return true;}
 function disbandArmy(a){
   if(a.gone)return;
+  if(a.company){companyPark(a.company);return;}
   if(a.men){musterSync(a);for(const p of a.men){sendHome(p);if(!p.merc&&W.settlements[p.home])W.settlements[p.home].pop+=1;}a.men=[];
     const hs=W.settlements[a.home];if(hs&&a.horses)hs.stores.horses=(hs.stores.horses||0)+a.horses*0.8;a.horses=0;} // the horses come back to the home stable, less the sell-swords' own // each man walks home to his own village; the sell-swords ride off
   else{const s=W.settlements[a.home];if(s)s.pop+=a.strength*0.6;}
@@ -14784,7 +14787,7 @@ function endWar(result){ // 1 crown wins, -1 rebels win, 0 white peace
   if(!W.war)return;
   const h=W.houses[W.war.rebel],warName=W.war.name;
   const dur=Math.max(1,Math.round((day()-W.war.start)/30));
-  [...W.armies].forEach(a=>{if(a.standing&&!(W.feuds||[]).some(f=>f.a===a.house||f.b===a.house)){liftSiege(a);if(a.state==='siege')a.state='idle';a.chase=null;if(a.state!=='battle'){a.foe=null;if(!a.hold)goHome(a,'the war is over');}}else if(!a.standing)disbandArmy(a);}); // household hosts go home (yours wait on your word); levies are paid off
+  [...W.armies].forEach(a=>{if(a.standing&&!(W.feuds||[]).some(f=>f.a===a.house||f.b===a.house)){liftSiege(a);if(a.state==='siege')a.state='idle';a.chase=null;if(a.state!=='battle'){a.foe=null;if(!a.hold)goHome(a,'the war is over');}}else if(!a.standing){if(a.company)companyPark(a.company);else{if(typeof companyFromArmy==='function')companyFromArmy(a);disbandArmy(a);}}}); // household hosts go home (yours wait on your word); levies are paid off
   W.settlements.forEach(s=>{s.siegeBy=null;s.revolted=false;});
   const keeps=W.settlements.some(s=>s.owner===W.war.rebel);
   if(result===1&&keeps){ // a beaten vassal submits: it keeps what was not taken from it, and remembers
@@ -14826,7 +14829,7 @@ function endWar(result){ // 1 crown wins, -1 rebels win, 0 white peace
       s.takenFrom=null;}
     if(W.capital.owner!==0){W.capital.owner=0;syncOwner(W.capital);}
   }
-  W.war=null;W.truceUntil=day()+1500;
+  if(W.knighthood)rollAdd(W.knighthood.roll,{kind:'service call ended',d:day(),start:W.war.start,result,service:Object.entries(W.war.service||{}).map(([house,q])=>({house:+house,kind:q.kind,paid:q.paid||0,day:q.day,end:q.end||day()}))});W.war=null;W.truceUntil=day()+1500;
   if(W.player)W.player.peaceSince=day();
   refreshOverlay();
 }
@@ -14835,6 +14838,98 @@ function nearestPlaceName(x,z){
   for(const s of W.settlements){const d=dist2d(x,z,s.pos.x,s.pos.z);if(d<bd){bd=d;best=s;}}
   return best.name;
 }
+
+/* KNIGHTLY SERVICE (#41). A relief is a dated customary due on an actual inheritance; a ward takes
+   only the estate's realised surplus. Calls, companies and lists use the existing people and purses. */
+function knightBook(){return W.knighthood||(W.knighthood={reliefs:0,wardIncome:0,wardSales:0,scutage:0,serviceDays:0,tourneySpent:0,ransoms:0,companies:0,companyHire:0,orders:0,tourneys:[],roll:{rows:[],over:{}}});}
+function knightAvailable(s,k,ad){return governmentAvailable(s,k,ad);}
+function knightSuccession(h,dead,heir){if(!h||!dead||!heir||!heir.alive||dead.house<=0||!knightAvailable(W.settlements[h.seat],'knightService',1066))return;
+  const K=knightBook(),majority=heir.birthDay+16*360; // the realm's existing legal majority; no second heir or surrogate population
+  if(h.ward&&h.ward.heir!==heir.id){rollAdd(K.roll,{kind:'ward ended',d:day(),house:dead.house,heir:h.ward.heir,why:'a new succession'});delete h.ward;}
+  const value=Math.max(0,h._incA||0)*12,rate=W.reliefRate??1/12; // customary one twelfth of an observed year's receipts
+  if(!h.relief||h.relief.heir!==heir.id){const old=h.relief;h.relief={heir:heir.id,from:dead.id,assessed:value*rate+(old?.assessed||0),paid:old?.paid||0,arrears:value*rate+(old?.arrears||0),due:day()+((20-day()%30+30)%30||30)};}
+  if(day()<majority)h.ward={heir:heir.id,warden:'crown',from:day(),until:majority,paid:0,sale:0,closed:false};
+  rollAdd(K.roll,{kind:'succession',d:day(),house:dead.house,from:dead.id,heir:heir.id,relief:h.relief.assessed,ward:day()<majority});}
+function knightWardSale(hi,buyer){const h=W.houses[hi],B=buyer===0?'crown':W.houses[buyer],V=h?.ward,s=W.settlements[h?.seat];if(!V||V.closed||day()>=V.until||V.warden!=='crown'||buyer===hi||!B||B==='crown'||B.exiled||!(knightAvailable(s,'knightService',1066)))return false;
+  const value=Math.max(0,h._netA||0)*(V.until-day())/30,guard=(V.until-day())*foodYr()/360,stew=stewardship(notableById(B.head))/stewardship(W.monarch),gain=value*Math.max(0,stew-1)-guard,spare=Math.max(0,means(B)-chestReserve(buyer)),offer=value+Math.max(0,gain)/2;if(!(gain>0)||spare+1e-8<offer)return false;
+  const paid=transfer(B,'crown',offer,'wardship purchased',s);if(paid+1e-8<offer)return false;V.warden=B;V.sale=paid;V.buyer=buyer;knightBook().wardSales+=paid;rollAdd(knightBook().roll,{kind:'ward sold',d:day(),house:hi,buyer,paid});return true;}
+function knightMonthly(h,net){const V=h?.ward;if(!V||V.closed||day()>=V.until||!(net>0))return 0;let w=V.warden;if(w!=='crown'&&(!w||w.exiled||w.extinct)){V.warden=w='crown';}
+  const s=W.settlements[h.seat],paid=transfer(h,w,Math.min(net,Math.max(0,means(h)-chestReserve(W.houses.indexOf(h)))),'ward estate income',s);V.paid+=paid;knightBook().wardIncome+=paid;return paid;}
+function knightDues(){const K=W.knighthood;if(!K)return;for(let hi=1;hi<W.houses.length;hi++){const h=W.houses[hi],R=h.relief,V=h.ward;if(V&&!V.closed&&(day()>=V.until||!notableById(V.heir)?.alive||h.extinct)){V.closed=true;V.end=day();rollAdd(K.roll,{kind:'ward ended',d:day(),house:hi,heir:V.heir,paid:V.paid});}
+    if(R&&!R.complete&&day()>=R.due){if(h.extinct||h.exiled){R.discharged=R.arrears;R.arrears=0;R.complete=true;}else{const paid=transfer(h,'crown',Math.min(R.arrears,Math.max(0,means(h)-chestReserve(hi))),'feudal relief',W.settlements[h.seat]);R.paid+=paid;R.arrears-=paid;K.reliefs+=paid;R.due+=30;R.complete=R.arrears<=1e-8;}}
+  }}
+function knightCall(war=W.war){if(!war||!knightAvailable(W.capital,'knightService',1066))return;const year=Math.floor((day()-war.start)/360),key=war.start+':'+year;
+  if(war.serviceKey!==key){war.serviceKey=key;war.service={};delete war.scutageConsent;delete war.scutageAsked;}
+  const rate=W.scutageRate??.07,scutage=knightAvailable(W.capital,'scutage',1100),parliament=knightAvailable(W.capital,'parliament',1265);
+  if(scutage&&parliament&&war.scutageConsent===undefined){if(!war.scutageAsked&&estatesSummon(rate,true,{kind:'scutage',war,year})){war.scutageAsked=true;}return;}
+  for(let hi=1;hi<W.houses.length;hi++){const h=W.houses[hi];if(h.exiled||h.extinct||hi===war.rebel||war.service[hi]||W.armies.some(a=>!a.gone&&a.house===hi&&a.side==='rebel'))continue;
+    const s=W.settlements[h.seat],head=notableById(h.head);if(!s||!head?.alive||ageOf(head)<16||h.journey||head.fp&&awayNow(head.fp))continue;
+    const host=W.armies.find(a=>!a.gone&&!a.company&&a.house===hi&&a.standing&&a.state!=='battle'),target=Math.max(0,host?.strength??hostTarget(hi)),due=Math.max(0,h._incA||0)*12*rate,service=(host?hostPay(host):target*.25*PL())*40/30+target*NEED.grain*price(s,'grain')*40,available=Math.max(0,means(h)-chestReserve(hi));
+    if(scutage&&(!parliament||war.scutageConsent)&&due>0&&available>=due&&(h.serviceChoice==='scutage'||h.serviceChoice!=='service'&&due<service)){
+      const paid=transfer(h,'crown',due,'scutage',s);if(paid+1e-8<due)continue;war.service[hi]={kind:'scutage',day:day(),paid,year,key};knightBook().scutage+=paid;continue;}
+    let a=host;if(!a&&target>0&&available>hostPay({strength:target,standing:false}))a=raiseArmy(hi,h.seat,target,'crown');if(!a)continue;
+    a.side='crown';a.serviceUntil=day()+40;a.serviceKey=key;a.hold=hi===plyH();war.service[hi]={kind:'service',day:day(),until:a.serviceUntil,army:a.id,year,key};knightBook();
+  }}
+function knightServiceEnds(){const war=W.war;if(!war)return;for(const q of Object.values(war.service||{})){if(q.kind!=='service'||q.complete)continue;if(day()<q.until){if(q.last!==day()){q.last=day();knightBook().serviceDays++;}continue;}const a=W.armies.find(a=>a.id===q.army&&!a.gone);if(a&&a.state==='battle')continue;q.complete=true;q.end=day();if(a){delete a.serviceUntil;delete a.serviceKey;a.side='neutral';a.hold=true;if(a.standing)armyHomeward(a,'forty days of service are done');else disbandArmy(a);}}}
+function knightHorse(s,hi){const A=houseAcct(hi),x=s?._owners?.get(A);return {account:A,stock:x,qty:Math.max(0,x?.animals?.horses||0)};}
+function tourneyProclaim(hi,si=lordSeat(hi)){const s=W.settlements[si],K=W.knighthood;if(!s||s.owner!==hi||s.siegeBy||!knightAvailable(s,'tournament',1100)||K?.tourneys.some(q=>!q.complete&&q.host===hi))return false;
+  const payer=houseAcct(hi),entrants=[];for(let j=0;j<W.houses.length;j++){const h=W.houses[j],n=j===0?W.monarch:notableById(h.head),at=lordAt(j),r=at===si?{len:0}:at>=0?route(at,si):null;if(h.exiled||h.extinct||!n?.alive||ageOf(n)<16||!r||h.journey||awayNow(n.fp||n)||!((n.fp||n).sk?.[KRi]>0)||!knightHorse(W.settlements[at],j).qty)continue;entrants.push({house:j,notable:n.id,from:at,go:Math.max(1,Math.ceil(r.len/1500))});}
+  if(entrants.length<2)return false;const timber=entrants.length*2,tools=entrants.length*.1,carpenters=workers_(s,p=>p.tr==='carpenter'&&!awayNow(p)),wage=foodYr()/360,workDays=Math.max(1,Math.ceil(timber/Math.max(1,carpenters.length)*2)),cost=timber*price(s,'timber')+tools*price(s,'tools')+workDays*carpenters.length*wage,prize=entrants.length*price(s,'horses'),license=hi&&knightAvailable(s,'licensedTourney',1194)?Math.max(0,W.houses[hi]._incA||0)/30:0;
+  if(!carpenters.length){governmentVacancy(s,'carpenter',payer,workDays*wage,'paid tournament lists');return false;}if(means(payer)-chestReserve(hi)<cost+prize+license||avail(s,'timber',price(s,'timber'))<timber||avail(s,'tools',price(s,'tools'))<tools)return false;
+  const q={kind:'tourney',name:'Lists of '+s.name,gold:0,host:hi,si,day:day(),meet:day()+Math.max(workDays,...entrants.map(e=>e.go))+3,entrants,prize,spent:0,board:0,bouts:[],complete:false,lists:{timber:0,tools:0,wages:0,needTimber:timber,needTools:tools,needWages:workDays*carpenters.length*wage,builders:carpenters.map(p=>p.id)}};
+  const reserved=transfer(payer,q,prize,'tourney prize escrow',s);cashRecord(q,reserved,'tourney prize escrow',s);if(reserved+1e-8<prize)return false;if(license){q.spent+=transfer(payer,'crown',license,'licensed tourney',s);}const Q=knightBook();Q.tourneys.push(q);s.tourney=q;return true;}
+function tourneyPrepare(q){const s=W.settlements[q.si],payer=houseAcct(q.host),L=q.lists;if(q.ready||q.cancelled||q.complete)return;const PM=W._pm||folkIndex(),builders=L.builders.map(id=>PM.get(id)).filter(p=>p&&!p.dead&&!awayNow(p)&&p.si===q.si&&p.tr==='carpenter');
+  if(!s||s.siegeBy||s.owner!==q.host||!builders.length){q.cancelled=true;q.complete=true;q.end=day();const refund=transfer(q,payer,Math.max(0,means(q)),'tourney cancelled',s);cashRecord(q,-refund,'tourney cancelled',s);knightBook().tourneySpent+=q.spent+q.board;rollAdd(knightBook().roll,{kind:'tourney cancelled',d:day(),host:q.host,si:q.si,spent:q.spent,board:q.board});if(s?.tourney===q)delete s.tourney;return;}
+  const old=means(payer);L.timber+=buyBuildingMaterial(s,'timber',payer,Math.max(0,L.needTimber-L.timber));L.tools+=buyBuildingMaterial(s,'tools',payer,Math.max(0,L.needTools-L.tools));const wages=Math.min(L.needWages-L.wages,builders.length*foodYr()/360);const wageBefore=means(payer);payAmong(builders,wages,payer,'tourney lists',s);L.wages+=Math.max(0,wageBefore-means(payer));q.spent+=Math.max(0,old-means(payer));
+  if(L.timber+1e-8<L.needTimber||L.tools+1e-8<L.needTools||L.wages+1e-8<L.needWages){q.meet=Math.max(q.meet,day()+3);return;}q.ready=true;q.meet=Math.max(q.meet,day()+Math.max(...q.entrants.map(e=>e.go))+1);
+  for(const e of q.entrants){const h=W.houses[e.house],n=notableById(e.notable),A=knightHorse(W.settlements[e.from],e.house),board=(e.go*2+3)*foodYr()/360;if(!n?.alive||h.head!==n.id&&e.house!==0||!(A.qty>=1)||means(houseAcct(e.house))-chestReserve(e.house)<board)continue;
+    if(e.house===q.host&&e.from===q.si){e.accepted=true;continue;}if(lordJourney(e.house,q.si,'tourney',q.meet+3)){e.accepted=true;if(h.journey)h.journey.tourney=q;}}
+  s.festivalUntil=q.meet+3;G.detDirty=true;}
+function tourneyHorse(q,winner,loser){const s=W.settlements[q.si],h=W.houses[loser.house],from=W.settlements[loser.from],A=knightHorse(from,loser.house),to=houseAcct(winner.house),ransom=price(s,'horses'),spare=Math.max(0,means(A.account)-chestReserve(loser.house));
+  if(!(A.qty>=1))return 0;if(spare>=ransom){const v=transfer(A.account,to,ransom,'tourney horse ransom',s);q.ransoms=(q.ransoms||0)+v;knightBook().ransoms+=v;return v;}
+  const T=stockOf(from,to);A.stock.animals.horses-=1;T.animals.horses=(T.animals.horses||0)+1;const a=mkt(from,'horses'),reserved=Math.min(1,a.get(A.account)||0);if(reserved){a.set(A.account,(a.get(A.account)||0)-reserved);a.set(to,(a.get(to)||0)+reserved);}G.herdsDirty=true;q.horses=(q.horses||0)+1;return 0;}
+function tourneyFinish(q){if(q.complete||!q.ready||day()<q.meet)return;const s=W.settlements[q.si],entrants=q.entrants.filter(e=>e.accepted&&notableById(e.notable)?.alive&&lordAt(e.house)===q.si),rank=e=>{const n=notableById(e.notable),p=n.fp||n;return(p.sk?.[KRi]||0)+(p.sk?.[KA]||0)/2+trait(p,GB)*.03;};let win=entrants[0];
+  for(const e of entrants.slice(1)){const v=rank(e)-rank(win)+(rand('inst')-.5)*.2,w=v>0?e:win,l=v>0?win:e;tourneyHorse(q,w,l);q.bouts.push({winner:w.notable,loser:l.notable,d:day()});life(notableById(l.notable).fp||notableById(l.notable),'Yielded at the lists of '+s.name);win=w;}
+  if(win){const paid=transfer(q,houseAcct(win.house),Math.max(0,means(q)),'tourney prize',s);cashRecord(q,-paid,'tourney prize',s);q.spent+=paid;q.winner=win.notable;W.houses[win.house].renown=(W.houses[win.house].renown||0)+q.bouts.length;life(notableById(win.notable).fp||notableById(win.notable),'Won the lists at '+s.name);}
+  if(!win){const refund=transfer(q,houseAcct(q.host),Math.max(0,means(q)),'tourney no entrants',s);cashRecord(q,-refund,'tourney no entrants',s);}q.complete=true;q.end=day();knightBook().tourneySpent+=q.spent+q.board;rollAdd(knightBook().roll,{kind:'tourney',d:day(),host:q.host,si:q.si,winner:q.winner||null,spent:q.spent,board:q.board,ransoms:q.ransoms||0,horses:q.horses||0,bouts:q.bouts.slice(0,12)});if(s.tourney===q)delete s.tourney;emit('house',4,s.pos,'The funded lists at '+s.name+' close'+(win?'; '+notableById(win.notable).name+' wins the prize.':'; no rider could attend.'));}
+function tickTourneys(){const K=W.knighthood;if(!K)return;for(const q of K.tourneys){if(q.complete)continue;tourneyPrepare(q);for(const e of q.entrants){if(!e.accepted||e.house!==q.host||lordAt(e.house)!==q.si||e.boardDay===day())continue;e.boardDay=day();const h=W.houses[e.house],v=governmentBoard(W.settlements[q.si],houseAcct(e.house),1);q.board+=v;h._courtBoardMonth=(h._courtBoardMonth||0)+v;}tourneyFinish(q);}K.tourneys=K.tourneys.filter(q=>!q.complete);}
+function companyPark(C){const a=C.army;if(!a)return;rollLiving(a);musterSync(a);C.men=a.men;C.horses=a.horses||0;C.si=a.at;C.lastHouse=a.house;liftSiege(a);dropArmyFlag(a);dropMarker(a);W.armies=W.armies.filter(x=>x!==a);a.gone=true;C.army=null;C.employer=null;C.next=day()+30;for(const p of C.men)p.away={until:Number.MAX_SAFE_INTEGER,why:'company',to:C.si};invalidateFolkIndex();}
+function companyFromArmy(a){if(!a||a.gone||a.standing||a.company||!knightAvailable(W.settlements[a.at],'mercenaryCompany',1100))return null;rollLiving(a);musterSync(a);const men=a.men.filter(p=>p.merc||!p.sp&&!p._strips&&p.sk?.[KA]>.25);if(men.length<2)return null;
+  const si=a.at,s=W.settlements[si],captain=men.slice().sort((p,q)=>(q.sk?.[KA]||0)-(p.sk?.[KA]||0)||p.id-q.id)[0],C={kind:'company',id:(W.companies||[]).length,name:folkName(captain)+"'s company",captain,men,gold:0,si,from:day(),next:day()+30,horses:Math.min(a.horses||0,men.filter(p=>p.sk?.[KRi]>=.45).length),lastHouse:a.house};
+  for(const p of men){a.men.splice(a.men.indexOf(p),1);if(p.merc){p.originCult=p.merc;delete p.merc;p.home=si;p.si=si;householdAccount(p);}p.away={until:Number.MAX_SAFE_INTEGER,why:'company',to:si};life(p,'Kept company under '+folkName(captain)+' after the war');}a.strength=a.men.length;a.horses=Math.max(0,(a.horses||0)-C.horses);
+  for(const p of men){const spare=Math.max(0,means(p)-courtKeep(s,p)),paid=transfer(p,C,Math.min(spare,NEED.grain*price(s,'grain')*7),'company common chest',s);if(paid)cashRecord(C,paid,'company common chest',s);}(W.companies||(W.companies=[])).push(C);knightBook().companies++;invalidateFolkIndex();return C;}
+function companyHire(C,hi){const s=W.settlements[C?.si],h=W.houses[hi],payer=houseAcct(hi),men=C?.men.filter(p=>p&&!p.dead);if(!C||C.gone||C.army||!s||!h||h.exiled||!(men?.length)||!knightAvailable(s,'mercenaryCompany',1100)||s.owner!==hi)return false;
+  const wage=men.length*.25*PL(),need=wage+men.length*NEED.grain*30*price(s,'grain');if(means(payer)-chestReserve(hi)<need)return false;const paid=transfer(payer,C,wage,'company hire',s);if(paid+1e-8<wage)return false;cashRecord(C,paid,'company hire',s);
+  const a={id:++armyN,house:hi,side:W.war?(hi===W.war.rebel?'rebel':'crown'):'neutral',name:C.name,strength:men.length,morale:70,supply:100,commander:null,at:C.si,target:null,poly:null,departDay:0,arriveDay:0,state:'idle',battleUntil:0,siegeUntil:0,home:C.si,men,horses:C.horses,company:C,hold:hi===plyH()};
+  C.army=a;C.men=men;C.employer=hi;C.paid=(C.paid||0)+paid;C.next=day()+30;W.armies.push(a);makeArmyFlag(a);knightBook().companyHire+=paid;return true;}
+function companyOutlaw(C){const s=W.settlements[C.si];if(!s)return;const men=C.men.filter(p=>p&&!p.dead);if(!men.length){C.gone=true;return;}const camp={id:++campN,x:s.pos.x+350,z:s.pos.z+350,raids:0,king:null,born:day(),men:[],nextRecruit:day()+7,company:C.id};
+  for(const p of men){if(!W.settlements[p.home])p.home=C.si;sendHome(p);if(!p.dead){W.settlements[p.home].pop+=1;p._outlawState={tr:p.tr,hadAway:false,away:null};p.outlawCampId=camp.id;p.tr=null;p.away={until:Number.MAX_SAFE_INTEGER,why:'outlaw',to:camp.id};camp.men.push(p);courtFelony(W.settlements[p.home],p,camp);}}
+  if(C.horses){const A=stockOf(s,householdAccount(C.captain));A.animals.horses=(A.animals.horses||0)+C.horses;s.stores.horses=(s.stores.horses||0)+C.horses;}C.men=[];C.horses=0;C.gone=true;C.outlawDay=day();(W.banditCamps||(W.banditCamps=[])).push(camp);markCampDisplaysDirty();rollAdd(knightBook().roll,{kind:'company outlaw',d:day(),company:C.id,men:camp.men.length});}
+function companyDissolve(C){const s=W.settlements[C.si],survivors=C.men.filter(p=>p&&!p.dead);if(C.army)companyPark(C);const pot=means(C);for(const p of survivors){const share=pot/Math.max(1,survivors.length),v=transfer(C,p,share,'company chest divided',s);if(v)cashRecord(C,-v,'company chest divided',s);if(!W.settlements[p.home])p.home=C.si;sendHome(p);if(!p.dead)W.settlements[p.home].pop+=1;delete p.away;}if(means(C)>0){const v=transfer(C,'crown',means(C),'company escheat',s);cashRecord(C,-v,'company escheat',s);}if(C.horses&&s){s.stores.horses=(s.stores.horses||0)+C.horses;const A=stockOf(s,survivors[0]||'crown');A.animals.horses=(A.animals.horses||0)+C.horses;}C.horses=0;C.men=[];C.gone=true;}
+function tickCompanies(){for(const C of W.companies||[]){if(C.gone)continue;if(C.army?.gone){C.army=null;C.men=[];companyDissolve(C);continue;}if(C.army){C.men=C.army.men;C.horses=C.army.horses||0;C.si=C.army.at;}
+    C.men=C.men.filter(p=>p&&!p.dead);if(!C.men.length){companyDissolve(C);continue;}
+    if(day()>=C.next){C.next+=30;let wage=C.men.length*.25*PL();if(C.army){const h=W.houses[C.employer],paid=h&&!h.exiled?transfer(houseAcct(C.employer),C,wage,'company hire',W.settlements[C.si]):0;if(paid){cashRecord(C,paid,'company hire',W.settlements[C.si]);C.paid=(C.paid||0)+paid;knightBook().companyHire+=paid;}if(paid+1e-8<wage){companyPark(C);}}
+      if(means(C)>0){const A=C.army||{men:C.men,strength:C.men.length,home:C.si,at:C.si},old=means(C);soldiersPay(A,Math.min(wage,means(C)),C);cashRecord(C,means(C)-old,'company wages',W.settlements[C.si]);}}
+    if(!C.army){const s=W.settlements[C.si],need=C.men.length*NEED.grain,old=means(C);purchase(s,'grain',C,need);const got=purchase.got;commodityCreditPurchase(s,C,'grain',got);consumeOwned(s,C,'grain',got);if(means(C)!==old)cashRecord(C,means(C)-old,'company bread',s);
+      if(s.owner>=0&&houseAtWar(s.owner)&&companyHire(C,s.owner))continue;if(got+1e-8<need&&means(C)<need*price(s,'grain'))companyOutlaw(C);}
+  }}
+function orderClergy(s,old){const p=old&&(W._pm||folkIndex()).get(old),valid=p=>p&&!p.dead&&!p.outlawCampId&&!p.sp&&!awayNow(p)&&ageYrs(p)>=18&&p.si===W.settlements.indexOf(s)&&(p.sk?.[KS]||0)>0&&(!p.office||p.office==='chaplain');if(valid(p))return p;return headsOf(s).filter(valid).sort((a,b)=>(b.sk[KS]-a.sk[KS])||a.id-b.id)[0]||null;} // an actual skilled celibate head; appointment follows paid service
+function chivalricFound(hi=0){const s=W.settlements[lordSeat(hi)],h=W.houses[hi],head=hi===0?W.monarch:notableById(h?.head);if(!s||!head?.alive||W.chivalricOrder&&!W.chivalricOrder.gone||!knightAvailable(s,'chivalricOrder',1348))return false;
+  const chap=s.buildings.find(b=>b.ch&&b.state==='sound'),priest=orderClergy(s);if(!chap||!priest)return false;const dues=Math.max(0,(hi? h._incA:W._crIncA)||0)/12,payer=houseAcct(hi);if(dues<foodYr()/360||means(payer)-chestReserve(hi)<dues)return false;
+  const O={kind:'chivalric',name:'The Order of '+s.name,gold:0,host:hi,si:W.settlements.indexOf(s),chapel:chap.k??chap.idx??s.buildings.indexOf(chap),chaplain:priest.id,members:[],day:day(),next:day()+360,dues,paid:0,service:0};
+  const paid=transfer(payer,O,dues,'chivalric foundation',s);if(!(paid>0))return false;cashRecord(O,paid,'chivalric foundation',s);W.chivalricOrder=O;O.members.push(head.id);const service=foodYr()/360,fee=transfer(O,priest,service,'order chapel service',s);cashRecord(O,-fee,'order chapel service',s);if(fee+1e-8>=service){priest.office='chaplain';priest.officeFor='order:'+O.day;O.service+=fee;}knightBook().orders++;return true;}
+function tickChivalric(){const O=W.chivalricOrder;if(!O||O.gone)return;O.members=O.members.filter(id=>notableById(id)?.alive);const host=W.houses[O.host],head=O.host===0?W.monarch:notableById(host?.head);if(!head?.alive||host.exiled){O.gone=true;const to=W.settlements[O.si]?.buildings.find(b=>(b.k??b.idx??W.settlements[O.si].buildings.indexOf(b))===O.chapel)?.ch;if(to){const v=transfer(O,{ch:to},Math.max(0,means(O)),'order dissolved',W.settlements[O.si]);cashRecord(O,-v,'order dissolved',W.settlements[O.si]);}return;}
+  if(day()<O.next)return;O.next+=360;const s=W.settlements[O.si],members=W.houses.map((h,hi)=>({h,hi,n:hi===0?W.monarch:notableById(h.head)})).filter(q=>!q.h.exiled&&q.n?.alive&&ageOf(q.n)>=16&&(q.n.fp||q.n).sk?.[KRi]>0&&lordAt(q.hi)===O.si);
+  for(const q of members){const paid=transfer(houseAcct(q.hi),O,Math.min(O.dues,Math.max(0,means(houseAcct(q.hi))-chestReserve(q.hi))),'chivalric dues',s);if(paid+1e-8<O.dues)continue;cashRecord(O,paid,'chivalric dues',s);O.paid+=paid;if(!O.members.includes(q.n.id))O.members.push(q.n.id);}
+  const chap=s.buildings.find(b=>(b.k??b.idx??s.buildings.indexOf(b))===O.chapel),priest=orderClergy(s,O.chaplain),service=Math.max(1,members.length)*foodYr()/360;if(chap?.state==='sound'&&priest&&means(O)>=service){const paid=transfer(O,priest,service,'order chapel service',s);cashRecord(O,-paid,'order chapel service',s);O.service+=paid;if(paid+1e-8>=service){priest.office='chaplain';priest.officeFor='order:'+O.day;O.chaplain=priest.id;}}
+  for(const q of W.war?members:[]){const call=W.war.service?.[q.hi];if(call?.kind==='service'){O.serviceDays=(O.serviceDays||0)+Math.min(40,Math.max(0,day()-call.day));}}}
+function tickKnighthood(){knightDues();if(W.war){knightCall();knightServiceEnds();}tickTourneys();tickCompanies();tickChivalric();}
+function knightCmd(cmd,arg){if(!sovOn())return;const hi=plyH();if(cmd==='c-scutage-rate'&&hi===0&&+arg>0&&+arg<=1)W.scutageRate=+arg;else if(cmd==='h-service'&&hi>0&&['service','scutage','auto'].includes(arg))W.houses[hi].serviceChoice=arg;
+  else if(cmd==='c-tourney')tourneyProclaim(hi,+arg);else if(cmd==='c-ward-sale'&&hi===0){const[ward,buyer]=String(arg).split(':').map(Number);knightWardSale(ward,buyer);}else if(cmd==='c-company-hire')companyHire((W.companies||[])[+arg],hi);else if(cmd==='c-order')chivalricFound(hi);}
+function knightState(){const K=W.knighthood;return{totals:K?Object.fromEntries(['reliefs','wardIncome','wardSales','scutage','serviceDays','tourneySpent','ransoms','companies','companyHire','orders'].map(k=>[k,K[k]||0])):null,scutageRate:W.scutageRate??.07,service:Object.entries(W.war?.service||{}).map(([house,q])=>({house:+house,...q})),wards:W.houses.map((h,house)=>({house,ward:h.ward?{heir:h.ward.heir,warden:acctLabel(h.ward.warden),until:h.ward.until,paid:h.ward.paid,closed:h.ward.closed}:null,relief:h.relief?{...h.relief}:null})).filter(q=>q.ward||q.relief),tourneys:(K?.tourneys||[]).map(q=>({host:q.host,si:q.si,meet:q.meet,ready:q.ready||false,spent:q.spent,entrants:q.entrants.filter(e=>e.accepted).map(e=>e.notable)})),companies:(W.companies||[]).filter(c=>!c.gone).slice(0,24).map(c=>({id:c.id,name:c.name,si:c.si,captain:c.captain.id,men:c.men.length,gold:c.gold,employer:c.employer??null,next:c.next})),order:W.chivalricOrder&&!W.chivalricOrder.gone?{name:W.chivalricOrder.name,gold:W.chivalricOrder.gold,members:W.chivalricOrder.members.slice(),paid:W.chivalricOrder.paid,service:W.chivalricOrder.service}:null,roll:K?.roll.rows.slice(-12)||[]};}
+function knightHTML(hi=0){const K=knightState(),q=K.wards.find(q=>q.house===hi),s=lordSeat(hi);let h='<div class="dhead">Knightly obligations</div>';if(q?.ward)h+='<p>Ward until '+esc(dateStr(q.ward.until))+'; warden '+esc(q.ward.warden)+'; actual income '+q.ward.paid.toFixed(2)+'.</p>';if(q?.relief)h+='<p>Relief paid '+q.relief.paid.toFixed(2)+'; arrears '+q.relief.arrears.toFixed(2)+'.</p>';
+  h+='<button class="wbtn" data-cmd="c-tourney" data-arg="'+s+'">Commission tournament lists and prizes</button><button class="wbtn" data-cmd="c-order" data-arg="1">Endow an order of chivalry</button>';if(hi===0){h+='<button class="wbtn" data-cmd="c-scutage-rate" data-arg="0.07">Set customary scutage (7% of annual receipts)</button>';for(const V of K.wards.filter(q=>q.ward&&!q.ward.closed))for(let buyer=1;buyer<W.houses.length;buyer++){if(buyer!==V.house&&!W.houses[buyer].exiled)h+='<button class="wbtn" data-cmd="c-ward-sale" data-arg="'+V.house+':'+buyer+'">Offer '+esc(W.houses[V.house].name)+' wardship to '+esc(W.houses[buyer].name)+'</button>';}}if(hi>0)h+='<div class="hb">'+['auto','service','scutage'].map(k=>'<button data-cmd="h-service" data-arg="'+k+'">'+k+'</button>').join('')+'</div>';
+  for(const C of K.companies)h+='<p>'+esc(C.name)+': '+C.men+' actual men, chest '+C.gold.toFixed(2)+'</p><button class="wbtn" data-cmd="c-company-hire" data-arg="'+C.id+'">Hire for an actual monthly wage</button>';return h;}
 
 /* ============================ THREATS ==================================== */
 function igniteFire(s,n,cause){
@@ -15706,7 +15801,7 @@ function lordJourney(hi,to,why,until){const h=W.houses[hi],from=lordAt(hi),n=hi=
   T.push({...rec,from,to,poly:r.poly,depart:day(),arrive},{...rec,from:to,to:from,poly:[...r.poly].reverse(),depart:leave,arrive:back,home:true});return true;}
 function tickLordJourneys(){for(let hi=0;hi<W.houses.length;hi++){const h=W.houses[hi],j=h.journey;if(!j)continue;const n=notableById(j.notable),p=n?.fp||n;
   if(!n?.alive||p?.dead||h.exiled){delete h.at;delete h.journey;W.travellers=(W.travellers||[]).filter(t=>t.lord!==hi);continue;}
-  if(day()>=j.back){delete h.at;delete h.journey;continue;}if(day()>=j.until){delete h.at;continue;}if(day()>=j.arrive){if(!j.contacted){if(typeof technologyContact==='function')technologyContact(W.settlements[j.from],W.settlements[j.to]);j.contacted=true;}h.at={si:j.to,until:j.until,why:j.why};if(j.boardDay!==day()){const s=W.settlements[j.to],v=governmentBoard(s,houseAcct(hi),Math.max(1,h._hallN||1));j.boardDay=day();h._courtBoardMonth=(h._courtBoardMonth||0)+v;h._courtDaysMonth=(h._courtDaysMonth||0)+1;}}}}
+  if(day()>=j.back){delete h.at;delete h.journey;continue;}if(day()>=j.until){delete h.at;continue;}if(day()>=j.arrive){if(!j.contacted){if(typeof technologyContact==='function')technologyContact(W.settlements[j.from],W.settlements[j.to]);j.contacted=true;}h.at={si:j.to,until:j.until,why:j.why};if(j.boardDay!==day()){const s=W.settlements[j.to],v=governmentBoard(s,houseAcct(hi),Math.max(1,h._hallN||1));if(j.tourney)j.tourney.board+=v;j.boardDay=day();h._courtBoardMonth=(h._courtBoardMonth||0)+v;h._courtDaysMonth=(h._courtDaysMonth||0)+1;}}}}
 function communeOffer(s){if(s.commune||s.kind==='village'||s.siegeBy||!governmentAvailable(s,'commune',1070)||!Number.isFinite(s._marketTollDay))return null;
   const farm=(s._marketTollY||0)+Math.max(0,s.court?.previousProfit||0),elapsed=day()-s._marketTollDay,yieldNow=elapsed>0?(s._marketToll||0)*360/elapsed+Math.max(0,s.court?.profit||0):0,entry=farm;
   if(!(farm>0)||!(yieldNow>farm+entry/12)||!(means(s)>=entry))return null;const mayor=governmentOfficer(s,'mayor');return mayor?{farm,entry,mayor,yieldNow}:null;}
@@ -15750,9 +15845,9 @@ function benchSession(){const C=W.houses[0]?.justice?.bench;if(!C)return;const s
 function estatesNeed(){return (W.armies||[]).filter(a=>!a.gone&&a.house===0).reduce((v,a)=>v+hostPay(a)*6+(a._arrears||0),0)+(W.houses[0]?._debt||0)+(W._debt||0);}
 function estatesMood(s,hi,rate,burden=0){const h=hi>=0?W.houses[hi]:null,threat=(townThreat(s)||0),war=W.war?1:0,loyalty=(h?.loyalty??50)/100,legitimacy=(W.legitimacy??50)/100,hunger=s.hunger||0,unrest=(s.unrest||0)/100;
   return{threat,war,loyalty,legitimacy,burden,hunger,unrest,rate,score:threat+war+loyalty*legitimacy-rate*5-burden-hunger-unrest};} // consent weighs the requested burden against actual danger and confidence; no dice
-function estatesSummon(rate=1/15,ordered=false){const cap=W.capital,to=W.settlements.indexOf(cap),old=W.estates;if(old?.session||old?.grants?.some(g=>!g.complete&&day()<g.expires)||!(rate>0&&rate<=1)||!cap)return false;
+function estatesSummon(rate=1/15,ordered=false,purpose=null){const cap=W.capital,to=W.settlements.indexOf(cap),old=W.estates;if(old?.session||!purpose&&old?.grants?.some(g=>!g.complete&&day()<g.expires)||!(rate>0&&rate<=1)||!cap)return false;
   const need=estatesNeed(),available=means('crown')+3*(W._crIncA||0);if(!ordered&&!(need>available))return false;const E=W.estates||(W.estates={sessions:{rows:[],over:{}},grants:[],called:0,passed:0,denied:0,assessed:0,collected:0,arrears:0});
-  const parliament=governmentAvailable(cap,'parliament',1265),S={day:day(),meet:day()+30,end:day()+51,rate,why:W.war?'war':'the royal obligations',parliament,lords:[],towns:[],votes:[],board:0,wages:0};
+  const parliament=governmentAvailable(cap,'parliament',1265),S={day:day(),meet:day()+30,end:day()+51,rate,why:purpose?.kind==='scutage'?'knight-service commutation':W.war?'war':'the royal obligations',kind:purpose?.kind||'subsidy',war:purpose?.war||null,callYear:purpose?.year,parliament,lords:[],towns:[],votes:[],board:0,wages:0};
   for(let hi=1;hi<W.houses.length;hi++){const h=W.houses[hi],si=lordSeat(hi);if(h.exiled||h.estatesChoice==='stay'||si<0||houseAtWar(hi))continue;const s=W.settlements[si],m=estatesMood(s,hi,rate),cost=(1+2*royalTravel(si,to))*foodYr()/360,favour=Math.max(0,need-available)*Math.max(0,m.score)/Math.max(1,W.houses.length-1);
     if((h.estatesChoice==='attend'||favour>cost)&&means(h)>cost&&lordJourney(hi,to,'parliament',S.end))S.lords.push(hi);}
   if(parliament)for(let si=0;si<W.settlements.length;si++){const s=W.settlements[si];if(s.kind==='village'||s.siegeBy)continue;const p=governmentOfficer(s,'burgess',s.commune?.mayor),r=si===to?{len:0,poly:[]}:route(si,to);if(!p||!r)continue;const go=Math.max(0,Math.ceil(r.len/WALK_MPD)),arrive=day()+go,wage=(s.kind==='capital'?2:1)*foodYr()/360,days=S.end-day()+go;if(go>30||!(means(s)>=wage*days))continue;
@@ -15761,7 +15856,7 @@ function estatesSummon(rate=1/15,ordered=false){const cap=W.capital,to=W.settlem
   E.session=S;E.called++;return true;}
 function estatesGrant(E,S){if(S.voted)return;S.voted=true;const burden=(E.grants||[]).filter(g=>day()-g.day<360*5).reduce((v,g)=>v+g.rate,0);let weighted=0,weight=0;
   if(S.parliament){for(const hi of S.lords){const h=W.houses[hi],si=lordSeat(hi);if(h.estatesChoice==='stay'||lordAt(hi)!==W.settlements.indexOf(W.capital)||si<0)continue;const s=W.settlements[si],m=estatesMood(s,hi,S.rate,burden),w=Math.max(1,s.pop);S.votes.push({kind:'lord',who:hi,...m,weight:w});weighted+=m.score*w;weight+=w;}for(const q of S.towns){const s=W.settlements[q.si],p=(W._pm||folkIndex()).get(q.person);if(!p||p.dead||day()<q.arrive||day()>=q.until)continue;const m=estatesMood(s,-1,S.rate,burden),w=Math.max(1,s.pop);S.votes.push({kind:'town',who:q.si,...m,weight:w});weighted+=m.score*w;weight+=w;}}
-  const passed=!S.parliament||weight>0&&weighted>0;S.granted=passed;if(!passed){E.denied++;return;}const G={day:day(),rate:S.rate,parliament:S.parliament,assessed:0,collected:0,arrears:0,places:W.settlements.map((s,si)=>({si,due:day()+((360-(day()+si*37)%360)%360||360),done:false,assessed:0,collected:0,arrears:0})),expires:day()+360,complete:false};E.grants.push(G);while(E.grants.length>12&&E.grants[0].complete){const old=E.grants.shift(),A=E.archive||(E.archive={day:old.day,rate:0,assessed:0,collected:0,arrears:0,discharged:0,places:[]});for(const k of ['assessed','collected','arrears','discharged'])A[k]+=(old[k]||0);for(const D of E.dues?.values()||[])for(const q of D.parts)if(q.grant===old){q.grant=A;q.place={assessed:q.amount,collected:0,arrears:q.amount};}for(const D of E.dues?.values()||[]){const parts=[];for(const q of D.parts){const prior=parts.find(p=>p.grant===q.grant);if(prior){prior.amount+=q.amount;prior.place.assessed+=q.place.assessed;prior.place.arrears+=q.place.arrears;}else parts.push(q);}D.parts=parts;}}E.passed++;
+  const passed=!S.parliament||weight>0&&weighted>0;S.granted=passed;if(S.kind==='scutage'){if(S.war===W.war&&S.callYear===Math.floor((day()-S.war.start)/360))S.war.scutageConsent=passed;if(passed)E.passed++;else E.denied++;return;}if(!passed){E.denied++;return;}const G={day:day(),rate:S.rate,parliament:S.parliament,assessed:0,collected:0,arrears:0,places:W.settlements.map((s,si)=>({si,due:day()+((360-(day()+si*37)%360)%360||360),done:false,assessed:0,collected:0,arrears:0})),expires:day()+360,complete:false};E.grants.push(G);while(E.grants.length>12&&E.grants[0].complete){const old=E.grants.shift(),A=E.archive||(E.archive={day:old.day,rate:0,assessed:0,collected:0,arrears:0,discharged:0,places:[]});for(const k of ['assessed','collected','arrears','discharged'])A[k]+=(old[k]||0);for(const D of E.dues?.values()||[])for(const q of D.parts)if(q.grant===old){q.grant=A;q.place={assessed:q.amount,collected:0,arrears:q.amount};}for(const D of E.dues?.values()||[]){const parts=[];for(const q of D.parts){const prior=parts.find(p=>p.grant===q.grant);if(prior){prior.amount+=q.amount;prior.place.assessed+=q.place.assessed;prior.place.arrears+=q.place.arrears;}else parts.push(q);}D.parts=parts;}}E.passed++;
   if(!W.prehistory)emit('crown',3,W.capital.pos,`${S.parliament?'The estates grant':'The Crown assesses'} ${+(S.rate*100).toFixed(2)}% of movable wealth for ${S.why}.`);}
 function subsidyAssessment(E,G,Q){const s=W.settlements[Q.si];if(!s||Q.done)return;const collector=governmentOfficer(s,'collector',s.subsidyCollector);if(!collector){Q.retry=day()+30;return;}Q.done=true;const rate=s.kind==='village'?G.rate:G.rate*1.5;let assessed=0,collected=0;
   for(const h of headsOf(s)){const A=householdAccount(h),stock=s._owners?.get(A),beasts=BEASTS.reduce((v,k)=>v+(stock?.animals[k]||0)*price(s,k),0),held=Object.entries(stock?.held||{}).reduce((v,[g,q])=>v+q*price(s,g),0),sale=Object.entries(stock?.sale||{}).reduce((v,[g,q])=>v+q*price(s,g),0),sum=Math.max(0,(h.si===Q.si?means(h):0)+beasts+held+sale)*rate,paid=transfer(h,'crown',Math.min(sum,courtSpare(s,h)),'subsidy',s);assessed+=sum;collected+=paid;if(sum-paid>1e-8){const M=E.dues||(E.dues=new Map());let D=M.get(A);if(!D)M.set(A,D={account:A,si:Q.si,due:0,parts:[]});D.due+=sum-paid;D.parts.push({grant:G,place:Q,amount:sum-paid});}}
@@ -17208,8 +17303,7 @@ function courtDilemma(){
     ()=>{if(!live.length)return null;const hi=pick('sim',live),H=W.houses[hi];
       return {key:'tourney',title:`${H.name} begs a royal tourney`,pos:W.settlements[H.seat]?.pos,
       text:`${H.name} would have the crown proclaim a tourney in its honour, that its young knights might win renown before the court.`,
-      opts:[{label:'Proclaim the tourney',cost:700,act:()=>{H.loyalty=clamp(H.loyalty+10,0,100);W.legitimacy=clamp(W.legitimacy+2,0,100);W.capital.festivalUntil=day()+3;
-              emit('crown',5,W.capital.pos,`A great tourney is held in honour of ${H.name}; lances splinter and ladies' favours fly.`,{festival:true});}},
+      opts:[{label:'Commission actual lists and prizes',cost:0,act:()=>{tourneyProclaim(0,0);}},
             {label:'Decline with courtesy',act:()=>{H.loyalty=clamp(H.loyalty-4,0,100);}}]};},
     ()=>({key:'preacher',title:`A wild preacher in ${S.name}`,pos:S.pos,
       text:`A barefoot friar in ${S.name} preaches that lords and kings are thieves before God. The crowds grow larger every market day.`,
@@ -17778,7 +17872,7 @@ function lordPanelHTML(){
   x+=cbtn('lord','plan','Plan works with the brush…',0,'','streets, squares, a wall, a new quarter in your towns');
   x+=cbtn('lord','village','Found a village… (click open ground)',1200,cd('l_vil'),'on your own land or unclaimed waste');
   x+=cbtn('lord','gift','Send gifts to court',400,cd('l_gift'),'+8 standing with the crown');
-  const nb=lordNeighbours(hi);
+  x+=knightHTML(hi);const nb=lordNeighbours(hi);
   if(nb.length){x+=`<div class="dhead">Neighbours</div>`;
     for(const j of nb){const o=W.houses[j],fd=(W.feuds||[]).find(f=>(f.a===hi&&f.b===j)||(f.b===hi&&f.a===j));
       x+=`<div class="houserow"><img src="${sigURL(j)}"><span class="hname" style="flex:1">${esc(o.name.replace('House ',''))}</span><span class="tag">${W.settlements.filter(s=>s.owner===j).length} towns · ${fd?'at feud':'at peace'}</span></div>`;
@@ -17903,7 +17997,7 @@ function crownPanelHTML(){
     }
     h+=`<div class="note">Click a crown host to give it orders.</div>`;
   }
-  h+=royalJusticeHTML()+governmentHTML()+creditHTML();
+  h+=royalJusticeHTML()+governmentHTML()+creditHTML()+knightHTML();
   h+=`<div class="dhead">Decrees</div>`;
   for(const d of DECREES){
     if(d.ok&&d.ok()!==true&&(d.k==='host'||d.k==='peace'))continue; // war decrees only in war
@@ -17986,6 +18080,7 @@ function runCmd(cmd,arg){
     case 's-justice':justiceCmd(arg);break;
     case 'c-eyre':royalEyreCmd();break;
     case 'c-usury':case 'c-recoin':case 'c-tallage':creditCmd(cmd,arg);break;
+    case 'c-scutage-rate':case 'h-service':case 'c-tourney':case 'c-ward-sale':case 'c-company-hire':case 'c-order':knightCmd(cmd,arg);break;
     case 'c-estates':case 'c-subsidy-rate':case 's-charter':case 'h-attend':case 'h-stay':governmentCmd(cmd,arg);break;
     case 's-learning':technologyCmd(arg);break;
     case 'p-manumit':freedomCmd(arg);break;
@@ -20314,6 +20409,12 @@ function workerCommandTarget(e){
       if(c==='s-college'){const[si,key,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||!['classroom','residence'].includes(key))throw Error('Invalid college command');return 'worker';}
       if(c==='s-justice'){const [si,k,v,...rest]=a.split(':');if(rest.length||!workerCommandIndexText(si,W.settlements.length)||k!=='cap'||!/^\d+(\.\d+)?$/.test(v||'')||+v>1)throw Error('Invalid justice command');return 'worker';}
       if(c==='c-eyre'){if(a!=='')throw Error('Invalid eyre command');return 'worker';}
+      if(c==='c-scutage-rate'){if(!/^\d+(\.\d+)?$/.test(a)||!(+a>0&&+a<=1))throw Error('Invalid scutage custom');return 'worker';}
+      if(c==='h-service'){if(!['auto','service','scutage'].includes(a))throw Error('Invalid knight-service choice');return 'worker';}
+      if(c==='c-tourney'){if(!workerCommandIndexText(a,W.settlements.length))throw Error('Invalid tournament place');return 'worker';}
+      if(c==='c-company-hire'){if(!workerCommandIndexText(a,(W.companies||[]).length))throw Error('Invalid actual company');return 'worker';}
+      if(c==='c-order'){if(a!=='1')throw Error('Invalid order command');return 'worker';}
+      if(c==='c-ward-sale'){const P=String(a).split(':');if(P.length!==2||!P.every(x=>workerCommandIndexText(x,W.houses.length)))throw Error('Invalid actual ward or buyer');return 'worker';}
       if(c==='c-usury'){if(!['allow','license','forbid'].includes(a))throw Error('Invalid usury custom');return 'worker';}
       if(c==='c-recoin'||c==='c-tallage'){if(!/^\d+(\.\d+)?$/.test(a)||!(+a>0&&+a<=(c==='c-recoin'?.2:1)))throw Error('Invalid coin command');return 'worker';}
       if(c==='c-estates'||c==='c-subsidy-rate'){if(!/^\d+(\.\d+)?$/.test(a)||!(+a>0&&+a<=1))throw Error('Invalid estates command');return 'worker';}
@@ -21158,7 +21259,7 @@ const ADV={muted:false,
     options:p.opts.map((o,k)=>({answer:k,label:o.label,cost:o.cost||0,affordable:!o.cost||purse(p.to|0)>=o.cost}))}));},
   SPEED:['paused','Normal','Fast','Very fast','Fastest','Reel years','Life pace'],
   state(path){const p=String(path||'realm'),[k,arg]=[p.split(':')[0],p.split(':').slice(1).join(':')],now=day();
-    if(k==='estates')return governmentState();if(k==='credit')return creditState();
+    if(k==='estates')return governmentState();if(k==='credit')return creditState();if(k==='knighthood')return knightState();
     if(k==='realm'){const dr=W.dragon,cm=W.comet;return{date:dateStr(),day:now,year:AD(),season:SEASONS[seasonIdx()],seasonDay:seasonDay(),weather:W.weather?.state,drought:!!W.drought,snowpack:W.snowpack?Math.round(W.snowpack):undefined,flooding:W.flooding>0||undefined,eclipse:W.eclipse>0||undefined,
       comet:cm&&cm.until>now?{until:dateStr(cm.until),withTeeth:!!cm.teeth}:null,dragon:dr&&!dr.gone?{name:dr.name,state:dr.dead?'dead':dr.state,lair:dr.lair?{x:Math.round(dr.lair.x),z:Math.round(dr.lair.z)}:undefined,raiding:dr.target?.name}:null,
       monarch:W.monarch&&fullTitle(W.monarch),treasury:Math.round(W.treasury),people:Math.round(W.settlements.reduce((t,s)=>t+detailPopulation(s),0)),legitimacy:Math.round(W.legitimacy),places:W.settlements.length,
