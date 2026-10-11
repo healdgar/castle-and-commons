@@ -2603,6 +2603,20 @@
         "phase": "tickChurchBodies",
         "closing": "churchCasesTick",
         "reads": "Actual marriage/will evidence, current paid clergy, funded named party fees and an independent paid appeal; inheritance witnesses follow creditor priority and precede title distribution."
+      },
+      {
+        "phase": "tickMilitary",
+        "first": "tickKnighthood",
+        "then": [
+          "knightDues",
+          "funded service/scutage and service expiration",
+          "tickTourneys",
+          "tickCompanies",
+          "tickChivalric",
+          "tickExpeditions",
+          "tickMilitaryOrders"
+        ],
+        "reads": "Actual living holders, current court consent and chests fund obligations; foreign opening holdings and voyages update before domestic native combat. Expedition participants remain actual absent people and physical goods/coin cross a registered boundary only. Equipment completed later today affects tomorrow\u2019s combat."
       }
     ],
     "new_phase_sources": {

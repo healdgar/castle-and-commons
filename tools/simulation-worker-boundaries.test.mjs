@@ -11,6 +11,7 @@ const html=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
 const source=inlineGameScript(html);
 const extract=(from,to)=>{const a=source.indexOf(from),b=source.indexOf(to,a);assert.ok(a>=0&&b>a,`missing source seam: ${from}`);return source.slice(a,b);};
 const extractHTML=(from,to)=>{const a=html.indexOf(from),b=html.indexOf(to,a);assert.ok(a>=0&&b>a,`missing HTML source seam: ${from}`);return html.slice(a,b);};
+const technologyRotation=extract('function technologyRotation(s){','function technologyFarmYield(');
 const presentation=extract('function visualScalars(', 'function installPresentation(packet){');
 const installProjection=extract('function installPresentation(packet){', '/*\n * Ephemeral renderer DTO builders');
 const renderPlans=extract('/*\n * Ephemeral renderer DTO builders', '/* Foreground adapters submit intent');
@@ -47,7 +48,7 @@ function context(extra={}){
     let allLines=[],entryCount=0,scene=null;const dateStr=()=>'';let MODEL_ONLY=false,SEED=33,FATE=44,START_AD=850;function storageOutcomeReady(){return true}
     function workerHTML(value){return value}function presentEndgame(){}
   `).runInContext(c);
-  new vm.Script(presentation+'\n'+installProjection+'\n'+renderPlans,{filename:'index.html production projection'}).runInContext(c);
+  new vm.Script(technologyRotation+'\n'+presentation+'\n'+installProjection+'\n'+renderPlans,{filename:'index.html production projection'}).runInContext(c);
   vm.runInContext('workerTrackSegments=()=>[];workerFenceSegments=()=>[]',c);
   return c;
 }
@@ -621,4 +622,24 @@ test('a packet\'s events are laid out once, and only fresh ones fly the camera o
   vm.runInContext(`chronicleAdd(Array.from({length:30},(_,i)=>({day:i,cat:'trade',text:'e'+i})))`,d);
   assert.equal(counts.append,1,'one append for the run');assert.ok(counts.measure<=3,`layout read ${counts.measure} times, not thirty`);assert.equal(list.children.length,30);
   vm.runInContext(`chronicleAdd({day:31,cat:'trade',text:'one'})`,d);assert.equal(list.children.length,31,'a single entry still works');
+});
+
+// An actual expedition links a road journey, host and hull to private foreign
+// accounts. Its model identities must not be copied through nested geometry.
+test('foreign expedition custody stays in the worker while routes and hull geometry cross',()=>{
+  const c=context();
+  const packet=vm.runInContext(`(()=>{
+    const E={kind:'expedition',gold:91,cargo:[{owner:{gold:4},quantity:7}],army:null};
+    const hull={kind:'cog',master:{family:{gold:12}},busy:E};
+    W.houses=[{name:'Crown',head:7,journey:{from:0,to:1,depart:7,arrive:9,expedition:E}}];
+    W.armies=[{id:1,at:-1,state:'foreign',expedition:E,men:[],poly:[{x:0,z:0},{x:4,z:8}]}];E.army=W.armies[0];
+    W.ships=[{id:1,kind:'cog',phase:'out',expedition:E,vessel:hull,poly:[{x:1,z:0},{x:8,z:9}]}];
+    return workerPresentation(true);})()`,c);
+  auditDTO(packet);
+  assert.equal(packet.houses[0].journey.expedition,undefined);
+  assert.equal(packet.armies[0].expedition,undefined);
+  assert.equal(packet.ships[0].expedition,undefined);
+  assert.equal(packet.ships[0].vessel,undefined);
+  assert.equal(packet.armies[0].poly.length,2);
+  assert.equal(packet.ships[0].poly.length,2);
 });
