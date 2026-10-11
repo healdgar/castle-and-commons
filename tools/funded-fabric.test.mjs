@@ -45,3 +45,7 @@ test('a fully paid native footprint licence survives parcel succession without a
   F.title.own=propertyRightsResolve(H[0].id);const inherited=storageGroundClaim(s,q,payer);if(!inherited.ok||inherited.recipients.length)throw Error('lawful successor takes the parcel subject to paid licence');
   if(means(payer)!==before)throw Error('licence must not charge again');cells=[1,3];const moved=storageGroundClaim(s,q,payer);if(moved.ok)throw Error('paid licence must not move to different native ground');
 `);near(r.eval('q.landCash'),20);assert.equal(r.eval('q.groundClaim.cells.join(",")'),'1,2');});
+test('a completed paid roof repair cancels a queued vacant-house fall',()=>{const r=setup();vm.runInContext(fn('tickFalling'),r.C);r.eval(`
+  delete b.ch;b.arch='house';b.ownerId='lord';
+  b._fallAt=2;s._falling=[b];q=fabricProjectCommission(s,b,{work:'repair',payer:'crown',labour:10,days:1,timber:4,stone:0});fabricProjectTick(q);now=2;tickFalling(s);
+`);assert.equal(r.eval('b.state'),'sound');near(r.eval('s.ruinCount'),0);near(r.eval('s._falling.length'),0);assert.equal(r.eval('q.status'),'completed');});

@@ -16063,7 +16063,7 @@ function moveIn(s){ // households with no roof, or lodging over another's, take 
   for(const b of vacated)vacantResidentialChanged(b.s||s,b);}
 function tickFalling(s){ // a due native fall is saved by occupation or actual completed roof repair
   if(!s._falling||!s._falling.length)return;
-  s._falling=s._falling.filter(b=>{if(day()<b._fallAt)return true;b._fallAt=0;
+  s._falling=s._falling.filter(b=>{if(!(b._fallAt>0)||(b._roofMaintainedUntil||0)>day()){b._fallAt=0;return false;}if(day()<b._fallAt)return true;b._fallAt=0;
     if(!b.removed&&b.state==='sound'&&!(b.hh&&b.hh.length)){b.state='ruin';vacantResidentialChanged(s,b);b.deserted=true;b.rebuildT=Infinity;s.ruinCount++;updateBuildingInstance(b);}return false;});}
 /* the streets: where the townsfolk's daily walks go far about, a street is cut straight through, and the houses in its line come down */
 function tickStreets(){
