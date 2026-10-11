@@ -84,6 +84,11 @@ at local prices. Coin collection preserves a family's next month's bread and
 rent. The shortfall remains a real named household obligation; collection
 fees come from coin actually received.
 
+The annual due date is the earliest assessment day. If no present eligible
+collector exists then, the same uncompleted assessment checks again each day
+until its real grant expiry. It neither waits another month nor reassesses a
+completed place; old saved `retry` backoff values grant no delay or early tax.
+
 The persistent obligation map is created by assessments, not a polling census.
 Quarter-day recoveries follow native single-household mergers. Extinct estates
 are discharged explicitly. Thus assessed wealth reconciles to collected coin,
@@ -103,6 +108,23 @@ fixed farm plus entry, or the player orders the offer. Tolls, local court fines
 and court fees then reach the native town chest; original private creditors
 and due principals retain their accounts. Annual farm payments go to the town's
 actual current lord. Unpaid amounts remain in its contract and bounded roll.
+
+A village's existing market-trade and road/river/harbour conditions are reviewed
+daily in growth, before housing and town proposals. The native weekly-market
+charter changes its actual town/layout classification once; annual population,
+building-peak and history quantities keep their original reckoning dates. This
+market right precedes the distinct purchased fee-farm commune.
+
+An existing commune reviews its present mayor daily. Actual delegated receipts
+must support the annual farm and the household's customary service fee; town
+coin must retain the full farm and arrears before paying one day's real service.
+The saved pay date prevents a second payment that day. A funded replacement
+releases only the former mayor's exact town office and refreshes native work
+rosters. Absence or another held job prevents service; a mayor assigned to
+another town retains that town's marker and receives no pay here. A genuinely
+funded vacant office records demand for learning, without creating a worker.
+The farm itself still transfers only on its annual contractual anniversary.
+Mayor pay dates and totals remain worker fiscal/job data, outside visual geometry.
 
 ## Controls and reads
 
@@ -127,3 +149,9 @@ invalidation and conserved fees. Its final run used 3.47 CPU seconds on the
 cloud host (load 0.17 before and 0.07 after). This is an intended staffing/history
 correction; the coordinator's native release gates still cover the assembled
 model.
+
+The daily charter/collector/mayor slice passes 22 focused government checks in
+1.65 CPU seconds (cloud host, load 0.00 before and after). These preserve actual
+annual obligations, cash conservation, native actor identity and readonly
+visual records. Midyear promotion uses the captured native layout callback;
+the coordinator still owns generated-world, save/speed and release validation.

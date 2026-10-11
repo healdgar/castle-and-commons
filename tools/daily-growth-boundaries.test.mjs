@@ -11,7 +11,7 @@ assert.ok(growthWrapper,'tickGrowth wrapper must exist');
 
 test('occupancy, due falls and structural decisions run in dependency order every day',()=>{
   const selected=new Set([0,1,5,6,7,361]),events=new Map(),decisionDays=Array.from({length:362},()=>({widen:[],vacancy:[]}));
-  const counts=Array.from({length:362},()=>({moveIn:0,fall:0,housing:0,widen:0,vacancy:0,fabric:0,newTown:0,lane:0,wall:0,reuse:0}));
+  const counts=Array.from({length:362},()=>({moveIn:0,fall:0,charter:0,housing:0,widen:0,vacancy:0,fabric:0,newTown:0,lane:0,wall:0,reuse:0}));
   let today=0;
   const record=(kind,s)=>{
     counts[s.index][kind]++;
@@ -24,7 +24,7 @@ test('occupancy, due falls and structural decisions run in dependency order ever
   const W={settlements:Array.from({length:362},(_,index)=>({index,folk:[{}]}))};
   const c=vm.createContext({
     W,day:()=>today,
-    moveIn:s=>record('moveIn',s),tickFalling:s=>record('fall',s),
+    moveIn:s=>record('moveIn',s),tickFalling:s=>record('fall',s),villageMarketCharter:s=>record('charter',s),
     tickGrowthHousing:s=>record('housing',s),tickGrowthWiden:s=>record('widen',s),
     tickGrowthVacancy:s=>record('vacancy',s),tickGrowthFabric:s=>record('fabric',s),
     newTownStreetProposal:s=>record('newTown',s),publicLaneProposal:s=>record('lane',s),
@@ -37,6 +37,7 @@ test('occupancy, due falls and structural decisions run in dependency order ever
     const n=counts[index];
     assert.equal(n.moveIn,360,`daily occupancy for settlement ${index}`);
     assert.equal(n.fall,360,`daily falls for settlement ${index}`);
+    assert.equal(n.charter,360,`daily market-charter eligibility for settlement ${index}`);
     assert.equal(n.housing,360,`daily housing decision for settlement ${index}`);
     assert.equal(n.fabric,360,`daily fabric decision for settlement ${index}`);
     assert.equal(n.widen,360,`daily widening decision for settlement ${index}`);
@@ -46,7 +47,7 @@ test('occupancy, due falls and structural decisions run in dependency order ever
     assert.deepEqual(decisionDays[index].vacancy,due);
     for(const kind of ['newTown','lane','wall','reuse'])assert.equal(n[kind],360,kind+' is daily for settlement '+index);
   }
-  const order=['moveIn','fall','housing','widen','vacancy','fabric','newTown','lane','wall','reuse'];
+  const order=['moveIn','fall','charter','housing','widen','vacancy','fabric','newTown','lane','wall','reuse'];
   for(const key of ['174:6','29:1','29:361','6:0'])assert.deepEqual(events.get(key),order,key+' keeps the same daily order');
 });
 
@@ -58,7 +59,7 @@ function occupancyHarness({heads,roof,dayValue=4}){
     heads_:(s,pred)=>(s.heads||[]).filter(h=>!pred||pred(h)),
     capOf:()=>1,workOf:()=>({x:0,z:0}),homeScore:()=>1,
     updateBuildingInstance:b=>{c.updated.push(b);},
-    tickGrowthHousing(){},tickGrowthWiden(){},tickGrowthVacancy(){},tickGrowthFabric(){},
+    villageMarketCharter(){},tickGrowthHousing(){},tickGrowthWiden(){},tickGrowthVacancy(){},tickGrowthFabric(){},
     newTownStreetProposal(){},publicLaneProposal(){},townWallProposal(){},tickTownReuse(){},
     chance:()=>{draws.push('chance');throw Error('occupancy/falls must not draw RNG');},
     frand:()=>{draws.push('frand');throw Error('occupancy/falls must not draw RNG');},
