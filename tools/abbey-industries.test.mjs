@@ -98,7 +98,7 @@ test('own windmill searches beyond its occupied church centroid while retaining 
 
 test('private own-use mill does not veto native public windmill preflight',()=>{const r=setup();building(r,'mill','windmill');r.eval("H[2].tr='miller';H[2].craft={qualified:true,rank:'journeyman'};s.growSlots=[];price(s,'grain');price(s,'timber');let quotes=0;const nativeRecipe=constructionRecipe;constructionRecipe=(...args)=>{quotes++;return nativeRecipe(...args)};technologyWindmillProposal(s,true)");near(r.eval('quotes'),1);r.eval("s.buildings.push({arch:'windmill',state:'sound',removed:false,ownerId:'lord'});technologyWindmillProposal(s,true)");near(r.eval('quotes'),1);assert.ok(r.eval('bmill.abbey===a.storageOwnerId'));});
 
-function ruralSetup(beforeCapture=''){const r=setup();r.eval(['obbCorners','obbOverlap','locW','segDist','segSegDist','inPolyXZ','graveyardPolygonsOverlap','streetFootprintOverlap','serviceDoor','polyLen','occupiedGroundCells','compoundPolys','compoundGround','storageGroundClaim','storageGroundPay','institutionFoundationAccess','institutionFoundationPath','storageRoadPlan','serviceRoadPlan','castleFoundationReserved','landValue','landPrice'].map(fn).join('\n'));r.eval(`
+function ruralSetup(beforeCapture=''){const r=setup();r.eval(['obbCorners','obbOverlap','locW','segDist','segSegDist','inPolyXZ','graveyardPolygonsOverlap','streetFootprintOverlap','serviceDoor','polyLen','occupiedGroundBoxMayHit','occupiedGroundCells','compoundPolys','compoundGround','storageGroundClaim','storageGroundPay','institutionFoundationAccess','institutionFoundationPath','storageRoadPlan','serviceRoadPlan','castleFoundationReserved','landValue','landPrice'].map(fn).join('\n'));r.eval(`
  const GRID=16,CELL=40,SIZE=640,LANDV={};cIdx=(x,z)=>z*GRID+x;toCell=x=>Math.floor((x+SIZE/2)/CELL);cellX=x=>-SIZE/2+(x+.5)*CELL;cellZ=cellX;PL=()=>1;
  W.monarch={alive:true,traits:['pious'],sk:[0,0,.6]};W.land.mask=new Uint8Array(GRID*GRID*4);for(let c=0;c<GRID*GRID;c++){W.land.mask[c*4]=1;W.land.mask[c*4+2]=255;}
  const privateField={...f,k:1,alms:null,own:'crown',wk:'crown',core:0,area:10000};privateField.title={own:propertyRightsResolve('crown'),work:propertyRightsResolve('crown')};let corridorFields=[privateField];occupiedGroundFields=cells=>new Set(cells.length?corridorFields:[]);occupiedGroundAreas=()=>new Map();
@@ -371,4 +371,54 @@ test('a replaced spatial predicate cold-checks the complete ordered public surfa
  const r=routeSetup();r.eval(`const T=abbeyRouteTerrain(s),corridor=abbeyCorridorReady(s,abbeyApproachSurvey(s),a.storageOwnerId,undefined,0,T),p={x:0,z:20},q={x:0,z:22},walker={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3,_em:abbeyRouteMemo(T),abbeyCorridor:corridor},scope=abbeyRouteEnter(walker),warm=armySegmentClear(walker,p,q);abbeyRouteLeave(walker,scope);
   privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh);let invalidIndexCalls=0;abbeySurveyIndexRows=()=>{invalidIndexCalls++;return []};const cold=abbeyCorridorCold(walker,corridor),actual=armySegmentClear(walker,p,q);`);
  assert.ok(r.eval('warm&&!cold.C.native&&actual&&invalidIndexCalls===0'),'actual public road surface remains an easement, with no use of the invalid spatial index');
+});
+
+function groundGeometrySetup(cell=40){
+ const context=vm.createContext({Math,Number,Map,Set,GRID:16,CELL:cell,SIZE:cell*16,W:{land:{F:[]}}});
+ const cells=fn('occupiedGroundCells'),fields=fn('occupiedGroundFields');
+ const legacyCells=cells.replace('function occupiedGroundCells(','function legacyOccupiedGroundCells(').replace('if(!occupiedGroundBoxMayHit(P,ax,bx,az,bz))return false;','');
+ const legacyFields=fields.replace('function occupiedGroundFields(','function legacyOccupiedGroundFields(').replace('occupiedGroundBoxMayHit(poly,x-half,x+half,z-half,z+half)&&','');
+ assert.notEqual(legacyCells,cells);assert.notEqual(legacyFields,fields);
+ vm.runInContext([constant('clamp'),constant('cIdx'),constant('inB'),constant('toCell'),constant('cellX'),constant('cellZ'),...['obbCorners','segDist','segSegDist','inPolyXZ','graveyardPolygonsOverlap','occupiedGroundBoxMayHit','occupiedGroundCells','occupiedGroundFields','computeFurlongPoly'].map(fn),legacyCells,legacyFields].join('\n'),context);
+ return{context,eval:s=>vm.runInContext(s,context)};
+}
+
+test('ground cell broad phase preserves the original ordered raster near threshold, signed zero, malformed and scaled inputs',()=>{
+ for(const cell of [15,6000/220,9000/220,40]){const r=groundGeometrySetup(cell);r.eval(`const edge=cellX(7)+CELL/2,z=cellZ(7),cases=[];
+  for(const gap of [0,.005,.009999999,.01,.010000001,.999999999,1,1.000000001,2])for(const angle of [0,Math.PI/4,-Math.PI/3])cases.push(obbCorners(edge+gap+1,z,2,3,angle));
+  cases.push([{x:-0,z:-0}],[{x:edge,z:z-1},{x:edge,z:z+1}],[],[{x:NaN,z:0},{x:1,z:1},{x:0,z:1}],[{x:Infinity,z:0},{x:1,z:1},{x:0,z:1}],
+   [{x:1e7,z:-1},{x:1e7+2,z:1},{x:1e7,z:1}],[{x:-20,z:-20},{x:20,z:20},{x:-20,z:20},{x:20,z:-20}]);
+  const differences=cases.map(P=>({new:occupiedGroundCells(P),old:legacyOccupiedGroundCells(P)}));`);
+  for(const [i,result]of Array.from(r.eval('differences')).entries())assert.deepEqual(Array.from(result.new),Array.from(result.old),`CELL=${cell} case=${i}`);
+  assert.equal(r.eval('occupiedGroundBoxMayHit([{x:12,z:0}],-10,10,-1,1)'),false);
+  assert.equal(r.eval('occupiedGroundBoxMayHit([{x:11,z:0}],-10,10,-1,1)'),true,'one-metre boundary still runs exact native predicates');
+  for(const expression of ['null,-10,10,-1,1','[{x:Infinity,z:0}],-10,10,-1,1','[{x:1e7,z:0}],-10,10,-1,1','[{x:12,z:0}],10,-10,-1,1','[{x:12,z:0}],NaN,10,-1,1'])assert.equal(r.eval(`occupiedGroundBoxMayHit(${expression})`),true,expression+' retains native fallback');
+ }
+});
+
+test('native Voronoi parcel broad phase retains exact field identity and order while sparing distant overlap calls',()=>{
+ const r=groundGeometrySetup(40);r.eval(`const FN=4,FG=SIZE/FN;W.land.F=Array.from({length:FN*FN},(_,k)=>{const i=k%FN,j=Math.floor(k/FN);return{k,i,j,jx:((i*7+j*11)%13)/12,jz:((i*5+j*3)%11)/10};});
+  const overlap0=graveyardPolygonsOverlap;let overlapReads=0;graveyardPolygonsOverlap=(...args)=>{overlapReads++;return overlap0(...args)};
+  const samples=[[0],[cIdx(7,7)],[cIdx(7,7),cIdx(8,7),cIdx(8,8),cIdx(7,7)],[cIdx(15,15)],[...Array(16)].map((_,i)=>cIdx(i,i))];
+  let oldReads=0,newReads=0;const comparisons=[];for(const cells of samples){overlapReads=0;const old=[...legacyOccupiedGroundFields(cells)];oldReads+=overlapReads;overlapReads=0;const current=[...occupiedGroundFields(cells)];newReads+=overlapReads;comparisons.push({old,current});}
+  W.land.F[5].jx=.999;W.land.F[5].jz=.001;const changed={old:[...legacyOccupiedGroundFields([cIdx(6,6),cIdx(7,7)])],current:[...occupiedGroundFields([cIdx(6,6),cIdx(7,7)])]};`);
+ for(const result of Array.from(r.eval('[...comparisons,changed]')))assert.ok(result.old.length===result.current.length&&Array.from(result.old).every((f,k)=>f===result.current[k]));
+ assert.ok(r.eval('newReads<oldReads/2'),'only proven distant parcels spare original overlap checks');
+ const malformed=groundGeometrySetup(40);malformed.eval(`const FN=1,FG=SIZE;W.land.F=[{k:0}];computeFurlongPoly=()=>[{x:NaN,z:0},{x:1,z:1},{x:0,z:1}];const previous=graveyardPolygonsOverlap;let exactCalls=0;graveyardPolygonsOverlap=(...args)=>{exactCalls++;return previous(...args)};const current=[...occupiedGroundFields([cIdx(8,8)])],old=[...legacyOccupiedGroundFields([cIdx(8,8)])];`);
+ assert.deepEqual(Array.from(malformed.eval('current')),Array.from(malformed.eval('old')));assert.equal(malformed.eval('exactCalls'),2,'uncertain parcel bounds run original overlap for both queries');
+});
+
+test('a certified corridor reuses its identical native ground once and still reads current worker rights',()=>{
+ const r=routeSetup(`const ground0=compoundGround;let groundReads=0;compoundGround=(...args)=>{groundReads++;return ground0(...args)};`),cash=coins(r);r.eval(`const T=abbeyRouteTerrain(s),corridor=abbeyCorridorReady(s,abbeyApproachSurvey(s),a.storageOwnerId,undefined,0,T),p={x:80,z:20},q={x:82,z:20},walker={house:s.owner,settlement:s,placed:s._lay.placed,requireRoadCrossing:true,waterClearance:2.3,_em:abbeyRouteMemo(T),abbeyCorridor:corridor},scope=abbeyRouteEnter(walker);groundReads=0;const legal=abbeyCorridorWorldClear(walker,p,q,corridor),warmReads=groundReads;abbeyRouteLeave(walker,scope);
+  privateField.wk=H[0]._hh;privateField.title.work=propertyRightsResolve(H[0]._hh);const fresh=abbeyCorridorCold(walker,corridor);groundReads=0;const refused=abbeyCorridorWorldClear({...walker,_em:undefined},p,q,fresh),coldReads=groundReads;`);
+ assert.ok(r.eval('legal&&!refused&&warmReads===1&&coldReads===2'),'only the certified unchanged carrier avoids duplicate native raster');near(coins(r),cash);assert.equal(r.eval('W.projects.length'),0);
+ r.eval(`privateField.wk=privateField.own=H[0]._hh;privateField.title={own:propertyRightsResolve(H[0]._hh),work:propertyRightsResolve(H[0]._hh)};const site={polys:[obbCorners(81,20,2.6,2,0)]},carrier={site,land:100,claimOccupied:true},ground=ground0(site),regular=storageGroundClaim(s,carrier,a),reused=storageGroundClaim(s,carrier,a,ground);`);
+ assert.equal(r.eval('regular.ok'),true);assert.ok(r.eval('regular.key===reused.key&&JSON.stringify(regular.cells)===JSON.stringify(reused.cells)&&regular.recipients.length===reused.recipients.length&&regular.recipients.every((p,k)=>p.owner===reused.recipients[k].owner&&p.id===reused.recipients[k].id&&p.due===reused.recipients[k].due&&p.due>0)'));
+});
+
+test('native approach contexts cannot retain a foreign settlement or different excluded project in the final accepted route',()=>{
+ const r=routeSetup();r.eval(`base.f.x=20;const project={type:'compound',si:0,site:{f:{x:10,z:12.2,w:2,d:2,rot:0}}};W.projects.push(project);const excluding=abbeyApproachSurvey(s,project),T=abbeyRouteTerrain(s),current=abbeyCorridorReady(s,excluding,a.storageOwnerId,undefined,0,T),quote=abbeyApproachPlan(s,base,a.storageOwnerId,undefined,excluding),foreign={...s,_lay:s._lay},foreignSurvey=abbeyApproachSurvey(foreign),sameSettlement=abbeyCorridorReady(s,foreignSurvey,a.storageOwnerId,undefined,0,T);`);
+ assert.ok(r.eval('current.C!==excluding&&current.C.s===s&&current.C.q===undefined&&current.C.projects.some(p=>p.q===project)'));
+ assert.ok(r.eval('sameSettlement.C!==foreignSurvey&&sameSettlement.C.s===s&&sameSettlement.C.q===undefined'));
+ assert.ok(r.eval('quote&&quote.path.length>3&&abbeyApproachClear(s,quote)'),'the accepted lexical context checks the currently pending project, not merely Ready');
 });
