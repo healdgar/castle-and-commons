@@ -36,6 +36,13 @@ Canonical buildings supply storage and housing; the compound owns neither a seco
 
 The current visual model is simple: a church, residential range and grange placed as separate functional buildings. A recognizable cloister layout and richer stone ranges are unfinished.
 
+The accepted next architecture phase uses the same shared engine as castles,
+colleges and estates. It adds church-relative ranges and lawful retained internal
+connections, then real paid chapter/refectory space and covered walks; it does
+not introduce another population, pantry or building identity. The client audit,
+historical layout and dependency boundary are in
+[COMPOUND-LAYOUT-PHASE.md](COMPOUND-LAYOUT-PHASE.md). This is planned work.
+
 ![Corscrug Abbey church in winter AD 1201](images/abbey-church-ad1201.png)
 
 *Actual completed Benedictine church from the frozen `61dd0bb` native run, at verified closed day 660. This view shows the church before residence and grange completion. Full-graph load, exact resave and readonly drawing/RNG checks passed; it is construction progress, not a full-core or industry pass.*

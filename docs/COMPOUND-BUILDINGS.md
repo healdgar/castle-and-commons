@@ -10,6 +10,12 @@ Purpose is a capability of a real component, with its existing system hooks supp
 
 The compound layer provides common site, component, connection, project and capability references. Institution adapters retain the rules that decide who may build, whose land is used, which account pays, how benefit is measured, and where later income goes. Castle authority and abbey corporate property are different adapters over shared construction mechanics.
 
+The next architecture phase extends this same engine for connected layouts in
+castles, abbeys and other compounds, with institution-specific layout adapters.
+[COMPOUND-LAYOUT-PHASE.md](COMPOUND-LAYOUT-PHASE.md) records the accepted shared
+requirement, current client audit and proposed bounded paid cloister stages.
+Those layout and covered-walk additions are not implemented yet.
+
 ## What exists now
 
 Issue #60's castle foundation operation uses existing ruler authority, seat/fort/border relevance, purse and reserve, town worth and threat, castle benefit criteria, live terrain and road geometry, agricultural land rights and foregone field value, native timber/stone prices and inventories, named builders/workers, a saved daily project, remaining construction demand, and the existing fortification/worker/rendering model. The foundation is one canonical keep plus a palisaded yard and connected approach. The yard is needed because `fortOf` grants circuit defense; a lone keep gives no circuit benefit. Current first towers require locally adopted stone-keep knowledge (historical invention AD 1080); earlier or unadopted sites use timber. The site and works are rechecked; paid materials and labor persist. Later castle upgrades now commission saved paid daily projects through the shared compound service. No unpaid annual upgrade is installed by `tickCastles`.
