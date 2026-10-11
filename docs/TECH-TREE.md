@@ -1,18 +1,23 @@
-# Technology: a proposal
+# Technology and institutions
 
-Status: proposal only (2026-10-06). Realm discovery, stored knowledge, place
-adoption, patronage and the inventions in this proposal are not implemented.
-The runtime has one narrow construction seam: a pure calendar fallback for the
-stone-keep method, shared by generated castle forms, first-foundation quotes,
-existing timber/motte upgrades and stone-demand forecasting. It stores no
-technology state and does not make other entries in this proposal operative.
+Status: realm knowledge/local adoption implemented in the current completion batch.
+The invention table remains the consumer specification for physical equipment and
+institutions. Learning and craft adapters continue in #40/#43; a known method
+never creates a machine, castle, ship, school, weapon, or money by itself.
 
-For compatibility, the runtime seam currently exposes the existing stone-keep
-gate at AD 1070. This proposal's stone-keep row is dated AD 1080. The difference
-is explicit and remains unresolved until #44 supplies real historical knowledge
-and local adoption. The fallback query has no RNG, resource, price, site,
-payment, adoption or world-write behavior; actual stone and eligible work still
-depend on their ordinary simulation systems.
+Initialized worlds use `technologyCapability`, `institutionalCapability` and
+`constructionCapability` to check historical invention, actual realm knowledge,
+prerequisites and local adoption. The previously explicit stone-keep discrepancy
+is intentionally resolved in favour of the proposal: ordinary worlds discover
+stone keeps no earlier than **AD 1080**. The old **AD 1070** calendar gate remains
+only when no technology state was initialized (small legacy fixtures). The query
+is pure; consumers still buy materials and complete paid construction.
+
+Direct starts initialize inherited knowledge dated at least thirty years before
+the opening year, with the established AD 850 methods always present. These are
+opening conditions, with no prehistory ticks, random draws, or historical payment
+records invented. Later settlements receive information about that inherited
+knowledge and pay their actual local teaching cost before adopting it.
 
 ## The idea
 
@@ -28,7 +33,7 @@ Each invention also reaches places one by one. A realm *knows* a technique first
 
 ## How knowledge grows
 
-Each year the realm gains learning from quantities it already has or will have:
+Each day the realm gains learning from quantities it already has or will have:
 
 - **Scholars:** literate clergy, monks and friars (#35), schoolmasters and masters at a university (#40), weighted by their number.
 - **Contact:** foreign ships in port, fairs, merchants who travel abroad. Ideas came with trade.
@@ -37,7 +42,7 @@ Each year the realm gains learning from quantities it already has or will have:
 
 **Timing.**
 - An invention becomes discoverable at its historical year, provided its prerequisites are known.
-- Each year after that, the chance of discovery grows with the realm's learning against a historical yardstick. A realm with that learning has a median arrival in the historical year; a realm with the unsponsored baseline has a median about 30 years later.
+- Each day after that, the chance of discovery grows with the realm's learning against a historical yardstick. A realm with that learning has a median arrival in the historical year; a realm with the unsponsored baseline has a median about 30 years later.
 - Draws use the simulation's own random stream, so a save replays identically.
 - Plague killing clerics, a sacked town or a burned library lower the learning that follows.
 
@@ -128,16 +133,31 @@ Years are the period's diffusion in north-western Europe. Effects say which exis
 - **No price fixing.** Effects change yields, labour per unit, carrying cost and build time; prices follow.
 - **Determinism.** Draws use the simulation's random stream, and patronage is a journaled command.
 - **Performance:**
-  - Learning is reckoned once a year per realm.
-  - Adoption is decided on each place's own yearly day, which the calendar already staggers.
+  - Learning and eligible adoption are decided daily inside the existing production phase.
+  - Actor indices hold only local prospective teachers and merchants; eligibility validates actual living, present, supported people.
+  - Each place visits its sparse ready-method set; discovery visits only pending methods.
   - Effects are factors on quantities the day already computes.
-  - No new daily loop. The hot list gets a "technology" part of the day with a small budget.
+  - Actual cargo, ship and lord arrivals convey known methods; there is no daily place × road × invention search.
 - **Worker and screen.** Technology state lives in the worker's world. The screen and the advisor see projected fields and panel reads.
 
-## Open questions
+## Recorded decisions and remaining consumers
 
-1. Should a superb player be able to arrive a little before the historical year (say up to 10 years), or never before it?
-2. Do rival great houses keep their own knowledge, so a lord's patronage favours his own lands, or does the realm share one pool?
-3. Is knowledge lost after a collapse: a burned library, a plague that kills the masters?
-4. How much should guilds resist new techniques?
-5. Which inventions belong in the first version? Suggested: three-field rotation, horse collar, windmill, fulling mill, spinning wheel, crane, university, bill of exchange, trebuchet, siege cannon. They touch the economy and war, which the game already models.
+- No invention before its historical date; all query paths enforce that date.
+- Knowledge is realm wide; local uptake and patronage favour actual places.
+- Losing teachers/buildings removes subsequent learning. Previously acquired
+  realm knowledge is retained; it does not depend on a decorative library.
+- Ordinary decisions are daily. Market days, terms, rent and tax dates remain
+  meaningful calendar events in their own systems.
+- Benedictine rules are available in the early AD 850 opening. AD 910 refers to
+  Cluny, not the invention of Benedictine monasticism; `benedictine910` is a
+  backwards-compatible alias. Augustinian adoption starts AD 1100 and Cistercian
+  granges AD 1128. Accepted Cistercian-first founding remains the abbey adapter's
+  policy, separate from capability.
+- Guild resistance awaits real guild ordinances and quantities in #43; there is
+  no invented scalar suppressing methods in the meantime.
+
+See [TECHNOLOGY-RUNTIME.md](TECHNOLOGY-RUNTIME.md) for the source contracts,
+phase order, equipment/payment requirements and exact remaining consumer list.
+The timing formula now operates on actual staffing/contact and daily receipts;
+the root runner must calibrate the historical lag with the combined native
+institution tests. Passing the small fixture does not assert a calibrated realm.

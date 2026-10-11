@@ -7,7 +7,7 @@ const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const helper=source.match(/const CONSTRUCTION_METHODS=Object\.freeze\(\{stoneKeep:[^\n]+\}\);\nfunction constructionCapability\(s,method,ad=AD\(\)\)\{[\s\S]*?\n\}/)?.[0];
 const foundationSpec=source.match(/function castleFoundationSpec\(s\)\{[\s\S]*?\n\}/)?.[0];
 
-test('stone keep construction hook is a pure historical fallback pending #44',()=>{
+test('stone keep construction hook is a pure historical fallback before world technology initialization',()=>{
   assert.ok(helper,'shared construction capability helper is present');
   const c={AD:()=>1400};vm.createContext(c);vm.runInContext(helper,c);
   const query=vm.runInContext('constructionCapability',c),place={id:1};
@@ -15,9 +15,9 @@ test('stone keep construction hook is a pure historical fallback pending #44',()
   assert.equal(query(place,'stoneKeep',1070).available,true);
   assert.equal(query(place,'stoneKeep',1070).historicalYear,1070);
   assert.equal(query(place,'stoneKeep',1070).proposalYear,1080);
-  assert.equal(query(place,'stoneKeep',1070).source,'calendar-fallback-pending-tech-tree');
+  assert.equal(query(place,'stoneKeep',1070).source,'calendar-fallback-before-technology-init');
   assert.equal(query(place,'unknown',1500).available,false);
-  assert.doesNotMatch(helper,/rand\(|chance\(|Math\.random|(?:^|[^\w])W\.|(?:^|[^\w])s\./);
+  assert.doesNotMatch(helper,/rand\(|chance\(|Math\.random|W\.[A-Za-z_]+\s*=|s\.[A-Za-z_]+\s*=/);
 });
 
 test('first foundation uses the capability result for its actual timber/stone quantities',()=>{
