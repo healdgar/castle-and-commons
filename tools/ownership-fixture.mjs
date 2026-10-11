@@ -17,7 +17,7 @@ export function realm({grain=20,fish=20,grainLard=0,fishLard=0,cash=20,crown=0,p
   const C=vm.createContext({W,s,H,console,waterMill:()=>false,GV:0,GB:1,GD:2,GWa:3,GF:4,nameUse:()=>{},archivePerson:()=>{},life:()=>{},folkName:p=>p.gn,beastsWord:()=>"beasts",MOD:{tax:12,birth:0,mort:0},BIRTH0:0,HOUSEHOLD:5,G:{bldList:[]},
     day:()=>1,year:()=>0,AD:()=>850,chestReserve:()=>0,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),ageYrs:p=>p.age??30,BEASTS:['sheep','cattle','horses','swine'],
     price:(x,g)=>x.px[g]??1,tilledOf:()=>[],parishOf:()=>null,payAmong:()=>assert.fail('fixture has no demesne wages'),
-    tradeCounts:()=>Object.fromEntries(H.map(h=>[h.tr,1])),marketFor:()=>null,book:()=>{},lordTake:()=>{},folkIndex:()=>new Map(H.map(h=>[h.id,h])),carryingCap:()=>1000,
+    tradeCounts:()=>Object.fromEntries(H.map(h=>[h.tr,1])),marketFor:()=>null,book:()=>{},lordTake:()=>{},folkIndex:()=>new Map(H.map(h=>[h.id,h])),carryingCap:()=>1000,clearLandUnder:()=>{},
     sheltered:()=>0,emit:()=>{},writeFurlong:()=>{},tradeIncome:()=>0,vary:(k,L)=>L[0](),randi:()=>0,famineStrikes:()=>{},dist2d:(ax,az,bx,bz)=>Math.hypot(ax-bx,az-bz)});
   if(bootstrap)vm.runInContext(bootstrap,C);
   vm.runInContext(`globalThis.FURLONG_COMMODITY_BALANCES=${!!commodity};`,C);

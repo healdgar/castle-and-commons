@@ -1,6 +1,6 @@
 # Missing institutions: design notes
 
-Status: design notes (2026-10-07). The groundwork (step 1 of *Order of work*) is in the game; no system is yet. These notes cover #35–#43 in `docs/ISSUES.md`, and tie them to #20–#23 and to the technology proposal (#44, `docs/TECH-TREE.md`).
+Status: institution design and accepted decisions. Customary income and manor/eyre justice are implemented; the remaining systems are under the full continuation contract in [SIMULATION-COMPLETION.md](SIMULATION-COMPLETION.md). These notes cover #35–#43 in `docs/ISSUES.md`, and tie them to #20–#23, technology (#44), the wider Church (#46) and foreign war (#47). The accepted decisions at the end override earlier alternatives.
 
 ## Why now
 
@@ -847,7 +847,7 @@ Sessions and their rulings:
 6. **#38.** Interest and pledges (needs #37), forward sales, the mint.
 7. **#41, #40, #43, #42**, in that order.
 
-Each lands as a behaviour change in its own batch, with the matched soak the test runner already uses (money, famine, population, CPU and economy at once). Calibration choices go to the user.
+Each lands as a behaviour change in its own batch, with the matched soak the test runner already uses (money, famine, population, CPU and economy at once). Model changes follow the accepted decisions and actual quantities; unresolved material choices go to the user.
 
 Era gates, following the kept historical gates:
 

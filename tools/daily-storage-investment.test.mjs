@@ -26,6 +26,7 @@ const sharedSource=declaration('storageInvestmentShared');
 const constructionMaterialsSource=declaration('constructionProjectMaterials');
 const constructionWorkSource=declaration('constructionProjectPaidWork');
 const projectTickSource=declaration('storageProjectTick');
+const groundSources=declaration('storageGroundClaim')+'\n'+declaration('storageGroundPay');
 
 const TYPES={
   grange:{capacity:800,cost:360,days:90,timber:24,stone:0},
@@ -218,11 +219,11 @@ function projectTickFixture(project,{cash=100,quotePurchase=()=>0,workPaid}={}){
   const K={day:0,locations:new Map([['new-store',location]]),event:(cause,lot,qty,metadata)=>events.push({cause,qty,metadata})};
   const context=vm.createContext({W:{settlements:[s],houses:[]},s,G:{},storageInit:()=>K,day:()=>44,year:()=>850,accountOwner:o=>o,
     means:()=>cash,clamp:(x,a,b)=>Math.max(a,Math.min(b,x)),price:()=>1,avail:()=>10,consumeOwnStock:()=>0,commodityCreditPurchase:()=>{},consumeOwned:()=>1,
-    storageFacilities:()=>K,bindPropertyRights:()=>{},syncLive:()=>{},emit:()=>{},storageOutcomeAssert:()=>{},storageOwnerId:o=>o?.id||'unassigned',storageProjectState:q=>({...q}),
+    storageFacilities:()=>K,bindPropertyRights:()=>{},syncLive:()=>{},clearLandUnder:()=>{},emit:()=>{},storageOutcomeAssert:()=>{},storageOwnerId:o=>o?.id||'unassigned',storageProjectState:q=>({...q}),
     buildWorks:(town,amount)=>workPaid?workPaid(amount):amount});
   const purchase=(...args)=>quotePurchase(...args);context.purchase=purchase;
   context.s._lay={live:{storageSite(x,z,arch,dry){if(dry)return{x,z};const b={storageId:'new-store',arch,tier:0,state:'sound',x,z};s.buildings.push(b);return b;}}};
-  vm.runInContext(`${constructionMaterialsSource}\n${constructionWorkSource}\n${projectTickSource}`,context);
+  vm.runInContext(`${constructionMaterialsSource}\n${constructionWorkSource}\n${groundSources}\n${projectTickSource}`,context);
   return{context,events,s,purchase,tick:()=>context.storageProjectTick(project)};
 }
 
@@ -255,13 +256,13 @@ for(const [arch,days] of [['grange',90],['warehouse',150]])test(`${arch} constru
     means:()=>poor?0:10000,storageProjectState:q=>({...q}),
     clamp:(x,a,b)=>Math.max(a,Math.min(b,x)),
     buildWorks:(town,share)=>{work+=share;return share;},
-    storageFacilities:()=>K,bindPropertyRights:()=>{},syncLive:()=>{},emit:()=>{},
+    storageFacilities:()=>K,bindPropertyRights:()=>{},syncLive:()=>{},clearLandUnder:()=>{},emit:()=>{},
     storageOutcomeAssert:()=>{},
     storageOwnerId:o=>o?.id||'unassigned',
     arch,
   });
   context.s._lay={live:{storageSite(x,z,which,dry){if(dry)return {x,z};placed++;return {storageId:'new-store',arch:which,tier:0,state:'sound',x,z};}}};
-  vm.runInContext(`${constructionMaterialsSource}\n${constructionWorkSource}\n${projectTickSource}`,context);
+  vm.runInContext(`${constructionMaterialsSource}\n${constructionWorkSource}\n${groundSources}\n${projectTickSource}`,context);
   const tick=()=>context.storageProjectTick(project);
   for(let i=0;i<12;i++)tick();
   const before={done:project.done,paid:project.paid,work,progress:events.filter(e=>e.cause==='construction-progress').length};
