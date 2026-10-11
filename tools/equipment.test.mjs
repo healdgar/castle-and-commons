@@ -118,7 +118,25 @@ test('immediate abbey grinding uses remaining actual operator time without drain
 
 
 test('indexed grinding retains native mill order and validates the current operator without rediscovering every building',()=>{
-  const f=fixture();f.eval('craftIndex(s)');f.s.buildings=new Proxy(f.s.buildings,{get:(target,key)=>{if(key===Symbol.iterator)assert.fail('a bread payment must not rescan all town buildings');return Reflect.get(target,key);}});assert.equal(f.eval('technologyGrindingCash(s,H[0],-1)'),0);assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),1);f.H[2].role='company soldier';assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),0);
+  const f=fixture();let passes=0,guard=false;
+  f.s.buildings=new Proxy(f.s.buildings,{get:(target,key)=>{if(key===Symbol.iterator){assert.equal(guard,false,'a bread payment must not rescan all town buildings');passes++;return target[Symbol.iterator].bind(target);}return Reflect.get(target,key);}});
+  f.eval('craftIndex(s)');assert.equal(passes,1);assert.deepEqual([...f.eval('s._craftIndex.mills')],[f.rooms[1]]);guard=true;
+  const coins=f.coins(),payer=f.H[0].w,operator=f.H[2].w,holder=f.H[5].w;f.rooms[1].ownerId=f.H[5].id;
+  assert.equal(f.eval('technologyGrindingCash(s,H[0],-1)'),0);near(f.H[0].w,payer);
+  assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),1);near(f.H[0].w,payer-1);near(f.H[2].w,operator+.75);near(f.H[5].w,holder+.25);near(f.coins(),coins);
+  f.H[2].role='company soldier';assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),0);near(f.H[0].w,payer-1);near(f.H[2].w,operator+.75);near(f.H[5].w,holder+.25);near(f.coins(),coins);assert.equal(passes,1);
+});
+
+test('same-size fabric replacement refreshes native mill order while retaining people and repeated-payment rosters',()=>{
+  const f=fixture(),mill=f.rooms[1],windmill={idx:2,arch:'windmill',w:8,d:8,state:'sound',tier:0,ownerId:f.H[5].id,s:f.s,windExposure:1};
+  f.rooms[2]=windmill;f.H[5].tr='miller';f.H[5].craft={rank:'master',qualified:true,room:2,employees:[],opened:0,takings:10000,lastWorkDay:1};windmill.craftMasters=[f.H[5].id];
+  const old=f.eval('craftIndex(s)'),heads=old.heads,young=old.young,trades=old.trades;assert.deepEqual([...old.mills],[mill,windmill]);
+  let passes=0,guard=false;f.s.buildings=new Proxy([windmill,mill,f.rooms[0]],{get:(target,key)=>{if(key===Symbol.iterator){assert.equal(guard,false,'only the actual fabric refresh may scan the replacement array');passes++;return target[Symbol.iterator].bind(target);}return Reflect.get(target,key);}});
+  const current=f.eval('craftIndex(s)');assert.equal(current,old);assert.equal(current.heads,heads);assert.equal(current.young,young);assert.equal(current.trades,trades);assert.deepEqual([...current.mills],[windmill,mill]);assert.equal(passes,1);guard=true;
+  const coins=f.coins(),payer=f.H[0].w,first=f.H[5].w,second=f.H[2].w;
+  assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),1);near(f.H[5].w,first+1);near(f.H[2].w,second);
+  f.H[5].away={until:40};assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),1);near(f.H[5].w,first+1);near(f.H[2].w,second+1);
+  f.H[2].role='company soldier';assert.equal(f.eval('technologyGrindingCash(s,H[0],1)'),0);near(f.H[0].w,payer-2);near(f.coins(),coins);assert.equal(passes,1);
 });
 
 
