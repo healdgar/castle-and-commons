@@ -6,11 +6,11 @@ import {parse} from './vendor/acorn/acorn.mjs';
 import {inlineGameScript} from './simulation-boundary.mjs';
 
 const source=inlineGameScript(fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8'));
-const ast=parse(source,{ecmaVersion:'latest'}),functions=new Map(),variables=new Map();
-for(const node of ast.body){if(node.type==='FunctionDeclaration')functions.set(node.id.name,node);else if(node.type==='VariableDeclaration')for(const declaration of node.declarations)if(declaration.id.type==='Identifier')variables.set(declaration.id.name,{kind:node.kind,node:declaration});}
+const ast=parse(source,{ecmaVersion:'latest'}),functions=new Map(),variables=new Map(),classes=new Map();
+for(const node of ast.body){if(node.type==='FunctionDeclaration')functions.set(node.id.name,node);else if(node.type==='ClassDeclaration')classes.set(node.id.name,node);else if(node.type==='VariableDeclaration')for(const declaration of node.declarations)if(declaration.id.type==='Identifier')variables.set(declaration.id.name,{kind:node.kind,node:declaration});}
 const fn=n=>{const node=functions.get(n);assert.ok(node,'missing native '+n);return source.slice(node.start,node.end);};
 const constant=n=>{const declaration=variables.get(n);assert.ok(declaration,'missing native '+n);return declaration.kind+' '+source.slice(declaration.node.start,declaration.node.end)+';';};
-const native=n=>functions.has(n)?fn(n):constant(n);
+const native=n=>functions.has(n)?fn(n):classes.has(n)?source.slice(classes.get(n).start,classes.get(n).end):constant(n);
 const certificate=constant('ABBEY_ROUTE_SURVEY_NATIVE'),certificateNode=variables.get('ABBEY_ROUTE_SURVEY_NATIVE').node.init;
 assert.equal(certificateNode.type,'CallExpression');assert.equal(certificateNode.callee.object.name,'Object');assert.equal(certificateNode.callee.property.name,'freeze');
 const readers=certificateNode.arguments[0].properties.map(property=>{
@@ -22,7 +22,7 @@ const readers=certificateNode.arguments[0].properties.map(property=>{
 });
 // Reviewed corridor extension: native permission/public-graph readers precede
 // the original 53 route identities, which keep their exact previous order.
-const reviewedReaders=('occupiedGroundBoxMayHit ABBEY_APPROACH_SURVEY_CURRENT resample wallDamage streetGraphFortContext fortStreetRuns fortRoadBlocked lakeAt streetGraph furlongAt computeFurlongPoly bindHousehold newHousehold oldHouseholdHead nonemptyHouseholds folkIndex cellZ cellX locW roadAccessClear streetAccessAt householdAccount corpOf abbeyApproachSurveyNative abbeyApproachSurvey abbeyCorridorCold abbeyCorridorInputs abbeyCorridorReady abbeyCorridorPrivate abbeyCorridorGhostClear abbeyCorridorWorldClear abbeyCorridorSegmentClear abbeySurveyBounds abbeySurveyBoxesMayHit abbeySurveyUnion abbeySurveyIndexRange abbeySurveyIndex abbeySurveyIndexRows abbeySurveyReserved abbeySurveyPublic abbeyPublicStreet abbeyAccessEndpointValid compoundPolys compoundPolygonDifference compoundGround occupiedGroundCells occupiedGroundFields occupiedGroundAreas storageGroundClaim propertyRightsResolve accountOwner houseAcct storageOwnerId graveyardPolygonsOverlap streetFootprintOverlap obbCorners inPolyXZ segSegDist abbeyRouteEnter abbeyRouteLeave serviceRoadPlan armyLandPath armyDetour armyReach armyReaches armyReachClosed armyReachFrom armyReachCovers armySegmentClear armyObstacle armyBridgeAt armyRaftAt armyCauseway hAt riverAt onRoad paidRoadAt walkedRoadAt roadWalkedBounds roadBounds fortGround fortSurface motteSurface fortCircuits casRing fortCenter wallRadAt wallKindAt wallBuilt wallProg wallDmgAt fortGateAngles wallGates citadelBarrier citadelLocal citadelBastion citadelFootprintAt citadelTownCut hostileTo atWar inRevolt inPoly segDist dist2d lerp clamp toCell cIdx inB sstep day').split(' ');
+const reviewedReaders=('abbeyFoundBudget occupiedGroundBoxMayHit ABBEY_APPROACH_SURVEY_CURRENT resample wallDamage streetGraphFortContext fortStreetRuns fortRoadBlocked lakeAt streetGraph furlongAt computeFurlongPoly bindHousehold newHousehold oldHouseholdHead nonemptyHouseholds folkIndex cellZ cellX locW roadAccessClear streetAccessAt householdAccount corpOf abbeyApproachSurveyNative abbeyApproachSurvey abbeyCorridorCold abbeyCorridorInputs abbeyCorridorReady abbeyCorridorPrivate abbeyCorridorGhostClear abbeyCorridorWorldClear abbeyCorridorSegmentClear abbeySurveyBounds abbeySurveyBoxesMayHit abbeySurveyUnion abbeySurveyIndexRange abbeySurveyIndex abbeySurveyIndexRows abbeySurveyReserved abbeySurveyPublic abbeyPublicStreet abbeyAccessEndpointValid compoundPolys compoundPolygonDifference compoundGround occupiedGroundCells occupiedGroundFields occupiedGroundAreas storageGroundClaim propertyRightsResolve accountOwner houseAcct storageOwnerId graveyardPolygonsOverlap streetFootprintOverlap obbCorners inPolyXZ segSegDist abbeyRouteEnter abbeyRouteLeave serviceRoadPlan armyLandPath armyDetour armyReach armyReaches armyReachClosed armyReachFrom armyReachCovers armySegmentClear armyObstacle armyBridgeAt armyRaftAt armyCauseway hAt riverAt onRoad paidRoadAt walkedRoadAt roadWalkedBounds roadBounds fortGround fortSurface motteSurface fortCircuits casRing fortCenter wallRadAt wallKindAt wallBuilt wallProg wallDmgAt fortGateAngles wallGates citadelBarrier citadelLocal citadelBastion citadelFootprintAt citadelTownCut hostileTo atWar inRevolt inPoly segDist dist2d lerp clamp toCell cIdx inB sstep day').split(' ');
 assert.deepEqual(readers,reviewedReaders);
 const hotDetour=fn('armyDetour');
 // Reconstruct only the two old expressions. All native routing, obstacles,
@@ -31,7 +31,9 @@ const oldScore='const score=k=>dist2d(point(k).x,point(k).z,q.x,q.z),push=';
 const hotScore='const score=k=>{if(!fast)return dist2d(point(k).x,point(k).z,q.x,q.z);if(!scored[k]){heuristic[k]=dist2d(x0+(k%nx)*step,z0+Math.floor(k/nx)*step,q.x,q.z);scored[k]=1;}return heuristic[k];},push=';
 const hotCost='let length;if(lengths&&k!==start&&j!==end){const e=dx&&dz?1:0;length=lengths[e];if(length===undefined)lengths[e]=length=dist2d(P.x,P.z,Q.x,Q.z);}else length=dist2d(P.x,P.z,Q.x,Q.z);const cost=g[k]+length;';
 assert.ok(hotDetour.includes(hotScore)&&hotDetour.includes(hotCost));
-const oldDetour=hotDetour.replace(/^  \/\/ Only the uninterrupted[^\n]*\n  const scope=[^\n]*\n/m,'').replace(hotScore,oldScore).replace(hotCost,'const cost=g[k]+dist2d(P.x,P.z,Q.x,Q.z);');
+const ellipseClause=hotDetour.match(/  \/\/ Every retained corner[^\n]*\n  \/\/ Refusals stay local[^\n]*\n  const budgeted=[^\n]*\n  const affordable=[^\n]*\n/)[0];
+const oldBudgetDetour=hotDetour.replace(ellipseClause,'').replace('if(!affordable(j,Q))continue;','');
+const oldDetour=oldBudgetDetour.replace(/^  \/\/ Only the uninterrupted[^\n]*\n  const scope=[^\n]*\n/m,'').replace(hotScore,oldScore).replace(hotCost,'const cost=g[k]+dist2d(P.x,P.z,Q.x,Q.z);');
 assert.ok(!oldDetour.includes('heuristic')&&!oldDetour.includes('lengths'));
 
 const boundedExpression='!!corridor?.terrain&&walker._em.abbeyTerrain===corridor.terrain&&abbeyCorridorInputs(corridor,walker)&&corridor.C.native&&abbeyApproachSurveyNative()';
@@ -39,6 +41,9 @@ assert.ok(fn('serviceRoadPlan').includes('const bounded='+boundedExpression+';')
 // Restores only the old exhaustive flood branch; its actual flood body, native
 // path search, endpoint ordering and all physical/title predicates are shared.
 const oldFloodService=fn('serviceRoadPlan').replace(boundedExpression,'false');
+const serviceBudgetClause=fn('serviceRoadPlan').match(/  \/\/ This proposal's funding[^\n]*\n  const limit=[^\n]*\n/)[0];
+const serviceBudgetTarget=fn('serviceRoadPlan').match(/    const end=\{x:q\.x,z:q\.z\};if\(limit[^\n]*\n/)[0];
+const oldBudgetService=fn('serviceRoadPlan').replace(serviceBudgetClause,'').replace(serviceBudgetTarget,'    const end={x:q.x,z:q.z};\n');
 const endpointGate='    if(bounded&&endpointBlocked(q)){if(attempted.length===12)break;continue;}\n';
 assert.ok(fn('serviceRoadPlan').includes(endpointGate));
 // Remove only the new necessary endpoint predicate. Native target order,
@@ -48,14 +53,14 @@ const spanClause=fn('abbeyCorridorSegmentClear').match(/  \/\/ Exact directed sp
 const oldSpanSegment=fn('abbeyCorridorSegmentClear').replace(spanClause,'');
 assert.ok(!oldSpanSegment.includes("'span:'"));
 const countedBody=(n,key)=>{const code=fn(n),at=functions.get(n).body.start-functions.get(n).start+1;return code.slice(0,at)+'count.'+key+'++;'+code.slice(at);};
-const countedService=code=>code.replace('attempted.push(q);','attempted.push(q);count.targets.push({street:s.streets.indexOf(q.st),road:W.roads.indexOf(q.road),x:q.x,z:q.z});');
+const countedService=code=>code.replace('attempted.push(q);','attempted.push(q);count.targets.push({street:s.streets.indexOf(q.st),road:W.roads.indexOf(q.road),x:q.x,z:q.z});').replace(/(  const limit=[^\n]*;\n)/,'$1  count.limits.push(limit);\n');
 
 const highwayClause=fn('serviceRoadPlan').match(/  \/\/ An Abbey's rural approach[^\n]*\n  if\(corridor\)\{const si=W\.settlements\.indexOf\(s\);[^\n]*\n/)[0];
 const oldServiceRoad=fn('serviceRoadPlan').replace(highwayClause,'').replaceAll('a.st||a.road','a.st').replaceAll('c.st||c.road','c.st').replace('(a.st)===(q.st||q.road)','a.st===q.st').replace("q.road?{path,road:q.road}:{path,street:q.st}","{path,street:q.st}").replace("q.road?{path,road:q.road}:{path,street:q.st}","{path,street:q.st}");
 assert.ok(!oldServiceRoad.includes('q.road')&&!oldServiceRoad.includes('a.road')&&!oldServiceRoad.includes('c.road'));
 
-function setup({old=false,oldService=false,oldFlood=false,oldEndpoint=false,oldSpan=false,countRoutes=false,countWorld=false,prepare='',replaceableDistance=false}={}){
- const count={hypot:0,heightReads:0,reach:0,from:0,closed:0,land:0,world:0,ghost:0,targets:[]},math=Object.create(Math);
+function setup({old=false,oldService=false,oldFlood=false,oldEndpoint=false,oldSpan=false,oldBudget=false,countRoutes=false,countWorld=false,prepare='',replaceableDistance=false}={}){
+ const count={hypot:0,heightReads:0,reach:0,from:0,closed:0,land:0,world:0,ghost:0,targets:[],limits:[]},math=Object.create(Math);
  math.hypot=(...args)=>{count.hypot++;return Math.hypot(...args);};
  const C=vm.createContext({Math:math,count});
  const run=code=>vm.runInContext(code,C);
@@ -66,7 +71,7 @@ function setup({old=false,oldService=false,oldFlood=false,oldEndpoint=false,oldS
  `);
  // Only replacement-reader tests make this lexical binding writable. The
  // captured native function body stays exact; replacing it invalidates proof.
- run(readers.map(n=>n==='armyDetour'&&old?oldDetour:n==='abbeyCorridorSegmentClear'&&oldSpan?oldSpanSegment:n==='serviceRoadPlan'?(countRoutes?countedService:code=>code)(oldService?oldServiceRoad:oldFlood?oldFloodService:oldEndpoint?oldEndpointService:fn(n)):countWorld&&['abbeyCorridorWorldClear','abbeyCorridorGhostClear'].includes(n)?countedBody(n,n==='abbeyCorridorWorldClear'?'world':'ghost'):countRoutes&&['armyReach','armyReachFrom','armyReachClosed','armyLandPath'].includes(n)?countedBody(n,({armyReach:'reach',armyReachFrom:'from',armyReachClosed:'closed',armyLandPath:'land'})[n]):n==='dist2d'&&replaceableDistance?constant(n).replace(/^const /,'let '):native(n)).join('\n'));
+ run(readers.map(n=>n==='armyDetour'&&(old||oldBudget)?old?oldDetour:oldBudgetDetour:n==='abbeyCorridorSegmentClear'&&oldSpan?oldSpanSegment:n==='serviceRoadPlan'?(countRoutes?countedService:code=>code)(oldService?oldServiceRoad:oldFlood?oldFloodService:oldEndpoint?oldEndpointService:oldBudget?oldBudgetService:fn(n)):countWorld&&['abbeyCorridorWorldClear','abbeyCorridorGhostClear'].includes(n)?countedBody(n,n==='abbeyCorridorWorldClear'?'world':'ghost'):countRoutes&&['armyReach','armyReachFrom','armyReachClosed','armyLandPath'].includes(n)?countedBody(n,({armyReach:'reach',armyReachFrom:'from',armyReachClosed:'closed',armyLandPath:'land'})[n]):n==='dist2d'&&replaceableDistance?constant(n).replace(/^const /,'let '):native(n)).join('\n'));
  run(['abbeyRouteSurveyNative','abbeyRouteSurveyInputs','abbeyRouteTerrain','abbeyRouteMemo','abbeyTerrainSegmentClear','makeHash'].filter(n=>!readers.includes(n)).map(fn).join('\n'));
  run(`W.rivHash=makeHash(40);s._lay.placed=makeHash(16);onRoad.reach=-1;`);
  if(prepare)run(prepare);
@@ -90,7 +95,7 @@ function search(r,{p={x:-20,z:0},q={x:26,z:0},pad=24,shared=true,ghost=null,nest
 }
 
 test('actual certified detours preserve full native paths, directed edge logs and expanded-node records',()=>{
- assert.equal(readers.length,111);assert.equal(new Set(readers).size,111);
+ assert.equal(readers.length,112);assert.equal(new Set(readers).size,112);
  const cases=[{}, {p:{x:-20.7,z:.3},q:{x:26.4,z:-.2}}, {p:{x:26.4,z:-.2},q:{x:-20.7,z:.3}},
   {p:{x:-0,z:-20},q:{x:0,z:22}}, {p:{x:0,z:0},q:{x:.3,z:.4}}, {nested:true},
   {ghost:{x:-15,z:-6,w:6,d:8,rot:.3}}];
@@ -188,10 +193,10 @@ test('retained landing metadata projects as detached scalar geometry while surve
 
 // Finite controlled native geometry/title fixture: one Crown-held parcel, no
 // generated people, goods, endowment, licence, commissioned project or RNG.
-function highwaySetup({prepare='',oldService=false,oldFlood=false,oldEndpoint=false,oldSpan=false,countRoutes=false,countWorld=false,replaceableDistance=false}={}){
+function highwaySetup({prepare='',oldService=false,oldFlood=false,oldEndpoint=false,oldSpan=false,oldBudget=false,countRoutes=false,countWorld=false,replaceableDistance=false}={}){
  const extra=['castleFoundationReserved','abbeyAccessEndpoint','lerpPt'].map(fn).join('\n')+'\n'+
   ['STREET_GRAPH_FORT_CONTEXTS','STREET_GRAPH_FORT_NATIVE','ABBEY_APPROACH_SURVEY_NATIVE'].map(constant).join('\n');
- return setup({oldService,oldFlood,oldEndpoint,oldSpan,countRoutes,countWorld,replaceableDistance,prepare:extra+`
+ return setup({oldService,oldFlood,oldEndpoint,oldSpan,oldBudget,countRoutes,countWorld,replaceableDistance,prepare:extra+`
 const FN=1,FG=SIZE,field={k:0,i:0,j:0,jx:.5,jz:.5,lord:0,own:'crown',wk:'crown'};
   W.houses=[{name:'Crown'},{name:'Other holder',gold:10}];W.projects=[];W.land={F:[field],mask:new Uint8Array(GRID*GRID*4)};
   for(let i=0;i<GRID*GRID;i++)W.land.mask[i*4]=1;
@@ -463,4 +468,114 @@ test('long-span unknown coordinates and stale, cold or replaced-native inputs ke
  for(const r of [current,prior]){spanFixture(r);assert.deepEqual(spanCalls(r,[[longP,longQ]]),[true]);r.run('abbeyRouteLeave(a,spanGate);W.clock.day++;heights.fill(0);count.world=0;spanGate=abbeyRouteEnter(a);');}
  assert.deepEqual(spanCalls(current,[[longP,longQ],[longP,longQ]]),[false,false]);assert.deepEqual(spanCalls(prior,[[longP,longQ],[longP,longQ]]),[false,false]);assert.equal(current.count.world,2);assert.equal(prior.count.world,2);
  for(const r of [current,prior]){r.run('abbeyRouteLeave(a,spanGate);');assert.equal(r.run('a._em.abbeyRouteGuard===undefined'),true);}
+});
+
+// Load the actual founding reader chain and registered native layout closure,
+// without generating a world or promoting a fixture callback to native status.
+function budgetSetup(options={}){
+ const r=highwaySetup({...options,countWorld:true,countRoutes:true});
+ const foundReaders=variables.get('ABBEY_FOUND_SURVEY_CURRENT').node.init.body.properties.map(p=>p.key.name);
+ const constants=('ARCH GOODBASE NEED STORAGE_TYPES ABBEY_ORDERS TECH_RULES TECH_ALIASES TECH_KEYS LK LS ARABLE LANDV LU HH_FIELDS HOUSEHOLD_MEMBER_INDEXES HOUSEHOLD_NATIVE_MAP HOUSEHOLD_MAP_ENTRIES HOUSEHOLD_NATIVE_SET HOUSEHOLD_SET_VALUES HOUSEHOLD_SET_ITERATOR HOUSEHOLD_MAP_SIZE HOUSEHOLD_SET_SIZE HOUSEHOLD_MAP_METHODS HOUSEHOLD_SET_METHODS NOTABLE_INDEXES HISTORY_SCRATCH ABBEY_FOUND_SURVEYS').split(' ');
+ r.run(constants.map(constant).join('\n'));
+ const loaded=new Set([...readers,'abbeyRouteSurveyNative','abbeyRouteSurveyInputs','abbeyRouteTerrain','abbeyRouteMemo','abbeyTerrainSegmentClear','makeHash','castleFoundationReserved','abbeyAccessEndpoint','lerpPt','ABBEY_APPROACH_SURVEY_CURRENT']);
+ r.run([...new Set([...foundReaders,'abbeyFoundSurveyNative','abbeyFoundSurvey','sfc32','seedStreams'])].filter(n=>!loaded.has(n)&&!constants.includes(n)).map(native).join('\n'));
+ const layout=functions.get('layoutSettlement'),privateDeclarations=new Map();
+ for(const n of layout.body.body)if(n.type==='VariableDeclaration')for(const d of n.declarations)if(d.id.type==='Identifier')privateDeclarations.set(d.id.name,{kind:n.kind,node:d});
+ const privateConstant=n=>{const d=privateDeclarations.get(n);assert.ok(d,n);return d.kind+' '+source.slice(d.node.start,d.node.end)+';';};
+ const compoundSite=privateDeclarations.get('liveOps').node.init.properties.find(p=>p.key.name==='compoundSite');
+ const registration=layout.body.body.find(n=>n.type==='IfStatement'&&source.slice(n.start,n.end).startsWith("if(typeof ABBEY_FOUND_SURVEYS!=="));
+ assert.ok(compoundSite?.method&&registration);
+ r.run(`const C=s.pos,RHW=3.2,placed=s._lay.placed,segH=makeHash(24);
+  ${['cellOK','buildable','inPlace','wallSide','probe','onRoadway','onStreet','fits'].map(privateConstant).join('\n')}
+  const liveOps={${source.slice(compoundSite.start,compoundSite.end)}};s._lay={fits,placed,segH,live:liveOps};
+  ${source.slice(registration.start,registration.end)}
+  Object.assign(W,{startAD:1200,_pl:1,treasury:100000,technology:{known:{}},water:new Uint8Array(GRID*GRID),abbeys:[],notables:[]});
+  Object.assign(s,{name:'Native controlled place',pop:0,res:{farm:1},technology:{adopted:{}},px:{timber:3,grain:2},places:[],remnants:[],stores:{}});
+ `);
+ r.run(['ABBEY_FOUND_SURVEY_CURRENT','ABBEY_FOUND_SURVEY_NATIVE'].map(constant).join('\n'));
+ r.C.btoa=btoa;r.run(native('HistoryGraph')+`
+  const RS=seedStreams(1001,42),minimum=250;function quote(L){const Q=constructionRecipe(s,foodYr()*12+L*.6*PL(),380+L/4,40+Math.max(.5,L*.005),0);return Q.labour+Q.timber*price(s,'timber')+minimum;}
+  function foundBudget(L){const U=abbeyFoundLengthLimit(s,quote(L),minimum,price(s,'timber'),true);return{native:ABBEY_FOUND_SURVEY_NATIVE,world:W,s,day:day(),house:s.owner,layout:s._lay,placed:s._lay.placed,folkRevision:W._folkRevision,limit:U};}
+  function budgetGraph(){const G=new HistoryGraph(),F=G.capture({world:W,rng:RS,hashStamp:HASH_STAMP});return{root:F.root,state:[...G.state],code:G.code};}
+  const initialDice=Object.getOwnPropertyNames(RS).map(k=>[k,RS[k].state()]);
+ `);
+ assert.equal(r.run('abbeyFoundSurveyNative(s)'),true);
+ return r;
+}
+function budgetDetour(r,{p={x:-20,z:0},q={x:26,z:0},length=1000,pad=24,mutation='',budget=true}={}){
+ r.C.budgetInput={p,q,length,pad};r.run(`var p=budgetInput.p,q=budgetInput.q,proposal=abbeyCorridorReady(s,abbeyApproachSurvey(s),'crown',undefined,0,terrain),a=walker();a.abbeyCorridor=proposal;
+  var funding=foundBudget(budgetInput.length);${budget?'a.abbeyBudget={found:funding,p,q,length:funding.limit+1};':''}${mutation}
+  count.world=count.ghost=count.heightReads=0;var path=armyDetour(a,p,q,budgetInput.pad),answer=result(path,a);`);return r.json('answer');
+}
+
+test('a large native budget keeps the exact old detour, full world graph, RNG and scope restoration',()=>{
+ for(const points of [{},{p:{x:-20.7,z:.3},q:{x:26.4,z:-.2}},{p:{x:26.4,z:-.2},q:{x:-20.7,z:.3}}]){
+  const current=budgetSetup({prepare:building}),prior=budgetSetup({prepare:building,oldBudget:true});
+  assert.deepEqual(budgetDetour(current,points),budgetDetour(prior,points));assert.ok(current.run('path'));
+  assert.deepEqual(current.json('budgetGraph()'),prior.json('budgetGraph()'));
+  assert.deepEqual(current.json('Object.getOwnPropertyNames(RS).map(k=>[k,RS[k].state()])'),current.json('initialDice'));
+  assert.equal(current.run('a._em.abbeyRouteGuard===undefined'),true);
+  assert.equal(current.count.world,prior.count.world);assert.equal(current.count.heightReads,prior.count.heightReads);
+  assert.equal(current.run('Reflect.ownKeys(W).some(k=>["budget","allowed","affordable","limit"].includes(k))||Reflect.ownKeys(s).some(k=>["budget","allowed","affordable","limit"].includes(k))'),false);
+ }
+});
+
+test('the exact endpoint ellipse refuses an unaffordable detour without poisoning physical edge truth',()=>{
+ const current=budgetSetup({prepare:building}),prior=budgetSetup({prepare:building,oldBudget:true});
+ const bounded=budgetDetour(current,{length:45}),unbounded=budgetDetour(prior,{length:45});
+ assert.equal(bounded.path,null);assert.ok(unbounded.path);assert.ok(current.count.world<prior.count.world*.5,`${current.count.world}/${prior.count.world}`);
+ assert.equal(current.run('quote(polyLen(('+JSON.stringify(unbounded.path)+')))>quote(45)'),true,'the actual retained route recipe exceeds actual funding');
+ assert.equal(current.run('proposal.banks.floods.length'),0);
+ // The same current physical memo must allow a later legitimately larger quote.
+ current.run(`funding=foundBudget(1000);a.abbeyBudget={found:funding,p,q,length:funding.limit+1};var resumed=armyDetour(a,p,q,24);`);
+ assert.deepEqual(current.json('resumed'),unbounded.path);
+ assert.equal(current.run('a._em.abbeyRouteGuard===undefined'),true);
+ assert.deepEqual(current.json('Object.getOwnPropertyNames(RS).map(k=>[k,RS[k].state()])'),current.json('initialDice'));
+});
+
+test('off-grid actual start and substituted end stay inside a just-affordable native ellipse',()=>{
+ const points={p:{x:.49,z:.49},q:{x:2.49,z:.49},length:0},current=budgetSetup(),prior=budgetSetup({oldBudget:true});
+ assert.deepEqual(budgetDetour(current,points),budgetDetour(prior,points));assert.deepEqual(current.json('path'),[points.p,points.q]);
+ assert.equal(current.run('path[0]===p&&path.at(-1)===q'),true);
+ assert.equal(current.run('funding.limit'),1);assert.equal(current.run('a.abbeyBudget.length'),2);
+ assert.ok(current.run('dist2d(p.x,p.z,2,0)+dist2d(2,0,q.x,q.z)>a.abbeyBudget.length'),'rounded end would falsely refuse the native affordable substitution');
+});
+
+test('whole church budget subtracts the actual doorway prefix, remains transient and still pays the complete quote',()=>{
+ const r=budgetSetup({prepare:remoteHighway});r.run(`field.x=-100;field.z=-13;field.area=SIZE*SIZE;field.kind=LK.DEMESNE;const funding=foundBudget(122),base={key:'church',arch:'temple',tier:0,hm:1,f:{x:-100,z:-13,w:12,d:22,rot:0},accessMode:'abbey-rural',accessDonor:0};
+  var survey=abbeyApproachSurvey(s),site=liveOps.compoundSite(base,'survey','crown',undefined,survey,undefined,funding);`);
+ assert.ok(r.run('site'));assert.equal(r.run('site.access.corridorFrom'),2);
+ assert.equal(r.run('polyLen(site.path.slice(0,3))'),2);
+ assert.equal(r.run('count.limits.at(-1)'),r.run('funding.limit-polyLen(site.path.slice(0,3))+1'));
+ assert.equal(r.run('polyLen(site.path)'),122);
+ r.run(`const paid=abbeyApproachRecipe(s,site,{labour:foodYr()*12,days:360,timber:40,stone:0});`);
+ assert.equal(r.run('paid.labour+paid.timber*price(s,"timber")+minimum'),r.run('quote(polyLen(site.path))'));
+ assert.equal(r.run('Reflect.ownKeys(site).some(k=>["budget","funding","limit"].includes(k))||Reflect.ownKeys(site.access).some(k=>["budget","funding","limit"].includes(k))||Reflect.ownKeys(survey.corridor||{}).some(k=>["budget","funding","limit"].includes(k))'),false);
+ assert.match(fn('abbeyFoundPlan'),/abbeyFoundLengthLimit\(s,means\(who\)-reserve,minimum,price\(s,'timber'\),true\)/);
+ assert.match(fn('abbeyFoundPlan'),/hi,survey,budget\)/);assert.match(fn('abbeySitePlan'),/undefined,C,legal,budget\)/);
+});
+
+test('economic endpoint refusal retains twelve-target accounting and every native full-width rights veto',()=>{
+ const prepare=`for(let i=0;i<13;i++)W.roads.push({a:0,b:i+1,path:[{x:20+i,z:-4},{x:20+i,z:4}]});`,r=budgetSetup({prepare});
+ r.run(`const p={x:-100,z:0},funding=foundBudget(10),proposal=abbeyCorridorReady(s,abbeyApproachSurvey(s),'crown',undefined,0,terrain);var roadAnswer=serviceRoadPlan(s,p,s._lay.placed,null,1.3,proposal.memo,undefined,proposal.banks,undefined,undefined,proposal,{found:funding,p,length:funding.limit+1});`);
+ assert.equal(r.run('roadAnswer'),null);assert.equal(r.count.targets.length,12);assert.deepEqual(r.count.targets.map(x=>x.road),Array.from({length:12},(_,i)=>i));
+ assert.equal(r.count.land,0);assert.equal(r.count.world,0);assert.equal(r.run('proposal.memo.size+proposal.banks.floods.length+proposal.claims.size'),0);
+ for(const occupied of [false,true]){const current=budgetSetup({prepare:remoteHighway+(occupied?'field.title.work={owner:W.houses[1],beneficiary:null};':'' )}),prior=budgetSetup({prepare:remoteHighway+(occupied?'field.title.work={owner:W.houses[1],beneficiary:null};':''),oldBudget:true});
+  for(const x of [current,prior])x.run(`const p={x:-100,z:0},funding=foundBudget(1000),proposal=abbeyCorridorReady(s,abbeyApproachSurvey(s),'crown',undefined,0,terrain);var roadAnswer=serviceRoadPlan(s,p,s._lay.placed,null,1.3,proposal.memo,undefined,proposal.banks,undefined,undefined,proposal,{found:funding,p,length:funding.limit+1});`);
+  assert.deepEqual(current.json('roadAnswer'),prior.json('roadAnswer'));assert.equal(current.run('roadAnswer===null'),occupied);
+ }
+});
+
+test('stale, unknown, cold or replaced funding readers keep the exact unbounded native fallback',()=>{
+ const mutations=['W.clock.day++;','s.owner=1;','s._lay={...s._lay};','W._folkRevision=1;','a.abbeyBudget.p={...p};','funding.native={};','funding.limit=NaN;',
+  'const original=abbeyFoundLengthLimit;abbeyFoundLengthLimit=(...v)=>original(...v);','const original=constructionRecipe;constructionRecipe=(...v)=>original(...v);','const original=liveOps.compoundSite;liveOps.compoundSite=(...v)=>original(...v);',
+  'const original=hAt;hAt=(...v)=>{reads.push(v);return original(...v);};'];
+ for(const mutation of mutations){const current=budgetSetup({prepare:building}),prior=budgetSetup({prepare:building,oldBudget:true});for(const r of [current,prior])r.run('const reads=[];');
+  assert.deepEqual(budgetDetour(current,{length:45,mutation}),budgetDetour(prior,{length:45,mutation}),mutation);
+  assert.ok(current.run('path'));assert.deepEqual(current.json('reads'),prior.json('reads'),mutation);assert.equal(current.count.world,prior.count.world);
+  assert.equal(current.run('a._em.abbeyRouteGuard===undefined'),true);
+ }
+ const current=budgetSetup({prepare:building}),prior=budgetSetup({prepare:building,oldBudget:true});for(const r of [current,prior])r.run(`var cold=walker(false),coldReads=0;Object.defineProperty(cold,'abbeyBudget',{get(){coldReads++;throw Error('cold budget');}});`);
+ for(const r of [current,prior])r.run('var coldPath=armyDetour(cold,{x:-20,z:0},{x:26,z:0},24);');
+ assert.deepEqual(current.json('coldPath'),prior.json('coldPath'));assert.equal(current.run('coldReads'),0);
 });
