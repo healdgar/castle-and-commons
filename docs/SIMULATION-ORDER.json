@@ -2768,7 +2768,7 @@
       "governmentMeals": "Actual named already-arrived visitors and consumed food receipts before household and own-seat hall meals; no new journeys, fees, offices or votes.",
       "tickCourts": "Daily real purchased-home consolidation with exact acquired plot union and retained reachable public approach; bought houses remain standing until all actual work is paid."
     },
-    "pending": "Combined native speed/save/worker/conservation/drawing validation.",
+    "pending": "Paid native abbey core/own-use industries, current coupled suite, worker, multi-era conservation and drawing/release validation. Fresh same-source150 full-history/all-speed/exact-save proof passes; economy/cadence/century-throughput limits remain.",
     "integration_source": "Current full operative institution batch; final native release gates pending",
     "own_use_industries": {
       "base_commit": "7460fbcffb81bfdfd1ee2a055a75acdce249c298",
@@ -2940,7 +2940,7 @@
         "canonical_ownership": "Whole living households set movingTo before departure, suppressing native household splitting. Their actual H/assets/member identities remain one account; native arriveHousehold moves existing goods after all living arrivals. Returning survivors use another real journey. Shared board receipts prevent repeated meals; native profession and service checks occur only after actual arrival and ordinary canonical room assignment.",
         "search_scope": "Qualification rosters use eight nearest native craft indexes and at most twelve current qualified candidates per place/job; current rights, exclusive jobs, purses, rooms, project/physical service and income gain are rechecked. The private WeakMap is rebuilt after loading; offer records hold plain observations plus canonical person/household/member references, not callbacks or duplicate goods."
       },
-      "current_source_validation_scope": "Static exact-source AST/dependency/provenance/search audit at61dd0bb plus one host-memory source-pin case. Root126/126 focused checks and full-source boot pass; fresh original-deadline90 feasibility passes with three actual abbeys/235projects and clean cash/goods/faults. Same-source150 speed/history/save is running; paid core/industry/worker/era/full-suite/drawing-release gates remain pending. No prior-source evidence is retagged and aggregate runner costs are not browser throughput.",
+      "current_source_validation_scope": "Static exact-source AST/dependency/provenance/search audit at61dd0bb plus source-pin check; root126 focused checks/full-source boot and90-day original-deadline feasibility pass. Fresh same-source150 completeworld/globals/layouts/closure-code/everyRNG/all-seven-speed906raw and day37 exact-resave/113-day678raw continuation pass, with clean cash/goods/faults. Paid native core→genuine closed-day FWS/fullgraph/exactresave→drawing→industry continuation is running with original actors/assertions/deadlines. Paid core/industry/full-suite/worker/era/drawing-release remain pending; no prior-source evidence retag or old-source/browser throughput claim.",
       "survey_optimization": {
         "commit": "cd8217867c9249909d7d4ced6be4fcf08f7e42e6",
         "index_sha256": "fc6caef1eac3b29054a2b3d4b15f939dbe5f43c7e67bf1a1f22dce8d54271b2f",
@@ -3666,7 +3666,7 @@
           "projects": 186,
           "scope": "Deliberately stopped for performance, not timeout/150 pass; readonly partial67 all native certificates true;5.687762-second live sample armyDetour97.9698546% inclusive. Same-source0/37 FWS retained; no partial67 FWS or new-source retag."
         },
-        "validation_scope": "Static exact-source AST/dependency/provenance/search audit at61dd0bb plus one host-memory source-pin case. Root126/126 focused checks and full-source boot pass; fresh original-deadline90 feasibility passes with three actual abbeys/235projects and clean cash/goods/faults. Same-source150 speed/history/save is running; paid core/industry/worker/era/full-suite/drawing-release gates remain pending. No prior-source evidence is retagged and aggregate runner costs are not browser throughput.",
+        "validation_scope": "Static exact-source AST/dependency/provenance/search audit at61dd0bb plus source-pin check; root126 focused checks/full-source boot and90-day original-deadline feasibility pass. Fresh same-source150 completeworld/globals/layouts/closure-code/everyRNG/all-seven-speed906raw and day37 exact-resave/113-day678raw continuation pass, with clean cash/goods/faults. Paid native core→genuine closed-day FWS/fullgraph/exactresave→drawing→industry continuation is running with original actors/assertions/deadlines. Paid core/industry/full-suite/worker/era/drawing-release remain pending; no prior-source evidence retag or old-source/browser throughput claim.",
         "current_native_feasibility90": {
           "source_commit": "61dd0bb3d7282c9dcbb56a6b22f7b7dc095b9331",
           "index_sha256": "503eec9311722394d7281d3f56e452be1d1a7944831138fca2d4f6d9b00680d7",
@@ -3687,6 +3687,40 @@
           "population_weighted_hunger": 0.00180146,
           "famine_population_share": 0,
           "scope": "Root fresh native90 feasibility, not150 identity/save/paid-core-industry or release pass. Runner includes generation/audits/saves; not browser throughput. Economy calibration/legacy cadence/century target remain explicit limits. Source-specific150 speed/history/save gates run next at unchanged deadlines."
+        },
+        "current_native_history150": {
+          "source_commit": "61dd0bb3d7282c9dcbb56a6b22f7b7dc095b9331",
+          "index_sha256": "503eec9311722394d7281d3f56e452be1d1a7944831138fca2d4f6d9b00680d7",
+          "pass": true,
+          "days": 150,
+          "all_seven_speeds": true,
+          "graph_scope": "Complete world/globals/layouts/closure code and every RNG stream, no normalization",
+          "accepted_raw_outcomes": 906,
+          "native_save": {
+            "day": 37,
+            "full_graph": true,
+            "exact_resave": true,
+            "continued_days": 113,
+            "through_day": 150,
+            "accepted_raw_outcomes": 678
+          },
+          "maximum_cash_residual": 1.780904312909115e-10,
+          "goods_and_faults": "clean",
+          "aggregate_child_cpu_seconds": 1822.352379,
+          "aggregate_wall_seconds": 1679.469807,
+          "load_start": 0.730957,
+          "load_end": 1.013672,
+          "maximum_rss_kb": 1911716,
+          "audited_fixed_speed5_step_cpu_seconds": 248.294278,
+          "audited_variable_speed_step_cpu_seconds": 246.477937,
+          "reference_scope": "Same operative candidate at fixed speed5 versus all seven speeds; no original-selector overrides/old-source comparison. Runner includes generation/audits/serialization and is not browser or century throughput.",
+          "actual_abbeys": 3,
+          "schools": 11,
+          "projects": 217,
+          "population": 4835.3554,
+          "population_weighted_hunger": 0.01539279,
+          "famine_population_share": 0,
+          "remaining": "Native paid core then actual closed-core FWS/fullgraph/exactresave→drawing→industry; original assertions/deadlines/actors retained. Paid core/industry, full-suite/worker/era/drawing-release pending; economy calibration and legacy cadence debt explicit."
         }
       }
     }

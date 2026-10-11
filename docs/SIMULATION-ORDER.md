@@ -147,8 +147,17 @@ original-deadline90 feasibility passes: three abbeys/235 projects, cash residual
 at most1.780904312909115e-10, goods/faults clean; day50/day90 tick-audit CPU
 1.607689/2.994492 seconds. Aggregate233.482374 child CPU/220.536047 wall,
 load0.32861→1.16992, RSS1039784 KB includes generation/audits/saves rather than
-browser throughput. The same-source150 speed/history/save and full release
-gates remain pending; neither feasibility nor a focused fixture closes them.
+browser throughput. The same-source150 gate now passes complete world/globals/
+layouts/closure-code/every-RNG history at all seven speeds with906 raw outcomes.
+Day37 full-graph/exact-resave and113-day/678raw continuation also pass, with
+clean cash/goods/faults. The runner uses1822.352379 child CPU/1679.469807 wall
+seconds, load0.730957→1.013672, RSS1911716 KB. Audited fixed-speed5/variable-speed
+steps cost248.294278/246.477937 seconds on this same candidate; no old-source
+performance or browser throughput claim follows. Root's paid native core job
+splits only at a genuine closed-core FWS/full-graph/exact-resave boundary before
+drawing and then industry continuation, retaining original actors/assertions/
+deadlines. Paid core/industry, worker, era, full-suite and drawing/release gates
+remain pending; measured feasibility and determinism alone do not close them.
 
 There is also an explicit persistence barrier: `storageOutcomeReady()` can
 return false before incrementing the day while the asynchronous raw journal has
