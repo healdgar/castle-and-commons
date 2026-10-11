@@ -12,7 +12,7 @@ function setup(households=1){
   const r=realm({households,cash:100,crown:100000,pop:households});
   r.eval(source.slice(source.indexOf('const NOTABLE_INDEXES='),source.indexOf('let NID=1;'))+'\n'+fn('notableById'));
   r.eval(source.slice(source.indexOf('/* ABBEY_INSTITUTION_BEGIN */'),source.indexOf('/* ABBEY_INSTITUTION_END */')));
-  r.eval(['corpFound','accountBalances'].map(fn).join('\n')+'\n'+['LK','LS','ARABLE'].map(constant).join('\n'));
+  r.eval(['corpFound','accountBalances','price','price0'].map(fn).join('\n')+'\n'+['LK','LS','ARABLE'].map(constant).join('\n'));
   r.eval(`KS=2;W.houses=[{name:'Royal house',seat:0,crown:true},{name:'House One',seat:0,head:901,gold:100000,_netA:100}];
     W.notables=[{id:900,name:'The ruler',alive:true,traits:['pious'],sk:[0,0,.2]},{id:901,name:'The great-house head',alive:true,traits:[],sk:[0,0,.6]}];W.monarch=W.notables[0];notableIndexRebuild();
     W.capital=s;W._crNetA=100;W.land={F:[],perHead:1000};W.abbeys=[];W.projects=[];s.furl=[];s.history=[];s.streets=[];s._gYield=.000001;
@@ -33,7 +33,45 @@ test('Crown foundation reads its actual living ruler without a Crown-house head 
   assert.ok(r.eval("abbeyFoundPlan(0,0,'cistercian')"));
   near(r.eval("abbeyFoundPlan(0,0,'cistercian').gift"),r.eval("52*foodYr()+STORAGE_TYPES.grange.cost+96*price(s,'timber')"));
   const rows=r.eval(abbeyNativeEligibilityExpression());assert.equal(rows[0].pious,true);assert.equal(rows[0].project,true);
+  assert.equal(rows[0].founderId,900);assert.equal(rows[0].founderAlive,true);assert.equal(rows[0].founderExiled,false);assert.equal(rows[0].founderPiousTrait,true);near(rows[0].founderScripture,.2);
+  assert.equal(rows[0].besieged,false);assert.equal(rows[0].existingFounderAbbeyId,null);assert.equal(rows[0].existingFounderAbbeyOrder,null);
   assert.equal(state(r),before,'quoting keeps actual coin, people and title');
+});
+
+test('diagnostics distinguish preliminary funds from the actual full church endowment',()=>{
+  const r=setup();r.eval(`const minimum=foodYr()*40+STORAGE_TYPES.grange.cost+(STORAGE_TYPES.grange.timber+32)*price(s,'timber'),fullGift=foodYr()*12+40*price(s,'timber')+minimum;W.treasury=hostTarget(0)*4+(minimum+fullGift)/2;`);
+  const before=state(r),row=r.eval(abbeyNativeEligibilityExpression())[0];
+  assert.equal(row.minimumFunded,true);assert.equal(row.fullGiftFunded,false);assert.equal(row.project,false);assert.equal(row.surplusPositive,true);
+  near(row.minimum,r.eval('minimum'));near(row.churchFixedGift,r.eval('fullGift'));near(row.cashAboveReserve,r.eval('(minimum+fullGift)/2'));near(row.fundingGap,r.eval('(fullGift-minimum)/2'));near(row.annualCropBudget,r.eval('W._crNetA*12'));
+  assert.equal(state(r),before,'reporting a cash gap spends neither coin nor land');
+});
+
+test('crop diagnostics use the native nearest twelve and retain the strict annual-surplus inequality',()=>{
+  const r=setup();r.eval(`W.monarch.alive=false;s._gYield=1;W._crNetA=2610;s.furl=Array.from({length:13},(_,i)=>({...field,k:i,x:13-i,z:0,area:i===11?100:i===10?200:1}));W.land.F=s.furl;`);
+  const before=state(r),row=r.eval(abbeyNativeEligibilityExpression())[0],crops=Array.from(row.first12CropOpportunities);
+  assert.equal(row.fields,13);assert.deepEqual(crops.map(f=>f.field),[12,11,10,9,8,7,6,5,4,3,2,1]);assert.equal(row.first12CropOpportunityCount,10);
+  const equal=crops.find(f=>f.field===11),above=crops.find(f=>f.field===10),below=crops.find(f=>f.field===12);
+  near(equal.yieldY,row.annualCropBudget);assert.equal(equal.positive,true);assert.equal(equal.belowAnnualSurplus,false);assert.equal(equal.eligible,false);
+  assert.ok(above.yieldY>row.annualCropBudget);assert.equal(above.eligible,false);assert.equal(below.positive,true);assert.equal(below.belowAnnualSurplus,true);assert.equal(below.eligible,true);
+  assert.equal(state(r),before);
+  r.eval('W._crNetA=0');const unfunded=r.eval(abbeyNativeEligibilityExpression())[0];assert.equal(unfunded.surplusPositive,false);assert.equal(unfunded.first12CropOpportunityCount,0);assert.ok(Array.from(unfunded.first12CropOpportunities).every(f=>f.positive&&!f.belowAnnualSurplus&&!f.eligible));
+});
+
+test('early-refused founder diagnostics do not initialize missing native price keys or a price object',()=>{
+  for(const change of ["delete s.px.timber;delete s.px.grain",'s.px=undefined']){
+    const r=setup();r.eval(`W.monarch.alive=false;${change};const beforePX=s.px;`);const before=state(r),px=r.eval('JSON.stringify(s.px)'),row=r.eval(abbeyNativeEligibilityExpression())[0];
+    assert.equal(row.founderAlive,false);assert.equal(row.project,false);assert.equal(r.eval('s.px===beforePX'),true);assert.equal(r.eval('JSON.stringify(s.px)'),px);assert.equal(state(r),before);
+    near(row.minimum,r.eval("foodYr()*40+STORAGE_TYPES.grange.cost+(STORAGE_TYPES.grange.timber+32)*price0(s,'timber')"));
+    near(row.churchFixedGift,r.eval("foodYr()*12+40*price0(s,'timber')+foodYr()*40+STORAGE_TYPES.grange.cost+(STORAGE_TYPES.grange.timber+32)*price0(s,'timber')"));
+    near(row.first12CropOpportunities[0].yieldY,r.eval("(s._gYield||soilYield(s))*field.area*.87*360*price0(s,'grain')"));
+    r.eval("price(s,'timber')");assert.equal(r.eval("s.px.timber!=null"),true,'the actual native price helper still initializes a missing price');
+  }
+});
+
+test('diagnostics show exile, siege and an actual existing different-order founder account',()=>{
+  const r=setup();r.eval("const existing=corpFound('abbey',{founder:0,order:'benedictine'});W.houses[0].exiled=true;s.siegeBy={house:1};");
+  const before=state(r),row=r.eval(abbeyNativeEligibilityExpression())[0];
+  assert.equal(row.founderId,900);assert.equal(row.founderAlive,true);assert.equal(row.founderExiled,true);assert.equal(row.besieged,true);assert.equal(row.existingFounderAbbeyId,r.eval('existing.id'));assert.equal(row.existingFounderAbbeyOrder,'benedictine');assert.equal(row.project,false);assert.equal(state(r),before);
 });
 
 test('a missing, dead or unpious actual ruler cannot borrow piety from a stale Crown-house head',()=>{
