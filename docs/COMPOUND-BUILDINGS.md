@@ -1,6 +1,6 @@
 # Compound buildings: shared model and dependency record
 
-Status: shared paid construction, castle upgrades, native abbey institutions and their compound adapters are integrated in the unpublished working batch, updated 2026-10-11. All 1,965 current checks are verified across the coordinator's combined suite and affected fixture rerun. Final native history/save, paid-institution, conservation, worker and drawing gates are active or pending; those checks do not yet establish a published release, calibrated economics or century-scale throughput. The first-castle foundation remains deliberately bounded; see [CASTLE-FOUNDATIONS.md](CASTLE-FOUNDATIONS.md). This record describes the implemented shared mechanics and their remaining scope limits.
+Status: shared paid construction, castle upgrades, native abbey institutions and their compound adapters are integrated in the unpublished working batch, updated 2026-10-11. The frozen `2d81f11` production source has 1,965 unique checks verified across the coordinator's combined suite and reviewed fixture rerun; subsequent source corrections await their own integrated gate. Final native history/save, paid-institution, conservation, worker and drawing gates are active or pending; those checks do not yet establish a published release, calibrated economics or century-scale throughput. The first-castle foundation remains deliberately bounded; see [CASTLE-FOUNDATIONS.md](CASTLE-FOUNDATIONS.md). This record describes the implemented shared mechanics and their remaining scope limits.
 
 ## Decision
 

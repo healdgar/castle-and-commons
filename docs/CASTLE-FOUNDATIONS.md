@@ -1,6 +1,6 @@
 # Daily first-castle foundations
 
-Implemented first-foundation runtime and paid castle-upgrade clients, updated 2026-10-11 following the dependency audit for #60. They are integrated in the unpublished institution batch. All 1,965 current checks are verified across the coordinator's combined suite and affected fixture rerun; final native history/save, paid-institution, conservation, worker and drawing gates are active or pending. See [HANDOFF.md](HANDOFF.md) for release evidence and remaining limits.
+Implemented first-foundation runtime and paid castle-upgrade clients, updated 2026-10-11 following the dependency audit for #60. They are integrated in the unpublished institution batch. The frozen `2d81f11` production source has 1,965 unique checks verified across the coordinator's combined suite and reviewed fixture rerun; subsequent source corrections await their own integrated gate. Final native history/save, paid-institution, conservation, worker and drawing gates are active or pending. See [HANDOFF.md](HANDOFF.md) for release evidence and remaining limits.
 
 The existing simulation supplies ruler authority, named purses, property value and
 threat assessments, real construction wages/materials, saved daily projects,

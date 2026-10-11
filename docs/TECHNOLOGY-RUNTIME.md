@@ -10,12 +10,13 @@ knowledge, actors, resources or random streams.
    the material of opening keeps. `initializeSimulation` initializes local
    inheritance before population/layout completion, then writes field rotation
    after `genLand`. This does not advance the opening date.
-2. `tickTechnology` is first inside the existing `tickEconomy` production phase,
-   once per simulation day. It reads living local teacher/contact indices,
-   current ownership/purses and support receipts from this day or the preceding
-   day. Prior local teaching phases must close actual receipts before the next
-   technology pass. It pays approved daily patronage and local teaching, then
-   discovers eligible methods on the deterministic `inst` stream. A saved day
+2. Inside `tickEconomy`, `tickLearning` closes today's actual funded school
+   receipts before `tickTechnology`; `tickCrafts` and
+   `tickTechnologyEquipment` follow before native goods production.
+   `tickTechnology` runs once per simulation day, reading living local
+   teacher/contact indices, current ownership/purses and support receipts from
+   this day or the preceding day. It pays approved daily patronage and local
+   teaching, then discovers eligible methods on the deterministic `inst` stream. A saved day
    guard prevents duplicate work; speed/presentation never changes the draws.
 3. Production and construction quotes consume current adopted capabilities.
    Machinery also requires actual installed equipment. Construction plans save

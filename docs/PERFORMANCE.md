@@ -12,9 +12,9 @@ failures: 2,683.46 aggregate child CPU seconds, 1,704.25 wall seconds, load
 0.004→1.00. Those are test-runner costs, not game throughput. The reviewed
 fixture repairs, operative own-use abbey processing and the remaining daily
 institution eligibility decisions form the coupled `2d81f11` batch. The assembled suite records 2,840.95 aggregate child CPU seconds, 1,788.89
-wall seconds and load 0.00→1.00. All 1,965 current unique checks are verified
+wall seconds and load 0.00→1.00. All 1,965 unique checks for the frozen `2d81f11` production source are verified
 across that batch and the reviewed three-file rerun (1.37 CPU seconds, load
-0.20→0.20). These are test costs, not daily simulation throughput.
+0.20→0.20). These are test costs, not daily simulation throughput; subsequent source corrections await their own integrated gate.
 The final native 150-day comparison preserves full world/globals/layouts/closure code, every RNG stream and all 906 accepted raw rows at all seven speeds. A day-37 native save/resave/replay also matches through day 150. Its controlled reference uses original full native craft/ground/mint/lodging selectors and disables castle survey/work reuse, with all intended model changes and candidate-cache maintenance common to both sides. Audited step CPU is 623.96 versus 230.08 seconds over 150 days; the complete comparison/replay runner costs 2,127.22 CPU / 1,989.30 wall seconds, load 0.10→1.34. These costs include inventory audits and serialization, omit browser persistence, and do not establish game throughput.
 
 Earlier exact-reuse diagnostics and failures are retained in
