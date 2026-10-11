@@ -1,0 +1,54 @@
+# Native credit and coin
+
+This phase implements #38 on the existing household, corporate, property, storage and court accounts. Model changes are deliberate: ordinary loans no longer require a scan of every head for each bread purchase, commercial contracts have explicit terms, and recoinage replaces the old fictitious 1,800-coin levy. No loan, mint, forward contract or levy supplies new money.
+
+## Order and ownership
+
+| Native operation | Reads | Writes and actual recipient | Timing |
+|---|---|---|---|
+| `borrow` | Cached named local sources/lenders; actual cash, keep and collateral | Existing interest-free bread debt, or real commercial contract paid by lender | Actual bread shortfall |
+| `repay` / `courtOwed` | Principal, contractual rate and elapsed simulation days | Dated simple interest; real creditor payment, interest first | Existing repayment/pleading |
+| `creditAnnual` | Native tenurial assessment date, current ownership and stored contracts | Refreshed source list, due rent charges, funded pledge judgements, due recoinage | Each place's existing annual assessment day |
+| `forwardOffer` | Actual newly produced quantity and unpaid delivery balance | Title to finite new goods goes to prepaid buyer; unpromised remainder to producer | Native grain/dower/herd output assignment |
+| `forwardReckon` | Due contract, actual undelivered goods, producer's spare purse | Real cash refund and explicit remaining refund claim; no missing goods | Contract expiry |
+| `mintReceipt` | Actual export receipt or frozen due-day purse, named smith, standing premises, priced supplies | Actual moneyer/Crown fees; consumed finite timber/tools | Foreign silver receipt or dated recoinage |
+| `creditRoyal` / institutional debt | Real debt book, operating keep and available cash | Actual lender receipts; consent-backed Crown borrowing only from actual lender | Monthly treasury reckoning |
+| Lender tallage | Actual unexpired licences and spare purses | Crown receipts, one completed assessment | Ordered monthly assessment |
+
+`tickCredit` is called from the simulation-owned daily government eligibility phase. It checks stored due dates. Sittings, annual land accounts, a lender licence's year, the pre-harvest proposal, treasury reckonings and contract maturities have world reasons for their dates. Rendering and readonly advisor/card generation never accrue interest or collect money.
+
+## Contracts and courts
+
+The legacy `_owe` entry remains `[creditor,totalDue,day,heard]`. Optional entry 4 holds a real interest/pawn contract, while optional entry 5 links a refund claim to its failed forward sale. Existing charity loans retain zero interest. Simple interest accrues from actual principal and dates, without charging interest on interest. Principal repayment is removed from earned-income totals; interest is real lender income.
+
+The place records its four best-off charity candidates and up to six real dealers/lenders at the annual refresh, with one initial refresh when first needed. Dead, absent or unavailable candidates do not lend. A funded commercial contract makes the actual head a lender; it creates no resident, cash, proficiency, wage or overseas financier. Opening land opportunity follows the documented twelve-years-purchase custom until there are observed holding rents and prices. Thereafter the rate uses those actual rents and prices plus that creditor's last twelve closed bond/default outcomes. Closed world and creditor rolls are bounded; active legal obligations are retained.
+
+The ruler can allow interest, require a paid annual licence, or forbid it. Forbid permits real secured zero-interest pawns and purchase of an actual holding's rent charge. A rent charge costs twelve annual rents, remains a charge on that holding, follows its title, pays only due real cash, retains arrears and can be redeemed. Post-bench arrears can be pleaded with the registered contract as explicit evidence; collection updates the same charge so a sitting cannot collect it twice. Royal loans require an actual active consented/assessed grant and a lender able to fund them. Their grant reference is collateral evidence, not a promise that future assessments will be collectible. A forbid policy makes the royal advance interest-free.
+
+A field with an active charge is excluded from voluntary debt-driven sale; pledged beasts are reserved from voluntary household sale. Normal loss, slaughter, war and insolvency still carry real default risk. A pledged property stays with its holder until actual due business is heard by two living, lettered native officers, with their full fees funded by the creditor. Neither debtor nor creditor's household judges its own case. The court first recovers available coin while preserving family bread/rent, breeding stock and the working ox pair. It then transfers only actual eligible beasts, or the actual field title. Excess land equity is paid to the real title owner; an unfunded equity buyout adjourns rather than confiscates the difference.
+
+Native household merger follows the actual successor account and carries the creditor's closed book. A split divides the actual debt and book entries; beast security divides proportionally. A field remains charged for its split claims, and a single judgement values and conveys that field only once. Cash and chattels in an insolvent deceased estate settle the actual claim under native inheritance. Remaining field security persists as a nonrecourse inherited title charge. The heir receives no invented personal debt. Real proceeds reduce the claim; any exhausted secured-estate shortfall is recorded and discharged. An archival estate record does not, by itself, extinguish a surviving family with a living head.
+
+## Real forwards
+
+A merchant prepays real coming grain supported by the producer's closed actual grain output, or wool supported by its actual sheep and the native biological fleece quantity. Production calls `forwardOffer` only after physical output exists; ordinary resale still uses `offer`. Crop tithe, multure, family shares and dower remain actual owners' rights. The prepaid reserve is the buyer's real unit cost. Deliveries recognize the producer's deferred earnings and grain receipts without crediting its purse again.
+
+Abbey callers use their canonical corporation account. One to five years of an actual abbey flock can be sold; missed clips, famine, loss of animals, absent staff or dissolution do not manufacture deliveries. At maturity spare real cash refunds the missed part; the remaining sum enters the actual producer's `_owe` book. Late repayment updates the linked missed-delivery/default record and actual refund totals once. Corporate debts use their real chest and documented grain/operating reserve at the monthly reckoning. An extinguished institution does not silently change its debtor to an unrelated owner.
+
+## Coin work and technology
+
+`moneyer` and `licensedCredit` consume the shared `institutionalCapability(...).available` seam. The technology/learning lane supplies canonical moneyer 850 and licensedCredit 1066; statutory `merchantBond` 1285, billExchange 1250 and doubleEntry 1340 remain distinct further capabilities. A capability permits a proposal; it supplies no money, actor or goods.
+
+A real resident smith works as moneyer in an actual sound smithy, hall or guildhall. The customary fee is 5% of actual coin processed. Timber fuel and tools are real finite inputs, priced at the current market and consumed through native purchase/custody. The moneyer receives the input allowance and a daily family bread service fee, with the actual remainder paid to the Crown. Unprofitable work, missing priced supplies, absent smiths, siege or lack of premises produces no fee. A moneyer reminting his own coin receives no self-payment: only actual Crown fees are counted, and his inputs are consumed.
+
+A recoinage order stores each place's next genuine tenure date and freezes household purses before fee transfers. It is completed once per place, even when no viable mint can work. Coin weight is a realm-wide accounting standard; foreign import reserves and export willingness reflect its silver content through market quotes. Domestic prices remain endogenous. The present economy has abstract money accounts, not a separate silver good or physical coin denominations. `mint.silver` therefore measures opening-standard coin value processed, not kilograms of newly mined metal, and reminting creates no spendable balances. New mint buildings or a silver-metallurgy production chain are not claimed by this phase.
+
+Crown controls `c-usury`, `c-recoin` and `c-tallage` are worker-validated and journaled. Household/town/Crown cards and `advisor-state credit` report stored contracts, due balances and actual totals. A readonly view does not build world indexes or mutate financial books.
+
+## Validation and integration
+
+`node --test --test-concurrency=1 tools/credit.test.mjs` exercises tiny native account worlds without generation or browser runs. Twenty checks cover actual interest and principal income, finite lender cash, cached hot borrowing, defaults/rates by actual account, merger/split claims, funded court-only property transfer, equity, inherited nonrecourse charges, finite new wool and refunds, real corporate repayment, zero-fee missing supplies, finite storage-lot mint inputs, single dated recoinage/tallage, consent-backed royal credit, readonly views and exact daily history under different batching.
+
+Latest successful focused run: 20/20, child CPU 0.756 seconds, wall 3.222 seconds; system load 2.664/3.541/2.682 before, 2.931/3.582/2.700 after during the coordinator's separate heavy gate. Final syntax checks parse the two executable inline scripts. Full native generation, worker/reference/replay, checkpoint/save continuation, all-speed and long-run conservation gates are serialized by the release coordinator. The 0.2% daily performance target is unverified until that integrated profile.
+
+Merge notes: the abbey production lane must call `forwardOffer` for its new net crop and corporate wool after physical production and retained native dues. Its existing canonical title resolver remains authoritative; this phase does not replace it. The person-status lane may add native inheritance/marriage/travel status hooks alongside these narrow credit book hooks. `creditMortgage(s,lender,actualOwner,amount)` supplies a funded real freehold/demesne mortgage seam for native knight-service and foreign-expedition decisions. Corporate suppression/merger must explicitly move real books, title and stock to a named successor; no implicit handover is implemented here.
