@@ -328,7 +328,10 @@
     "workOf|collection:streets": 1,
     "yearOfFolk|collection:folk": 3,
     "millWheelBuildings|collection:buildings": 1,
-    "abbeyIndustryCandidate|helper:workers_": 1
+    "abbeyIndustryCandidate|helper:workers_": 1,
+    "abbeyApproachPrivate|collection:streets": 1,
+    "abbeyApproachClear|collection:buildings": 1,
+    "abbeySkilledRoom|collection:buildings": 1
   },
   "review": "Worker cutover: inspectorCard replaces showInspect scans; visualSettlement transports building IDs only on layout change; installPresentation reattaches display objects; groundPick scans projected churchyards on click; refreshOverlayNow sorts numeric property-value results. Court grazing: one owner pass only when the existing monthly livestock reckoning finds overstocking, plus one holding pass; no per-family search, persistent index or new daily census. Assize receipts use payCrafts' existing payee loop.",
   "reviewedMoves": [
@@ -507,5 +510,24 @@
     "geometry": "millWheelBuildings enumerates actual additional native water mills only when drawing the hydraulic key/rebuild; no authoritative decision or transaction-wide actor traversal.",
     "vacancy": "abbeyIndustryCandidate reuses the existing ordered native workers_ household roster only for a qualified vacant own-use operation or funded proposal/adoption assessment. Existing assigned operators use actual member/servant identities; the native land-title exclusion retains actual current claims. No extra per-purchase buyer/seller/lender scan.",
     "boundary": "Actual millWater/wheel/feeder geometry remains projected. Jobs, proposal refusals and actual annual/cumulative production counters stay private and cross only detached worker inspector output. No new top-level daily phase."
+  },
+  "reviewedRuralAdditions": {
+    "sourceCommit": "e2fa455dc8bd1a9ae1702f7024742cf6f21e7aff",
+    "indexSHA256": "ad7d07b894de80a0aeded5ea95043b576b6ee46c7e32830bee52575deea3dd32",
+    "sites": [
+      {
+        "key": "abbeyApproachPrivate|collection:streets",
+        "reason": "Proposal-local subtraction of actual public street strips from the fixed private approach footprint prevents selling existing public access as a new building grant."
+      },
+      {
+        "key": "abbeyApproachClear|collection:buildings",
+        "reason": "Current physical obstruction check of every settlement building along the retained corridor; real footprints/churchyards and pending projects remain authoritative."
+      },
+      {
+        "key": "abbeySkilledRoom|collection:buildings",
+        "reason": "A bounded skilled relocation quote must discover a current ordinary sound residential slot with a canonical owner, actual occupancy and native payable rent; no remote or phantom lodging."
+      }
+    ],
+    "scope": "Only these three actual new proposal/physical validation sites are added. Existing entries and limits remain; this is not approval of repeated transaction searches or a century-scale performance claim."
   }
 }

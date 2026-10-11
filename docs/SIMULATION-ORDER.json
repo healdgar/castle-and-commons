@@ -2591,6 +2591,19 @@
         "reads": "Only unknown actual people receive personal status; prior personal bonds remain independent of current tenure."
       },
       {
+        "phase": "tickAbbeyWork",
+        "first": "churchWork",
+        "per_abbey": [
+          "abbeySkilledTick",
+          "abbeyYear",
+          "abbeyIndustryPrepare",
+          "abbeyStaff",
+          "abbeyIndustryPrepare",
+          "abbeyWork"
+        ],
+        "reads": "Native tickTravel arrivals and peoplePrepare precede the offer lifecycle. Outward/returning people consume real source household food once through shared board receipts; an actual arrival resolves canonical household goods and native housing before profession/service eligibility. Invalid or lost offers return the same living household on a native journey. Current qualified paid staff then precede self-worked crop/flock area and ordinary production. No remote appointment, duplicate purse or invented mouth."
+      },
+      {
         "phase": "tickGovernment",
         "first": [
           "tickLordJourneys",
@@ -2635,16 +2648,17 @@
           "storage",
           "road/pave"
         ],
-        "reads": "Fixed retained native targets and geometry, current adopted authority, actual installed goods and named paid makers/crew. Saved productive equipment is consumed only after completion; no map structure or gear from a method name."
+        "reads": "Fixed retained native targets and geometry, current adopted authority, actual installed goods and named paid makers/crew. Saved productive equipment is consumed only after completion; no map structure or gear from a method name. Rural abbey work separately validates the granted building ground and the fixed public approach endpoint, current footprints and current owner/tenant licence; approach receipts or an actual qualifying donor precede materials and paid work. Only completed native approaches retain the paid claim on their installed street."
       },
       {
         "phase": "tickAbbeys",
         "closing": [
           "daily native flock investment",
           "paid due order visitation/reform",
-          "licensed post-plague leasing"
+          "licensed post-plague leasing",
+          "abbeySkilledRecruit"
         ],
-        "reads": "Current granted grazing, spare actually fed/paid hands, real sellers and closed-year surplus; changed work rights feed the next crop pass. Dated General Chapter and mother-house visits are paid journeys."
+        "reads": "Current granted grazing, spare actually fed/paid hands, real sellers and closed-year surplus; changed work rights feed the next crop pass. Dated General Chapter and mother-house visits are paid journeys. Closing daily skilled offers re-quote actual funded sites, qualifications, free-person/land obligations, native destination room and household gain; paid relocation expenses precede removing the actual family from its native roll. Saved offers retain actual household/person/member references. New departures affect the next arrival/work pass."
       },
       {
         "phase": "tickChurchBodies",
@@ -2730,9 +2744,9 @@
       }
     ],
     "new_phase_sources": {
-      "tickAbbeyWork": "Current Church service and canonical membership; invalid/covered industry bookings release before actual paid staff and qualified industry assignments. Remaining fed field/flock hands establish self-worked area; no duplicate crop or full second workday.",
+      "tickAbbeyWork": "Current Church service; actual traveller/household offer lifecycle and consumed travel meals; canonical membership and ordinary native housing after real arrival; invalid/covered industry bookings release before paid staff and qualified industry assignments. Remaining fed field/flock hands establish self-worked area; no duplicate crop or full second workday.",
       "tickAbbeyMeals": "Actual corporate held/sale food into existing member/corrody household pantries, before one native meal.",
-      "tickAbbeys": "Actual grants, endowments, admission, charity, saved compound commissions and due order visits after upkeep; new work starts next day.",
+      "tickAbbeys": "Actual grants, endowments, admission, charity, saved compound commissions and due order visits after upkeep; new work starts next day. Daily funded external skilled household offers depart through native journey after the current work/meal/market close; no remote admission or wages.",
       "tickEstateWork": "Current titled fields/live ecology and actual paid keepers, before production/storage; no meat/fish or skill from a display read.",
       "tickEstateProjects": "Current actual receipts, costs, adopted methods, retained public access and native titled ground; paid compound commissions start next day.",
       "tickInstitutionFoundations": "Actual current worship/harbor/rock demand, adopted methods, named payer, public frontage, native title and paid retained footprint; commissions create saved work, not completed buildings.",
@@ -2747,10 +2761,10 @@
       "reviewed_function_sha256": {
         "slaughterSkins": "a2ef1d682174fb36bd92afd3b78529b738875c585c16c28be584dd52e20f82cd",
         "herdTake": "ba7669bf3022d2a6819791abd648aebb407375b09bd54ffa43513ef875f6194b",
-        "abbeyCompoundValidate": "28cf377ee55b1ac7198f001dcdc503ac9aea6085b90fe1799ee94749b6132757",
-        "abbeyCompoundComplete": "c3af894308970b94ced1d0c82ac62bc0564ca71c831d205e6af2aaeb11977d0e",
-        "abbeySitePlan": "ca912626aec958ca808af967be1d2e23da3ec5df92519c9a447b5eb94153e6b8",
-        "abbeyCommission": "3cc00b8d1cfcfd39be21dd124fa381e2d41e20ac5371d3e54ba983ebc492bf64",
+        "abbeyCompoundValidate": "b487e1f6d76ad61aedf9bf7d095e70d2bd3bf0c3792869e48479218ddea188a4",
+        "abbeyCompoundComplete": "57984ff13c3c47b505ec202ff386f75a8714d5fb36676b46f2f098ae87dca466",
+        "abbeySitePlan": "34c65da0e8eb4d1b04b537365f4f09fd19ec8dc8c370315c22c1de6da35972ee",
+        "abbeyCommission": "ffc083ef4afc27a39973f70417a1ea348bd36c694ff82d7805c507fd910f0c8f",
         "abbeyYear": "3e53350f13860299736ac8de8a409aab10064bba5368cb93b6c8fbfd7d19d08c",
         "abbeyAdmit": "312aec1480453ddf38ae95e3910b83ffaa028bfeceeb0c78134f97aa632bedb8",
         "abbeyStaff": "106225e31b7d492fd0742e0f71656a4cc852bacd6b8954e2cfe7f9bd9169c885",
@@ -2760,19 +2774,19 @@
         "abbeyIndustryOperator": "381bb80a70ed77926f7654410322a7fd337e6d6a8073354a22a14745425997fc",
         "abbeyIndustryPrepare": "f6181744cd8bebee4486414fae9a435305cca1607ec1c56174ac331ffffdcba5",
         "abbeyMillPower": "a87ce3a013885c3f66fa9c9dc93e5c3a204f7049163d51d9736c1498f0863108",
-        "abbeyMillPlan": "cf857f4e97f73d7ec35d4eef8ed175806877dac032c98d10159fae0c26fe647a",
+        "abbeyMillPlan": "2e3e66642dd6322bc103f977bf6bc859afb44a33dfabf00e9cbb5835382765b4",
         "abbeyLeatherMouths": "d0d62e97e2a1b4e65aa803f54bceeb16e7242c06ae42d4f67fee4e07f5bd5061",
         "abbeyTanningTarget": "eb74aef07a4831ab54421db7292143e643346c0dbb33267f3bc31341cb5fdde0",
-        "abbeyTanneryPlan": "272e9cd69aa12eb2a0d61ebbaf3ce68c4cdc1fbb740f97b29ae099857436c444",
+        "abbeyTanneryPlan": "2361ae2b80954c1b3ce51c6b9b66950aa026863131313832c2a85c22dbcefe95",
         "abbeyIndustryInput": "260b0aad2c7b73e689b7a969dee2e6e4d58f2d65e6c2cc02b1944ceb6aafa5d8",
         "abbeyIndustryCount": "79309fe65ab8140fd9841a3a3f61984bac66b987a62192616d957f1175014076",
         "abbeyIndustries": "2df7cd967fc70e513135d761f479e89f022c266f61bf69d1286c4269ce07c117",
         "abbeyWork": "d5a8bee53fb7585c3326c492033651cd01b45947e5b6c082d314f2fcc1c9e5cc",
-        "tickAbbeyWork": "82114a982acb8086f8e8840b676602bb2f24c599457b362c552cf1f3e570b251",
+        "tickAbbeyWork": "2aca7ab79ccc18114176e3d610f23c5d5665902968d48740370d5f7fa0f04480",
         "abbeyCrop": "fb3e336d457e52e96bfd7fe18cf920cc0c4df648c779d19d0e3e654803bfaa84",
         "abbeyGrantWork": "c484e6c15c831bc618378776b100e0928009b1f89712bbcf752b12419efa52f9",
         "abbeyHerdHands": "9752454b401090dd070bb9285c2185a69093642942b8a9167dfb940c73895c2d",
-        "abbeySummary": "a628eeb38b3f0eb722bd4fd7001daab8b2a0eddfedbc4542ab3dc16f521cd433",
+        "abbeySummary": "99dd05d9cea6fd9087533257bd13c224a0e33b83fdf2c43ee1ca9656a6dae1b5",
         "technologyBenefit": "a9fbe202f3c810d73da161cf41bbb8e46e04ef06dca90082628f1df25a5fcd2d",
         "technologyGrindingPower": "4e23fbd5345fee8faab3c72af1ab5bce33bdd31b1129ecaddfeb8b1c7272cb10",
         "technologyGrindingDay": "f57eb242aafc2d4939d2422a1b8260a4da684ae6f1e3b4107e51e40770664738",
@@ -2788,10 +2802,25 @@
       "top_level_phases": 59,
       "intended_history_change": true,
       "conservation": "Zero opening skins/leather and zero ordinary household NEED. Actual lawful cattle/sheep slaughter credits the actual slaughterer once; native purchases/held stocks fund conserved hide+timber-to-leather and finite own-use wear. No stock or persons from a label.",
-      "operative_checks": "28 focused native-source checks pass in isolation, including exact original pose order and real footprint collision/refusal. Full generated-world industries, save, history, worker/draw and conservation remain serialized root gates."
+      "operative_checks": "28 focused native-source checks pass in isolation, including exact original pose order and real footprint collision/refusal. Full generated-world industries, save, history, worker/draw and conservation remain serialized root gates.",
+      "review_update": {
+        "commit": "e2fa455dc8bd1a9ae1702f7024742cf6f21e7aff",
+        "index_sha256": "ad7d07b894de80a0aeded5ea95043b576b6ee46c7e32830bee52575deea3dd32",
+        "changed_functions": [
+          "abbeyCompoundValidate",
+          "abbeyCompoundComplete",
+          "abbeySitePlan",
+          "abbeyCommission",
+          "abbeyMillPlan",
+          "abbeyTanneryPlan",
+          "tickAbbeyWork",
+          "abbeySummary"
+        ],
+        "scope": "Reviewed rural building-grant/approach separation, fixed endpoint and obstruction/licence validation, separately quoted and paid approach before completion, actual recruited household arrival before paid staffing, and detached scalar recruitment reports. These eight exact AST-body pins change; the other 31 remain exact. The earlier isolated own-use checks above remain historical evidence, not a gate of this source."
+      }
     },
     "current_cadence": {
-      "ordinary_clients": "Daily actual foundation/admission/staffing, commune/market-charter, learning, credit proposal, knightly service choice, estate investment, machinery, castle and paid housing eligibility. Idempotence and unchanged-input guards do not schedule an arbitrary later day.",
+      "ordinary_clients": "Daily actual foundation/admission/staffing, commune/market-charter, learning, credit proposal, knightly service choice, estate investment, machinery, castle and paid housing eligibility. Idempotence and unchanged-input guards do not schedule an arbitrary later day. Skilled recruitment is daily; a current-day idempotence guard prevents booking the same house twice. Travel length and household gain, not a retry calendar, govern offers.",
       "dated_world_obligations": "Court sittings, annual/quarterly rents and assessments, company/foreign payroll, feudal calls and forty-day service, chivalric dues, school terms/Sunday rest, harvest/biology and order chapters retain actual dates. Overdue subsidy eligibility is daily.",
       "legacy_military_debt": [
         {
@@ -2813,19 +2842,19 @@
       "scope": "These legacy quantity/cadence debts remain outside the new-institution conversion. The full older simulation is not claimed to make every ordinary decision daily."
     },
     "assembled_source_review": {
-      "commit": "9000cf0",
-      "index_sha256": "a9ce7dfc2507823ed92203262267b94d61d04e78adb4bb054bfc84dd1e3445da",
+      "commit": "e2fa455dc8bd1a9ae1702f7024742cf6f21e7aff",
+      "index_sha256": "ad7d07b894de80a0aeded5ea95043b576b6ee46c7e32830bee52575deea3dd32",
       "top_level_phases": 59,
       "prerequisite_edges": 200,
       "own_use_hashes": {
         "reviewed": 39,
         "exact_matches": 39,
-        "scope": "Acorn FunctionDeclaration source.slice(start,end), exact UTF-8 SHA-256. Only the reviewed abbeySitePlan and abbeyMillPlan pins change for bounded shared poses; the other 37 remain exact."
+        "scope": "Acorn FunctionDeclaration source.slice(start,end), exact UTF-8 SHA-256. Eight reviewed rural/arrival/report bodies change from the prior 9000cf0 review; 31 remain exact. All 39 current pins match this source."
       },
       "native_fault_repairs": {
         "reviewed_function_sha256": {
           "abbeyFounder": "f36a7e633fc157a775b9cdaad7812dcfcc53b60b9f7d6619ddef3831154b61e4",
-          "abbeyFoundPlan": "008e6b62f569dd1b33ad8b17c2e8052c0cb22a3bbbe5b902b364fcd847dc0cb6",
+          "abbeyFoundPlan": "c18d39986a19f01deb7868602819ea87c72bc6e305b5577cd6c4e7b1c7114636",
           "abbeyEndowLease": "411491c2e43cca6332f40c6370d78e39cdb8b7642f3086bd6030b5300b035ab7",
           "abbeySitePoses": "1ef5d4518f7b2263ac6f8749df561e90f7a26e8c8f824156797d579185716bbd",
           "learningUniversityQuote": "13e23d56ab5369f05f247ccad651bcd348d5109ecd46ac51e9abd672f582d46b",
@@ -2834,24 +2863,53 @@
           "technologyEquipmentHTML": "343a3f865fa10ea84879d9113bd8555b56f74d7a411c76d635db932af7a5f47a"
         },
         "intended_history_change": true,
-        "reason": "Resolve the actual Crown founder; reject unavailable university masters before pricing and readonly equipment queries; bounded eight-pose windmill sites retain native ground, public approach, power, qualification and payment constraints. Public windmill proposal, retained validation and readonly button all exclude private abbey mills; standing public mills still veto."
+        "reason": "Resolve the actual Crown founder; reject unavailable university masters before pricing and readonly equipment queries; bounded eight-pose windmill sites retain native ground, public approach, power, qualification and payment constraints. Public windmill proposal, retained validation and readonly button all exclude private abbey mills; standing public mills still veto. The current founding quote separates the unheld free-alms building grant from a lawful paid/donated approach and includes its current actual permission cost in the named founder endowment."
       },
       "recognized_legacy_search_inventory": {
-        "sites": 410,
-        "reported_functions_with_direct_or_transitive_searches": 1394,
+        "sites": 413,
+        "reported_functions_with_direct_or_transitive_searches": 1419,
         "patterns": {
           "collection:folk": 49,
-          "collection:buildings": 187,
+          "collection:buildings": 189,
           "unscoped-entries": 15,
-          "collection:streets": 70,
+          "collection:streets": 71,
           "helper:workers_": 22,
           "collection:_owners": 16,
           "helper:heads_": 35,
           "helper:headsOf": 16
         },
-        "scope": "Actual tools/legacy-search-audit.mjs syntactic inventory, not runtime cost or a prohibition of necessary one-pass traversals."
+        "scope": "Actual tools/legacy-search-audit.mjs syntactic inventory, not runtime cost or a prohibition of necessary one-pass traversals. The three added physical-access/room proposal traversals are explicitly reviewed in tools/legacy-search-inventory.json; no other count is renewed."
       },
-      "validation_scope": "Frozen972a01f combined1977/1978 with one30-second serialization deadline; original-deadline final8file serial82/82. Two newpublic/private regressions+4founder diagnostics=1984 unique verified across batch and focused reruns, not onefull1984pass. Freshc205150day fullgraph/allRNG/sevenspeed/906raw and37→150 exactsave/replay678raw pass. Abbeycoordinatorabortday626 proves gaps69–71; changedsource native completion and finalgates pending."
+      "validation_scope": "Frozen972a01f combined1977/1978 with one30-second serialization deadline; original-deadline final8file serial82/82. Two newpublic/private regressions+4founder diagnostics=1984 unique verified across batch and focused reruns, not onefull1984pass. Freshc205150day fullgraph/allRNG/sevenspeed/906raw and37→150 exactsave/replay678raw pass. Abbeycoordinatorabortday626 proves gaps69–71; changedsource native completion and finalgates pending.",
+      "petition_checkpoint": {
+        "reviewed_function_sha256": {
+          "petitionClosure": "b5c2da4bef37a255939c44b1bf27cf777186d81f36e29d3c9bb110eb8bd71cc7",
+          "worldSaveEncode": "d408fbbe1312c6b41290f74b1a594ce85674c33e1a4542aa907e1a4030c6bdf0",
+          "worldSaveDecode": "d3f917fd4a5933a51a6a3ca7bb89a6af6df1c7bec75da9a1b5dbf0840b147a84"
+        },
+        "scope": "Forty-five queued actions across 21 native petition kinds, one wyrm AI and one nested clearing acceptance callback are created by 43 named pure makers. All 47 original callback expressions remain unchanged. The WeakMap retains exact shared captured objects and primitive bindings; private quote/option/request nodes join the same saved binary graph. Placeholder reconstruction reads no live world or RNG; every source hash is checked, and unregistered or changed closures still reject. Metadata survives re-save without entering presentation or ordinary world state."
+      },
+      "rural_recruitment": {
+        "reviewed_function_sha256": {
+          "abbeyEligiblePerson": "9649c83a8e149d2ed4e36040db90b62f262a12c824a5f06fd816b51fedfc2a97",
+          "institutionalJobHeld": "cb427203da0d35cb6340b85e4e56485e94a24d3e6d6cfc0a15cabac1eaf5780f",
+          "tickAbbeys": "8ce708b0dd2f643cf745d0731e48d2e696933dffb8013c3335458222f97be7bd",
+          "abbeySkilledRoom": "4e9204542b413d0c9e7eebef0b74faf651303a3e44a54c67a5519e7fe4a04512",
+          "abbeySkilledPurpose": "0e69dc9315c598ee54022c36b27ee70b85b63cb8f8cb3c398e631472592da32e",
+          "abbeySkilledQuote": "46430ad506f184d8eba454e156c0b844bb825504b0e83b9564bf070d7faefcb7",
+          "abbeySkilledMove": "abfd1063a55b76ee24e6e9e93c718207d96273efcbed5a0089df41bbaab45c50",
+          "abbeySkilledCommission": "415c12903994b8e56b33b97a8dfefebb13bf80a5d81921f98e1a783f502bffd9",
+          "abbeySkilledClose": "0a63b3ce9bd798cc87d331c47e88e3fc93748772b9e8d64d56061a1582711069",
+          "abbeySkilledBoard": "5d15c87e79befab6a67747dda90ffb255cc5edcb30267e6be3db78e9ecde36d4",
+          "abbeySkilledReturn": "7c39896db7b2ec0110c6a52c9378c58b4f4aa1c26a60132280d4af990c92fe1f",
+          "abbeySkilledTick": "b12f32d16e3748ac2f96bfd0bd71f2a601fca2ab14376e945736143a8b6be185",
+          "abbeySkilledCandidates": "75256225c67334fe590c0d02b0f052ee982e94f13b62ba58ce48fd308f4fe50d",
+          "abbeySkilledRecruit": "20acddd81d828e56849da073b7ec26b0684f0cb2712b6473ff3ee92c681cd80d"
+        },
+        "canonical_ownership": "Whole living households set movingTo before departure, suppressing native household splitting. Their actual H/assets/member identities remain one account; native arriveHousehold moves existing goods after all living arrivals. Returning survivors use another real journey. Shared board receipts prevent repeated meals; native profession and service checks occur only after actual arrival and ordinary canonical room assignment.",
+        "search_scope": "Qualification rosters use eight nearest native craft indexes and at most twelve current qualified candidates per place/job; current rights, exclusive jobs, purses, rooms, project/physical service and income gain are rechecked. The private WeakMap is rebuilt after loading; offer records hold plain observations plus canonical person/household/member references, not callbacks or duplicate goods."
+      },
+      "current_source_validation_scope": "Static review only at e2fa455. Current source native/history/save/worker/conservation gates remain serialized root work. The earlier-source results above and focused petition/recruitment/approach checks do not establish a full release pass of this source."
     }
   }
 }
