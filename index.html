@@ -2452,13 +2452,36 @@ function wallKindAt(s,a){if(!s.wallKind)return 0;const n=s.wallKind.length,f=((a
 /* Circuits own their shape and condition once. Castle yards and summit walls use the town wall rules. */
 function fortCenter(c){return c.pos||c;}
 function fortPoint(s,c,a){const C=fortCenter(c),r=wallRadAt(c,a);return{x:C.x+Math.cos(a)*r,z:C.z+Math.sin(a)*r,a,r};}
-function fortCircuits(s){const out=[];if(s.wallRad)out.push(s);if(s.cas&&s.cas.outerWall&&!s.cas.outerWall.razed)out.push(s.cas.outerWall);const R=casRing(s);if(R&&!R.razed)out.push(R);if(s.motte&&!s.motte.razed)out.push(s.motte);return out;}
+function citadelLocal(ct,x,z){const c=Math.cos(ct.rot),sn=Math.sin(ct.rot),dx=x-ct.x,dz=z-ct.z;return{u:dx*c+dz*sn,v:-dx*sn+dz*c};}
+function citadelBastion(ct,a,b){ // shared vertices for native collision, paid ground and drawing
+  const ux=Math.cos(ct.rot),uz=Math.sin(ct.rot),vx=-uz,vz=ux,h=ct.S/2,x=ct.x+ux*h*a+vx*h*b,z=ct.z+uz*h*a+vz*h*b,dx=a*ux+b*vx,dz=a*uz+b*vz,L=Math.hypot(dx,dz),ox=dx/L,oz=dz/L,tx=-oz,tz=ox;
+  return[{x:x-tx*11,z:z-tz*11},{x:x-tx*11+ox*8,z:z-tz*11+oz*8},{x:x+ox*24,z:z+oz*24},{x:x+tx*11+ox*8,z:z+tz*11+oz*8},{x:x+tx*11,z:z+tz*11}];
+}
+function citadelFootprintAt(ct,x,z,pad=0){
+  if(!ct)return false;const{u,v}=citadelLocal(ct,x,z),U=Math.abs(u),V=Math.abs(v),h=ct.S/2;if(U>h+24+pad||V>h+24+pad)return false;
+  if(U<=h+4.5+pad&&V<=h+pad||V<=h+4.5+pad&&U<=h+pad)return true;
+  if(U<h-16-pad||V<h-16-pad)return false;const P=citadelBastion(ct,u<0?-1:1,v<0?-1:1);return inPoly(P,x,z)||P.some((p,k)=>segDist(x,z,p,P[(k+1)%P.length])<=pad+1e-8);
+}
+function citadelTownCut(s,x,z){return citadelFootprintAt(s.citadel,x,z);}
+function citadelBarrier(ct,x,z,pad=0,open=true,breach=.98){ // actual nine-metre ramparts, solid corner works and a six-metre gate
+  if(!ct||ct.razed)return false;const{u,v}=citadelLocal(ct,x,z),U=Math.abs(u),V=Math.abs(v),h=ct.S/2;if(U>h+24+pad||V>h+24+pad)return false;
+  const a=Math.atan2(z-ct.z,x-ct.x);if(wallKindAt(ct,a)===1||!wallBuilt(ct,a)||wallDmgAt(ct,a)>=breach)return false;
+  const wall=Math.abs(U-h)<=4.5+pad&&V<=h+pad||Math.abs(V-h)<=4.5+pad&&U<=h+pad;
+  if(wall&&open&&u<0&&Math.abs(u+h)<=4.5+pad&&V<Math.max(0,3-pad))return false;
+  if(wall)return true;if(U<h-16-pad||V<h-16-pad)return false;const P=citadelBastion(ct,u<0?-1:1,v<0?-1:1);return inPoly(P,x,z)||P.some((p,k)=>segDist(x,z,p,P[(k+1)%P.length])<=pad+1e-8);
+}
+function citadelTownAperture(s,ct){ // completed demolition remains in the native town circuit after the fort is razed
+  if(!s.wallRad)return;const K=s.wallKind||(s.wallKind=new Uint8Array(s.wallRad.length)),cut=[];
+  for(let k=0;k<s.wallRad.length;k++){const a=k/s.wallRad.length*Math.PI*2,r=s.wallRad[k],x=s.pos.x+Math.cos(a)*r,z=s.pos.z+Math.sin(a)*r;if(citadelFootprintAt(ct,x,z)&&K[k]!==1){K[k]=1;cut.push(k);}}
+  s.wallRazed=(s.wallRazed||0)+cut.length;ct.townCut=cut;s._gates=null;s._gatesK=null; // no salvage stock or cash is invented by removing the replaced curtain
+}
+function fortCircuits(s){const out=[];if(s.wallRad)out.push(s);if(s.cas&&s.cas.outerWall&&!s.cas.outerWall.razed)out.push(s.cas.outerWall);const R=casRing(s);if(R&&!R.razed)out.push(R);if(s.motte&&!s.motte.razed)out.push(s.motte);if(s.citadel?.wallRad&&!s.citadel.razed)out.push(s.citadel);return out;}
 function fortGateAngles(s,c,population){if(BACKGROUND&&s.renderGates&&c===s)return s.renderGates;if(c!==s)return c.gates||[c.gateA??Math.atan2(s.pos.z-c.z,s.pos.x-c.x)];const key=(s.streets||[]).length+':'+(s.wallR|0)+':'+(s._gateTrafficVersion||0);return s._gates&&s._gatesK===key?s._gates:wallGates(s,population);}
 function settleFortGates(s){if(!s.wallRad)return;const key=(s.streets||[]).length+':'+(s.wallR|0)+':'+(s._gateTrafficVersion||0);if(!s._gates||s._gatesK!==key){s._gates=wallGates(s);s._gatesK=key;}}
 function fortRoadBlocked(s,x,z,pad=0,local=null){ // roads and walkers share the actual curtain and its authorised apertures
   const memo=local&&STREET_GRAPH_FORT_CONTEXTS.get(local),use=memo?.s===s,circuits=use?memo.circuits:fortCircuits(s);
-  for(const c of circuits){if(c.razed||!c.wallRad)continue;const C=fortCenter(c),d=dist2d(x,z,C.x,C.z);if(d>(c.wallR||Math.max(...c.wallRad))+1.3+pad)continue;
-    const a=Math.atan2(z-C.z,x-C.x),r=wallRadAt(c,a);if(Math.abs(d-r)>1.3+pad||wallKindAt(c,a)===1||!wallBuilt(c,a)||wallDmgAt(c,a)>=0.98)continue;
+  for(const c of circuits){if(c.razed||!c.wallRad)continue;if(c===s.citadel){if(citadelBarrier(c,x,z,pad,true))return true;continue;}const C=fortCenter(c),d=dist2d(x,z,C.x,C.z);if(d>(c.wallR||Math.max(...c.wallRad))+1.3+pad)continue;
+    const a=Math.atan2(z-C.z,x-C.x),r=wallRadAt(c,a);if(c===s&&s.citadel&&citadelTownCut(s,C.x+Math.cos(a)*r,C.z+Math.sin(a)*r))continue;if(Math.abs(d-r)>1.3+pad||wallKindAt(c,a)===1||!wallBuilt(c,a)||wallDmgAt(c,a)>=0.98)continue;
     const half=c===s?7.5:c===s.motte?1.2:2.1;
     let gates;if(use){gates=memo.gates.get(c);if(!gates){gates=fortGateAngles(s,c);memo.gates.set(c,gates);}}else gates=fortGateAngles(s,c);
     if(gates.some(g=>Math.abs(Math.atan2(Math.sin(a-g),Math.cos(a-g)))*r<half))continue;return true;}
@@ -2474,10 +2497,10 @@ function fortStreetRuns(s,st,local=null){ // clipped centre lines: a grid lane e
 // helpers are in place. The context itself is passed down the call stack and never stored
 // on a settlement, so nested builds cannot share or retain it.
 const STREET_GRAPH_FORT_CONTEXTS=new WeakMap();
-const STREET_GRAPH_FORT_NATIVE=Object.freeze({fortCircuits,fortGateAngles,fortStreetRuns,fortRoadBlocked,wallGates,roadAccessClear,fortCenter,wallRadAt,wallKindAt,wallBuilt,wallProg,wallDmgAt,wallDamage,casRing,dist2d,lerp,resample,hAt,lakeAt,riverAt,paidRoadAt,onRoad});
+const STREET_GRAPH_FORT_NATIVE=Object.freeze({fortCircuits,fortGateAngles,fortStreetRuns,fortRoadBlocked,wallGates,roadAccessClear,fortCenter,wallRadAt,wallKindAt,wallBuilt,wallProg,wallDmgAt,wallDamage,casRing,dist2d,lerp,resample,hAt,lakeAt,riverAt,paidRoadAt,onRoad,citadelLocal,citadelBastion,citadelFootprintAt,citadelTownCut,citadelBarrier});
 function streetGraphFortContext(s,circuits){
   const N=STREET_GRAPH_FORT_NATIVE;
-  if(fortCircuits!==N.fortCircuits||fortGateAngles!==N.fortGateAngles||fortStreetRuns!==N.fortStreetRuns||fortRoadBlocked!==N.fortRoadBlocked||wallGates!==N.wallGates||roadAccessClear!==N.roadAccessClear||fortCenter!==N.fortCenter||wallRadAt!==N.wallRadAt||wallKindAt!==N.wallKindAt||wallBuilt!==N.wallBuilt||wallProg!==N.wallProg||wallDmgAt!==N.wallDmgAt||wallDamage!==N.wallDamage||casRing!==N.casRing||dist2d!==N.dist2d||lerp!==N.lerp||resample!==N.resample||hAt!==N.hAt||lakeAt!==N.lakeAt||riverAt!==N.riverAt||paidRoadAt!==N.paidRoadAt||onRoad!==N.onRoad)return null;
+  if(fortCircuits!==N.fortCircuits||fortGateAngles!==N.fortGateAngles||fortStreetRuns!==N.fortStreetRuns||fortRoadBlocked!==N.fortRoadBlocked||wallGates!==N.wallGates||roadAccessClear!==N.roadAccessClear||fortCenter!==N.fortCenter||wallRadAt!==N.wallRadAt||wallKindAt!==N.wallKindAt||wallBuilt!==N.wallBuilt||wallProg!==N.wallProg||wallDmgAt!==N.wallDmgAt||wallDamage!==N.wallDamage||casRing!==N.casRing||dist2d!==N.dist2d||lerp!==N.lerp||resample!==N.resample||hAt!==N.hAt||lakeAt!==N.lakeAt||riverAt!==N.riverAt||paidRoadAt!==N.paidRoadAt||onRoad!==N.onRoad||citadelLocal!==N.citadelLocal||citadelBastion!==N.citadelBastion||citadelFootprintAt!==N.citadelFootprintAt||citadelTownCut!==N.citadelTownCut||citadelBarrier!==N.citadelBarrier)return null;
   const local={};STREET_GRAPH_FORT_CONTEXTS.set(local,{s,circuits,gates:new Map()});return local;
 }
 function fortBaileyShape(m,b){ // one continuous enceinte around courtyard, neck and mound; temporary survey points only
@@ -2499,6 +2522,7 @@ function fortPrepare(s){ // foundation or structural change only; no daily recou
     if(old>0&&!c.wallDmg&&!c.razed)c.wallDmg=new Float32Array(c.wallRad.length).fill(old);
     let all=0,inside=0;for(const b of s.buildings||[]){if(b.removed||b.state==='gone')continue;const w=RESID.has(b.arch)?1:0;all+=w;if(fortContains(c,b.x,b.z))inside+=w;}
     c.protectedShare=all?inside/all:0;let surrounding=0;for(let k=0;k<12;k++){const a=k/12*Math.PI*2;surrounding+=hAt(c.x+Math.cos(a)*(r+20),c.z+Math.sin(a)*(r+20));}c.relief=(c===s.motte?c.topY??hAt(c.x,c.z):hAt(c.x,c.z))-surrounding/12;};
+  if(s.citadel&&!s.citadel.razed){const c=s.citadel;if(!c.wallRad){const G=citadelGeometry(c);c.polys=c.polys||G.polys;c.wallRad=Float32Array.from({length:128},(_,k)=>Math.max(...G.polys.map(P=>rayPolyR(P,c.x,c.z,k/128*Math.PI*2))));c.wallKind=new Uint8Array(c.wallRad.length);c.gateA=c.rot+Math.PI;c.gates=[c.gateA];citadelTownAperture(s,c);}prep(c,Math.max(...c.wallRad),true,7);}
   if(R)prep(R,R.r,casStone(s),R===s.bailey?(s.baileyStone?6:3.8):casStone(s)?7.5:4.5);
   if(s.motte)prep(s.motte,s.motte.summitR??Math.min(8.4,s.motte.r*0.4),!!s.motteStone,s.motteStone?4:2.6);
   if(cs&&cs.outer&&(cs.outerWall||R&&!R.razed&&R.wallRad)){const O=cs.outerWall||(cs.outerWall={x:R.x,z:R.z,r:R.r+cs.outer,gateA:R.gateA,wallRad:Float32Array.from(R.wallRad,r=>r+cs.outer)});prep(O,O.r,casStone(s),casStone(s)?5:3.4);}
@@ -3317,9 +3341,7 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
     s.citadel={x:best.x,z:best.z,rot:best.a,S};
     const gone=liveB().filter(b=>!b.inst&&dist2d(b.x,b.z,best.x,best.z)<S*0.85);gone.forEach(unplace);built=s.buildings.length;
     for(const st of s.streets)if(st.kind!=='road'&&st.kind!=='edge'&&st.pts.some(q=>dist2d(q.x,q.z,best.x,best.z)<S*0.62))st.hidden=true;
-    const ux=Math.cos(best.a),uz=Math.sin(best.a),vx=-uz,vz=ux;
-    for(const[o,w]of[[-18,0],[0,0],[18,0]]){ // barracks about the parade ground
-      const f={x:best.x+vx*o-ux*14,z:best.z+vz*o-uz*14,w:6,d:24,rot:-best.a};place('longhouse',2,f,'keep',1.1,{inst:true,barracks:true});}
+    for(const B of citadelGeometry(s.citadel).buildings)place(B.arch,B.tier,B.f,'keep',1.1,{inst:true,barracks:true});
     hist(e,`A citadel was raised astride the walls on the ${['eastern','southern','western','northern'][Math.round(((best.a%6.2832)+6.2832)%6.2832/1.5708)%4]} side; ${gone.length} houses of the old quarter were razed for it and its glacis, and a garrison quartered there for good.`);
   };
   if(!saved){for(let e=0;e<E;e++){
@@ -5762,9 +5784,13 @@ function institutionWharfProposal(s){if(AD()<950||!s.harbor||s.siegeBy||!s._lay?
 }
 function citadelGeometry(ct){ // one native footprint for the parade ground, ramparts, bastions, gate and residential barracks
   const ux=Math.cos(ct.rot),uz=Math.sin(ct.rot),vx=-uz,vz=ux,h=ct.S/2,corners=[[1,1],[1,-1],[-1,-1],[-1,1]].map(([a,b])=>({x:ct.x+ux*h*a+vx*h*b,z:ct.z+uz*h*a+vz*h*b,a,b})),bastions=[],ramparts=[];
-  for(const c of corners){const dx=c.a*ux+c.b*vx,dz=c.a*uz+c.b*vz,L=Math.hypot(dx,dz),ox=dx/L,oz=dz/L,tx=-oz,tz=ox;bastions.push([{x:c.x-tx*11,z:c.z-tz*11},{x:c.x-tx*11+ox*8,z:c.z-tz*11+oz*8},{x:c.x+ox*24,z:c.z+oz*24},{x:c.x+tx*11+ox*8,z:c.z+tz*11+oz*8},{x:c.x+tx*11,z:c.z+tz*11}]);}
+  for(const c of corners)bastions.push(citadelBastion(ct,c.a,c.b));
   for(let k=0;k<corners.length;k++){const a=corners[k],b=corners[(k+1)%4];ramparts.push(obbCorners((a.x+b.x)/2,(a.z+b.z)/2,9,ct.S,Math.atan2(b.x-a.x,b.z-a.z)));}
   const gate={x:ct.x-ux*h,z:ct.z-uz*h,side:2,half:3},buildings=[-18,0,18].map((o,i)=>({key:'barracks:'+i,arch:'longhouse',tier:2,f:{x:ct.x+vx*o-ux*14,z:ct.z+vz*o-uz*14,w:6,d:24,rot:Math.atan2(ux,uz)}}));return{corners,bastions,ramparts,gate,buildings,polys:[corners.map(c=>({x:c.x,z:c.z})),...bastions,...ramparts]};
+}
+function citadelRampartRuns(ct,k){ // renderer reads the same native gate, sector condition and geometry as movement
+  if(ct.razed)return[];const G=citadelGeometry(ct),a=G.corners[k],b=G.corners[(k+1)%4],n=Math.max(1,Math.ceil(ct.S/2)),T=Array.from({length:n+1},(_,j)=>j/n),runs=[];if(k===G.gate.side)T.push(.5-3/ct.S,.5+3/ct.S);T.sort((x,y)=>x-y);
+  for(let j=1;j<T.length;j++){if(T[j]-T[j-1]<1e-10)continue;const t=(T[j]+T[j-1])/2;if(k===G.gate.side&&Math.abs(t-.5)*ct.S<3)continue;const x=lerp(a.x,b.x,t),z=lerp(a.z,b.z,t),angle=Math.atan2(z-ct.z,x-ct.x),damage=wallDmgAt(ct,angle);if(wallKindAt(ct,angle)===1||!wallBuilt(ct,angle)||damage>=.98)continue;runs.push({a:{x:lerp(a.x,b.x,T[j-1]),z:lerp(a.z,b.z,T[j-1])},b:{x:lerp(a.x,b.x,T[j]),z:lerp(a.z,b.z,T[j])},damage});}return runs;
 }
 function citadelStreetCuts(st,polys){ // exact intersections retain the public lane outside the paid enclosure
   const keep=[];let run=[];const same=(a,b)=>dist2d(a.x,a.z,b.x,b.z)<1e-7,point=(a,b,t)=>({x:lerp(a.x,b.x,t),z:lerp(a.z,b.z,t)});
@@ -9101,13 +9127,10 @@ function projectWalls(){
         if((s.streets||[]).some(st=>!st.hidden&&!st.gone&&st.kind!=='edge'&&st.pts.some((u,i)=>i>0&&segSegDist(p,q,st.pts[i-1],u)<st.hw+1))||hs.some(b=>dist2d(b.x,b.z,m.x,m.z)<4.5))continue;
         slab(p,q,2.2,4.6,0x9a9182,0x8a8174);}
     }
-    if(s.citadel){ // a star citadel: a square of ramparts with a bastion at each corner
-      const ct=s.citadel,ux=Math.cos(ct.rot),uz=Math.sin(ct.rot),vx=-uz,vz=ux,h=ct.S/2,cor=[];
-      for(const[a,b]of[[1,1],[1,-1],[-1,-1],[-1,1]])cor.push({x:ct.x+ux*h*a+vx*h*b,z:ct.z+uz*h*a+vz*h*b,a,b});
-      const top=Math.max(...cor.map(c=>hAt(c.x,c.z)))+7;
-      for(let k=0;k<4;k++)slab(cor[k],cor[(k+1)%4],9,top-Math.max(hAt(cor[k].x,cor[k].z),hAt(cor[(k+1)%4].x,cor[(k+1)%4].z)),0x9c9282,0x6d8a47);
-      for(const c of cor){const dx=c.a*ux+c.b*vx,dz=c.a*uz+c.b*vz,dl=Math.hypot(dx,dz),ox=dx/dl,oz=dz/dl,tx=-oz,tz=ox;
-        prism([{x:c.x-tx*11,z:c.z-tz*11},{x:c.x-tx*11+ox*8,z:c.z-tz*11+oz*8},{x:c.x+ox*24,z:c.z+oz*24},{x:c.x+tx*11+ox*8,z:c.z+tz*11+oz*8},{x:c.x+tx*11,z:c.z+tz*11}],top,0x9c9282,0x6d8a47);}
+    if(s.citadel&&!s.citadel.razed){ // shared actual square ramparts and corner bastions, open at the native paid gate
+      const ct=s.citadel,Gd=citadelGeometry(ct),top=Math.max(...Gd.corners.map(c=>hAt(c.x,c.z)))+7;
+      for(let k=0;k<4;k++)for(const R of citadelRampartRuns(ct,k)){const ground=Math.max(hAt(R.a.x,R.a.z),hAt(R.b.x,R.b.z)),height=Math.max(.5,(top-ground)*(1-.85*sstep(.45,1,R.damage)));slab(R.a,R.b,9,height,0x9c9282,0x6d8a47);}
+      for(let k=0;k<Gd.bastions.length;k++){const c=Gd.corners[k],a=Math.atan2(c.z-ct.z,c.x-ct.x),d=wallDmgAt(ct,a);if(wallKindAt(ct,a)!==1&&wallBuilt(ct,a)&&d<.98)prism(Gd.bastions[k],top-7*.85*sstep(.45,1,d),0x9c9282,0x6d8a47);}
     }
   }
   const quad=(a,b,c,d,n,col)=>{ // a,b,c,d counter-clockwise seen from the normal's side
@@ -9130,7 +9153,7 @@ function projectWalls(){
     for(let i=0;i<N;i++){
       const a=i/N*Math.PI*2,q=at(a),ci=toCell(q.x),cj=toCell(q.z),gh=7.5/q.r;
       ok.push(W.water[cIdx(ci,cj)]!==1&&!riverAt(q.x,q.z,-1)&&wallKindAt(s,a)!==1 // cliffs need no curtain
-        &&!(s.citadel&&dist2d(q.x,q.z,s.citadel.x,s.citadel.z)<s.citadel.S*0.62) // the citadel takes this stretch
+        &&!citadelTownCut(s,q.x,q.z) // the actual citadel footprint replaces this curtain
         &&gates.every(g=>Math.abs(Math.atan2(Math.sin(a-g),Math.cos(a-g)))>gh)
         &&(!s.wallBuild||s.wallBuild.upgrade||wallBuilt(s,a))); // a new circuit stands only where the masons have got to
     }
@@ -9211,7 +9234,7 @@ function projectWalls(){
       if(!near)return;
       const q=at(g),ci=toCell(q.x),cj=toCell(q.z);
       if(W.water[cIdx(ci,cj)]===1||riverAt(q.x,q.z,1)||wallKindAt(s,g)===1)return;
-      if(s.citadel&&dist2d(q.x,q.z,s.citadel.x,s.citadel.z)<s.citadel.S*0.62)return;
+      if(citadelTownCut(s,q.x,q.z))return;
       const q0=at(g-0.02),q1=at(g+0.02),ry=-Math.atan2(q1.z-q0.z,q1.x-q0.x);
       const shut=!!s.siegeBy,broke=s.breachUntil>day()&&Math.abs(Math.atan2(Math.sin(g-s.breachA),Math.cos(g-s.breachA)))<0.12; // the gates are shut against a siege; the stormed one hangs broken
       if(gates.roads[gi2]&&(stone||bast)){
@@ -9718,11 +9741,10 @@ function featStroke(ch,pts,hw){const E=G.feat.E[ch];
       const u=clamp(((px-a.x)*dx+(pz-a.z)*dz)/L2,0,1),d=Math.hypot(px-a.x-dx*u,pz-a.z-dz*u)-w;
       if(d<FBAND){const e=Math.max(0,Math.round((d+8)*4));if(e<E[i])E[i]=e;}});}}
 function featWalls(s){
-  if(!s.wallRad)return;const P=[];
-  for(let k=0;k<=360;k++){const a=k/360*Math.PI*2;if(wallKindAt(s,a)===1){featStroke(1,P,3.5);P.length=0;continue;}
-    const r=wallRadAt(s,a);P.push({x:s.pos.x+Math.cos(a)*r,z:s.pos.z+Math.sin(a)*r});}
+  if(!s.wallRad&&!s.citadel)return;const P=[];
+  for(let k=0;s.wallRad&&k<=360;k++){const a=k/360*Math.PI*2,r=wallRadAt(s,a),p={x:s.pos.x+Math.cos(a)*r,z:s.pos.z+Math.sin(a)*r};if(wallKindAt(s,a)===1||citadelTownCut(s,p.x,p.z)){featStroke(1,P,3.5);P.length=0;continue;}P.push(p);}
   featStroke(1,P,3.5);
-  if(s.citadel){const c=s.citadel,ux=Math.cos(c.rot),uz=Math.sin(c.rot),h=c.S/2,cor=[[1,1],[1,-1],[-1,-1],[-1,1],[1,1]].map(([a,b])=>({x:c.x+(ux*a-uz*b)*h,z:c.z+(uz*a+ux*b)*h}));featStroke(1,cor,4);}
+  if(s.citadel&&!s.citadel.razed){const ct=s.citadel,Gd=citadelGeometry(ct);for(let k=0;k<4;k++)for(const R of citadelRampartRuns(ct,k))featStroke(1,[R.a,R.b],4.5);for(const P of Gd.bastions)featStroke(1,[...P,P[0]],2);}
 }
 function featRoads(){
   for(const r of W.roads)featStroke(2,r.drawn||r.path,r.grade?4.8:4.2);
@@ -14719,7 +14741,7 @@ function armyObstacle(a,x,z){
       if(cells){const i1=Math.floor((x+1)/cs),j1=Math.floor((z+1)/cs);for(let ci=Math.floor((x-1)/cs);ci<=i1;ci++)for(let cj=Math.floor((z-1)/cs);cj<=j1;cj++){const list=cells.get(ci*100003+cj);if(list&&hit(list))return 'building';}}
       else if(hit(placed.near(x,z,1)))return 'building';}
     let circuits=mem?mem.circuits.get(s):undefined;if(!circuits){circuits=fortCircuits(s);if(mem)mem.circuits.set(s,circuits);}
-    for(const c of circuits){if(!c.wallRad)continue;const C=fortCenter(c),an=Math.atan2(z-C.z,x-C.x),r=wallRadAt(c,an);if(Math.abs(dist2d(x,z,C.x,C.z)-r)>1.3||wallKindAt(c,an)===1||!wallBuilt(c,an)||wallDmgAt(c,an)>=0.65)continue;
+    for(const c of circuits){if(!c.wallRad)continue;if(c===s.citadel){if(citadelBarrier(c,x,z,0,s.owner===a.house||!hostileTo(a,s),.65))return 'wall';continue;}const C=fortCenter(c),an=Math.atan2(z-C.z,x-C.x),r=wallRadAt(c,an);if(c===s&&s.citadel&&citadelTownCut(s,C.x+Math.cos(an)*r,C.z+Math.sin(an)*r))continue;if(Math.abs(dist2d(x,z,C.x,C.z)-r)>1.3||wallKindAt(c,an)===1||!wallBuilt(c,an)||wallDmgAt(c,an)>=0.65)continue;
       const gates=fortGateAngles(s,c),open=s.owner===a.house||!hostileTo(a,s);
       if(open&&gates.some(g=>Math.abs(Math.atan2(Math.sin(an-g),Math.cos(an-g)))*r<(c===s.motte?1.2:2.1)))continue;return 'wall';}
   }
@@ -14793,6 +14815,7 @@ function routeSettlement(a,s){ // all armyObstacle and fortGround read of a plac
     for(const[key,list]of placed.historyCells){const i=Math.round(key/100003),j=key-i*100003;if(!routeHas(i*cs,j*cs,i*cs+cs,j*cs+cs))continue;const L=[];
       for(const b of list){if(b.removed||b.state==='gone'||b.arch==='churchyard')L.push(b,0,0,0,0,0,0);else L.push(b,1,b.x,b.z,b.rot||0,b.w,b.d);}cells.set(key,L);}
     ROUTE_BLD.push(cells);}else{routeW(-1);ROUTE_BLD.push(null);}
+  const ct=s.citadel;routeW(!!ct?1:0);if(ct){routeW(ct.x);routeW(ct.z);routeW(ct.rot);routeW(ct.S);routeW(ct.razed?1:0);}
   const C=fortCircuits(s);routeW(C.length);
   for(const c of C){if(!c.wallRad){routeW(0);continue;}const O=fortCenter(c),B=c.wallBuild,D=c.wallDmg;routeW(1);routeW(c===s.motte?1:0);routeW(O.x);routeW(O.z);routeList(c.wallRad);routeList(c.wallKind);
     if(B){routeW(1);routeW(B.a0);routeW(wallProg(c));}else routeW(0);
@@ -15229,10 +15252,10 @@ function prominence(s,readOnly=false){ // height of the town above the country w
 function fortOf(s,readOnly=false){
   const c=activeFort(s),parts=[];let mult=1;
   if(c){const dm=wallDamage(c),n=c.wallRad.length,k=Math.max(0,1-0.7*dm-(c.wallRazed||0)/n)*(c.wallBuild?(c.wallBuild.upgrade?0.6+0.4*wallProg(c):wallProg(c)):1);
-    mult+=(c.walls>=2?1.5:0.6)*k;parts.push((c===s?'town ':c===s.motte?'summit ':'castle ')+(c.walls>=2?'stone walls':'palisade and ditch')+(dm>0.05?`, ${Math.round(dm*100)}% battered`:''));
+    mult+=(c.walls>=2?1.5:0.6)*k;parts.push((c===s?'town ':c===s.motte?'summit ':c===s.citadel?'citadel ':'castle ')+(c.walls>=2?'stone walls':'palisade and ditch')+(dm>0.05?`, ${Math.round(dm*100)}% battered`:''));
     if(c===s&&s.bastions){mult+=1;parts.push('bastioned trace');}
-    if(c===s&&s.citadel){mult+=0.4;parts.push('citadel');}
-    if(c!==s){parts.push(`${Math.round((c.protectedShare||0)*100)}% of homes enclosed`);const cfg=s.cas;if(cfg){mult+=Math.max(0,(cfg.towers||0)-4)*0.04+(cfg.gate>=2?0.22:cfg.gate?0.12:0);}}
+    if(c===s&&s.citadel&&!s.citadel.razed){mult+=0.4*Math.max(0,1-wallDamage(s.citadel));parts.push('citadel');}
+    if(c!==s){parts.push(`${Math.round((c.protectedShare||0)*100)}% of homes enclosed`);const cfg=c===s.citadel?null:s.cas;if(cfg){mult+=Math.max(0,(cfg.towers||0)-4)*0.04+(cfg.gate>=2?0.22:cfg.gate?0.12:0);}}
     const pr=c===s?prominence(s,readOnly):c.relief||0;if(pr>8){mult*=1+Math.min(0.4,pr/100);parts.push(`high ground (${Math.round(pr)} m)`);}
     if(c===s&&s.wallKind&&s.natDef>0.02){const k=s.wallKind,n=k.length,nat=k.reduce((t,x)=>t+(x===2||x===1?1:x===3?0.5:0),0)/n;mult*=1+nat*0.8;parts.push(`${Math.round(nat*100)}% natural defence`);}}
   return{mult,parts,circuit:c};}
@@ -19271,10 +19294,11 @@ function buildMapCanvas(){
     if(s.walls>0&&s.wallRad){ // the traced wall line; cliffs left open, as on the ground
       g.strokeStyle='#3b3029';g.lineWidth=s.walls>=2?2.4:1.4;g.setLineDash(s.walls>=2?[]:[2,2]);g.beginPath();let pen=false;
       for(let k=0;k<=96;k++){const a=k/96*Math.PI*2,r=wallRadAt(s,a),px2=mx(s.pos.x+Math.cos(a)*r),pz2=mz(s.pos.z+Math.sin(a)*r);
-        if(wallKindAt(s,a)===1){pen=false;continue;}if(pen)g.lineTo(px2,pz2);else g.moveTo(px2,pz2);pen=true;}
+        if(wallKindAt(s,a)===1||citadelTownCut(s,s.pos.x+Math.cos(a)*r,s.pos.z+Math.sin(a)*r)){pen=false;continue;}if(pen)g.lineTo(px2,pz2);else g.moveTo(px2,pz2);pen=true;}
       g.stroke();g.setLineDash([]);}
-    if(s.citadel){const c=s.citadel,h=c.S/2*S/SIZE;g.save();g.translate(mx(c.x),mz(c.z));g.rotate(c.rot); // the citadel's square
-      g.strokeStyle='#3b3029';g.lineWidth=1.6;g.strokeRect(-h,-h,h*2,h*2);g.restore();}
+    if(s.citadel&&!s.citadel.razed){const ct=s.citadel,Gd=citadelGeometry(ct);g.strokeStyle='#3b3029';g.lineWidth=1.6;
+      for(let k=0;k<4;k++)for(const R of citadelRampartRuns(ct,k)){g.beginPath();g.moveTo(mx(R.a.x),mz(R.a.z));g.lineTo(mx(R.b.x),mz(R.b.z));g.stroke();}
+      for(const P of Gd.bastions){g.beginPath();P.forEach((p,k)=>k?g.lineTo(mx(p.x),mz(p.z)):g.moveTo(mx(p.x),mz(p.z)));g.closePath();g.stroke();}}
     const n=s.kind==='capital'?9:s.kind==='town'?6:3,rr2=s.kind==='village'?3:rW*0.55;
     for(let k=0;k<n;k++){ // little roofs
       const a=k/n*Math.PI*2+0.4,hx=x+Math.cos(a)*rr2*(k%2?0.55:1),hy=y+Math.sin(a)*rr2*(k%2?0.55:1);

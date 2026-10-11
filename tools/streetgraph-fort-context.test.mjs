@@ -7,7 +7,7 @@ import vm from 'node:vm';
 
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const fn=(text,name)=>{const hit=text.match(new RegExp(`^function ${name}\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))`,'m'));assert.ok(hit,`missing ${name}`);return hit[0];};
-const COMMON=['resample','wallRadAt','wallKindAt','fortCenter','casRing','fortCircuits','fortGateAngles','wallProg','wallBuilt','wallDmgAt','wallDamage','wallGates'];
+const COMMON=['citadelLocal','citadelBastion','citadelFootprintAt','citadelTownCut','citadelBarrier','inPoly','segDist','resample','wallRadAt','wallKindAt','fortCenter','casRing','fortCircuits','fortGateAngles','wallProg','wallBuilt','wallDmgAt','wallDamage','wallGates'];
 const CURRENT=['roadAccessClear','fortRoadBlocked','fortStreetRuns','streetGraph'];
 const nativeContext=source.match(/^const STREET_GRAPH_FORT_CONTEXTS=new WeakMap\(\);\nconst STREET_GRAPH_FORT_NATIVE=.*?;\nfunction streetGraphFortContext\(s,circuits\)\{[\s\S]*?^\}/m);
 assert.ok(nativeContext,'missing native street graph fort context');
