@@ -5721,10 +5721,22 @@ function projectReservationSetback(site){ // the native fit margin is clearance,
   const polys=[],f=site.f;if(f)polys.push(obbCorners(f.x,f.z,f.w+4,f.d+4,f.rot));
   for(const P of site.paths||(site.path?[site.path]:[]))for(let k=1;k<P.length;k++){const a=P[k-1],b=P[k];polys.push(obbCorners((a.x+b.x)/2,(a.z+b.z)/2,(site.pathWidth||2.6)+4,dist2d(a.x,a.z,b.x,b.z)+4,Math.atan2(b.x-a.x,b.z-a.z)));}return polys;
 }
+const PROJECT_RESERVATION_BOUNDS_NATIVE=Object.freeze({projectReservationPublic,projectReservationPolys,projectReservationSetback,compoundPolys,compoundPolygonDifference,obbCorners,wallRadAt,dist2d,lerp,graveyardPolygonsOverlap,inPolyXZ,segSegDist,segDist,clamp,abbeySurveyBounds,abbeySurveyBoxesMayHit,array:Array.prototype,point:Object.prototype,some:Array.prototype.some,map:Array.prototype.map,iterator:Array.prototype[Symbol.iterator],isArray:Array.isArray,descriptor:Object.getOwnPropertyDescriptor,prototype:Object.getPrototypeOf,equal:Object.is}); // pure native geometry readers; no retained geometry or query result
 function projectSiteReserved(s,q){ // paid pending sites bind later public proposals before any new work or payment
+  const N=typeof PROJECT_RESERVATION_BOUNDS_NATIVE==='undefined'?null:PROJECT_RESERVATION_BOUNDS_NATIVE,bounds=new Map();
+  const native=()=>!!N&&projectReservationPublic===N.projectReservationPublic&&projectReservationPolys===N.projectReservationPolys&&projectReservationSetback===N.projectReservationSetback&&compoundPolys===N.compoundPolys&&compoundPolygonDifference===N.compoundPolygonDifference&&obbCorners===N.obbCorners&&wallRadAt===N.wallRadAt&&dist2d===N.dist2d&&lerp===N.lerp&&graveyardPolygonsOverlap===N.graveyardPolygonsOverlap&&inPolyXZ===N.inPolyXZ&&segSegDist===N.segSegDist&&segDist===N.segDist&&clamp===N.clamp&&abbeySurveyBounds===N.abbeySurveyBounds&&abbeySurveyBoxesMayHit===N.abbeySurveyBoxesMayHit&&Array.isArray===N.isArray&&Object.getOwnPropertyDescriptor===N.descriptor&&Object.getPrototypeOf===N.prototype&&Object.is===N.equal&&N.descriptor(N.array,'some')?.value===N.some&&N.descriptor(N.array,'map')?.value===N.map&&N.descriptor(N.array,Symbol.iterator)?.value===N.iterator;
+  const bound=P=>{ // plain coordinates only; callbacks and degenerate or unbounded polygons keep the exact scan
+    if(!N.isArray(P)||N.prototype(P)!==N.array||N.descriptor(P,'some')||N.descriptor(P,Symbol.iterator)||P.length<3)return null;
+    const values=[];for(let k=0;k<P.length;k++){const item=N.descriptor(P,k),p=item?.value;if(!p||typeof p!=='object')return null;const proto=N.prototype(p);if(proto!==N.point&&proto!==null)return null;const x=N.descriptor(p,'x'),z=N.descriptor(p,'z');
+      if(!x||!z||!Number.isFinite(x.value)||!Number.isFinite(z.value)||Math.abs(x.value)>1048576||Math.abs(z.value)>1048576)return null;values.push(x.value,z.value);}
+    const old=bounds.get(P);if(old&&old.values.length===values.length){let same=true;for(let k=0;k<values.length;k++)if(!N.equal(values[k],old.values[k])){same=false;break;}if(same)return old.box;}
+    let area=0;for(let k=0;k<values.length;k+=2){const j=(k+2)%values.length;area+=values[k]*values[j+1]-values[j]*values[k+1];}const box=area&&Number.isFinite(area)?abbeySurveyBounds(P):null;bounds.set(P,{values,box});return box;
+  };
+  const overlap=(A,B)=>{if(!native())return A.some(P=>B.some(Q=>graveyardPolygonsOverlap(P,Q)));
+    const a=A.map(P=>({P,box:bound(P)})),b=B.map(P=>({P,box:bound(P)}));return a.some(P=>b.some(Q=>abbeySurveyBoxesMayHit(P.box,Q.box)&&graveyardPolygonsOverlap(P.P,Q.P)));};
   const candidate=projectReservationPolys(q);for(const p of W.projects||[])if(p!==q&&!p.dead&&p.site){const town=W.settlements[p.si]||s,publicPolys=projectReservationPublic(town,p.site),solid=compoundPolys(p.site.ward?{...p.site,ring:p.site.ward,path:null,paths:null}:{...p.site,path:null,paths:null});
-    if(candidate.some(P=>solid.some(Q=>graveyardPolygonsOverlap(P,Q))))return true;
-    const paths=p.type==='compound'&&p.adapter==='abbey'&&p.site.accessMode==='abbey-rural'?projectReservationSetback(p.site):compoundPolys({path:p.site.path,paths:p.site.paths,pathWidth:p.site.pathWidth}),C=publicPolys.length?projectReservationPolys(q,publicPolys):candidate;if(C.some(P=>paths.some(Q=>graveyardPolygonsOverlap(P,Q))))return true;
+    if(overlap(candidate,solid))return true;
+    const paths=p.type==='compound'&&p.adapter==='abbey'&&p.site.accessMode==='abbey-rural'?projectReservationSetback(p.site):compoundPolys({path:p.site.path,paths:p.site.paths,pathWidth:p.site.pathWidth}),C=publicPolys.length?projectReservationPolys(q,publicPolys):candidate;if(overlap(C,paths))return true;
   }return false;
 }
 function compoundGround(site){const polys=compoundPolys(site);return{polys,cells:[...new Set(polys.flatMap(occupiedGroundCells))]};}
