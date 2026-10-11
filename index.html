@@ -7744,7 +7744,17 @@ function castleFoundationBoxMayHit(x,z,b,pad=0){ // conservative point-to-AABB b
 function castleFoundationSegmentMayHitBox(a,b,box,pad=0){ // rotated OBB padding grows a corner by up to sqrt(2)*pad in world axes
   if(!box||![a?.x,a?.z,b?.x,b?.z,box.minX,box.maxX,box.minZ,box.maxZ,pad].every(Number.isFinite))return true;const d=Math.SQRT2*pad+1e-6;return !(Math.max(a.x,b.x)+d<box.minX||Math.min(a.x,b.x)-d>box.maxX||Math.max(a.z,b.z)+d<box.minZ||Math.min(a.z,b.z)-d>box.maxZ);
 }
+function castleFoundationCentersPossible(s,spec){ // necessary first clear() predicates at exactly the survey's candidate centres; no index or RNG
+  const si=W.settlements.indexOf(s),reach=(s.radius||90)+100,minR=Math.hypot(spec.w,spec.d)/2+13;
+  for(const st of s.streets||[])if(!st.gone&&st.kind!=='edge'&&!st.hidden&&!st.planQ&&!st.castlePath&&(st.kind!=='quay'||st.serviceLinked))for(let k=1;k<st.pts.length;k++){
+    const a=st.pts[k-1],b=st.pts[k],dx=b.x-a.x,dz=b.z-a.z,L=Math.hypot(dx,dz);if(L<=1)continue;const tx=dx/L,tz=dz/L,hw=st.hw||2;
+    for(const t of[0.5,0.15,0.85])for(const side of[1,-1])for(const off of[minR+hw+7,minR+hw+17]){
+      const x=lerp(a.x,b.x,t)-tz*side*off,z=lerp(a.z,b.z,t)+tx*side*off;
+      if(dist2d(x,z,s.pos.x,s.pos.z)<=reach-40&&planCellOK(x,z)&&!riverAt(x,z,1)&&!lakeAt(s,x,z,2)&&castleFoundationLandOK(W.land&&furlongAt(x,z),s,si))return true;
+    }}return false;
+}
 function castleFoundationSite(s,spec,retained=null){ // fresh operation-local geometry; a retained project is rechecked, never treated as a validity cache
+  if(!retained&&!castleFoundationCentersPossible(s,spec))return null;
   const si=W.settlements.indexOf(s),B=makeHash(24),H=makeHash(24),anchors=[],blockBounds=new WeakMap(),reach=(s.radius||90)+100,near=(x,z,r)=>dist2d(x,z,s.pos.x,s.pos.z)<reach+r+10,circuits=W.settlements.flatMap(t=>fortCircuits(t)).filter(R=>{const C=fortCenter(R);return near(C.x,C.z,R.wallRad?Math.max(...R.wallRad):R.r||0);}),protectedGround=[];
   for(const t of W.settlements){for(const p of t.places||[])if(near(p.x,p.z,Math.max(...p.r)))protectedGround.push({place:p});
     if(t.citadel&&near(t.citadel.x,t.citadel.z,t.citadel.S))protectedGround.push({circle:{x:t.citadel.x,z:t.citadel.z,r:t.citadel.S*0.85}});
@@ -7814,19 +7824,66 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
       const per=circuitLen(ward),score=hAt(x,z)-dist2d(x,z,s.pos.x,s.pos.z)*0.03-per*0.025;if(score>bv){bv=score;best=site;}
     }return best;
 }
-function castleFoundationProposal(s,si){
+// Only a null native proposal survey may be recalled. Daily financial/authority/technology
+// guards stay outside this memory; successful or retained project sites are always surveyed.
+function castleFoundationSurveyNative(){const N=CASTLE_FOUNDATION_SURVEY_NATIVE,C=CASTLE_FOUNDATION_SURVEY_CURRENT();return Object.entries(N).every(([k,f])=>C[k]===f);}
+function castleFoundationSurveyRead(buffer=null){ // exact writer certificate, not a count/version/hash; see docs/CASTLE-FOUNDATION-DEPENDENCIES.md
+  const V=buffer||[];V.length=0;const value=v=>V.push(v),list=A=>{value(A?.length??-1);if(A)for(const x of A)value(x);},point=p=>{value(p?.x);value(p?.z);},poly=P=>{value(P?.length??-1);if(P)for(const p of P)point(p);},polys=A=>{value(A?.length??-1);if(A)for(const P of A)poly(P);},box=f=>{point(f);value(f?.w);value(f?.d);value(f?.rot);},ring=R=>{point(R);point(R?.pos);list(R?.wallRad);value(R?.r);value(R?.wallR);value(R?.summitR);value(R?.coreR);},site=S=>{value(!!S);if(!S)return;box(S.f);ring(S.ring);polys(S.polys);poly(S.poly);poly(S.yard?.poly);polys(S.paths);poly(S.path);value(S.pathWidth);},building=b=>{ // near() stamps only private copies; an inherited stamp ahead of the counter is not certified
+    if(typeof b.__hs==='number'&&b.__hs>HASH_STAMP)return false;
+    box(b);poly(b.poly);poly(b.lot);return true;};
+  value(SIZE);value(GRID);value(CELL);value(FN);value(FG);value(PLN);list(W.h);list(W.water);
+  value(!!W.land);const F=W.land?.F;value(F?.length??-1);if(F)for(const f of F){value(!!f);if(!f)continue;value(f.i);value(f.j);value(f.jx);value(f.jz);value(f.dom);value(f.lord);value(!!f.crofts);const held=x=>x!=null&&x!==-1;value(held(f.title?.own?.owner??f.own));value(held(f.title?.work?.owner??f.wk));}
+  const mask=W.land?.mask;value(mask?.length??-1);if(mask)for(let i=2;i<mask.length;i+=4)value(mask[i]===255); // only occupied versus unoccupied is read by this survey
+  value(W.settlements.length);for(const s of W.settlements){point(s.pos);value(s.radius);value(s.owner);
+    const B=(s.buildings||[]).filter(b=>!b.removed&&b.state!=='gone');value(B.length);for(const b of B){if(!building(b))return null;const G=b._graveyard&&!b._graveyard.removed?b._graveyard:null;value(!!G);if(G&&!building(G))return null;}
+    const S=(s.streets||[]).filter(st=>!st.gone&&st.kind!=='edge');value(S.length);for(const st of S){poly(st.pts);value(st.hw||2);value(!!st.hidden);value(!!st.planQ);value(!!st.castlePath);value(st.kind==='quay');value(!!st.serviceLinked);}
+    const C=fortCircuits(s);value(C.length);for(const c of C)ring(c);
+    value(s.places?.length??0);for(const p of s.places||[]){point(p);list(p.r);}
+    value(!!s.citadel);if(s.citadel){point(s.citadel);value(s.citadel.S);}
+    value(s.remnants?.length??0);for(const r of s.remnants||[]){point(r);value(r.r);}
+    value(!!s.burgRing);if(s.burgRing){point(s.burgRing);value(s.burgRing.r);}polys(s.relicWalls);
+    value(!!s.lake);if(s.lake){poly(s.lake.poly);value(s.lake.y);}}
+  value(W.roads?.length??0);for(const r of W.roads||[])poly(r.open||r.path||[]);
+  value(W.trackSet?.size??W.trackSet?.length??0);for(const key of W.trackSet||[]){value(key);const e=W.tg.E.get(key);value(!!e);if(e){point(W.tg.pts[e.a]);point(W.tg.pts[e.b]);}}
+  const R=W.rivHash;value(!!R);if(R){value(R.near.cell);value(R.historyCells.size);for(const[key,A]of R.historyCells){value(key);value(A.length);for(const r of A){point(r.a);point(r.b);value(r.hw);}}}
+  const Q=(W.projects||[]).filter(q=>!q.dead);value(Q.length);for(const q of Q){value(q.type);value(q.kind);value(q.si);
+    if(q.type==='road')poly(q.P?.path||[]);
+    if(q.type==='castle'&&q.site){point(q.site.ward);value(q.site.ward.r);poly(q.site.path);}
+    if((q.type==='compound'||q.type==='fabric')&&q.site)site(q.site);
+    if(q.type==='storage'){point(q);value(q.arch);list(ARCH[q.arch]?.slice(0,2));}if(q.type==='clear'){point(q);value(q.r);}
+    if(q.type==='plan'){if(q.kind==='square'){point(q.place);list(q.place.r);}if(q.kind==='wall')list(q.rad);
+      const A=q.kind==='quarter'?q.sts||[]:q.kind==='street'&&q.st?[q.st]:[];value(A.length);for(const st of A){poly(st.pts);value(st.hw||2);}}}
+  return V;
+}
+function castleFoundationSurveyToken(batch){ // one read per operation-local batch; commissioning invalidates that batch before another decision
+  const M=CASTLE_FOUNDATION_SURVEYS;if(batch?.world===W&&batch.token)return batch.token;
+  const read=castleFoundationSurveyRead(M.scratch);if(!read)return null;M.reads++;
+  if(M.world!==W||!M.read||read.length!==M.read.length||read.some((v,k)=>!Object.is(v,M.read[k]))){M.world=W;M.scratch=M.read||[];M.read=read;M.token={};}
+  if(batch?.world===W)batch.token=M.token;return M.token;
+}
+function castleFoundationFailedSite(s,spec,batch=null){
+  const M=CASTLE_FOUNDATION_SURVEYS;if(!M.on||!castleFoundationSurveyNative()||!Number.isSafeInteger(HASH_STAMP))return castleFoundationSite(s,spec);
+  const token=castleFoundationSurveyToken(batch);if(!token)return castleFoundationSite(s,spec);
+  const e=M.memory.get(s);if(e?.world===W&&e.token===token&&Object.is(e.w,spec.w)&&Object.is(e.d,spec.d)&&Number.isSafeInteger(HASH_STAMP+e.stamps)){
+    M.hits++;if(M.verify){const before=HASH_STAMP,q=castleFoundationSite(s,spec);if(q||HASH_STAMP-before!==e.stamps)throw new Error('First-castle failure certificate disagrees with fresh native survey');return q;}
+    HASH_STAMP+=e.stamps;return null; // the same discarded private-index queries advance the saved derived counter by the same amount
+  }
+  M.misses++;const before=HASH_STAMP,q=castleFoundationSite(s,spec),stamps=HASH_STAMP-before;
+  if(!q&&Number.isSafeInteger(stamps))M.memory.set(s,{world:W,token,w:spec.w,d:spec.d,stamps});else M.memory.delete(s);return q;
+}
+function castleFoundationProposal(s,si,batch=null){
   if(!castleFoundationAuthority(s)||s.siegeBy||!s._lay?.live?.keepFoundation||s.owner>0&&W.houses[s.owner].exiled||casKeep(s)||casRing(s)||(W.projects||[]).some(q=>q.type==='castle'&&!q.dead&&q.si===si))return null;
   const spec=castleFoundationSpec(s),recipe=typeof constructionTechnologyRecipe==='function'?constructionTechnologyRecipe(s,spec.stone>0?'masonry':'timber'):{laborFactor:1,timber:0},base=500*spec.w*spec.d/169*PL(),minR=Math.hypot(spec.w,spec.d)/2+13,minPer=64*minR*Math.sin(Math.PI/32),minLen=Math.max(0,minR-spec.d/2-2.2),lower=(base+wallCost(s,false,minPer)+minLen*0.8*PL())*recipe.laborFactor+(spec.timberTower+minPer*0.25+recipe.timber)*price(s,'timber')+spec.stone*price(s,'stone');if(purse(s.owner)<lower*1.25)return null;
   const seat=s===W.capital||s.owner>0&&W.settlements[W.houses[s.owner].seat]===s,V=townWorth(s)*(seat?1.6:1)+3000*casLvl(s),gain=(0.06*townThreat(s)+(seat?0.01:0))*V; // the existing ward's defence factor; a tower alone adds no circuit strength
-  if(gain<=lower)return null;const site=castleFoundationSite(s,spec);if(!site)return null;
+  if(gain<=lower)return null;const site=castleFoundationFailedSite(s,spec,batch);if(!site)return null;
   const per=circuitLen(site.ward),len=polyLen(site.path),timber=spec.timberTower+per*0.25+recipe.timber,stone=spec.stone,labour=(base+wallCost(s,false,per)+len*0.8*PL())*recipe.laborFactor,materialEstimate=timber*price(s,'timber')+stone*price(s,'stone');
   let landOpportunity=0;if(W.land?.mask){const cells=castleFoundationGround(site).cells,used=typeof occupiedGroundAreas==='function'?occupiedGroundAreas(cells):new Map();if(typeof occupiedGroundAreas!=='function')for(const i of cells)if(W.land.mask[i*4+2]!==255){const f=furlongAt(cellX(i%GRID),cellZ((i/GRID)|0));if(f)used.set(f,(used.get(f)||0)+225);}for(const[f,area]of used)landOpportunity+=landPrice(f)*Math.min(1,area/Math.max(1,f.area||20000));}
   const cost=labour+materialEstimate,net=gain-cost-landOpportunity;
   if(!(net>0)||purse(s.owner)<cost*1.25)return null;
   return {si,payer:s.owner,site,spec,x:site.f.x,z:site.f.z,timber,stone,labour,materialEstimate,landOpportunity,cost,gain,net,days:Math.ceil((60+per/15+spec.timberTower/2+stone/0.5+len/4)*recipe.laborFactor),title:'First keep and palisaded yard'};
 }
-function castleFoundationCommission(s,si){const Q=castleFoundationProposal(s,si);if(!Q)return null;
-  const q={...Q,type:'castle',...(typeof compoundEnsure==='function'?{compoundId:compoundEnsure(s,'castle',s.owner).id}:{}),start:day(),worked:0,done:0,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,dead:false,stalled:false};(W.projects||(W.projects=[])).push(q);if(q.compoundId)compoundOf(s,q.compoundId).stage='building';G.ordersDirty=true;
+function castleFoundationCommission(s,si,batch=null){const Q=castleFoundationProposal(s,si,batch);if(!Q)return null;
+  const q={...Q,type:'castle',...(typeof compoundEnsure==='function'?{compoundId:compoundEnsure(s,'castle',s.owner).id}:{}),start:day(),worked:0,done:0,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,dead:false,stalled:false};(W.projects||(W.projects=[])).push(q);if(batch)batch.token=null;if(q.compoundId)compoundOf(s,q.compoundId).stage='building';G.ordersDirty=true;
   emit(q.payer>0?'house':'trade',4,{x:q.x,z:q.z},`${q.payer>0?W.houses[q.payer].name:'The crown'} commissions a first keep and palisaded yard at ${s.name}, to be built in ${q.days} paid working days.`);return q;
 }
 function castleFoundationTick(q){
@@ -7929,6 +7986,9 @@ function drawCourt(b,put){
    goes forward as the purse allows: the householders bought out one by one, then the works; when it is done
    the town's own growth fills the new frontage. */
 const planCellOK=(x,z)=>{const ci=toCell(x),cj=toCell(z);if(!inB(ci,cj))return false;const i=cIdx(ci,cj);return !W.water[i]&&slopeAt(ci,cj)<0.35&&W.h[i]>1;}; // the same test the town's own builders use
+const CASTLE_FOUNDATION_SURVEY_CURRENT=()=>({castleFoundationSite,castleFoundationCentersPossible,castleFoundationSurveyRead,castleFoundationLandOK,castleFoundationGround,castleFoundationBoxMayHit,castleFoundationSegmentMayHitBox,planCellOK,slopeAt,hAt,riverAt,lakeAt,furlongAt,compoundGround,occupiedGroundCells,occupiedGroundFields,computeFurlongPoly,graveyardPolygonsOverlap,inPoly,inPolyXZ,fortContains,fortCircuits,fortCenter,casRing,wallRadAt,circuitLen,placeFitRadii,placeR,placeHit,serviceDoor,locW,obbCorners,obbOverlap,streetFootprintOverlap,dist2d,segDist,segSegDist,resample,lerpPt,lerp,clamp,toCell,cIdx,inB,cellX,cellZ,makeHash});
+const CASTLE_FOUNDATION_SURVEY_NATIVE=Object.freeze(CASTLE_FOUNDATION_SURVEY_CURRENT());
+const CASTLE_FOUNDATION_SURVEYS={on:true,verify:false,memory:new WeakMap(),world:null,read:null,scratch:[],token:null,hits:0,misses:0,reads:0}; // derived only; exact null answers plus private hash-query count, never saved
 const PLAN_YP=25; // years' purchase of a house's rent
 let planUI=null;
 const PLANB={street:{c:0xe0c070,loop:false,n:'Street'},square:{c:0x9ad0e0,loop:true,n:'Square'},wall:{c:0xd08a6a,loop:true,n:'Wall'},stopup:{c:0xb0a8a0,loop:false,n:'Stop up a street'},raze:{c:0xc07060,loop:false,n:'Pull down'}}; // (the old 'new quarter' grid is retired: streets are drawn one by one)
@@ -11652,11 +11712,11 @@ function tickLordPlayer(){ // what comes to a lord's table
 }
 
 function tickCastles(){ // decisions daily; only commissioned, paid projects change the castle
-  const ad=AD(),pending=new Set((W.projects||[]).filter(q=>!q.dead&&(q.type==='castle'||q.type==='compound'&&q.adapter==='castle')).map(q=>q.si));
+  const batch={world:W,token:null},ad=AD(),pending=new Set((W.projects||[]).filter(q=>!q.dead&&(q.type==='castle'||q.type==='compound'&&q.adapter==='castle')).map(q=>q.si));
   W.settlements.forEach((s,si)=>{if(!s._lay?.live||s.siegeBy||pending.has(si)||s.owner>0&&W.houses[s.owner]?.exiled)return;
-    if(!casKeep(s)&&!casRing(s)){if(castleFoundationAuthority(s))castleFoundationCommission(s,si);return;}
+    if(!casKeep(s)&&!casRing(s)){if(castleFoundationAuthority(s))castleFoundationCommission(s,si,batch);return;}
     const c=casOf(s),n=casNext(s,ad);c.next=n;if(!n||n.net<=0||purse(s.owner)<n.cost*1.25)return;
-    const P=castleCompoundProposal(s,si,n);if(!P)return;const C=castleCompound(s),q=compoundProjectCommission(s,C,P);if(!q)return;
+    const P=castleCompoundProposal(s,si,n);if(!P)return;const C=castleCompound(s),q=compoundProjectCommission(s,C,P);if(!q)return;batch.token=null;
     emit(s.owner>0?'house':'trade',3,casKeep(s)||casRing(s),`${s.owner>0?W.houses[s.owner].name:'The crown'} commissions ${q.title} at ${s.name}: ${q.days} paid working days.`);
   });}
 

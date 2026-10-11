@@ -35,6 +35,7 @@ function fixture({ad=1000,cash=10000,timber=0,stone=0,workers=true}={}){
     consumeOwnStock:(town,who,g,q)=>{const n=Math.min(q,town.stores[g]||0);town.stores[g]-=n;return n;},
     buyBuildingMaterial:(town,g,who,q)=>{const n=Math.min(q,reachable?Math.max(0,(who?.gold||0)-100):0);who.gold-=n;payments.push(['material',g,n]);return n;},
     buildWorks:(town,v,who,why)=>{const paid=workers>0?Math.min(v*workers,Math.max(0,who?.gold||0)):0;if(paid){who.gold-=paid;workersAccount.gold+=paid;}payments.push(['labour',why,paid]);return paid;},
+    castleFoundationFailedSite:(town,spec)=>ctx.castleFoundationSite(town,spec),
     castleFoundationSite:(town,spec,retained=null)=>{if(!reachable||!siteAvailable)return null;if(!retained)site.spec=spec;return retained||site;},
   });
   vm.runInContext([constructionMethods,declaration('constructionCapability'),...functions.map(declaration)].join('\n'),ctx);

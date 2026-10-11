@@ -7,7 +7,7 @@ import vm from 'node:vm';
 
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const fn=name=>{const hit=source.match(new RegExp(`^function ${name}\\b[\\s\\S]*?(?=^function |^const |^/\\*|$(?![\\s\\S]))`,'m'));assert.ok(hit,`missing ${name}`);return hit[0];};
-const REAL=['lerpPt','segDist','resample','obbCorners','obbOverlap','makeHash','streetFootprintOverlap','serviceDoor','locW','inPoly','lakeAt','wallRadAt','fortCenter','casRing','fortCircuits','fortContains','placeR','placeHit','placeFitRadii','furlongAt','castleFoundationLandOK','castleFoundationBoxMayHit','castleFoundationSegmentMayHitBox','circuitLen','castleFoundationSite'];
+const REAL=['lerpPt','segDist','resample','obbCorners','obbOverlap','makeHash','streetFootprintOverlap','serviceDoor','locW','inPoly','lakeAt','wallRadAt','fortCenter','casRing','fortCircuits','fortContains','placeR','placeHit','placeFitRadii','furlongAt','castleFoundationLandOK','castleFoundationCentersPossible','castleFoundationBoxMayHit','castleFoundationSegmentMayHitBox','circuitLen','castleFoundationSite'];
 function runtime({water=()=>false,ground=()=>true,field={dom:0,lord:-1,own:-1,wk:-1,jx:0,jz:0},street=null}={}){
   const s={pos:{x:0,z:0},radius:70,owner:0,buildings:[],streets:[],places:[],remnants:[],relicWalls:[]};
   const st=street||{kind:'lane',hw:2,pts:[{x:0,z:-100},{x:0,z:100}]};s.streets=[st];

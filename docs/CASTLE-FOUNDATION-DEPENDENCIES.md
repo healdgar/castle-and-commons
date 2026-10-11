@@ -1,0 +1,41 @@
+# First-castle survey dependency certificate
+
+The daily decision still recomputes current authority, exile/siege, existing castle and projects, local construction knowledge, real technology equipment recipe, actual material prices, lord's purse, threat, defended property value and expected benefit. Those are cheap eligibility guards before geometry. Only the geometry survey's **null answer** is remembered; a positive answer is never recalled, and an existing paid project's retained site is always freshly checked.
+
+`castleFoundationFailedSite` compares an exact ordered scalar certificate with `Object.is`. It uses no hash, day interval, retry clock, geometry revision counter or elapsed-time budget. `tickCastles` shares the read only within its synchronous operation, and invalidates that batch immediately after any foundation/compound commissioning adds a reserved site. A new daily operation rereads the native sources. Two reusable arrays avoid allocating the complete writer list every unchanged day. The memory and counters are derived objects outside `W`; checkpoint loading may leave them empty without changing the answer or saved hash counter.
+
+## Read and writer coverage
+
+| Native source | Values certified | Native changes that invalidate |
+| --- | --- | --- |
+| Survey constants and terrain | `SIZE`, `GRID`, `CELL`, `FN`, `FG`, `PLN`, every `W.h` and `W.water` sample | Map/terrain edits, earthworks modifying native heights, changed flood/water raster |
+| Furlong lattice and rights | Ordered `F`, `i/j/jx/jz`, `dom`, `lord`, whether canonical own/work owner exists, crofts; full mask's occupied (`B===255`) predicate | Survey/parcel changes, ownership or holding eligibility, crofts, any newly occupied/unoccupied native mask cell |
+| Settlement scope | Ordered settlements, position, radius, owner | Changed site reach, political owner or native position |
+| Buildings and churchyards | All standing native footprints: center, width, depth, rotation, polygon and toft; attached standing graveyard geometry | Same-count moves/rotation/extensions, title-ground/toft boundary edits, buildings completed/removed/ruined to gone, churchyard growth/removal |
+| Streets | All nongone nonedge lines and widths; local anchor visibility, planning, castle-path, quay/service flags | New/closed/moved/hidden streets, changed width or public access |
+| Defensive circuits | Actual ordered `fortCircuits`, centers (including `pos`), radial arrays and radius fallbacks | Native town/castle/motte/outer-curtain installation, removal, shape edits; `fortCircuits` inclusion changes |
+| Protected ground | Actual places' radial arrays, citadel dimensions, remnants, burg rings and relic-wall vertices | Place reshaping or reserved historic/defensive ground changes |
+| Water geometry | Each settlement's native lake polygon/level; actual river hash cell size, ordered cell keys and segment endpoints/half-width | Dam/pond or shoreline changes, native river-hash replacement or same-cell segment edits |
+| Roads and tracks | Actual `open || path` highway points; selected track keys and actual current graph endpoints | New paid highway/path geometry, native track creation/deletion or moved selected vertices |
+| Active reserved projects | Actual active type/kind/settlement; road routes, castle yard circle/approach, compound/fabric footprint polygons/boxes/rings/approaches, storage dimensions, clear radius, planned streets/quarters/places/wall radials | Commission/retirement, same-count retained geometry edits, any newly reserved or released ground |
+| Foundation query | Exact `spec.w/d`; the settlement is the weak-map key and world identity is checked | A different keep footprint or world replacement |
+
+The certified held-owner predicates deliberately follow `castleFoundationLandOK`: null or `-1` is unheld; any other canonical holder is held. Changing one held person into another does not change this geometry predicate. Financial consequences are still assessed by the current daily decision. Crop colors and unoccupied mask classifications do not affect the survey; only `B===255` does. Project payment/progress does not affect reservation geometry until its real project is removed, completed or edited. Wall damage and construction progress do not affect this survey's curtain clearance, which checks the native circuit shape.
+
+No spatial exclusion is assumed: the first implementation reads full native geometry, including remote records, so a distant building/road/parcel can move into the site without relying on a stale extent or writer counter. This conservatively invalidates some unrelated changes; future regional narrowing requires its own dependency proof.
+
+## Helper discipline
+
+`CASTLE_FOUNDATION_SURVEY_NATIVE` captures every surveyed geometry helper before boot or test overrides. A replaced helper bypasses memory. `tools/castle-foundation-memory.test.mjs` also pins each audited helper's source and core scalar helpers; a future source edit requires auditing this writer certificate before repinning. The certificate includes `computeFurlongPoly`, occupied raster intersections, `compoundGround`, native river lookup, and the complete containment, footprint, interpolation and resampling call graph.
+
+The cheap `castleFoundationCentersPossible` preflight visits exactly the same public frontage candidates and offsets as the authoritative survey. It rejects only if every center already fails the survey's necessary terrain, water or legal-ground predicates. On that path the old survey could not reach any private hash query, so it skips world index construction without changing `HASH_STAMP`.
+
+## Private hash stamps and checkpoint exactness
+
+The survey's `B.add` receives shallow `{...b}` copies of native buildings/churchyards. `H.add` receives newly allocated segment records. `B.near` and `H.near` stamp only those private top-level objects; references to native polygons or street records are read without stamping or mutation. `riverAt` reads the existing hash's `historyCells` directly rather than invoking its stamping `near`. Other helpers in this audited survey are read-only.
+
+A real failed survey records its exact `HASH_STAMP` increment. A certified recalled null advances the saved derived counter by the same amount. It does not restore the counter or discard old bookkeeping. Reuse is disabled if a native building's inherited `__hs` could be ahead of the current counter, or if a counter/delta cannot be represented as a safe integer. Thus discarded private queries cannot create stamp collisions in later native indexes, and clearing the transient memory after a checkpoint produces the same native graph and counter.
+
+## Evidence and limits
+
+The focused native fixture covers all writer categories, unchanged-count edits, cold memory, helper overrides, same full graph plus counter at repeated daily calls, fresh success after removing an obstruction, and a verification mode that checks recalled nulls against fresh native surveys. It uses a small fixed terrain and native geometry helpers without generation/rendering/long simulations. It does not establish the whole game's century throughput or checkpoint/worker equivalence. Root's serialized batch profile and full graph/RNG comparison remain the integration gate. `CASTLE_FOUNDATION_SURVEYS.on=false` provides the fresh-survey comparison; `.verify=true` reruns every recalled null and rejects a certificate or stamp-count disagreement.
