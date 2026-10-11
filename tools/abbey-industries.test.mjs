@@ -107,7 +107,7 @@ function ruralSetup(){const r=setup();r.eval(['obbCorners','obbOverlap','locW','
  let blocked=false,routeCalls=0;armyObstacle=()=>blocked;armySegmentClear=()=>!blocked;roadAccessClear=()=>!blocked;armyReach=()=>null;armyReachFrom=()=>false;armyReachClosed=()=>false;armyReachCovers=()=>false;armyReaches=()=>true;armyLandPath=(walker,P)=>{routeCalls++;return blocked?null:P;};
  const placed={near:()=>[]};s._lay.placed=placed;s._lay.segH={near:()=>s.streets.flatMap(st=>st.pts.slice(1).map((b,k)=>({a:st.pts[k],b,st,hw:st.hw})))};
  const base={key:'church',arch:'temple',tier:0,hm:1,accessMode:'abbey-rural',accessDonor:0,f:{x:200,z:0,w:12,d:22,rot:0}};
- `);return r;}
+ `);r.eval([constant('ABBEY_APPROACH_SURVEY_CURRENT'),constant('ABBEY_APPROACH_SURVEY_NATIVE')].join('\n'));return r;}
 
 test('rural abbey survey retains a paid long native approach and exempts only actual public surface',()=>{const r=ruralSetup();const cash=coins(r);r.eval(`const short=storageRoadPlan(s,base.f,s._lay.placed,s._lay.segH),site=abbeyApproachPlan(s,base,a.storageOwnerId),length=polyLen(site.path),recipe=abbeyApproachRecipe(s,site,{labour:120,days:360,timber:40,stone:0}),claim=abbeyApproachClaim(s,site,a);`);assert.equal(r.eval('short'),null);assert.ok(r.eval('length>150&&site.access.endpoint.kind===\"street\"&&site.access.endpoint.ref===0'));assert.ok(r.eval('abbeyApproachClear(s,site)'));assert.ok(r.eval('site.access.privatePolys.every(P=>P.every(p=>p.x>=3-1e-6))'));assert.ok(r.eval('site.access.land>0&&claim.ok&&claim.recipients.length===1&&claim.recipients[0].donated&&claim.recipients[0].due===0'));near(r.eval('recipe.labour'),120+r.eval('length')*.6);near(r.eval('recipe.days'),360+20+r.eval('length')/4);near(r.eval('recipe.timber'),40+r.eval('length')*.005);assert.equal(r.eval('W.projects.length'),0);near(coins(r),cash);});
 
@@ -138,3 +138,71 @@ test('later ranges may reach an actual completed paid rural alley with its retai
 
 
 test('ordinary craft premises refuse private abbey industry while public rooms and qualified recruitment remain available',()=>{const r=setup();building(r,'tannery');building(r,'mill','windmill');r.eval("const privateTanner=craftRoomQuote(s,H[2],'tanner'),privateMiller=craftRoomQuote(s,H[2],'miller');const eligible=abbeyIndustryCandidate(a,s,'tanner');const publicTannery={idx:20,s,arch:'tannery',state:'sound',ownerId:'crown',w:15,d:8};const publicMill={idx:21,s,arch:'windmill',state:'sound',ownerId:'crown',w:6,d:6};s.buildings.push(publicTannery,publicMill);const tanner=craftRoomQuote(s,H[2],'tanner'),miller=craftRoomQuote(s,H[2],'miller');const classroom={idx:22,s,arch:'hall',state:'sound',abbey:a.storageOwnerId,compoundKey:'school'}");assert.equal(r.eval('privateTanner'),null);assert.equal(r.eval('privateMiller'),null);assert.ok(r.eval('eligible===H[2]&&H[2].craft.qualified'));assert.ok(r.eval('tanner.b===publicTannery&&miller.b===publicMill'));assert.equal(r.eval('craftRoomValid(s,classroom,"carpenter")'),true);assert.equal(r.eval('btannery.craftMasters'),undefined);assert.equal(r.eval('bmill.craftMasters'),undefined);});
+
+
+test('operation bounds retain native polygon and rotated-footprint decisions at the tolerance boundary',()=>{
+ const r=ruralSetup();r.eval('const origin=obbCorners(0,0,2,2,0),A=abbeySurveyBounds(origin);');
+ for(const gap of [-.01,-0,0,.009999,.01,.010001,1,100]){
+  r.C.gap=gap;r.eval('var other=obbCorners(2+gap,0,2,2,0);');
+  const exact=r.eval('graveyardPolygonsOverlap(origin,other)'),broad=r.eval('abbeySurveyBoxesMayHit(A,abbeySurveyBounds(other))');
+  assert.equal(r.eval('abbeySurveyBoxesMayHit(A,abbeySurveyBounds(other))&&graveyardPolygonsOverlap(origin,other)'),exact,`polygon gap ${gap}`);
+  if(gap<=.01)assert.equal(broad,true,`retain boundary ${gap}`);
+ }
+ for(const rot of [0,Math.PI/8,Math.PI/4,Math.PI/2,Math.PI])for(const gap of [-.000001,0,.000001,.009999,.01,.010001,10]){
+  r.C.rot=rot;r.C.gap=gap;r.eval(`var building={x:100,z:100,w:8,d:12,rot},c=Math.cos(rot),sn=Math.sin(rot),g={a:{x:100+(4+1.6+gap)*c-30*sn,z:100-(4+1.6+gap)*sn-30*c},b:{x:100+(4+1.6+gap)*c+30*sn,z:100-(4+1.6+gap)*sn+30*c},hw:1.3};`);
+  assert.equal(r.eval('abbeySurveyBoxesMayHit(abbeySurveyBounds([g.a,g.b]),abbeySurveyBounds(obbCorners(building.x,building.z,building.w,building.d,building.rot)),Math.SQRT2*1.6)&&streetFootprintOverlap(building,g,.3)'),r.eval('streetFootprintOverlap(building,g,.3)'),`rotated ${rot}/${gap}`);
+ }
+ assert.equal(r.eval('abbeySurveyBounds([{x:NaN,z:0}])'),null);
+ for(const bad of ['null','{minX:NaN,maxX:1,minZ:0,maxZ:1}','{minX:-Infinity,maxX:1,minZ:0,maxZ:1}'])assert.equal(r.eval(`abbeySurveyBoxesMayHit(A,${bad})`),true);
+ assert.equal(r.eval('abbeySurveyBoxesMayHit(A,A,-1)'),true);
+});
+
+test('fresh synchronous survey agrees with unfactored native checks for pending, graveyard and current mutations',()=>{
+ const r=ruralSetup();r.eval(`const site=abbeyApproachPlan(s,base,a.storageOwnerId),fastBounds=abbeySurveyBoxesMayHit,nativeReserved=castleFoundationReserved;
+  const obstruction={x:100,z:60,w:8,d:8,rot:Math.PI/4,state:'sound'},grave={poly:obbCorners(90,70,6,6,0)},pending={type:'compound',si:0,site:{path:[{x:80,z:60},{x:120,z:60}]}};
+  obstruction._graveyard=grave;s.buildings.push(obstruction);W.projects.push(pending);`);
+ const compare=label=>{const fast=r.eval('abbeyApproachClear(s,site)');r.eval('castleFoundationReserved=(...args)=>nativeReserved(...args)');assert.equal(r.eval('abbeyApproachSurvey(s).native'),false);const cold=r.eval('abbeyApproachClear(s,site)');r.eval('castleFoundationReserved=nativeReserved');assert.equal(fast,cold,label);return fast;};
+ assert.equal(compare('remote native items'),true);
+ r.eval('pending.site.path[0].z=pending.site.path[1].z=12.2');assert.equal(compare('live project enters corridor'),false);
+ r.eval('pending.dead=true');assert.equal(compare('dead project releases native reservation'),true);
+ r.eval('obstruction.z=12.2');assert.equal(compare('standing rotated footprint'),false);
+ r.eval('obstruction.removed=true');assert.equal(compare('removed building no longer blocks'),true);
+ r.eval('obstruction.removed=false;obstruction.z=60;grave.poly=obbCorners(90,12.2,6,6,0)');assert.equal(compare('native active graveyard'),false);
+ r.eval('grave.removed=true');assert.equal(compare('removed graveyard'),true);
+ r.eval('street.hidden=true');assert.equal(compare('actual endpoint lost'),false);
+ r.eval('street.hidden=false;const retained=abbeyApproachSurvey(s);castleFoundationReserved=()=>true');assert.equal(r.eval('abbeyApproachClear(s,site,undefined,retained)'),false,'replaced native predicate disables an existing operation context');r.eval('castleFoundationReserved=nativeReserved;site.path[1].x=NaN');assert.equal(compare('invalid retained geometry'),false);
+});
+
+test('distant pending geometry avoids native distance work without changing the paid route or polygon order',()=>{
+ const r=ruralSetup();r.eval(`const site=abbeyApproachPlan(s,base,a.storageOwnerId),fastBounds=abbeySurveyBoxesMayHit;
+  for(let k=0;k<120;k++)W.projects.push({type:'compound',si:0,site:{f:{x:1500+k*3,z:1800+k*2,w:8,d:12,rot:k*.1},path:[{x:1500+k*3,z:1800+k*2},{x:1510+k*3,z:1800+k*2}]}});
+  const nativeHypot=Math.hypot;let distanceCalls=0;Math.hypot=(...args)=>{distanceCalls++;return nativeHypot(...args)};
+  const clear=abbeyApproachClear(s,site),fast=distanceCalls;distanceCalls=0;abbeySurveyBoxesMayHit=()=>true;
+  const reference=abbeyApproachClear(s,site),unbounded=distanceCalls;abbeySurveyBoxesMayHit=fastBounds;Math.hypot=nativeHypot;
+  const privateFast=JSON.stringify(abbeyApproachPrivate(s,site.path));abbeySurveyBoxesMayHit=()=>true;const privateReference=JSON.stringify(abbeyApproachPrivate(s,site.path));abbeySurveyBoxesMayHit=fastBounds;`);
+ assert.equal(r.eval('clear'),r.eval('reference'));assert.ok(r.eval('clear&&unbounded>10000&&fast<unbounded/10'));
+ assert.equal(r.eval('privateFast'),r.eval('privateReference'));
+});
+
+test('physical-grant preflight preserves short native access queries and refuses before remote pathfinding',()=>{
+ const r=ruralSetup();r.eval(`const accessNative=institutionFoundationAccess;let prefixCalls=0,legalCalls=0;institutionFoundationAccess=(...args)=>{prefixCalls++;return accessNative(...args)};
+  const noGrant=abbeyApproachPlan(s,base,a.storageOwnerId,undefined,undefined,()=>{legalCalls++;return false});`);
+ assert.equal(r.eval('noGrant'),null);assert.equal(r.eval('prefixCalls'),1);assert.equal(r.eval('legalCalls'),1);assert.equal(r.eval('routeCalls'),0);
+ r.eval('const legal=abbeyApproachPlan(s,base,a.storageOwnerId,undefined,undefined,()=>true)');assert.ok(r.eval('legal&&abbeyApproachClear(s,legal)&&routeCalls>0'));
+});
+
+
+test('own mill preflight carries actual wheel ground and rejects lost grant or power before remote routing',()=>{
+ const r=ruralSetup();lay(r,0,'miller');lay(r,1,'ploughman');lay(r,2,'ploughman');
+ const method=source.slice(source.indexOf('    compoundSite(site,'),source.indexOf('    fabricSite(site,'));assert.ok(method.includes('surveyContext,groundLegal'));
+ const arches=source.match(/^const ARCH=\{[\s\S]*?^\};/m)?.[0];assert.ok(arches);
+ r.eval(arches);r.eval(`const fits=()=>true;s._lay.live.compoundSite=({${method}}).compoundSite;
+  const bank={x:200,z:0,w:9,d:9,rot:0,arch:'mill',millWater:{x:180,z:0,y:2,kind:'river',side:0}};millBankSites=()=>[bank];
+  s.river=true;delete s.technology.adopted.windmill;f.area=10000;W.land.perHead=5000;a.workArea=f.area;a.workRatio=1;a.workingHands=3;s._gYield=.001;
+  let grantOK=false,waterOK=true;occupiedGroundFields=()=>new Set(grantOK?[f]:[privateField]);const nativeRiver=riverAt;riverAt=(...args)=>waterOK?nativeRiver(...args):null;
+  const nativeGround=abbeyGroundOwned;let sawWheel=false;abbeyGroundOwned=(owner,site)=>{sawWheel ||= site.polys?.length===1&&site.polys[0].some(p=>p.x===179);return nativeGround(owner,site)};
+  const unowned=abbeyMillPlan(a,s);`);
+ assert.equal(r.eval('unowned'),null);assert.equal(r.eval('routeCalls'),0);assert.equal(r.eval('sawWheel'),true);
+ r.eval('grantOK=true;waterOK=false;const dry=abbeyMillPlan(a,s)');assert.equal(r.eval('dry'),null);assert.equal(r.eval('routeCalls'),0);
+ r.eval('waterOK=true;const powered=abbeyMillPlan(a,s)');assert.ok(r.eval('powered&&powered.site.millWater===bank.millWater&&powered.site.polys.length===1&&routeCalls>0'));assert.ok(r.eval("powered.site.arch==='mill'&&powered.ownerId===a.storageOwnerId&&powered.requires.join(',')==='church,grange'"));
+});
