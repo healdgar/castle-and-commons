@@ -1,6 +1,6 @@
-# Abbey institutions: first operative slice
+# Abbey institutions and distinct order policies
 
-The first adapter is Cistercian, available through `institutionalCapability` from 1128. This follows the accepted rules in `SYSTEMS.md` decisions 1–2 and 12: granted marginal ground, self-worked granges, actual lay brothers/sisters and hired households, wool, fish, alms and hospitality. Benedictine and Augustinian policies remain separate follow-on adapters; their calendar entries do not yet enable founding controls. The 850 and 1066 starts do not create anachronistic Cistercians.
+The first adapter is Cistercian, available through `institutionalCapability` from 1128. This follows the accepted rules in `SYSTEMS.md` decisions 1–2 and 12: granted marginal ground, self-worked granges, actual lay brothers/sisters and hired households, wool, fish, alms and hospitality. Benedictine houses are available from 850 and Augustinian canons from 1100, through the same technology eligibility and genuine funded founding path. Those orders accept unheld cultivated demesne and may receive the landlord title of an existing lease; its actual tenant retains the work right and customary crop share. Cistercians retain their marginal-land and no-rent rules. The 850 and 1066 starts do not create anachronistic Cistercians.
 
 ## Canonical records and conservation
 
@@ -20,7 +20,9 @@ Real customary dates retain their cadence: the settlement market day handles she
 
 ## Native compound and water operations
 
-Church, residence, grange and guest house/almonry use the shared paid compound project engine and exact fixed native building/access geometry. Required materials are real owner stock or native purchases, and work advances only with actual wages. Abbey churches are distinct from the parish church and do not claim a parish churchyard. Canonical buildings supply storage and housing; the compound owns neither a second capacity nor another inventory.
+Church, residence, grange and guest house/almonry use the shared paid compound project engine and exact fixed native building/access geometry. Required materials are real owner stock or native purchases, and work advances only with actual wages. Abbey churches are distinct from the parish church and do not claim a parish churchyard. Daily vacancy letting preserves the corporate title and selects an actual household for a lease only when its expected retained crop supports that household. Generic crop production includes leased fields, with native ownership splitting the real crop between tenant and abbey. Only fields whose native owner and worker are both the abbey enter the self-worked crop pass; granted tenant fields never become an invented lay workforce.
+
+Canonical buildings supply storage and housing; the compound owns neither a second capacity nor another inventory.
 
 A fishpond is a paid contained river reservoir in canonical `s.lake`, only where the settlement has no existing reservoir. The entire retained pond/dam footprint must be granted, terrain must close the water, and no native road/building may be flooded. Completion consumes an actual purchased fish stocking input. Output waits a full growing year and requires today's actual paid fisher; drought and winter affect it. Fish remains the existing native commodity. Initial throughput is an explicit game calibration, not a claim about historical load weights. The pond reuses native masks, route fingerprints, minimap, water surface and dam drawing, with a dedicated worker-to-render hydraulic dirty flag. Its component references the same lake and carries no store or capacity.
 
@@ -30,9 +32,9 @@ Charity gives only actual grain above the institution's annual food reserve. Cor
 
 ## Remaining continuation
 
-Distinct Benedictine/Augustinian land/rent/tithe policies and valid earlier institutions, wider Church holders/courts/payments, funded schooling, forward contracts, order discipline/mother-daughter obligations beyond the funded journey, and additional pond/fishery forms are subsequent planned slices. This first slice does not claim those systems complete. In particular, one canonical reservoir per settlement is the existing hydraulic limit; it does not fabricate multiple decorative ponds.
+Parish tithe appropriation, wider Church holders/courts/payments, funded schooling, forward contracts, order discipline/mother-daughter obligations beyond the funded journey, and additional pond/fishery forms are subsequent planned slices. This first slice does not claim those systems complete. In particular, one canonical reservoir per settlement is the existing hydraulic limit; it does not fabricate multiple decorative ponds.
 
-The focused `tools/abbeys.test.mjs` checks actual native accounts, titles, stocks, mouth/population conservation, admission, paid work, pond stocking and delay, wool sales, charity, corrodies and observational projection. Full native founding/site generation, worker history/save and multi-year integration tests are serialized by the root agent.
+The focused `tools/abbeys.test.mjs` additionally verifies the earlier order dates and that a manorial house receives only the actual native landlord crop share while the actual tenant retains the remainder. It checks actual native accounts, titles, stocks, mouth/population conservation, admission, paid work, pond stocking and delay, wool sales, charity, corrodies and observational projection. Full native founding/site generation, worker history/save and multi-year integration tests are serialized by the root agent.
 
 Personal status integration: native abbey admission rejects an actual unfree
 person until the origin claimant has released that person through #42. A
