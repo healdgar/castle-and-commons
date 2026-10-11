@@ -42,7 +42,7 @@ The running consumers are:
   household horse teams. Native field and herd quantities bound the effect.
   The model has no clay-soil classification; it applies a general operational
   plough benefit, rather than claiming a soil-specific mechanism.
-- A sound paid watermill, completed saw/hammer/fulling/paper equipment and a
+- A sound watermill or paid windmill, completed saw/hammer/fulling/paper equipment and a
   present actual miller are all required. Per-use fees pay the real operator
   and entitled mill holder. One miller's day is shared between these powered
   services. A missing operator, purse, material or paid installed machine
@@ -86,8 +86,24 @@ must stay out of visual DTOs. Worker queries return scalar receipts, method
 names and native IDs. Existing native project progress/title can be reported
 without these graphs.
 
-Limits: paid windmill siting/grinding, explicit port quarantine, real canal
-locks and machine-specific guild resistance still require native clients.
+Paid post-windmills require adopted knowledge (1185), a real qualified native
+miller, an exposed actual retained site, paid land/access and a fixed timber
+recipe through native foundation work. Daily weather and actual terrain exposure
+bound grinding. Actual operator work shares the finite powered mill day;
+`technologyGrindingReceipt` retains canonical operator/title-holder claims
+until crop distribution, so later deaths or title changes do not erase earned
+receipts. Only actually ground crop bears multure. Native grain service payments
+go directly to its real present operator and entitled holder, with no anonymous
+miller pool. The former free mill crop-yield multiplier is removed. The existing
+windmill visual still uses its old tower mesh; post-mill geometry is a rendering
+follow-up.
+
+Private additional mill fields are `grindingClaims`, `grindingPending`,
+`grindingWorked`, `grindingOperator`, `multureWorked` and `grindingCash`: actual
+earned grain/service claims and canonical actors, never visual state.
+
+Limits: explicit port quarantine, real canal locks and machine-specific guild
+resistance still require native clients.
 Army splits partition actual individual holders and divide their paid recipe
 provenance; one siege engine remains in the original army unless explicitly
 moved. Its method and generic engine alias share the same canonical record.
@@ -100,7 +116,7 @@ Equipment has no separate wear stock; native site/owner/operator loss already
 stops its use. No simulation-century throughput or economy calibration claim
 follows from these focused fixtures.
 
-Light evidence: extracted inline JavaScript syntax and thirteen focused cases in
+Light evidence: extracted inline JavaScript syntax and eighteen focused cases in
 `tools/equipment.test.mjs`, covering both native commodity ledgers, material and
 coin conservation, paid completion, actual exclusivity and current wages,
 finite mill work, held animal teams, paid paper/printing, native army holders,

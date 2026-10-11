@@ -142,7 +142,7 @@ Local adoption alone changes none of these quantities.
 | Funded universities, paper, spectacles, clocks, printing | Actual masters, pupils and rooms; paper has one commodity ledger and printed lessons consume purchased sheets |
 | Rudder, cog, compass, charts, carrack | Paid actual boatman equipment changes his real native trip time/freight; native cargo limits and wreck rules are unchanged |
 | Crossbow, longbow, plate, ram, trebuchet, cannon | Paid actual army recipe and recorded living holders; `technologyArmyEquipmentFactor` is the battle/siege adapter contract |
-| Post windmill | Still requires a paid suitable native mill site and actual grinding/multure consumer |
+| Post windmill | Paid native retained exposed site/approach, real timber and crew; present native master grinding shares finite mill time, actual earned multure and cash service receipts |
 | Numerals, bills, double entry | Finance clients must use actual clerk/merchant claims; no simulated accounting errors or free remote payments |
 | Quarantine, canal lock | Still require actual port closure or paid native canal/lock operations |
 
