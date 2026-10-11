@@ -2504,8 +2504,12 @@
     "internal_order": [
       {
         "phase": "tickEconomy",
-        "first": "tickTechnology",
-        "reads": "Prior staffing/paid support, current arrivals/contacts, canonical purses and land; discovery/local adoption precede current production."
+        "first": [
+          "tickLearning",
+          "tickTechnology",
+          "tickCrafts"
+        ],
+        "reads": "Actual paid teachers, pupils and equipment, current adoption and canonical employment before current production. Independent masters remain available to construction; employed journeymen, teachers, abbey and estate staff cannot take a second full job."
       },
       {
         "phase": "tickJustice",
@@ -2520,13 +2524,36 @@
         "after": "folkIndex",
         "then": "freedomPrepare",
         "reads": "Only unknown actual people receive personal status; prior personal bonds remain independent of current tenure."
+      },
+      {
+        "phase": "tickGovernment",
+        "first": [
+          "tickLordJourneys",
+          "tickCredit",
+          "benchSession",
+          "tickEstates"
+        ],
+        "reads": "Current real whereabouts, dated claims, actual consent and funded officers; credit settlements precede current judicial recovery."
+      },
+      {
+        "phase": "tickAbbeyWork",
+        "first": "churchWork",
+        "reads": "Today\u2019s actual bishop/chapter/vicar service precedes crop and marriage/estate use; unsupported service gives no appropriation."
+      },
+      {
+        "phase": "tickChurches",
+        "closing": "tickChurchBodies",
+        "reads": "Actual parish closed receipts and titles fund assessments, fabric and separate domestic/foreign remittances; appointments become available for paid service next day."
       }
     ],
     "new_phase_sources": {
       "tickAbbeyWork": "Current canonical membership, actual paid staff, fed hands and self-worked area; no duplicate ordinary crop allocation.",
       "tickAbbeyMeals": "Actual corporate held/sale food into existing member/corrody household pantries, before one native meal.",
-      "tickAbbeys": "Actual grants, endowments, admission, charity, saved compound commissions and due order visits after upkeep; new work starts next day."
+      "tickAbbeys": "Actual grants, endowments, admission, charity, saved compound commissions and due order visits after upkeep; new work starts next day.",
+      "tickEstateWork": "Current titled fields/live ecology and actual paid keepers, before production/storage; no meat/fish or skill from a display read.",
+      "tickEstateProjects": "Current actual receipts, costs, adopted methods, retained public access and native titled ground; paid compound commissions start next day."
     },
-    "pending": "Combined native speed/save/worker/conservation/drawing validation."
+    "pending": "Combined native speed/save/worker/conservation/drawing validation.",
+    "integration_source": "Current isolated batch based on 00c7f14; native release gates pending"
   }
 }

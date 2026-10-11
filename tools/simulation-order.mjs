@@ -7,7 +7,8 @@ import {inlineGameScript} from './simulation-boundary.mjs';
 
 export function dailyDispatch(html){
   const source=inlineGameScript(html),ast=acorn.parse(source,{ecmaVersion:'latest'});
-  const functions=new Map(ast.body.filter(n=>n.type==='FunctionDeclaration').map(n=>[n.id.name,n]));
+  const declarations=ast.body.filter(n=>n.type==='FunctionDeclaration'),functions=new Map();
+  for(const n of declarations){if(functions.has(n.id.name))throw Error('Duplicate simulation function: '+n.id.name);functions.set(n.id.name,n);}
   const tick=functions.get('simTick');if(!tick)throw Error('No master tick');
   const phases=[];const walk=(node,depth=0)=>{if(!node?.type)return;
     if(node.type==='CallExpression'&&node.callee.name==='simPart'){

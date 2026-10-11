@@ -30,6 +30,8 @@ test('dependency review detects a misplaced consumer and a repeated or omitted p
   assert.ok(validateDailyOrder({...dispatch,phases:wrong},contract).some(e=>e.includes('Wrong phase callback: tickMilitary')));
 });
 
+test('dependency survey rejects a silent top-level function replacement',()=>{assert.throws(()=>dailyDispatch(html.replace('function simTick(){','function tickEstateProjects(){}\nfunction simTick(){')),/Duplicate simulation function: tickEstateProjects/);});
+
 for(const commodity of [false,true])test(`delivery pays the real driver and supplies meals before new loads (${commodity?'balances':'lots'})`,()=>{
   const r=realm({commodity,households:2,grain:10,fish:0,cash:20,crown:100});
   r.eval(`W.clock={day:36};day=()=>W.clock.day;W.roads=[];W.caravans=[];W.armies=[];
