@@ -168,7 +168,18 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // abbey-industries fixtures cover a public-core tenant refusal, real freeholder
  // payment once, lawful succession, deceased donor before/after paid permission,
  // separate building grant, fixed-footprint drift and actual road replacement.
- assert.equal(digest(source.slice(a,b)),"676e0eba8c5c3c1f2d8ef8e8c4a529928ea5b5252076b1e850cbdf90eee102c0");
+ // Synchronous survey optimization (reviewed e2fa455..cd82178): this region
+ // changes only the two rural-payment guards from q.site.accessMode to optional
+ // q.site?.accessMode; normal retained sites pay the identical native recipients
+ // before identical material/work operations. No quantity/title/claim writer or
+ // payment order changes. The additional survey contexts live only in a proposal,
+ // hold current geometry and lazily derived public polygons, and are discarded;
+ // no context is installed on W, a site, project or presentation record.
+ // Native geometry function identity certifies the optimized path; replaced
+ // predicates retain original unfactored checks. Existing Abbey industry fixtures
+ // cover near-boundary rotated geometry, fresh pending/yard mutations, original
+ // fallback, ordered private polygons and grant/water preflight before routing.
+ assert.equal(digest(source.slice(a,b)),"e2bc35507ce12162b84cf8f288f3882a096887dd9f712acd164a07eb13fb4602");
  // This explicit worker inspector copies existing balances. Pin the entire line
  // before excluding it so a future mutation cannot hide behind the read exemption.
  const inspectorLine=source.split('\n').find(l=>l.trim().startsWith("if(kind==='household'){const h=W.households.get(payload.id);"));
@@ -212,6 +223,10 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // scalar offer identity/status/dates, genuine quoted service terms, actual paid
  // travel/board and copied refusal reasons. Its existing _owners read is unchanged;
  // no external ownership writer or inspector exemption is added.
+ // e2fa455..cd82178 leaves this outside corpus byte-identical. The frozen
+ // ABBEY_APPROACH_SURVEY_NATIVE constant holds geometry function identities,
+ // not native account/state/stock; it adds no corpus exemption. The pure geometry
+ // contexts and unchanged public projection require no private-field expansion.
  assert.equal(digest(outside),"ccf4ba853e32b844c98cf2e7767ac540e42205e29353e17410f6f12a2319092c");
  assert.equal((source.match(/storageTitleDirty\(/g)||[]).length,3);
 });
