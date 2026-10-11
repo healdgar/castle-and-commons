@@ -110,3 +110,8 @@ test('native grain service pays its actual present operator and entitled holder 
 test('earned grinding claims retain their actual operator and entitled holder through later succession',()=>{
   const f=fixture();f.W.weather={state:'clear'};f.rooms[1].ownerId=f.H[5].id;f.eval('technologyGrindingDay(s,4)');const worked=f.s.mill.grindingPending;f.H[2].dead=true;f.rooms[1].ownerId=f.H[0].id;f.rooms[1].state='ruin';const R=f.eval('technologyGrindingReceipt(s,10)');near(R.worked,worked);assert.equal(R.rows[0].operator,f.H[2]);assert.equal(R.rows[0].holder,f.H[5]);assert.equal(f.s.mill.grindingClaims.length,0);
 });
+
+
+test('immediate abbey grinding uses remaining actual operator time without draining family crop claims',()=>{
+  const f=fixture();f.W.weather={state:'clear'};f.eval('technologyGrindingDay(s,1)');const family=f.s.mill.grindingPending;const R=f.eval('technologyGrindingDay(s,10,false)');assert.ok(R.worked>0);near(f.s.mill.grindingPending,family);const ordinary=f.eval('technologyGrindingReceipt(s,10)');near(ordinary.worked,family);
+});

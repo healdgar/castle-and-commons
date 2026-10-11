@@ -92,7 +92,9 @@ recipe through native foundation work. Daily weather and actual terrain exposure
 bound grinding. Actual operator work shares the finite powered mill day;
 `technologyGrindingReceipt` retains canonical operator/title-holder claims
 until crop distribution, so later deaths or title changes do not erase earned
-receipts. Only actually ground crop bears multure. Native grain service payments
+receipts. Only actually ground crop bears multure. Actual self-worked abbey crop uses
+`technologyGrindingDay(s,q,false)` for its immediate distribution; this spends
+the same remaining operator day without draining unrelated family crop claims. Native grain service payments
 go directly to its real present operator and entitled holder, with no anonymous
 miller pool. The former free mill crop-yield multiplier is removed. The existing
 windmill visual still uses its old tower mesh; post-mill geometry is a rendering
@@ -116,7 +118,7 @@ Equipment has no separate wear stock; native site/owner/operator loss already
 stops its use. No simulation-century throughput or economy calibration claim
 follows from these focused fixtures.
 
-Light evidence: extracted inline JavaScript syntax and eighteen focused cases in
+Light evidence: extracted inline JavaScript syntax and nineteen focused cases in
 `tools/equipment.test.mjs`, covering both native commodity ledgers, material and
 coin conservation, paid completion, actual exclusivity and current wages,
 finite mill work, held animal teams, paid paper/printing, native army holders,
