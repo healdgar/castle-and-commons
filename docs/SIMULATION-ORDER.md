@@ -228,12 +228,12 @@ refusal reasons and annual/lifetime counters remain worker state and detached
 inspector output. This intentionally adds the accepted own-use mechanics and
 changes affected histories; same-speed/history/save discipline still applies.
 
-The assembled static review at `cd82178` retains 59 phases and 200 edges;
+The assembled static review at `972beba` retains 59 phases and 200 edges;
 `simTick` is byte-identical to its parent candidate. All 39 own-use-industry pins
 match exact AST declaration slices. This survey change renews only the existing
 `abbeySitePlan`, `abbeyMillPlan` and founding-quote pins, and separately records
 the nine changed and six new survey/dispatcher/layout bodies. The recognized
-legacy search inventory contains 417 sites across 1422 reported functions:
+legacy search inventory contains 417 sites across 1423 reported functions:
 191 building, 73 street, 49 folk and 16 owner collection scans; 35 `heads_`,
 22 `workers_`, 16 `headsOf` helper calls and 15 unscoped entries. Four additional
 recognized occurrences cover the ordered geometry snapshot, public strips,
@@ -259,6 +259,25 @@ outside history/save roots and later fills the same fixed coefficients.
 These changes carry no old-model 150-day identity claim. The JSON records the
 exact source and dependency review separately from historical evidence and
 the current source's pending native speed/save/conservation gates.
+
+The later route adapter shares ghost-free terrain edges, native scope/circuit
+lists and certified flood banks only inside that proposal. Its 51-function
+identity certificate and current world/place/owner/day/size/cell/placed checks
+guard reuse. Each candidate pose keeps a fresh ghost-edge memo; its current
+ghost still uses the native interpolation and strict rotated footprint test.
+First ghost rejection keeps the original paid-road query prefix, while signed
+zero, off-lattice or long spans use the original segment loop. Floods speak for
+another door only after native closure, first-step and search-box certificates.
+Changed inputs supply neither shared terrain nor shared banks.
+
+This context stays on local service walkers and returns only ordinary
+path/street results. Host route recall accepts no `_em`, `settlement` or
+`placed`, and its own temporary memo carries no `abbeyTerrain`; the added
+`armySegmentClear` branch introduces no ordinary host-memory input. Only that
+fixture pin changes. The JSON records the three changed and five new bodies,
+the separate certificate, and one added transitive-search function without
+changing any of the 417 recognized site counts. Current-source generated
+performance and native release gates remain coordinator work.
 
 Foreign population/food and current recruitment run first inside
 `tickExpeditions`, before that phase's actual campaign combat. Recruitment is

@@ -565,5 +565,13 @@
     "recognizedSites": 417,
     "reportedFunctionsWithDirectOrTransitiveSearches": 1422,
     "scope": "Only these four additional recognized occurrences are inventoried. Existing key order and all unrelated limits are retained; no broad regeneration, cross-day permission cache or measured performance/old-model identity claim."
+  },
+  "reviewedProposalRouteReuse": {
+    "sourceCommit": "972beba59615cbded06f491fb83386e3f2d0ec28",
+    "indexSHA256": "6f6338d102abce2ef8599017efb22b6bb537976414e268c3c4c316f3f3eb0826",
+    "recognizedSites": 417,
+    "reportedFunctionsWithDirectOrTransitiveSearches": 1423,
+    "newRecognizedSiteOccurrences": 0,
+    "scope": "Existing recognized counts and key order are unchanged. The five new proposal-local helpers add one function with a transitive search, using native domain scopes/circuit lists and current paid-road queries once per actual edge. The context is not retained between proposals or copied into W/site/project; each ghost pose retains its own edge memo and all current legal/payment queries stay native."
   }
 }
