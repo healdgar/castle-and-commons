@@ -8375,7 +8375,7 @@ function planProjectPayer(q){return q.account?accountOwner(q.account):q.payer>0?
 function planGroundQuote(site){let total=0;for(const[f,area]of occupiedGroundAreas(compoundGround(site).cells))total+=landPrice(f)*Math.min(1,area/Math.max(1,f.area||20000));return total;}
 function planProjectCommission(D,payer,account){
   const s=W.settlements[D?.si],L=s?._lay?.live;if(!D?.ok||!s||!L||s.owner!==payer||!Number.isFinite(D.works)||!(D.works>0)||!Number.isFinite(D.days)||!(D.days>0))return null;
-  const q={type:'plan',kind:D.kind,si:D.si,payer,account:account?accountOwner(account):null,title:D.title,hit:(D.hit||[]).slice(),start:day(),worked:0,done:0,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,status:'building',stage:'build',stalled:false,dead:false,automatic:!!D.automatic};
+  const q={type:'plan',kind:D.kind,si:D.si,payer,account:account?accountOwner(account):null,title:D.title,hit:(D.hit||[]).slice(),start:day(),worked:0,done:0,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,status:'building',stage:'build',stalled:false,dead:false,automatic:!!D.automatic,newTown:!!D.newTown};
   if(D.kind==='street'){q.st=L.planStreet(D.pts,true,D.hw,true);q.site={path:q.st.pts,pathWidth:q.st.hw*2};}
   else if(D.kind==='quarter'){q.sts=D.grid.map(P=>L.planStreet(P,true,undefined,true));q.site={paths:q.sts.map(st=>st.pts),pathWidth:6};}
   else if(D.kind==='stopup'){q.st=D.st;q.keep=D.keep;q.cut=D.pts;q.site={path:D.pts,pathWidth:(D.st.hw||3)*2};}
@@ -11949,7 +11949,7 @@ function tickPlan(q){ // the retained site, named receipts, materials and actual
   if(!progress.paid&&!progress.complete){stall(progress.reason||'workers');return;}q.stalled=false;q.status='building';q.reason=null;G.ordersDirty=true;if(!progress.complete)return;
   const final=planProjectValidate(q,s);if(!final.ok||!s._lay.live.planSite(q,'complete')){stall(final.reason||'site-obstructed');return;}
   const L=s._lay.live,who=q.payer>0?W.houses[q.payer]:null;let t='';
-  if(q.kind==='street'){q.st=L.planOpen(q.st);q.st.groundClaim=q.groundClaim;const names=['New Street','Broad Street','Lord Street','Bridge Street','High Cross','Sheep Street','Castle Street','Church Lane'];q.st.name=names[randi('sim',names.length)];t=`${q.st.name} is open at ${s.name}; its frontage is available for paid houses`;}
+  if(q.kind==='street'){q.st=L.planOpen(q.st);q.st.groundClaim=q.groundClaim;const names=['New Street','Broad Street','Lord Street','Bridge Street','High Cross','Sheep Street','Castle Street','Church Lane'];q.st.name=q.newTown?'New Town Street':names[randi('sim',names.length)];if(q.newTown)q.st.neu=true;t=`${q.st.name} is open at ${s.name}; its frontage is available for paid houses`;}
   else if(q.kind==='raze'||q.kind==='razewall'){for(const c of q.cuts||[])razeWall(s,c.ks,c.circuit);G.detDirty=true;t=`The works at ${s.name} are pulled down where the plan ran; the gaps stand open`;}
   else if(q.kind==='stopup'){L.stopUp(q.st,q.keep);t=`${q.st.name||'The lane'} at ${s.name} is stopped up${q.keep.length?' where the brush ran':''}`;}
   else if(q.kind==='quarter'){q.sts=q.sts.map(st=>L.planOpen(st));for(const st of q.sts)st.groundClaim=q.groundClaim;t=`The new quarter at ${s.name} is laid out: ${q.sts.length} paid streets of plots for settlers`;}
@@ -15889,7 +15889,6 @@ function tickHistory(){ // once a year for each place (staggered): the town's ow
     if(s.kind==='village'&&AD()>=950&&marketHeads(s)>Math.max(150,s.pop*0.35)&&(roadsN>=2||s.river||s.harbor)){ // a charter follows the trade: when a good share of the place lives by its market, it is made a town
       L.live.promote();did=`${s.name} is granted a market charter; the village is a town now, and its fair draws the countryside.`;}
     else if((bid=townWallProposal(s)))did=null;
-    else if(s.kind!=='village'&&AD()>=1150&&(s.role==='crossing'||s.kind==='capital'&&s.river)&&s.pop>900&&chance('sim',0.1)&&L.live.neustadt())did=`The lord plants a “New Town” across the river from ${s.name}: one straight street of equal plots.`;
     else if(s.bastions&&(s.role==='border'||s.kind==='capital')&&!s.citadel&&chance('sim',0.3)&&hasStone(s,'citadel')&&L.live.citadel()&&(useStone(s,'citadel'),true))did=`A star citadel is raised astride the walls of ${s.name}, a quarter razed for it.`;
 
 
@@ -17010,7 +17009,20 @@ function tickStreets(){ // daily current journeys reveal a valuable cut; buying 
 }
 
 function tickGrowth(){ // decisions are daily; each commissioned work carries its own paid quantities and duration
-  for(const s of W.settlements){if(s.folk?.length)moveIn(s);tickFalling(s);tickGrowthHousing(s);tickGrowthWiden(s);tickGrowthVacancy(s);tickGrowthFabric(s);publicLaneProposal(s);townWallProposal(s);tickTownReuse(s);}
+  for(const s of W.settlements){if(s.folk?.length)moveIn(s);tickFalling(s);tickGrowthHousing(s);tickGrowthWiden(s);tickGrowthVacancy(s);tickGrowthFabric(s);newTownStreetProposal(s);publicLaneProposal(s);townWallProposal(s);tickTownReuse(s);}
+}
+function newTownStreetProposal(s){ // daily demand for paid equal plots beyond an existing native road crossing
+  const si=W.settlements.indexOf(s);if(AD()<1150||s.kind==='village'||!(s.role==='crossing'||s.kind==='capital'&&s.river)||s.pop<=900||s.siegeBy||!s._lay?.live||s.streets.some(st=>st.neu&&!st.gone)||(W.projects||[]).some(q=>!q.dead&&q.type==='plan'&&q.si===si&&['street','quarter'].includes(q.kind)))return null;
+  const want=s.folk?.length?crowding(s):Math.max(0,(s.pop-housing(s))/HOUSEHOLD);if(want<8||s.growSlots?.length>=Math.ceil(want))return null;
+  const payer=lordAcct(s),minimum=constructionRecipe(s,64*.6*PL(),36,.5);if(means(payer)<minimum.labour+minimum.timber*price(s,'timber')+foodYr()*2)return null;
+  let crossings=0;for(const st of s.streets)if(st.kind==='road'&&!st.hidden&&!st.gone&&!st.planQ){const P=dist2d(st.pts[0].x,st.pts[0].z,s.pos.x,s.pos.z)<=dist2d(st.pts.at(-1).x,st.pts.at(-1).z,s.pos.x,s.pos.z)?st.pts:[...st.pts].reverse();
+    for(let i=1;i<P.length&&crossings<3;i++){if(!riverAt(P[i].x,P[i].z,0))continue;crossings++;let j=i;while(j<P.length&&riverAt(P[j].x,P[j].z,3))j++;let k=j,acc=0;while(k<P.length-1&&acc<45){acc+=dist2d(P[k].x,P[k].z,P[k+1].x,P[k+1].z);k++;}if(k>=P.length-1)break;
+      const q=P[k],a=P[Math.max(0,k-1)],b=P[k+1],length=dist2d(a.x,a.z,b.x,b.z)||1,nx=-(b.z-a.z)/length,nz=(b.x-a.x)/length;if(!streetAccessAt(s,q))continue;
+      for(const side of[1,-1]){const pts=[{x:q.x,z:q.z}];for(let t=8;t<=72;t+=8){const p={x:q.x+nx*t*side,z:q.z+nz*t*side},probe={type:'plan',kind:'street',automatic:true,hit:[],st:{pts:[pts.at(-1),p],hw:2.4},site:{path:[pts.at(-1),p],pathWidth:4.8}};
+          if(!planCellOK(p.x,p.z)||riverAt(p.x,p.z,4)||fortRoadBlocked(s,p.x,p.z,3)||!s._lay.live.planSite({...probe,automatic:false},'validate'))break;pts.push(p);}
+        if(polyLen(pts)<64)continue;const D={ok:true,kind:'street',automatic:true,newTown:true,si,pts,hw:2.4,hit:[],works:polyLen(pts)*.6*PL(),days:20+polyLen(pts)/4,title:`A New Town street beyond the river at ${s.name}`},project=planProjectCommission(D,s.owner,payer);if(project)return project;
+      }i=Math.max(i,j);
+    }}return null;
 }
 function publicLaneProposal(s){
   if(s.siegeBy||!s._lay?.live?.laneSurvey||(W.projects||[]).some(q=>!q.dead&&q.type==='plan'&&q.si===W.settlements.indexOf(s)&&['street','quarter'].includes(q.kind)))return null;
