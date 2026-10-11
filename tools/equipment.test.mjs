@@ -101,6 +101,27 @@ test('a paid post-windmill uses an actual retained site and never opens before p
   const coins=f.coins(),Q=f.eval('technologyWindmillProposal(s)');assert.ok(Q);assert.equal(Q.site.arch,'windmill');assert.ok(Q.site.windExposure>0);assert.equal(Q.method,'windmill');assert.equal(Q.recipe.stone,0);assert.equal(f.s.mill,null);near(f.coins(),coins);f.s.denied='windmill';assert.equal(f.eval('technologyWindmillProposal(s)'),null);
 });
 
+for(const privateArch of ['mill','windmill'])test(`public windmill quote, retained validation and commission button agree beside a private abbey ${privateArch}`,()=>{
+  const f=fixture(),abbey=f.eval("corpFound('abbey',{si:0,name:'Private Abbey',founder:0,members:[],servants:[]})");
+  Object.assign(f.rooms[1],{arch:privateArch,abbey:abbey.storageOwnerId,ownerId:abbey.storageOwnerId,compoundKey:'mill'});f.s.mill=null;f.s._gYield=.001;f.s._bearA=20000;f.s.growSlots=[{mx:40,mz:20,side:1,ux:1,uz:0,st:{hw:2}}];
+  let footprintClear=true,publicEnd=true,approachClear=true,issued=null;
+  f.s._lay={placed:{},fits:(footprint,gap,soft,q)=>{assert.equal(footprint,q.site.f);assert.equal(gap,1.2);assert.equal(soft,true);return footprintClear;},live:{compoundSite:site=>({...site,path:[{x:40,z:20},{x:42,z:20}]})}};
+  Object.assign(f.C,{institutionFoundationPending:()=>false,constructionRecipe:(s,labour,days,timber,stone)=>({labour,days,timber,stone}),planGroundQuote:()=>10,serviceDoor:f=>({x:f.x,z:f.z}),
+    institutionFoundationCommission:(s,site,payer,ownerId,recipe,method,title)=>issued={site,payer,ownerId,recipe,method,title},
+    streetAccessAt:(s,p)=>publicEnd&&s===f.s&&p===issued.site.path.at(-1),armyObstacle:()=>false,armySegmentClear:(walker,p,q)=>approachClear&&walker.settlement===f.s&&walker.requireRoadCrossing&&walker.waterClearance===2.3});
+  f.eval(fn('institutionFoundationPath'));const coins=f.coins(),stores=JSON.stringify(f.s.stores),count=f.s.buildings.length;
+  const Q=f.eval('technologyWindmillProposal(s)');assert.ok(Q);f.C.project={site:Q.site};assert.equal(f.eval('technologyWindmillValidate(project,s).ok'),true);assert.match(f.eval('technologyEquipmentHTML(s)'),/data-cmd="s-windmill"/);
+  for(const key of ['footprint','public endpoint','approach']){
+    footprintClear=key!=='footprint';publicEnd=key!=='public endpoint';approachClear=key!=='approach';
+    const V=f.eval('technologyWindmillValidate(project,s)');assert.equal(V.ok,false,key);assert.equal(V.reason,'windmill-ground-or-access',key);assert.notEqual(V.abandon,true,key);
+  }
+  footprintClear=publicEnd=approachClear=true;
+  const publicMill={idx:3,arch:'mill',state:'sound',removed:false,ownerId:'lord',s:f.s};f.s.buildings.push(publicMill);
+  for(const arch of ['mill','windmill']){publicMill.arch=arch;assert.equal(f.eval('technologyWindmillProposal(s)'),null);const V=f.eval('technologyWindmillValidate(project,s)');assert.equal(V.ok,false);assert.equal(V.abandon,true);assert.equal(V.reason,'grinding-mill-already-open');assert.doesNotMatch(f.eval('technologyEquipmentHTML(s)'),/data-cmd="s-windmill"/);}
+  for(const unavailable of ['removed','ruin']){publicMill.removed=unavailable==='removed';publicMill.state=unavailable==='ruin'?'ruin':'sound';assert.equal(f.eval('technologyWindmillValidate(project,s).ok'),true);assert.match(f.eval('technologyEquipmentHTML(s)'),/data-cmd="s-windmill"/);}
+  assert.equal(f.s.buildings.length,count+1);assert.equal(f.W.projects.length,0);assert.equal(JSON.stringify(f.s.stores),stores);near(f.coins(),coins);
+});
+
 
 test('native grain service pays its actual present operator and entitled holder without a phantom pool',()=>{
   const f=fixture(),coins=f.coins(),w=f.H[2].w;f.rooms[1].ownerId=f.H[5].id;const lord=f.H[5].w;assert.equal(f.eval('technologyGrindingCash(s,H[0],4)'),4);near(f.H[2].w,w+3);near(f.H[5].w,lord+1);near(f.coins(),coins);f.H[2].away={until:40};assert.equal(f.eval('technologyGrindingCash(s,H[0],4)'),0);near(f.coins(),coins);assert.equal(f.s._poolBy?.miller,undefined);
