@@ -27,7 +27,7 @@ test('the certified survey still reads the reviewed native helpers',()=>{
 });
 function realm(on=true){const c=vm.createContext({console});
   vm.runInContext(`const SIZE=1000,GRID=20,CELL=SIZE/GRID,FN=1,FG=1000,PLN=20;let W=null;`,c);
-  vm.runInContext([...HELPERS.map(line),line('let HASH_STAMP='),fn('occupiedGroundBoxMayHit'),...READS.map(fn),NATIVE_LINE,line('const CASTLE_FOUNDATION_SURVEY_NATIVE='),line('const CASTLE_FOUNDATION_SURVEYS='),fn('castleFoundationSurveyNative'),fn('castleFoundationSurveyToken'),fn('castleFoundationFailedSite')].join('\n'),c);
+  vm.runInContext([...HELPERS.map(line),line('let HASH_STAMP='),...READS.map(fn),NATIVE_LINE,line('const CASTLE_FOUNDATION_SURVEY_NATIVE='),line('const CASTLE_FOUNDATION_SURVEYS='),fn('castleFoundationSurveyNative'),fn('castleFoundationSurveyToken'),fn('castleFoundationFailedSite')].join('\n'),c);
   vm.runInContext(`
     const s={pos:{x:0,z:0},radius:70,owner:0,buildings:[{x:0,z:0,w:800,d:800,rot:0,state:'sound'}],streets:[{kind:'lane',hw:2,pts:[{x:0,z:-100},{x:0,z:100}]}],places:[],remnants:[],relicWalls:[]};
     const field={i:0,j:0,jx:.5,jz:.5,dom:0,lord:-1,own:-1,wk:-1};
