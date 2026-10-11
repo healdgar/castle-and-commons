@@ -99,7 +99,7 @@ function search(r,{p={x:-20,z:0},q={x:26,z:0},pad=24,shared=true,ghost=null,nest
 }
 
 test('actual certified detours preserve full native paths, directed edge logs and expanded-node records',()=>{
- assert.equal(readers.length,114);assert.equal(new Set(readers).size,114);
+ assert.equal(readers.length,116);assert.equal(new Set(readers).size,116);
  const cases=[{}, {p:{x:-20.7,z:.3},q:{x:26.4,z:-.2}}, {p:{x:26.4,z:-.2},q:{x:-20.7,z:.3}},
   {p:{x:-0,z:-20},q:{x:0,z:22}}, {p:{x:0,z:0},q:{x:.3,z:.4}}, {nested:true},
   {ghost:{x:-15,z:-6,w:6,d:8,rot:.3}}];
