@@ -181,7 +181,7 @@ test('a later goal gets fresh operation-local heuristic values without world or 
 });
 
 test('retained landing metadata projects as detached scalar geometry while survey caches stay local',()=>{
- const r=setup();r.run(['VISUAL_PRIVATE','VISUAL_LINKS','VISUAL_SHAPES','VISUAL_ENTITY'].map(constant).join('\n')+'\n'+['visualDataNames','visualScalars','visualGeometry','visualPoints','visualPut','visualRecord'].map(fn).join('\n'));
+ const r=setup();r.run(['VISUAL_PRIVATE','VISUAL_LINKS','VISUAL_SHAPES','VISUAL_ENTITY'].map(constant).join('\n')+'\n'+['visualDataNames','visualScalars','visualGeometry','visualPoints','visualPut','visualRecord','projectMarkerKey'].map(fn).join('\n'));
  // A geometry-copy boundary: no founder, claim, completed building or actor is
  // created. The actual project DTO recursively carries the retained site.
  r.run(`const site={f:{x:0,z:0,w:12,d:22,rot:0},path:[{x:0,z:11},{x:0,z:12.2},{x:0,z:13}],access:{corridorFrom:2,endpoint:{kind:'street',ref:0,segment:1,point:{x:0,z:13}},pathKey:'fixed route',privatePolys:[]}};

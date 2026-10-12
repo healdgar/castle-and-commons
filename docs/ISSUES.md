@@ -95,6 +95,26 @@ repeat of already answered questions.
 | 48 | We never test past year 20; Reel can't reliably reach 1066 | In progress | Run the build-frozen farm through long checkpoint chains to AD 1066 and later milestones, then additional worlds. Add foundings/decade, distant lots, castle kinds, list sizes and per-era profiles to its census. Shipped checkpoints and browser snapshot resume remain unfinished (#6). See [WORLD-SAVE.md](WORLD-SAVE.md). |
 | 17 | The full history recorder (`history=full`) is off by default and lost its harness; is it dead code? | Open | Review the disabled `history=full` recorder and its missing harness. Distinguish it from the HistoryGraph machinery used by checkpoints and identity tests; restore a useful supported workflow or retire only genuinely unused code. |
 
+## Playability and order feedback
+
+The [12 October playability audit](PLAYABILITY-AUDIT-2026-10-12.md) records the
+released defects and repair evidence. All six scoped repairs are verified locally:
+14 new regression cases, 15 real worker/browser flows plus the paving-estimate
+check, native paid day-zero work/save continuation, and final 150-day complete
+save/RNG/journal identity with clean conservation. All 2,245 unique suite checks
+are verified across the 2,243-pass batch and unchanged-assertion rechecks of its
+two missing fixture dependencies; 59 focused checks also pass on the final source.
+Publication remains; none awaits user acceptance.
+
+| # | Issue | Status | Next action / current evidence |
+|---|---|---|---|
+| 89 | Opening-day works can charge repeatedly for the same completed order | Verified local | Completion guards, buttons, market-toll readers and advisor flags now recognize day zero without changing its recorded timestamp. Crown/lord mill and market checks verify one payment to actual builders, conserved coins and disabled “built” controls. Native paid mill/market save/load retains zero and rejects duplicates before/after reload, with clean five-day continuation. |
+| 90 | Learning tab opens Overview in the simulation worker | Verified local | Learning is included in worker court views. Replies are keyed to their requested view and ignored after a newer selection; mouse and rapid keyboard navigation retain the actual Learning panel. Compact realm tabs wrap with usable spacing. |
+| 91 | A ruler's host card fails silently in worker mode | Verified local | Host controls use viewport-independent wording; failed worker views produce a visible recoverable error. Real worker browser flow opens the called-out watch, exposes march/campaign controls and orders an actual native march. |
+| 92 | Orders lack durable results and failed placement ends the order | Verified local | A persistent result survives expanded card refreshes, reports pending/accepted/refused or processed outcomes, actual net purse movement and links to new hosts/places/projects. Invalid placement retains its prompt; pending duplicate clicks are blocked and cancellation prevents late replies restoring placement. Govern town waits for its asynchronous card before opening Orders. Paving now announces the commissioned wage/material estimate rather than its lower recipe input. |
+| 93 | Ground markers have no persistent explanation or hover labels | Verified local | Menu → Map symbols explains host badges, trade dots, event rings and construction marks. Existing picking supplies named hover labels; project pegs/bands/rings open actual progress, payments and stalled-state cards through renderer records with stable project keys. Browser checks pass for host hover and actual paving-band hover/map inspection. The user's exact other symbols remain unidentified. |
+| 94 | Expanded planning sheet disables the map it asks the player to draw on | Verified local | Active planning stays compact, hides Expand and refuses programmatic expansion. A real 390×844 worker browser flow drags a street on the available map, receives its native survey refusal and closes with Escape. |
+
 ## Inspection, geometry and advisor
 
 | # | Issue | Status | Next action / current evidence |

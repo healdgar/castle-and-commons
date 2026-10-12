@@ -424,7 +424,7 @@ body[data-ui-size=large] #insp ul.tree,body[data-ui-size=large] #insp ol.tline{f
 #contextpanel[data-kind=plan] #planbar,#contextpanel[data-kind=petition] #petition,#contextpanel[data-kind=legend] #terrlegend{display:block !important;}
 #contextpanel #insphead,#contextpanel #drawerhead,#contextpanel #chronhead{display:none !important;}
 #contextpanel #inspsub{font:italic 15px 'IM Fell English',Georgia,serif;line-height:1.4;margin:0 0 14px;color:var(--red);}
-#contextpanel #dbody{padding:10px 0;overflow:visible;}#contextpanel #dtabs{flex-wrap:wrap;}#contextpanel #dtabs .t{flex:1 0 20%;font-size:14px;min-height:44px;border-radius:4px;}
+#contextpanel #dbody{padding:10px 0;overflow:visible;}#contextpanel #dtabs{flex-wrap:wrap;gap:4px;}#contextpanel #dtabs .t{flex:1 0 auto;font-size:14px;min-height:44px;border-radius:4px;padding:8px 12px;}
 #contextpanel #insp{overflow:visible;}#contextpanel #inspscroll{overflow:visible;max-height:none;}#contextpanel #insp .row{font-size:15px;line-height:1.5;padding:6px 0;gap:24px;}
 #contextpanel #insp .row.long{display:block;}#contextpanel #insp .row.long>span{display:block;}#contextpanel #insp .row.long>b{display:block;max-width:65ch;}
 #contextpanel #insp .note,#contextpanel .note,#contextpanel .cstat{font-size:14px;line-height:1.5;opacity:1;}
@@ -493,11 +493,18 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
 #infobody{font-size:16px;line-height:1.6;}#infobody details{padding:8px 0;border-bottom:1px solid var(--edge);}#infobody summary{cursor:pointer;min-height:44px;}#infobody a{color:var(--red);}
 #infobody .detail-jumps{flex-wrap:wrap;}
 @media(max-width:600px){#hud #brand{font-size:19px;}#hud .hudlink{padding:4px 0;}}
+
+#orderfeedback{position:fixed;bottom:16px;left:12px;z-index:54;width:420px;max-width:calc(100vw - 24px);max-height:30dvh;overflow:auto;padding:12px 14px;background:var(--parch);color:var(--ink);border:1px solid var(--edge);border-radius:6px;box-shadow:0 3px 12px #0004;font-size:14px;line-height:1.4;}
+#orderfeedback[hidden],#maphover[hidden],#contextsize[hidden]{display:none !important;}
+#contextpanel>#orderfeedback{position:static;width:auto;max-width:none;max-height:24dvh;margin:0 16px 8px;box-shadow:none;flex:none;}
+#orderfeedback p{margin:6px 0;}#orderfeedback nav{display:flex;gap:8px;flex-wrap:wrap;}#orderfeedback button{min-height:44px;padding:6px 10px;border:1px solid var(--edge);border-radius:4px;background:transparent;color:var(--ink);font:inherit;cursor:pointer;}
+#maphover{position:fixed;z-index:40;pointer-events:none;max-width:min(360px,calc(100vw - 24px));padding:8px 10px;border-radius:5px;background:#201a12;color:#f0e6cf;border:1px solid #c4a24a;font-size:14px;line-height:1.4;}
+#contexttitle:disabled{color:var(--ink);cursor:default;}#contextpanel[data-kind=plan]{max-height:min(44dvh,calc(100dvh - var(--hudH) - 80px));}
 </style>
 </head>
 <body>
 <div id="gl"></div>
-<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-12 18:24 UTC · after 70975a2</div></div>
+<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-12 20:33 UTC · after ed01fb6</div></div>
 
 <div id="hud">
   <button type="button" id="brand" class="hudlink" aria-label="About Castle and Commons" aria-controls="contextpanel">Castle and Commons</button>
@@ -516,7 +523,7 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
     </select>
     <button id="menubtn" aria-expanded="false" aria-controls="toolmenu">Menu</button>
     <div id="toolmenu" hidden>
-      <button data-context-tab="crown">Crown</button><button data-context-tab="world">Realm</button><button data-context-tab="over">Overlays</button><button id="menuaccounts" type="button">Kingdom accounts</button><button id="menuannals">Annals</button><button id="menulegend" hidden>Map legend</button><button data-context-tab="rates">Rates</button><button data-context-tab="acts">Acts</button>
+      <button data-context-tab="crown">Crown</button><button data-context-tab="world">Realm</button><button data-context-tab="over">Overlays</button><button id="menuaccounts" type="button">Kingdom accounts</button><button id="menuannals">Annals</button><button id="menumarkers">Map symbols</button><button id="menulegend" hidden>Map legend</button><button data-context-tab="rates">Rates</button><button data-context-tab="acts">Acts</button>
       <button id="planbtn" title="Plan streets, squares, walls and quarters (B)">Plan</button>
       <button id="savebtn">Save</button><button id="advbtn">Advisor</button><button id="helpbtn">Help</button><button id="petitionbtn" hidden>Petitions</button>
       <button class="menu-extra" id="menuexport">Export chronicle</button><button class="menu-extra" id="menushare">Copy realm link</button>
@@ -525,6 +532,8 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
 </div>
 <div id="watchdate">—</div>
 
+<section id="orderfeedback" role="status" aria-live="polite" aria-atomic="true" hidden></section>
+<div id="maphover" role="tooltip" hidden></div>
 <section id="infopanel"><div id="infobody"></div></section>
 <div id="chron">
   <header id="chronhead"><h2 id="chrontitle">The Annals</h2><button id="chronmin" title="Collapse / expand">▾</button></header>
@@ -11021,6 +11030,7 @@ function initInput(){
   };
   el.addEventListener('contextmenu',e=>e.preventDefault());
   el.addEventListener('pointerdown',e=>{
+    mapHoverHide();
     touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
     el.setPointerCapture(e.pointerId);
     if(planUI&&planUI.painting&&touches.size>1){planUI.painting=false;planClear();} // a second finger: pinch, not paint
@@ -11066,7 +11076,8 @@ function initInput(){
     if(placeMode==='order'){const a=placeArg,foe=pk&&pk.type==='army'&&pk.a!==a?pk.a:null,town=pk&&pk.type==='settlement'?pk.s:null; // say what the click will do
       setPlaceHint(foe?(foe.house===a.house?`${foe.name} is your own`:`Attack ${foe.name} (${Math.round(foe.strength)} men${atWar(a.house,foe.house)?'':' — this means war'})`):town?`March on ${town.name}${town.owner!==a.house&&!atWar(a.house,town.owner)?' (not at war: they will hold the gates)':''}`:`Choose open ground to camp, a town to march, or an enemy host to attack.`);
       el.style.cursor=foe&&foe.house!==a.house?'crosshair':'cell';hoverPick=null;return;}
-    hoverPick=pk;el.style.cursor=placeMode?'crosshair':pk&&pk.type!=='land'?'pointer':'';});
+    hoverPick=pk;el.style.cursor=placeMode?'crosshair':pk&&pk.type!=='land'?'pointer':'';mapHoverShow(pk,e.clientX,e.clientY);});
+  el.addEventListener('pointerleave',mapHoverHide);
   el.addEventListener('pointercancel',endPtr); // a cancelled touch must not leave a drag stuck on
   el.addEventListener('wheel',e=>{
     e.preventDefault();markManual();
@@ -11120,10 +11131,11 @@ function groundPoint(e){
 }
 function onClick(e){
   if(placeMode){
-    const p=groundPoint(e),mode=placeMode,arg=placeArg;
-    setPlaceMode(null);
+    if(G.placePending)return;const p=groundPoint(e),mode=placeMode,arg=placeArg,hint=placeHint;
+    if(!p){orderFeedbackFinish(orderFeedbackBegin({k:'place'}),{accepted:false,reason:'Choose ground on the map, rather than the sky.'});return;}
+    if(!BACKGROUND)setPlaceMode(null);
     if(p){let pkA=null;if(mode==='order'){const pk=resolvePick(e.clientX,e.clientY);if(pk&&pk.type==='army'&&pk.a)pkA=pk.a.id;}else if(mode==='objective')pkA=armyObjectivePick(resolvePick(e.clientX,e.clientY),p,arg.kind);
-      if(mode!=='storage')jot({k:'place',m:mode,a:serializePlaceArg(mode,arg),x:+p.x.toFixed(2),z:+p.z.toFixed(2),pk:pkA});doPlace(mode,arg,p,pkA);}
+      if(mode!=='storage')jot({k:'place',m:mode,a:serializePlaceArg(mode,arg),x:+p.x.toFixed(2),z:+p.z.toFixed(2),pk:pkA});const before=!BACKGROUND?commandBefore():null,n0=allLines.length,token=!BACKGROUND?orderFeedbackBegin({k:'place'}):null,result=doPlace(mode,arg,p,pkA);if(!BACKGROUND){if(result===false&&!placeMode)setPlaceMode(mode,arg,hint);orderFeedbackFinish(token,commandReceipt(before,result,allLines.slice(n0)));}}
     return;
   }
   const m=new THREE.Vector2((e.clientX/innerWidth)*2-1,-(e.clientY/innerHeight)*2+1);
@@ -11135,50 +11147,50 @@ function onClick(e){
 }
 function doPlace(mode,arg,p,pkA){ // a click on the map in a placing mode: the same in play and when a save is read again
       if(backgroundUserRequest()&&mode!=='storage')return workerSubmitCommand({k:'place',m:mode,a:serializePlaceArg(mode,arg),x:+p.x.toFixed(2),z:+p.z.toFixed(2),pk:pkA??null});
-      if(mode==='storage'){storagePreview(arg.si,arg.arch,p.x,p.z);return;}
+      if(mode==='storage'){storagePreview(arg.si,arg.arch,p.x,p.z);return false;}
       if(mode==='objective'){
         const a=W.armies.find(x=>x.id===arg.id&&!x.gone),t=pkA,kind=arg.kind,s=t&&W.settlements[t.si];
-        if(!a||a.house!==plyH()||!s){emit('war',2,p,'Choose a valid target for the host.');return;}
+        if(!a||a.house!==plyH()||!s){emit('war',2,p,'Choose a valid target for the host.');return false;}
         if((['capture','pillage','depose','devastate'].includes(kind)&&t.type!=='settlement')||(kind==='destroy'&&t.type!=='building')||(kind==='demolish'&&t.type!=='wall')){
-          emit('war',2,p,kind==='destroy'?'Choose a building to destroy.':kind==='demolish'?'Choose a wall segment to demolish.':'Choose a settlement for the host.');return;}
-        if(s.owner===a.house){emit('war',2,s.pos,'A campaign objective must be set against another lord.');return;}
-        if(kind==='depose'&&W.houses[s.owner]?.seat!==t.si){emit('war',2,s.pos,'To seize a lord’s seat, choose the seat of his house.');return;}
-        if(kind==='destroy'&&!objectiveBuilding(s,t)){emit('war',2,s.pos,'That building no longer stands.');return;}
-        if(kind==='demolish'&&(!fortCircuitFor(s,t.circuit)?.wallRad||!Number.isFinite(t.angle))){emit('war',2,s.pos,'That wall segment no longer stands.');return;}
+          emit('war',2,p,kind==='destroy'?'Choose a building to destroy.':kind==='demolish'?'Choose a wall segment to demolish.':'Choose a settlement for the host.');return false;}
+        if(s.owner===a.house){emit('war',2,s.pos,'A campaign objective must be set against another lord.');return false;}
+        if(kind==='depose'&&W.houses[s.owner]?.seat!==t.si){emit('war',2,s.pos,'To seize a lord’s seat, choose the seat of his house.');return false;}
+        if(kind==='destroy'&&!objectiveBuilding(s,t)){emit('war',2,s.pos,'That building no longer stands.');return false;}
+        if(kind==='demolish'&&(!fortCircuitFor(s,t.circuit)?.wallRad||!Number.isFinite(t.angle))){emit('war',2,s.pos,'That wall segment no longer stands.');return false;}
         if(!atWar(a.house,s.owner)){
           const me=a.house,them=s.owner;
           if((me===0||them===0)&&!W.war)startWar(me===0?them:me,me===0?'is set upon by the crown’s host':'raises its hand against the crown');
           else startFeud(me,them,me);
-          if(!atWar(a.house,s.owner)){emit('war',3,s.pos,`${a.name} cannot be brought against the lord of ${s.name} now.`);return;}
+          if(!atWar(a.house,s.owner)){emit('war',3,s.pos,`${a.name} cannot be brought against the lord of ${s.name} now.`);return false;}
         }
         a.objective={kind,si:t.si,...(kind==='destroy'?{arch:t.arch,x:t.x,z:t.z}:{}),...(kind==='demolish'?{circuit:t.circuit,angle:t.angle}:{})};
-        if(!orderArmy(a,t.si))a.objective=null;return;
+        const ok=orderArmy(a,t.si);if(!ok)a.objective=null;return ok;
       }
       if(mode==='supplyroad'){
         const a=W.armies.find(x=>x.id===arg.id&&!x.gone),si=nearestSettlementIdx(p.x,p.z),t=W.settlements[si],from=a&&W.settlements[a.at];
-        if(!a||a.house!==plyH()||!from||!t||dist2d(p.x,p.z,t.pos.x,t.pos.z)>(t.radius||90)*1.4){emit('war',2,p,'Choose a nearby friendly place for the supply road.');return;}
-        if(from.owner!==a.house||t.owner!==a.house){emit('war',2,t.pos,'A supply road must join places held by the host’s lord.');return;}
-        orderRoad(a.at,si,a.house);return;
+        if(!a||a.house!==plyH()||!from||!t||dist2d(p.x,p.z,t.pos.x,t.pos.z)>(t.radius||90)*1.4){emit('war',2,p,'Choose a nearby friendly place for the supply road.');return false;}
+        if(from.owner!==a.house||t.owner!==a.house){emit('war',2,t.pos,'A supply road must join places held by the host’s lord.');return false;}
+        return orderRoad(a.at,si,a.house);
       }
       if(mode==='raft'){
-        const a=W.armies.find(x=>x.id===arg.id&&!x.gone);if(!a||a.house!==plyH())return;
-        if(!buildArmyRaft(a,p.x,p.z))emit('war',2,p,'The host needs a nearby supplied bank, sound crossing ground, and timber for a raft.');return;
+        const a=W.armies.find(x=>x.id===arg.id&&!x.gone);if(!a||a.house!==plyH())return false;
+        const ok=buildArmyRaft(a,p.x,p.z);if(!ok)emit('war',2,p,'The host needs a nearby supplied bank, sound crossing ground, and timber for a raft.');return ok;
       }
-      if(mode==='order'){const pk=pkA!=null?W.armies.find(x=>x.id===pkA&&!x.gone):null;if(pk&&pk!==arg){orderArmyAt(arg,pk);return;} // pointed at a host: go and fight it
+      if(mode==='order'){const pk=pkA!=null?W.armies.find(x=>x.id===pkA&&!x.gone):null;if(pk&&pk!==arg){return orderArmyAt(arg,pk);} // pointed at a host: go and fight it
         const i=nearestSettlementIdx(p.x,p.z),t=W.settlements[i];
-        if(dist2d(p.x,p.z,t.pos.x,t.pos.z)<(t.radius||90)*1.4)orderArmy(arg,i);else orderArmyTo(arg,p.x,p.z);}
-      else if(mode==='charter'){if(W.treasury>=arg&&doAct('village',p)){buildWorks(W.settlements[W.settlements.length-1],arg,'crown','founding');setCd('d_charter',360);sovAmbition('founder');}}
+        if(dist2d(p.x,p.z,t.pos.x,t.pos.z)<(t.radius||90)*1.4)return orderArmy(arg,i);else return orderArmyTo(arg,p.x,p.z);}
+      else if(mode==='charter'){if(W.treasury>=arg&&doAct('village',p)){buildWorks(W.settlements[W.settlements.length-1],arg,'crown','founding');setCd('d_charter',360);sovAmbition('founder');return true;}return false;}
       else if(mode==='road1'){const i=nearestSettlementIdx(p.x,p.z),s=W.settlements[i];
         if(dist2d(p.x,p.z,s.pos.x,s.pos.z)>(s.radius||90)*2)emit('crown',2,p,'The road must start from a place.');
-        else{const others=W.settlements.map((o,j)=>j).filter(j=>j!==i);setPlaceMode('road2',i,`From ${s.name}: now click the place the road should reach — Esc to cancel`);}}
+        else{const others=W.settlements.map((o,j)=>j).filter(j=>j!==i);setPlaceMode('road2',i,`From ${s.name}: now click the place the road should reach — Esc to cancel`);return true;}return false;}
       else if(mode==='road2'){const i=nearestSettlementIdx(p.x,p.z),s=W.settlements[i];
-        if(dist2d(p.x,p.z,s.pos.x,s.pos.z)>(s.radius||90)*2)emit('crown',2,p,'The road must end at a place.');else crownRoad(arg,i);}
-      else if(mode==='pave'){const g=groundPick(p.x,p.z);if(g&&g.type==='road')paveRoad(g.r);else emit('crown',2,p,'There is no road there to pave.');}
-      else if(mode==='buyland'){const f=W.land&&furlongAt(p.x,p.z);if(f)buyLand(f);}
-      else if(mode==='seize'){const f=W.land&&furlongAt(p.x,p.z);if(f&&seizeLand(f))setPlaceMode('seize',null,'Click another furlong to seize (a host of yours must be within 450 m) — Esc to stop');}
-      else if(mode==='clear'){if(clearDistrict(p))setCd('d_clear',90);}
-      else if(/^l(road1|road2|pave|village)$/.test(mode))lordPlace(mode,p,arg);
-      else doAct(mode,p);
+        if(dist2d(p.x,p.z,s.pos.x,s.pos.z)>(s.radius||90)*2)emit('crown',2,p,'The road must end at a place.');else return crownRoad(arg,i);return false;}
+      else if(mode==='pave'){const g=groundPick(p.x,p.z);if(g&&g.type==='road')return paveRoad(g.r);emit('crown',2,p,'There is no road there to pave.');return false;}
+      else if(mode==='buyland'){const f=W.land&&furlongAt(p.x,p.z);return f?buyLand(f):false;}
+      else if(mode==='seize'){const f=W.land&&furlongAt(p.x,p.z);if(f&&seizeLand(f)){setPlaceMode('seize',null,'Click another furlong to seize (a host of yours must be within 450 m) — Esc to stop');return true;}return false;}
+      else if(mode==='clear'){if(clearDistrict(p)){setCd('d_clear',90);return true;}return false;}
+      else if(/^l(road1|road2|pave|village)$/.test(mode))return lordPlace(mode,p,arg);
+      else return doAct(mode,p);
 }
 /* ---------------- picking: ONE resolver shared by click and hover ----------------
    Order (first match wins):  1 badges drawn over the map (hosts, camps, dragon, envoys, battles, caravan dots), exactly where they show
@@ -11242,7 +11254,7 @@ function resolvePick(cx,cy){ // what is under the cursor? returns a pick record 
   raycaster.setFromCamera(new THREE.Vector2((cx/innerWidth)*2-1,-(cy/innerHeight)*2+1),camera);
   const mk=pickMarkers(cx,cy);if(mk)return mk;
   const gp=rayGround(raycaster.ray),gd=gp?raycaster.ray.origin.distanceTo(gp):Infinity,lim=gd+3+gd*0.004; // hits deeper than the ground are behind a hill
-  const targets=[...(G.rings||[]).filter(r=>r.m.visible&&r.t<r.dur&&r.m.userData.pick).map(r=>r.m),...G.pickS,...(G.cairnMesh?[G.cairnMesh]:[]),...(G.armyFlags?.values()||[]),...G.campMeshes.values(),...(G.envoyMeshes?G.envoyMeshes.values():[]),G.bodies,G.roofs];
+  const targets=[...(G.orders?.children||[]),...(G.rings||[]).filter(r=>r.m.visible&&r.t<r.dur&&r.m.userData.pick).map(r=>r.m),...G.pickS,...(G.cairnMesh?[G.cairnMesh]:[]),...(G.armyFlags?.values()||[]),...G.campMeshes.values(),...(G.envoyMeshes?G.envoyMeshes.values():[]),G.bodies,G.roofs];
   if(G.soldiers)targets.push(G.soldiers);
   if(G.herdMesh&&cam.cur.dist<1400)targets.push(...Object.values(G.herdMesh));
   if(G.citizens&&G.citizens.count)targets.push(G.citizens,G.citKit);
@@ -11307,7 +11319,7 @@ function setPlaceHint(hint){
   const text=document.getElementById('placetext');if(text)text.textContent=String(hint||'Click the map to place').replace(/ — Esc to (cancel|stop)/g,'').replace(/click/gi,uiLayout()==='phone'||matchMedia('(pointer:coarse)').matches?'tap':'click');
 }
 function setPlaceMode(mode,arg,hint){
-  placeMode=mode;placeArg=arg??null;placeHint=hint||'';if(MODEL_ONLY)return;document.body.classList.toggle('placing',!!mode);
+  placeMode=mode;placeArg=arg??null;placeHint=hint||'';if(MODEL_ONLY)return;G.placeRevision=(G.placeRevision||0)+1;mapHoverHide();document.body.classList.toggle('placing',!!mode);
   if(mode)hideBeat();
   const ph=document.getElementById('placehint');
   ph.innerHTML='<span id="placetext" role="status"></span><button id="placecancel">Cancel</button>';
@@ -11425,6 +11437,7 @@ function accountSheetHTML(town=null,prefix='ledger'){
   return h;
 }
 function infoHTML(){
+  if(infoUI.kind==='symbols')return '<h3>Symbols on the map</h3><p>Hover a symbol for its name and state, or tap it to open its card.</p><dl><dt>Round heraldic badge</dt><dd>A host, wearing its house’s banner. It is not the town or its ruler. The host’s card has march and campaign orders.</dd><dt>Other round badges</dt><dd>An outlaw camp, the dragon, a battle or travelling envoys. Open the badge to read who is there and what they are doing.</dd><dt>Small gold dots</dt><dd>Trade loads moving by cart or boat. Open one for its cargo and destination.</dd><dt>Expanding coloured rings</dt><dd>A recent event at that place. Open the ring to read the event; it is not a boundary or a construction plan.</dd><dt>Pegs and coloured lines</dt><dd>Commissioned work in progress: a road, paving, a wall or another building. Open a mark for its progress, cost and any reason it has halted. Red construction marks mean halted work.</dd><dt>Town-name warnings</dt><dd>⚔ siege · ⚠ hunger · ☠ plague · ⚑ high unrest. Open the town to read the cause and your available orders.</dd></dl><p>Map overlays have their own colour keys. Use Menu → Overlays to choose one, then Map legend to read it.</p>';
   if(infoUI.kind==='reference')return referenceInfoHTML();
   if(infoUI.kind==='about')return '<p>Castle and Commons</p><p>A living realm of households, towns, trade and dynasties.</p><p>© 2026 Six Cailloux, LLC.</p><p>Released under the <a href="LICENSE" target="_blank" rel="noopener">MIT licence</a>, retaining the original source notice: Copyright (c) 2026 healdgar.</p>';
   if(infoUI.kind==='timeline'){
@@ -11454,7 +11467,7 @@ function openInfo(kind,town=null,reference=null){
   if(!document.getElementById('contextpanel').contains(document.activeElement))document.getElementById(contextUI.expanded?'contextsize':'contexttitle').focus();
 }
 function contextAnchor(pk){
-  if(!pk)return null;if(BACKGROUND&&pk._anchor)return pk._anchor;
+  if(!pk)return null;if(BACKGROUND&&pk._anchor)return pk._anchor;if(pk.type==='project')return projectMarkerAnchor((W.projects||[]).find(q=>projectMarkerKey(q)===pk.key)||{});
   let p=null;
   switch(pk.type){
     case 'church-body':case 'abbey':case 'court':case 'settlement':case 'wall':case 'beast':p=(pk.s||W.settlements[pk.si])?.pos;break;
@@ -11488,7 +11501,7 @@ function contextPlacement(anchor,width,height,viewport,side){
 function contextTitle(){
   const k=contextUI.kind;
   if(k==='event')return esc(eventTitle(eventUI.current));
-  if(k==='info')return infoUI.kind==='reference'?esc(referenceTitle(infoUI.reference)):infoUI.kind==='about'?'About Castle and Commons':infoUI.kind==='timeline'?'The timeline':infoUI.town?esc(infoUI.town.name)+' · Accounts':'Kingdom ledger';
+  if(k==='info')return infoUI.kind==='reference'?esc(referenceTitle(infoUI.reference)):infoUI.kind==='symbols'?'Map symbols':infoUI.kind==='about'?'About Castle and Commons':infoUI.kind==='timeline'?'The timeline':infoUI.town?esc(infoUI.town.name)+' · Accounts':'Kingdom ledger';
   if(k==='insp')return document.getElementById('insptitle').innerHTML;
   if(k==='drawer')return {crown:'The Crown',rates:'Rates',acts:'Acts',over:'Map overlays',world:'The realm'}[drawerTab];
   if(k==='chron')return esc('The Annals of '+W.name);
@@ -11500,6 +11513,9 @@ function contextSync(){
   if(!contextUI.ready||!contextUI.kind)return;
   const el=document.getElementById('contextpanel');setHTML(document.getElementById('contexttitle'),contextTitle());
   el.setAttribute('aria-label',document.getElementById('contexttitle').textContent);el.dataset.kind=contextUI.kind;
+  const drawing=contextUI.kind==='plan';document.getElementById('contextsize').hidden=drawing;document.getElementById('contexttitle').disabled=drawing;
+  if(drawing)document.getElementById('contexttitle').title='Plan works beside the map';
+  orderFeedbackPosition();
   if(contextUI.kind==='insp'){
     const source=document.getElementById('inspbody'),rows=[...source.querySelectorAll(':scope > .row')];
     const selected=inspTarget?.type==='settlement'?rows.filter(r=>['Population','Unrest','Opening housing'].includes(r.firstElementChild?.textContent)):rows.slice(0,2);
@@ -11512,6 +11528,7 @@ function contextShow(kind){
   if(!contextUI.ready||!CONTEXT_IDS[kind])return;
   const changed=contextUI.kind!==kind;
   contextUI.kind=kind;contextUI.side=changed?null:contextUI.side;
+  if(kind==='plan'&&contextUI.expanded)contextExpand(false);
   const el=document.getElementById('contextpanel');el.hidden=false;
   const child=document.getElementById(CONTEXT_IDS[kind]);if(child&&child.parentElement.id!=='contextcontent')document.getElementById('contextcontent').append(child);
   if(changed&&kind==='drawer'){refreshCrownPanel(true);refreshHousePanel(true);}
@@ -11519,7 +11536,7 @@ function contextShow(kind){
   contextPosition();if(changed&&contextUI.expanded)document.getElementById('contextsize').focus();
 }
 function contextExpand(on){
-  if(!contextUI.ready||!contextUI.kind)return;
+  if(!contextUI.ready||!contextUI.kind||on&&contextUI.kind==='plan')return;
   const el=document.getElementById('contextpanel'),content=document.getElementById('contextcontent');
   if(contextUI.expanded===on)return;
   if(!on)contextUI.scroll.set(contextUI.kind,content.scrollTop);
@@ -11537,7 +11554,7 @@ function contextDismiss(){
   const kind=contextUI.kind,opener=kind==='info'?contextUI.opener:null;contextUI.opener=null;contextExpand(false);contextUI.kind=null;document.getElementById('contextpanel').hidden=true;
   if(kind==='insp')hideInspect();else if(kind==='drawer')setDrawerClosed(true);else if(kind==='chron')setChronMin(true);else if(kind==='plan')planClose();else if(kind==='petition')document.getElementById('petition').classList.add('min');else if(kind==='legend')document.getElementById('terrlegend')?.classList.add('min');
   if(kind==='event'){eventUI.current=null;eventUI.referenceRequest++;}
-  (opener?.isConnected?opener:document.getElementById('menubtn')).focus();document.dispatchEvent(new Event('contextchange'));
+  (opener?.isConnected?opener:document.getElementById('menubtn')).focus();document.dispatchEvent(new Event('contextchange'));orderFeedbackPosition();
 }
 function contextPosition(){
   eventBubbleUpdate();
@@ -12039,7 +12056,7 @@ function advisorLinks(html,max=60){const out=[],seen=new Set(),rx=/<a\b([^>]*)>(
 function advisorTownIndex(t){if(Number.isInteger(t)&&t>=0&&t<W.settlements.length)return t;if(typeof t!=='string'||!t)return null;if(/^s\d+$/.test(t))return +t.slice(1)<W.settlements.length?+t.slice(1):null;const e=ADV.byName(t);return e&&e.code[0]==='s'?+e.code.slice(1):null;}
 function advisorPanel(p){
   const kind=String(p.of||''),T=(html,extra)=>({kind,...extra,text:advisorText(html),links:advisorLinks(html,200)});
-  if(kind==='crown')return T(workerUIQuery({kind:'crown',expanded:true,ledgerOpen:true}).html,{note:'all four court views: overview, governance, orders, houses'});
+  if(kind==='crown')return T(workerUIQuery({kind:'crown',expanded:true,ledgerOpen:true}).html,{note:'court views: overview, governance, orders, houses, learning'});
   if(kind==='accounts'){const si=p.town!=null?advisorTownIndex(p.town):null;if(p.town!=null&&si==null)return{error:'no such town: '+p.town};return T(workerUIQuery({kind:'info',infoKind:'accounts',town:si}).html,si!=null?{town:W.settlements[si].name}:{});}
   if(kind==='timeline'||kind==='about')return T(workerUIQuery({kind:'info',infoKind:kind}).html);
   if(kind==='petitions'){const P=W.petitions||[];return{kind,petitions:ADV.petitions(),sheet:P[0]?advisorText(petitionHTML(P[0],P.length-1,true)):'',note:P.length?undefined:'no petition waits on you'+(sovOn()?'':' (petitions come only to a ruler)')};}
@@ -12071,7 +12088,7 @@ function workerUIQuery(payload={}){
   if(kind==='inspect')return workerInspectorQuery(payload.code,payload.full);
   if(kind==='crown'){
     const expanded=contextUI.expanded,oldSection=crownSection,ledgerOpen=G.ledgerOpen,section=payload.section??payload.crownSection;
-    try{if(typeof payload.expanded==='boolean')contextUI.expanded=payload.expanded;if(typeof payload.ledgerOpen==='boolean')G.ledgerOpen=payload.ledgerOpen;if(['overview','governance','orders','houses'].includes(section))crownSection=section;return{html:linkNames(crownPanelHTML())};}
+    try{if(typeof payload.expanded==='boolean')contextUI.expanded=payload.expanded;if(typeof payload.ledgerOpen==='boolean')G.ledgerOpen=payload.ledgerOpen;if(['overview','governance','orders','houses','learning'].includes(section))crownSection=section;return{html:linkNames(crownPanelHTML())};}
     finally{contextUI.expanded=expanded;crownSection=oldSection;G.ledgerOpen=ledgerOpen;}
   }
   if(kind==='info'){
@@ -12110,6 +12127,8 @@ function workerUIQuery(payload={}){
 }
 function showInspect(pk){
   if(MODEL_ONLY)return;
+  if(pk?.type==='project'){const q=(W.projects||[]).find(q=>projectMarkerKey(q)===pk.key);pk.workerCard=projectMarkerCard(q);pk._anchor=q?projectMarkerAnchor(q):pk._anchor;}
+  if(pk?.type==='project'&&!backgroundApplying){backgroundApplying=true;try{return showInspect(pk);}finally{backgroundApplying=false;}}
   if(BACKGROUND&&!backgroundApplying)return workerShowInspector(pk);
   if(pk?.type==='event'){showEventDialog(pk.ev);return;}
   const opening=document.getElementById('insp').style.display!=='flex',changed=!inspTarget||Object.keys(pk).some(k=>pk[k]!==inspTarget[k]);
@@ -12876,8 +12895,8 @@ function tickDomains(){ // monthly: owners, hosts, the frontier, and private war
     const own=W.settlements.filter(s=>s.owner===hi&&!s.siegeBy);
     const opts=[];for(const t of own){const w=t.works||{},rents=townWorth(t)/25+t.pop*0.4; // each work by what it would bring in a year, against its cost
       // Finite storage commissions are chosen by storageInvestment, with a real site and resources.
-      if(!w.mill)opts.push([t,'mill',600*PL(),(t.res?t.res.farm:0)*t.pop*0.004+rents*0.03]);
-      if(!w.market)opts.push([t,'market',800*PL(),rents*0.08+marketHeads(t)*0.2]);
+      if(w.mill==null||w.mill===false)opts.push([t,'mill',600*PL(),(t.res?t.res.farm:0)*t.pop*0.004+rents*0.03]);
+      if(w.market==null||w.market===false)opts.push([t,'market',800*PL(),rents*0.08+marketHeads(t)*0.2]);
       if(!(t.clearUntil>day())&&t.landShort)opts.push([t,'clearing',400*PL(),t.pop*0.5*clamp(t.pop/Math.max(40,t.cap||t.pop)-0.8,0,1)]);}
     const spare=purse(hi)-hostTarget(hi)*4,o=opts.filter(x=>x[3]*15>x[2]&&x[2]*1.2<spare).sort((a,b)=>b[3]/b[2]-a[3]/a[2])[0];if(!o)continue; // the best return that pays for itself in fifteen years, from silver to spare
     const[t,k,c]=o;if(k==='clearing')payAmong(heads_(t,h=>tills(h,t)),c,purseAcct(hi),'works');else buildWorks(t,c,purseAcct(hi),'works');
@@ -14214,7 +14233,7 @@ function ladeOut(c,o,quiet,actors){ladeOut.why=null;if(c.riverLeg){const old=c.r
   if(c.sea)portPlagueDeparture(c,o);life(drv,`${mode==='cart'?'Carted':'Shipped'} ${Math.round(got)} ${c.good} from ${o.name} to ${dest?dest.name:'market'}${m!==drv&&m!=='out'?' for '+folkName(m):''}`);if(m!=='out'&&m!==drv)life(m,`Sent ${Math.round(got)} ${c.good} to ${dest?dest.name:'market'}`);return c;}
 function ladeIn(c,d){if(typeof technologyContact==='function')technologyContact(W.settlements[c.origin],d);let m=c.m||'out';if(m!=='out'&&m.dead)m=lordAcct(W.settlements[c.origin]); // a merchant who died on the road: his goods to his lord
   const val=c.cost||0,lord=d.owner>0&&!inRevolt(d.owner)?W.houses[d.owner]:null;let dues=payTolls(c,m,val); // dues on what the goods cost him, not on a price no one may pay: first the pontage and pavage at each toll house it passed
-  if(lord||d.commune){const tl=transfer(m,d.commune?d:lord,val*0.05*(d.works&&d.works.market?1.6:1),'markets',d);dues+=tl;d._marketToll=(d._marketToll||0)+tl;if(!d.commune)lordTake(d,tl);dues+=transfer(m,'crown',val*(MOD.tax/100)*0.14,'Trade tax',d);} // the market toll and the crown's aid, on what is brought to sell
+  if(lord||d.commune){const tl=transfer(m,d.commune?d:lord,val*0.05*(d.works?.market!=null&&d.works.market!==false?1.6:1),'markets',d);dues+=tl;d._marketToll=(d._marketToll||0)+tl;if(!d.commune)lordTake(d,tl);dues+=transfer(m,'crown',val*(MOD.tax/100)*0.14,'Trade tax',d);} // the market toll and the crown's aid, on what is brought to sell
   else dues+=transfer(m,'crown',val*(MOD.tax/100)*0.35,'Trade tax',d);
   const drv=c.drv&&!c.drv.dead?householdHead(c.drv):null;if(c.fee>0&&drv&&drv!==m)transfer(m,drv,c.fee,'freight'); // the carter is paid on delivery
   if(m!=='out'&&m.gn!==undefined)m._inc=(m._inc||0)-dues-(drv!==m?c.fee||0:0);
@@ -14342,7 +14361,7 @@ function eatHouseholds(s,PM){initOwnership(s);if(typeof HUNGRY_HANDS!=='undefine
    demand alone (reprice), and a household's want of each good gives way as its price rises above what the good costs to make or to bring */
 function goodWorth(s){ // what each good the households buy is worth here: what it costs to make it here (the stuff each piece takes, at the place's prices: the floor a smith's or a weaver's offer carries; their work is not reckoned apart, for they work whenever the ware pays for its stuff), or to bring as much of it as the place needs in a month (the markets with some to spare beyond their own month's need, the cheapest laid down here first, until their spare covers the month: the last one's price with the tolls here, the carter's freight from there and what perishes on the way; or the far ports' price, GOODBASE, at a harbour their ships reach), whichever is less; where neither can be reckoned, its price here one year with another; else nothing is known (0). Reckoned on the market day from prices and stocks alone: it fills no price and moves nothing (#51: the cheapest market alone set it, so a village where fish rotted unsold made the capital's plentiful fish seem seventy times its worth, and the capital went a third short of bread)
   const own=s.px||{},Y=s._pxY||{},ad=AD(),far=ad>=900?FARPORTS.filter(f=>ad>=f.from&&ad<(f.to||9999)):[],M=metroOf(s),out={};
-  const toll=s.owner>0&&!inRevolt(s.owner)?0.05*(s.works&&s.works.market?1.6:1)+MOD.tax/100*0.14:MOD.tax/100*0.35; // the market toll and the crown's aid on what is brought to sell (ladeIn)
+  const toll=s.owner>0&&!inRevolt(s.owner)?0.05*(s.works?.market!=null&&s.works.market!==false?1.6:1)+MOD.tax/100*0.14:MOD.tax/100*0.35; // the market toll and the crown's aid on what is brought to sell (ladeIn)
   const from=closedToTrade(s)?[]:W.settlements.filter(t=>t!==s&&metroOf(t)!==M&&!closedToTrade(t)).map(t=>{const len=dist2d(t.pos.x,t.pos.z,s.pos.x,s.pos.z)*1.2;return [t,freight(t,1,len,'cart'),len/CART_MPD];}); // every market that trades, the freight of a load from it at its going rate, as the caravans reckon it, and the days on the road
   for(const g in ELASTIC){const sea=far.some(f=>f.g[g]);
     let w=g==='tools'?(s._smiths>0&&own.ore>0&&own.timber>0?0.75*(own.ore+own.timber):Infinity):g==='cloth'?(own.wool>0?own.wool/0.8:Infinity):g==='meat'?Math.min(...['cattle','swine','sheep'].map(k=>own[k]>0&&s.stores[k]>0?own[k]/CARCASS[k]/(1-SHAMBLES):Infinity)):Infinity; // iron and charcoal where there is a smithy; wool, for every cottage spins and weaves; a beast of the place's herds, killed and dressed
@@ -18759,18 +18778,31 @@ function answerPersuade(q){ // the lord's answer
     if(q.lever==='force'&&!W.war&&chance('sim',0.35+(50-h.loyalty)/100))startWar(req.hi,'will not bend to threats');
   }
 }
+function projectMarkerText(q){const name=q.title||({road:'Road construction',pave:'Road paving',buy:'Land offer',clear:'District clearing',persuade:'Envoys awaiting an answer',storage:'Storage construction',castle:'Castle construction',compound:'Building construction',fabric:'Building repairs'}[q.type]||'Commissioned work');
+  const progress=q.type==='storage'?(q.worked??q.done??0)/Math.max(1,q.days||1):q.done||0;
+  return name+' · '+(q.stalled?'halted'+(q.reason?': '+q.reason.replace(/-/g,' '):''):['buy','persuade'].includes(q.type)?'awaiting an answer':Math.round(clamp(progress,0,1)*100)+'% complete');}
+function projectMarkerAnchor(q){const p=q.site?.f||q.site?.ring||q.site?.ward||q.f||q.P?.path?.[0]||q.st?.pts?.[0]||q.r?.path?.[0]||q.place||q;
+  return Number.isFinite(p.x)&&Number.isFinite(p.z)?{x:p.x,z:p.z}:W.settlements[q.si??q.ai]?.pos||null;}
+function projectMarkerCard(q){
+  if(!q)return{title:'Commissioned work',sub:'No longer active',body:'<p>This work is no longer in progress. Read the Annals or inspect its town for the recorded outcome.</p>',actions:'',follow:null};
+  const rows=[['State',projectMarkerText(q)],...(Number.isFinite(q.cost)?[['Estimated cost',Math.round(q.cost).toLocaleString()+' gold']]:[]),...(Number.isFinite(q.paid)?[['Labour paid',q.paid.toLocaleString(undefined,{maximumFractionDigits:2})+' gold']]:[]),...(Number.isFinite(q.materialPaid)?[['Materials paid',q.materialPaid.toLocaleString(undefined,{maximumFractionDigits:2})+' gold']]:[])];
+  const si=q.si??q.ai,town=W.settlements[si];
+  return{title:q.title||'Commissioned work',sub:q.type+' · '+(town?.name||'in the realm'),body:rows.map(([k,v])=>'<div class="row long"><span>'+esc(k)+'</span><b>'+esc(v)+'</b></div>').join('')+(town?'<p><a class="nm" data-nm="s'+si+'">Open '+esc(town.name)+'</a> for its orders and works.</p>':''),actions:'',follow:null};
+}
 function refreshOrders(){ // a mark on everything an order is still working on: pegs, a band, a ring
   G.ordersDirty=false;if(G.orders){scene.remove(G.orders);disposeTree(G.orders);}
   const grp=G.orders=new THREE.Group(),mat=c=>new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.5,depthWrite:false,side:THREE.DoubleSide});
-  const ring=(x,z,r,c)=>{const m=new THREE.Mesh(new THREE.RingGeometry(r-2.2,r,48),mat(c));m.rotation.x=-Math.PI/2;m.position.set(x,surfY(x,z)+3,z);m.renderOrder=4;grp.add(m);};
+  let pick;
+  const ring=(x,z,r,c)=>{const m=new THREE.Mesh(new THREE.RingGeometry(r-2.2,r,48),mat(c));m.rotation.x=-Math.PI/2;m.position.set(x,surfY(x,z)+3,z);m.renderOrder=4;m.userData.pick=pick;grp.add(m);};
   const band=(pts,w,c)=>{const q=resample(pts,10);if(q.length<2)return;const pos=[],idx=[];
     q.forEach((p,k)=>{const a=q[Math.max(0,k-1)],b=q[Math.min(q.length-1,k+1)],L=dist2d(a.x,a.z,b.x,b.z)||1,nx=-(b.z-a.z)/L*w,nz=(b.x-a.x)/L*w,y=surfY(p.x,p.z)+1.6;
       pos.push(p.x+nx,y,p.z+nz,p.x-nx,y,p.z-nz);if(k)idx.push(k*2-2,k*2-1,k*2,k*2-1,k*2+1,k*2);});
-    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);const m=new THREE.Mesh(g,mat(c));m.renderOrder=4;grp.add(m);};
-  for(const q of W.projects||[]){
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);const m=new THREE.Mesh(g,mat(c));m.renderOrder=4;m.userData.pick=pick;grp.add(m);};
+  for(const q of W.projects||[]){pick={type:'project',key:projectMarkerKey(q)};
     if(q.type==='road'){const P=resample(q.P.path,24),k0=Math.floor(P.length*q.done);
-      for(let k=k0;k<P.length;k++){const p=P[k],m=new THREE.Mesh(new THREE.BoxGeometry(0.8,5,0.8),mat(q.stalled?0x8a2f22:0xe0c070));m.position.set(p.x,hAt(p.x,p.z)+2.5,p.z);grp.add(m);} // surveyors' pegs where the road will run
-    }else if(q.type==='pave'){const r=q.r,P=r.drawn||r.path;band(P,6.5,q.stalled?0x8a2f22:0xe0c070);}
+      for(let k=k0;k<P.length;k++){const p=P[k],m=new THREE.Mesh(new THREE.BoxGeometry(0.8,5,0.8),mat(q.stalled?0x8a2f22:0xe0c070));m.position.set(p.x,hAt(p.x,p.z)+2.5,p.z);m.userData.pick=pick;grp.add(m);} // surveyors' pegs where the road will run
+    }else if(q.type==='storage'){ring(q.x,q.z,12,q.stalled?0x8a2f22:0xe0c070);}
+    else if(q.type==='pave'){const r=q.r,P=r.drawn||r.path;band(P,6.5,q.stalled?0x8a2f22:0xe0c070);}
     else if(q.type==='castle'&&q.site){const R=q.site.ward,P=Array.from(R.wallRad,(r,k)=>{const a=k/R.wallRad.length*Math.PI*2;return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};});P.push({...P[0]});const c=q.stalled?0x8a2f22:0xe0c070;band(P,1.3,c);band(q.site.path,1.3,c);}
     else if((q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')&&q.site){const c=q.stalled?0x8a2f22:0xe0c070;for(const P of q.site.polys||[])if(P.length>2)band([...P,P[0]],1.3,c);if(q.site.poly?.length>2)band([...q.site.poly,q.site.poly[0]],1.3,c);if(q.site.f){const f=q.site.f,P=obbCorners(f.x,f.z,f.w,f.d,f.rot);band([...P,P[0]],1.3,c);}if(q.site.ring){const R=q.site.ring,P=Array.from({length:65},(_,k)=>{const a=k/64*Math.PI*2,r=wallRadAt(R,a);return{x:R.x+Math.cos(a)*r,z:R.z+Math.sin(a)*r};});band(P,1.3,c);}if(q.site.path)band(q.site.path,1.3,c);}
     else if(q.type==='buy')ring(q.f.x,q.f.z,FG*0.55,0x3e5f8a);
@@ -18805,8 +18837,8 @@ function paveRoad(r,payer){
   payer=payer|0;if(!r)return false;if(r.grade){emit('crown',3,W.settlements[r.a].pos,'That road is paved already.');return false;}
   if((W.projects||[]).some(q=>q.type==='pave'&&q.r===r)){emit('crown',2,W.settlements[r.a].pos,'That road is being paved already.');return false;}
   const cost=Math.round(r.len*0.6+150),days=Math.round(40+r.len/25);if(purse(payer)<cost*0.25){emit('crown',3,W.settlements[r.a].pos,`Paving the road from ${W.settlements[r.a].name} to ${W.settlements[r.b].name} would cost ${cost.toLocaleString()} gold; the treasury cannot even begin it.`);return false;}
-  const A=W.settlements[r.a],recipe=constructionRecipe(A,cost,days,0,r.len*0.12);G.ordersDirty=true;(W.projects=W.projects||[]).push({type:'pave',r,payer,si:r.a,cost:recipe.labour+recipe.timber*price(A,'timber')+recipe.stone*price(A,'stone'),...recipe,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,worked:0,done:0,start:day(),status:'building'});
-  emit('crown',5,W.settlements[r.a].pos,`Masons begin paving and ditching the road from ${W.settlements[r.a].name} to ${W.settlements[r.b].name}: ${Math.round(days/30)} months' work, ${cost.toLocaleString()} gold as it goes.`);
+  const A=W.settlements[r.a],recipe=constructionRecipe(A,cost,days,0,r.len*0.12),estimated=recipe.labour+recipe.timber*price(A,'timber')+recipe.stone*price(A,'stone');G.ordersDirty=true;(W.projects=W.projects||[]).push({type:'pave',r,payer,si:r.a,cost:estimated,...recipe,paid:0,materialPaid:0,timberInstalled:0,stoneInstalled:0,worked:0,done:0,start:day(),status:'building'});
+  emit('crown',5,W.settlements[r.a].pos,`Masons begin paving and ditching the road from ${W.settlements[r.a].name} to ${W.settlements[r.b].name}: ${Math.round(days/30)} months' work, an estimated ${Math.round(estimated).toLocaleString()} gold at current wages and material prices, paid as it goes.`);
   return true;
 }
 function landPrice(f){return Math.round(120+landValue(f)*55);}
@@ -18876,12 +18908,12 @@ function decreeBlock(d){ // → [reason or '', cost]
 }
 function runDecree(k){
   const d=DECREES.find(x=>x.k===k);if(!d)return;
-  const [why,c]=decreeBlock(d);if(why)return;
+  const [why,c]=decreeBlock(d);if(why)return{accepted:false,reason:why};
   if(d.place===true){setPlaceMode('charter',c,'Choose the ground for the new village — Esc to cancel');return;}
   if(d.place==='plan'){planOpen(0);return;}
   if(d.place){setPlaceMode(d.place,d.k,d.hint);return;}
   if(d.cd)setCd('d_'+d.k,d.cd);
-  d.run(c);
+  d.run(c);return{accepted:true};
 }
 
 /* ---- the great houses ---- */
@@ -18953,11 +18985,11 @@ async function storagePreview(si,arch,x,z){const s=W.settlements[si];if(!s||!sov
   STORAGE_UI.set(s,{arch,...storageSiteQuote(si,arch,x,z,plyH())});showInspect({type:'settlement',s});setInspectorView('orders');}
 function storagePlayerCommission(arg){let choice;try{choice=JSON.parse(decodeURIComponent(arg));}catch{return false;}const s=choice&&Number.isInteger(choice.si)&&W.settlements[choice.si];if(!s||!sovOn()||choice.payer!==plyH()||s.owner!==choice.payer||!Object.hasOwn(STORAGE_TYPES,choice.arch)||!Number.isFinite(choice.x)||!Number.isFinite(choice.z))return false;const project=storageCommission(storageSiteQuote(choice.si,choice.arch,choice.x,choice.z,choice.payer));if(project)STORAGE_UI.delete(s);return project;}
 function worksHTML(s){const si=W.settlements.indexOf(s),w=s.works||{};let x='<div class="dhead" style="margin-top:6px">Works</div>';
-  for(const[k,l,c,d]of WORKS){const done=k==='clearing'?s.clearUntil>day():w[k];x+=cbtn('s-work',si+':'+k,l,c,done?(k==='clearing'?'under way':'built'):'',d);}return x+storageWorksHTML(s);}
+  for(const[k,l,c,d]of WORKS){const done=k==='clearing'?s.clearUntil>day():w[k]!=null&&w[k]!==false;x+=cbtn('s-work',si+':'+k,l,c,done?(k==='clearing'?'under way':'built'):'',d);}return x+storageWorksHTML(s);}
 function settlementWork(si,k){const s=W.settlements[si],me=plyH(),wk=WORKS.find(x=>x[0]===k);if(!s||!wk||s.owner!==me)return;
-  if(k==='clearing'?s.clearUntil>day():(s.works||{})[k])return;if(purse(me)<wk[2])return;if(k==='clearing')payAmong(heads_(s,h=>tills(h,s)),wk[2],purseAcct(me),'works');else buildWorks(s,wk[2],purseAcct(me),'works');
+  if(k==='clearing'?s.clearUntil>day():s.works?.[k]!=null&&s.works[k]!==false)return{accepted:false,reason:k==='clearing'?'The assarters are already at work.':'This work is already built.'};if(purse(me)<wk[2])return{accepted:false,reason:'There is not enough gold for this work.'};if(k==='clearing')payAmong(heads_(s,h=>tills(h,s)),wk[2],purseAcct(me),'works');else buildWorks(s,wk[2],purseAcct(me),'works');
   if(k==='clearing')s.clearUntil=day()+360*3;else{(s.works||(s.works={}))[k]=day();if(k==='market')s.prosperity=clamp(s.prosperity+5,0,100);}
-  emit(me>0?'house':'trade',4,s.pos,`${me>0?W.houses[me].name:'The crown'} ${k==='mill'?'builds a mill':k==='granary'?'builds a granary':k==='market'?'grants a market charter':'sets assarters to clear the waste'} at ${s.name}.`);}
+  emit(me>0?'house':'trade',4,s.pos,`${me>0?W.houses[me].name:'The crown'} ${k==='mill'?'builds a mill':k==='granary'?'builds a granary':k==='market'?'grants a market charter':'sets assarters to clear the waste'} at ${s.name}.`);return{accepted:true};}
 function settlementActsHTML(s){
   const si=W.settlements.indexOf(s);
   if(inRevolt(s.owner)&&s.owner!==plyH())return '<div class="note">Held by rebels — your writ does not run here.</div>';
@@ -18987,29 +19019,29 @@ function orderArmy(a,si){
   return true;
 }
 function orderArmyAt(a,b){ // set one host on another: it follows the foe until they meet; if their lords are not at war, this begins one
-  if(!a||a.gone||!b||b.gone||a===b)return;
-  if(a.state==='battle'){emit('war',2,null,`${a.name} is locked in battle and cannot heed new orders.`);return;}
-  if(b.house===a.house){emit('war',2,null,`${b.name} marches under the same banner.`);return;}
+  if(!a||a.gone||!b||b.gone||a===b)return false;
+  if(a.state==='battle'){emit('war',2,null,`${a.name} is locked in battle and cannot heed new orders.`);return false;}
+  if(b.house===a.house){emit('war',2,null,`${b.name} marches under the same banner.`);return false;}
   if(!atWar(a.house,b.house)){const me=a.house,them=b.house; // drawing the sword is a declaration
     if((me===0||them===0)&&!W.war)startWar(me===0?them:me,me===0?'is set upon by the crown’s host':'raises its hand against the crown');
     else startFeud(me,them,me);
-    if(!atWar(a.house,b.house)){emit('war',3,null,`${a.name} cannot be brought against ${b.name} now.`);return;}
+    if(!atWar(a.house,b.house)){emit('war',3,null,`${a.name} cannot be brought against ${b.name} now.`);return false;}
     emit('war',7,armySimPos(b),`${W.houses[me].name} sends ${a.name} against ${b.name} of ${W.houses[them].name}: it is war between them.`);}
   if(a.state==='siege')liftSiege(a);
   a.hold=true;a.why=null;a.chase=b.id;a.nextOrder=null;chaseStep(a,b);
-  if(a.chase!==b.id){emit('war',3,armySimPos(a),`${a.name} cannot reach ${b.name}: a passable ford, bridge or breach is required.`);refreshInspect();return;} // the first day's march failed (armyRouteBlocked ends the pursuit)
-  emit('war',4,armySimPos(b),`${a.name} marches to bring ${b.name} to battle${b.state==='idle'&&!b.field&&W.settlements[b.at]?` at ${W.settlements[b.at].name}`:''}.`);refreshInspect();}
+  if(a.chase!==b.id){emit('war',3,armySimPos(a),`${a.name} cannot reach ${b.name}: a passable ford, bridge or breach is required.`);refreshInspect();return false;} // the first day's march failed (armyRouteBlocked ends the pursuit)
+  emit('war',4,armySimPos(b),`${a.name} marches to bring ${b.name} to battle${b.state==='idle'&&!b.field&&W.settlements[b.at]?` at ${W.settlements[b.at].name}`:''}.`);refreshInspect();return true;}
 function chaseStep(a,b){ // one day's pursuit: on the roads while the foe is far, straight at it when near; a foe within its town's walls is besieged there
   const p=armySimPos(a),q=armySimPos(b),d=dist2d(p.x,p.z,q.x,q.z),go=si=>{if(a.state==='march'||a.field){a.field={x:p.x,z:p.z};}a.fieldTo=null;a.state='idle';marchArmy(a,si);}; // set out from where it stands, not from home
   if(b.state==='idle'&&!b.field&&W.settlements[b.at]){if(a.state!=='march'||a.target!==b.at||a.fieldTo)go(b.at);return;}
   if(b.state==='march'&&d>1500&&b.target!=null&&!b.fieldTo){if(a.state!=='march'||a.target!==b.target||a.fieldTo)go(b.target);return;} // head for where it is going
   const t=b.state==='march'?armyAt(b,clamp((day()-b.departDay+1.5)/Math.max(0.01,b.arriveDay-b.departDay),0,1)):q;if(t&&d>110)marchToPoint(a,t.x,t.z);}
 function orderArmyTo(a,x,z){
-  if(!a||a.gone)return;
-  if(a.state==='battle'){emit('war',2,null,`${a.name} is locked in battle and cannot heed new orders.`);return;}
+  if(!a||a.gone)return false;
+  if(a.state==='battle'){emit('war',2,null,`${a.name} is locked in battle and cannot heed new orders.`);return false;}
   if(a.state==='siege')liftSiege(a);
   a.hold=true;a.why=null;if(!marchToPoint(a,x,z)){emit('war',3,armySimPos(a),`${a.name} cannot reach that ground; a passable ford, bridge or breach is required.`);refreshInspect();return false;}
-  emit('war',3,{x,z},`${a.name} marches across country towards ${nearestPlaceName(x,z)}.`);refreshInspect();}
+  emit('war',3,{x,z},`${a.name} marches across country towards ${nearestPlaceName(x,z)}.`);refreshInspect();return true;}
 function armyCmd(cmd,id){
   const[ia,ib]=String(id).split(':'),a=W.armies.find(x=>x.id===+ia);if(!a||a.house!==plyH())return;
   if(cmd==='objective'){
@@ -19032,7 +19064,7 @@ function armyActsHTML(a){
   const pa=armySimPos(a),near=W.armies.filter(b=>b!==a&&!b.gone&&b.house===a.house&&b.state!=='battle'&&(()=>{const pb=armySimPos(b);return dist2d(pa.x,pa.z,pb.x,pb.z)<=250;})());
   return `<div class="dhead">Campaign objective</div>`+
     [['capture','Capture settlement'],['pillage','Pillage settlement'],['depose','Seize lord’s seat'],['demolish','Demolish a wall segment'],['destroy','Destroy a building'],['devastate','Devastate settlement']].map(([k,l])=>cbtn('a-objective',a.id+':'+k,l,0,'')).join('')+
-    cbtn('a-order',a.id,'Order a march… ('+(uiLayout()==='phone'||matchMedia('(pointer:coarse)').matches?'tap':'click')+' a town, a host to attack, or open ground to camp)',0,'')+
+    cbtn('a-order',a.id,'Order a march…',0,'','Choose a town, a host to attack, or open ground to camp.')+
     cbtn('a-road',a.id,'Lay a supply road…',0,'','Uses the existing monthly road project')+
     cbtn('a-raft',a.id,'Build a raft crossing…',0,'','Consumes owned timber at a supplied friendly riverbank')+
     cbtn('a-split',a.id,'Split the host in two',0,a.strength<60?'too few men':'','half marches under its own banner')+
@@ -19227,15 +19259,15 @@ function lordCmd(cmd,arg){
 }
 function lordPlace(mode,p,arg){ // map clicks for a lord's works
   const hi=plyH(),{h,seat}=lordHouse(),i=nearestSettlementIdx(p.x,p.z),s=W.settlements[i],near=dist2d(p.x,p.z,s.pos.x,s.pos.z)<=(s.radius||90)*2;
-  if(mode==='lroad1'){if(!near||s.owner!==hi){emit('house',2,p,'The road must start from one of your towns.');return;}
-    setPlaceMode('lroad2',i,`From ${s.name}: now click the place the road should reach — Esc to cancel`);}
-  else if(mode==='lroad2'){if(!near){emit('house',2,p,'The road must end at a place.');return;}orderRoad(arg,i,hi);}
-  else if(mode==='lpave'){const g=groundPick(p.x,p.z);if(!g||g.type!=='road'){emit('house',2,p,'There is no road there to pave.');return;}
-    if(W.settlements[g.r.a].owner!==hi&&W.settlements[g.r.b].owner!==hi){emit('house',2,p,'That road does not run to any of your towns.');return;}paveRoad(g.r,hi);}
+  if(mode==='lroad1'){if(!near||s.owner!==hi){emit('house',2,p,'The road must start from one of your towns.');return false;}
+    setPlaceMode('lroad2',i,`From ${s.name}: now click the place the road should reach — Esc to cancel`);return true;}
+  else if(mode==='lroad2'){if(!near){emit('house',2,p,'The road must end at a place.');return false;}return orderRoad(arg,i,hi);}
+  else if(mode==='lpave'){const g=groundPick(p.x,p.z);if(!g||g.type!=='road'){emit('house',2,p,'There is no road there to pave.');return false;}
+    if(W.settlements[g.r.a].owner!==hi&&W.settlements[g.r.b].owner!==hi){emit('house',2,p,'That road does not run to any of your towns.');return false;}return paveRoad(g.r,hi);}
   else if(mode==='lvillage'){const f=W.land&&furlongAt(p.x,p.z);
-    if(!f||(f.lord!==hi&&f.lord>=0)){emit('house',2,p,'That ground is another’s. Found your village on your own land or on open waste.');return;}
-    if(cdLeft('l_vil')||purse(hi)<1200)return;
-    const n=W.settlements.length;if(doAct('village',p,{from:seat,owner:hi})&&W.settlements.length>n){buildWorks(W.settlements[W.settlements.length-1],1200,purseAcct(hi),'founding');setCd('l_vil',360);sovAmbition('found');}}
+    if(!f||(f.lord!==hi&&f.lord>=0)){emit('house',2,p,'That ground is another’s. Found your village on your own land or on open waste.');return false;}
+    if(cdLeft('l_vil')||purse(hi)<1200)return false;
+    const n=W.settlements.length;if(doAct('village',p,{from:seat,owner:hi})&&W.settlements.length>n){buildWorks(W.settlements[W.settlements.length-1],1200,purseAcct(hi),'founding');setCd('l_vil',360);sovAmbition('found');return true;}return false;}
 }
 function incite(by,j){ // agents in a rival's market: bread riots and sedition; found out, and the rival does not forget
   const own=W.settlements.filter(s=>s.owner===j).sort((a,b)=>b.pop-a.pop),t=own[0];if(!t)return false;
@@ -19355,6 +19387,7 @@ function uiConfirmShow(root){ // an armed button says so; the rest say what they
     else if(!on&&b.dataset.unconfirmed!==undefined){text.textContent=b.dataset.unconfirmed;delete b.dataset.unconfirmed;}}}
 function runCmd(cmd,arg){
   if(backgroundUserRequest()&&!workerCommandIsLocal(cmd,arg))return workerSubmitCommand({k:'c',c:cmd,a:arg});
+  const feedback=!MODEL_ONLY&&!BACKGROUND&&!['s-manage','storage-pick','army','notable'].includes(cmd)&&!(cmd==='decree'&&DECREES.find(d=>d.k===arg)?.place)&&typeof orderFeedbackBegin==='function'?orderFeedbackBegin({k:'c',c:cmd,a:arg}):null,before=feedback?commandBefore():null,n0=feedback?allLines.length:0;
   let result;switch(cmd){
     case 'sov-on':setSovereign(true,0);break;
     case 'sov-house':setSovereign(true,+arg);break;
@@ -19362,18 +19395,18 @@ function runCmd(cmd,arg){
     case 'sov-off':setSovereign(false);break;
     case 'pause-toggle':W.player.pause=!W.player.pause;break;
     case 'camp-len':W.player.campLen=+arg;break;
-    case 'decree':runDecree(arg);break;
+    case 'decree':result=runDecree(arg);break;
     case 'h-honour':case 'h-hostage':case 'h-match':case 'h-attaint':houseCmd(cmd.slice(2),+arg);break;
     case 'notable':{const n=notableById(+arg);if(n)showInspect({type:'notable',n});break;}
     case 'army':{const a=W.armies.find(x=>x.id===+arg);if(a){showInspect({type:'army',a});const p=armyDisplayPos(a);flyTo(p.x,p.z,420);markManual();}break;}
-    case 's-manage':{const s=W.settlements[+arg];if(s&&sovOn()&&s.owner===plyH()){showInspect({type:'settlement',s});setInspectorView('orders');contextExpand(true);}break;}
+    case 's-manage':{const s=W.settlements[+arg];if(s&&sovOn()&&s.owner===plyH()){const pk={type:'settlement',s},opened=showInspect(pk);if(opened?.then)return opened.then(()=>{if(inspTarget===pk){setInspectorView('orders');contextExpand(true);}});setInspectorView('orders');contextExpand(true);}break;}
     case 'storage-pick':storagePick(+arg);break;
     case 'storage-commission':storagePlayerCommission(arg);break;
     case 'abbey-found':abbeyPlayerFound(arg);break;
     case 'abbey-gift':result=abbeyPlayerGift(arg);break;
     case 'church-appeal':{const [ai,id]=String(arg).split(':').map(Number),a=W.churchBodies?.[ai],q=a?.cases?.find(q=>q.id===id);if(sovOn()&&q&&W.settlements[q.si]?.owner===plyH())churchCaseAppeal(a,id);}break;
     case 'church-tenth':{const [si,rate,terms]=String(arg).split(':').map(Number);if(sovOn()&&plyH()===0)churchTenthCall(si,rate,terms);}break;
-    case 's-work':{const[a,b]=arg.split(':');settlementWork(+a,b);break;}
+    case 's-work':{const[a,b]=arg.split(':');result=settlementWork(+a,b);break;}
     case 's-relief':case 's-garrison':case 's-callout':case 's-levy':case 's-walls':case 's-seal':case 's-suppress':settlementCmd(cmd.slice(2),+arg);break;
     case 's-justice':justiceCmd(arg);break;
     case 'c-eyre':royalEyreCmd();break;
@@ -19397,6 +19430,7 @@ function runCmd(cmd,arg){
     case 'a-order':case 'a-road':case 'a-raft':case 'a-objective':case 'a-hold':case 'a-release':case 'a-disband':case 'a-split':case 'a-merge':case 'a-garrison':armyCmd(cmd.slice(2),arg);break;
   }
   if(!MODEL_ONLY){uiDownAt=0;refreshCrownPanel();refreshInspect();updateHUD();renderPetition();}
+  if(feedback)orderFeedbackFinish(feedback,commandReceipt(before,result,allLines.slice(n0)));
   return result;
 }
 /* =========================================================================
@@ -19565,6 +19599,7 @@ function initAccessibleUI(){
   document.addEventListener('pointerdown',e=>{if(!e.target.closest('#toolmenu,#menubtn'))closeToolMenu();const panel=e.target.closest('#drawer,#insp,#chron,#planbar,#terrlegend,#petition');if(panel)primaryPanel=({planbar:'plan',terrlegend:'legend'})[panel.id]||panel.id;});
   document.getElementById('petitionbtn').onclick=()=>{renderPetition(true);const p=document.getElementById('petition');p.classList.remove('min');sheet('petition');p.querySelector('#petitionfold')?.setAttribute('aria-expanded','true');};
   document.getElementById('brand').onclick=()=>openInfo('about');document.getElementById('datechip').onclick=()=>openInfo('timeline');document.getElementById('goldchip').onclick=()=>openInfo('accounts');document.getElementById('menuaccounts').onclick=()=>openInfo('accounts');
+  document.getElementById('menumarkers').onclick=()=>{closeToolMenu();openInfo('symbols');};
   document.getElementById('helpbtn').onclick=helpUI;document.getElementById('menuexport').onclick=()=>document.getElementById('btnexport').click();document.getElementById('menushare').onclick=()=>document.getElementById('btnshare').click();
   document.getElementById('guideclose').onclick=()=>document.body.classList.add('guideclosed');
   document.getElementById('pausebtn').onclick=()=>setSpeed(speedIdx===0?lastSpeed||1:0);document.getElementById('speedselect').onchange=e=>setSpeed(+e.target.value);
@@ -21117,6 +21152,7 @@ function beginChronicle(){
 let BACKGROUND=null,backgroundApplying=false;
 const WORKER_PRESENTATION={events:[],camera:null,started:false,revision:0,buildingCount:0,towns:0,profile:null,profileDirty:false,endgame:null};
 function visualScalars(o){const out={};if(!o)return out;for(const k of visualDataNames(o)){if(VISUAL_PRIVATE.has(k))continue;const v=o[k];if(v===null||typeof v==='number'||typeof v==='string'||typeof v==='boolean')out[k]=v;}return out;}
+function projectMarkerKey(q){return q.renderKey||q.storageProjectId||q.id||[q.type,q.si,q.ai,q.bi,q.start,q.kind,q.title,q.x??q.f?.x??q.site?.f?.x,q.z??q.f?.z??q.site?.f?.z,q.r?.a,q.r?.b,q.P?.path?.[0]?.x,q.P?.path?.[0]?.z].join(':');}
 // The names of an object that hold plain data (not accessors, which are never read here), found with a descriptor each only when its names change (and now and then again).
 const VISUAL_SHAPES=new WeakMap();
 function visualDataNames(o){
@@ -21228,7 +21264,7 @@ const VISUAL_ENTITY={
   banditCamp:(c,m)=>({...visualRecord(c,'',m),men:(c.men||[]).slice(0,12).map(visualPerson)}),
   dragon:(d,m)=>visualRecord(d,'path pos lair',m),
   road:(r,m)=>({...visualRecord(r,'path drawn bridges',m),renderKey:visualRoadKey(r)}),
-  project:q=>({...visualRecord(q,'cut st sts rad place site spec requires purposes change'),site:q.site?visualGeometry(q.site):null,P:q.P?{path:visualGeometry(q.P.path)}:null,r:typeof q.r==='number'?q.r:q.r?visualRecord(q.r,'path drawn'):null,f:q.f?{k:q.f.k,x:q.f.x,z:q.f.z}:null})};
+  project:q=>({...visualRecord(q,'cut st sts rad place site spec requires purposes change'),renderKey:projectMarkerKey(q),site:q.site?visualGeometry(q.site):null,P:q.P?{path:visualGeometry(q.P.path)}:null,r:typeof q.r==='number'?q.r:q.r?visualRecord(q.r,'path drawn'):null,f:q.f?{k:q.f.k,x:q.f.x,z:q.f.z}:null})};
 function workerTrackSegments(){return [...(W.trackSet||[])].map(k=>{const e=W.tg.E.get(k);return{a:{x:W.tg.pts[e.a].x,z:W.tg.pts[e.a].z},b:{x:W.tg.pts[e.b].x,z:W.tg.pts[e.b].z},L:e.L};});}
 function workerFenceSegments(){const out=[];for(const f of W.land.F){if(!fenceWorked(f))continue;const P=f.poly||computeFurlongPoly(f),stone=fenceStoneView(W.settlements[f.dom]);for(let k=0;k<P.length;k++){const a=P[k],b=P[(k+1)%P.length],g=a.nb>=0?W.land.F[a.nb]:null,ta=W.tg?.V.get(tgKey(a)),tb=W.tg?.V.get(tgKey(b)),lane=W.trackSet&&ta!==undefined&&tb!==undefined&&W.trackSet.has(ta<tb?ta+'_'+tb:tb+'_'+ta);if(!lane){if(!f.estateWild&&!g?.estateWild&&g&&fenceWorked(g)&&g.dom===f.dom&&(g.state===LS.PASTURE)===(f.state===LS.PASTURE))continue;if(g&&fenceWorked(g)&&g.k<f.k)continue;}out.push({a:{x:a.x,z:a.z},b:{x:b.x,z:b.z},x:f.x,z:f.z,lane:!!lane,stone});}}return out;}
 function workerPresentation(bootstrap=false){
@@ -21450,18 +21486,62 @@ function workerRenderCampActors(center,range=1500){
 }
 
 /* Foreground adapters submit intent; they never execute a daily transaction. */
+// Results belong to the player’s screen. They survive a card refresh, never a world save.
+function orderFeedbackPosition(){
+  const el=document.getElementById('orderfeedback'),panel=document.getElementById('contextpanel');if(!el||!panel)return;
+  const host=panel.hidden?document.body:panel;if(el.parentElement===host)return;
+  if(host===panel){el.inert=false;host.insertBefore(el,document.getElementById('contextcontent'));}else host.append(el);
+}
+function orderFeedbackBegin(entry){
+  const el=document.getElementById('orderfeedback');if(!el)return null;
+  const b=document.activeElement,label=b?.matches?.('[data-cmd], [data-pb]')?(b.firstElementChild?.firstChild?.textContent||b.textContent).trim():entry.k==='place'?'Map order':entry.k==='plan'?'Commission works':'Order';
+  const token={entry,label};G.orderFeedback=token;el.hidden=false;el.innerHTML='<strong>'+esc(label)+'</strong><p>Sending the order…</p>';orderFeedbackPosition();return token;
+}
+function orderFeedbackFinish(token,reply){
+  if(!token||G.orderFeedback!==token)return;const el=document.getElementById('orderfeedback');if(!el)return;
+  const state=reply.accepted===false?'Order refused':reply.accepted===true?'Order accepted':'Order processed';
+  const news=(reply.news||[]).map(x=>String(x).replace(/^\[[^\]]+\]\s*/,'')),message=reply.reason||news.join(' ')||'No change was reported. Check the current state and available orders.';
+  let text='<strong>'+esc(token.label)+' · '+state+'</strong><p>'+esc(message)+'</p>';
+  if(Number.isFinite(reply.coinChange))text+='<p>'+esc(reply.purseName||'Purse')+': '+(Math.abs(reply.coinChange)>1e-8?(reply.coinChange>0?'+':'−')+Math.abs(reply.coinChange).toLocaleString(undefined,{maximumFractionDigits:2})+' gold':'no gold moved')+'</p>';
+  text+='<nav>'+(reply.links||[]).map(l=>'<button data-order-target="'+esc(l.code||'project:'+l.key)+'">'+esc(l.name)+'</button>').join('')+'<button data-order-dismiss>Dismiss result</button></nav>';
+  el.innerHTML=text;el.hidden=false;el.querySelectorAll('[data-order-target]').forEach(b=>b.onclick=()=>{const code=b.dataset.orderTarget;if(code.startsWith('project:'))showInspect({type:'project',key:code.slice(8)});else goName(code);});
+  el.querySelector('[data-order-dismiss]').onclick=()=>{el.hidden=true;G.orderFeedback=null;};orderFeedbackPosition();
+}
+function mapHoverText(pk){
+  if(!pk)return '';if(pk.type==='army'){const a=pk.a||pk.army;return a.name+' · '+Math.round(a.strength)+' men · '+(a.state||'host');}
+  if(pk.type==='project'){const q=(W.projects||[]).find(q=>projectMarkerKey(q)===pk.key);return q?projectMarkerText(q):'This work is no longer in progress.';}
+  if(pk.type==='event')return pk.ev.text;
+  if(pk.type==='camp')return pk.camp.name||'Outlaw camp';
+  if(pk.type==='dragon')return W.dragon?.name+' · '+W.dragon?.state;
+  if(pk.type==='envoy')return 'Envoys · '+(pk.e.what||pk.e.purpose||'on their journey');
+  if(pk.type==='caravan'){const c=pk.c;return (c.sea?'Trading cog':c.river?'River barge':'Caravan')+' · '+Math.round(c.qty)+' '+c.good+' · '+(W.settlements[c.origin]?.name||'')+' → '+(W.settlements[c.dest]?.name||'');}
+  if(pk.type==='settlement')return pk.s.name+' · open the town card';
+  if(pk.type==='road')return 'Road · '+W.settlements[pk.r.a]?.name+' ↔ '+W.settlements[pk.r.b]?.name;
+  return '';
+}
+function mapHoverShow(pk,x,y){const el=document.getElementById('maphover');if(!el)return;const text=placeMode?'':mapHoverText(pk);el.hidden=!text;if(!text)return;
+  if(el.textContent!==text)el.textContent=text;el.style.left=Math.min(Math.max(12,x+16),innerWidth-el.offsetWidth-12)+'px';el.style.top=Math.max(document.getElementById('hud').getBoundingClientRect().bottom+8,Math.min(y+16,innerHeight-el.offsetHeight-12))+'px';}
+function mapHoverHide(){const el=document.getElementById('maphover');if(el)el.hidden=true;}
+
 function workerNotice(error){backgroundApplying=true;try{setSpeed(0);}finally{backgroundApplying=false;}if(BACKGROUND&&!BACKGROUND.closed)BACKGROUND.request('pause').then(reply=>workerSpeedReply(reply)).catch(()=>{});console.error('Background simulation:',error);storageFaultNotice('The simulation is paused: '+String(error.message||error)+'. Save or reload the last committed game.');}
 function workerHTML(html){return String(html||'').replace(/worker-sigil:(\d+)/g,(_,hi)=>sigURL(+hi));}
 function workerQuery(key,payload,install){
   const pending=BACKGROUND.reads||(BACKGROUND.reads=new Map());if(pending.has(key)){ADV_PENDING?.push(pending.get(key));return pending.get(key);}
-  const query=BACKGROUND.request('view',payload).then(install).catch(error=>{console.error('Game query:',error);return null;}).finally(()=>pending.delete(key));pending.set(key,query);ADV_PENDING?.push(query);return query;
+  const query=BACKGROUND.request('view',payload).then(install).catch(error=>{console.error('Game query:',error);if(typeof orderFeedbackBegin==='function'&&typeof document!=='undefined')orderFeedbackFinish(orderFeedbackBegin({k:'view'}),{accepted:false,reason:'This view could not be opened: '+String(error.message||error)+'. Try opening it again.'});return null;}).finally(()=>pending.delete(key));pending.set(key,query);ADV_PENDING?.push(query);return query;
 }
 // An advisor's press gathers what it sent (ADV_PENDING), so it can answer with the worker's own reply instead of a guess.
 let ADV_PENDING=null;
 function workerSubmitCommand(entry){const run=workerSubmitNow(entry);ADV_PENDING?.push(run);return run;}
 async function workerSubmitNow(entry){
-  try{const reply=await BACKGROUND.request('command',entry);if(entry.k==='place'&&reply?.place&&!placeMode)setPlaceMode(reply.place.mode,reply.place.arg,reply.place.hint);await workerRefreshLandscape();refreshCrownPanel(true);refreshInspect();renderPetition();return reply;}
-  catch(error){storageFaultNotice(String(error.message||error));return{accepted:false,error:String(error.message||error)};}
+  const token=typeof orderFeedbackBegin==='function'&&typeof document!=='undefined'?orderFeedbackBegin(entry):null;
+  const placement=entry.k==='place'&&placeMode?{revision:G.placeRevision,mode:placeMode,arg:placeArg,hint:placeHint}:null;
+  if(placement)G.placePending=placement;
+  try{const reply=await BACKGROUND.request('command',entry);
+    if(placement&&G.placeRevision===placement.revision){if(reply?.place)setPlaceMode(reply.place.mode,reply.place.arg,reply.place.hint);else if(reply?.accepted!==false)setPlaceMode(null);}
+    else if(!placement&&entry.k==='place'&&reply?.place&&!placeMode)setPlaceMode(reply.place.mode,reply.place.arg,reply.place.hint);
+    await workerRefreshLandscape();refreshCrownPanel(true);refreshInspect();renderPetition();if(token)orderFeedbackFinish(token,reply);return reply;}
+  catch(error){const reply={accepted:false,error:String(error.message||error),reason:String(error.message||error)};if(token)orderFeedbackFinish(token,reply);else storageFaultNotice(reply.error);return reply;}
+  finally{if(G.placePending===placement)G.placePending=null;}
 }
 function workerSetSpeed(index){const run=workerSetSpeedNow(index);ADV_PENDING?.push(run);return run;}
 async function workerSetSpeedNow(index){
@@ -21553,7 +21633,8 @@ function reconcileFlocks(old,plans){
       mem=f.members.map((m,i)=>{const a=o&&same(o.P,P)?o.mem[i]:null;return a?Object.assign(a,{ox:m.ox,oz:m.oz,coat:m.coat,born:m.born}):{...m,ph:m.phase,rot:m.yaw};});
     return o&&same(o.P,P)?Object.assign(o,{c0:f.center,seed:f.seed,mem}):{key,k:f.kind,si:f.si,P,c0:f.center,cx:f.center.x,cz:f.center.z,seed:f.seed,mem};});}
 // SCREEN MOTION END
-function workerRefreshCourt(force=false){if(drawerTab!=='crown'||!force&&(!drawerVisible()||uiBusy()))return;return workerQuery('court',{kind:'ui',panel:'crown',expanded:contextUI.expanded,section:crownSection,ledgerOpen:G.ledgerOpen},view=>{if(drawerTab==='crown')setHTML(document.getElementById('dbody'),workerHTML(view.html));});}
+function workerRefreshCourt(force=false){if(drawerTab!=='crown'||!force&&(!drawerVisible()||uiBusy()))return;const section=crownSection,expanded=contextUI.expanded,ledgerOpen=!!G.ledgerOpen;
+  return workerQuery('court:'+section+':'+expanded+':'+ledgerOpen,{kind:'ui',panel:'crown',expanded,section,ledgerOpen},view=>{if(drawerTab==='crown'&&crownSection===section&&contextUI.expanded===expanded&&!!G.ledgerOpen===ledgerOpen)setHTML(document.getElementById('dbody'),workerHTML(view.html));});}
 function workerRefreshHousePanel(force=false){if(drawerTab!=='world'||!force&&!drawerVisible())return;return workerQuery('houses',{kind:'ui',panel:'house-panel'},view=>{if(drawerTab!=='world')return;setHTML(document.getElementById('housepanel'),workerHTML(view.houses));setHTML(document.getElementById('succpanel'),workerHTML(view.succession));});}
 function workerOpenInfo(kind,town=null,reference=null){
   const refresh=kind==='accounts-refresh',content=document.getElementById('contextcontent'),scroll=refresh?content.scrollTop:0;
@@ -21852,6 +21933,14 @@ function workerCommandApplyClick(cmd,arg){
   return runCmd(cmd,arg??'');
 }
 
+function commandBefore(){return{house:Math.max(0,plyH()),coin:purse(Math.max(0,plyH())),hosts:new Set((W.armies||[]).map(a=>a.id)),projects:new Set((W.projects||[]).map(projectMarkerKey)),places:W.settlements.length};}
+function commandReceipt(before,result,news){
+  const links=(W.armies||[]).filter(a=>!a.gone&&!before.hosts.has(a.id)).map(a=>({code:'a'+a.id,name:'Open '+a.name}));
+  for(const q of W.projects||[])if(!q.dead&&!before.projects.has(projectMarkerKey(q)))links.push({key:projectMarkerKey(q),name:'Open '+(q.title||'commissioned '+q.type)});
+  for(let i=before.places;i<W.settlements.length;i++)links.push({code:'s'+i,name:'Open '+W.settlements[i].name});
+  const accepted=typeof result==='boolean'?result:typeof result?.accepted==='boolean'?result.accepted:links.length?true:null;
+  return{news,accepted,reason:result?.reason||null,coinChange:purse(before.house)-before.coin,purseName:before.house>0?W.houses[before.house]?.name+' purse':'Royal treasury',links};
+}
 function simulationWorkerModel(){return{
   async init(options,progress){
     if(!Number.isInteger(options.seed)||options.seed<0||options.seed>0xffffffff||!Number.isInteger(options.fate)||options.fate<0||options.fate>0xffffffff)throw Error('Invalid realm seeds');
@@ -21867,7 +21956,7 @@ function simulationWorkerModel(){return{
   validate(command){
     const prepared=workerCommandValidate(command);if(prepared.target==='main')throw Error('Command requires the main-thread interface');return prepared;
   },
-  command(command,prepared){const n0=allLines.length;workerCommandApply(command,prepared||workerCommandValidate(command));const r={news:allLines.slice(n0)}; // the reply carries the annals the command wrote,
+  command(command,prepared){const n0=allLines.length,before=commandBefore(),result=workerCommandApply(command,prepared||workerCommandValidate(command)),r=commandReceipt(before,result,allLines.slice(n0)); // the reply carries the annals the command wrote,
     if(placeMode){r.place={mode:placeMode,arg:serializePlaceArg(placeMode,placeArg),hint:placeHint};setPlaceMode(null);}return r;}, // and a second place the first one asked for (a road's far end)
   view(kind,payload={}){
     const prior=QUERY_LAND_VALUES;QUERY_LAND_VALUES=['inspect','ui','plan-quote','overlay','actors'].includes(kind)?new Map():prior;
@@ -22470,7 +22559,7 @@ const ADV={muted:false,
   // A control's name is what it does, not what it says today: its command and argument (crown:h-honour:3), else its id, else
   // what it is for. Costs, cooldowns and dates are fields beside the name, so a name found one day still works the next.
   ID:{pausebtn:'pause',speedselect:'speed',menubtn:'menu',rulebtn:'rule',goldchip:'ledger',datechip:'timeline',brand:'about',crownchip:'monarch',drawertoggle:'panels',uiback:'controls',
-    chronmin:'fold',btnexport:'export',btnshare:'share',menuexport:'export',menushare:'copy-link',menuaccounts:'accounts',menuannals:'annals',menulegend:'legend',savebtn:'save',advbtn:'advisor',helpbtn:'help',planbtn:'plan',petitionbtn:'petitions',
+    chronmin:'fold',btnexport:'export',btnshare:'share',menuexport:'export',menushare:'copy-link',menuaccounts:'accounts',menuannals:'annals',menulegend:'legend',menumarkers:'symbols',savebtn:'save',advbtn:'advisor',helpbtn:'help',planbtn:'plan',petitionbtn:'petitions',
     placecancel:'cancel',perfcopy:'copy-report',eventlocate:'locate',eventinspect:'inspect',eventbubbleclose:'dismiss',eventbubbledetails:'details',seedin:'seed',fatein:'fate',erain:'era',emap:'land',ecoast:'coast',
     btnreforge:'reforge',btnmap:'map',btndaycycle:'day-cycle',btnlabels:'labels',btnwatch:'watch',inspx:'close',inspfollow:'follow',contextorders:'orders',contextdetails:'details',contextaccounts:'accounts',drawerclose:'close-drawer',guideclose:'got-it'},
   DATA:[['contextTab',''],['rulerRate',''],['o',''],['cview','view:'],['iview','view:'],['info',''],['accountTown','accounts:'],['infoAnnals','annals'],['f','filter:'],['pi','answer:'],['pv','show'],['pb','plan:'],['sv',''],['eg','endgame:'],['s','speed:'],['nm','go:']],
@@ -22589,7 +22678,7 @@ const ADV={muted:false,
     return{name:s.name,code:'s'+i,kind:s.kind,role:s.role,at:{x:Math.round(s.pos.x),z:Math.round(s.pos.z)},tongue:CULT[s.cult]?.name,lord:W.houses[s.owner]?.name,people:Math.round(detailPopulation(s)),prosperity:Math.round(s.prosperity),unrest:Math.round(s.unrest),hunger:+(s.hunger||0).toFixed(2),
       plague:s.infected>0.5?{sick:Math.round(s.infected),dead:Math.round(s.plagueDead||0)}:false,quarantinedUntil:s.quarantineUntil>now?dateStr(s.quarantineUntil):undefined,besieged:!!s.siegeBy,raidedUntil:s.raidedUntil>now?dateStr(s.raidedUntil):undefined,
       walls:['none','palisade','stone'][s.walls|0]||'stone',wallsBuilding:s.wallBuild?Math.round(wallProg(s)*100)+'%':undefined,garrison:Math.round(s.garrison||0),militia:Math.round(s.militia||0),murage:Math.round(s.murage||0),
-      works:{mill:!!s.works?.mill,market:!!s.works?.market,clearing:s.clearUntil>now?'under way until '+dateStr(s.clearUntil):false},
+      works:{mill:s.works?.mill!=null&&s.works.mill!==false,market:s.works?.market!=null&&s.works.market!==false,clearing:s.clearUntil>now?'under way until '+dateStr(s.clearUntil):false},
       port:s.harbor?{health:portHealthSummary(s),ships:(W.ships||[]).filter(x=>x.port===i).map(x=>({kind:x.kind,from:x.from,phase:x.phase,sails:x.until!=null?dateStr(x.until):undefined}))}:false,
       herds:Object.fromEntries(BEASTS.map(b=>[b,Math.round(s.stores?.[b]||0)])),stores:Object.fromEntries(Object.entries(s.stores||{}).filter(([,v])=>typeof v==='number').map(([g,v])=>[g,Math.round(v)])),
       prices:abs,prices_vs_usual:pr,trades:s._tcY===year()?s._tc:undefined,wardOf:s.wardOf!=null?W.settlements[s.wardOf]?.name:undefined};},
@@ -24410,6 +24499,8 @@ Keys: `Space` pause, `1`–`5` the speeds above, `L` Life pace.
   export it as a text file or copy a link to this realm.
 - **Rates** and **Acts**: Providence's dials and deeds (plague, dragon, fire,
   flood…). Both are sealed while you rule.
+- **Map symbols** explains host badges, trade dots, event rings and construction
+  marks. Hover a mark for its name and current state, or tap it to open its card.
 - **Plan**, **Save**, **Advisor**, **Help**, and **Petitions** when one waits.
 
 ## Taxes and dues
@@ -24509,6 +24600,13 @@ returns, **Close** or `Esc` dismisses it. A town you govern has **Details** and
 storage); a host of yours has its orders (march, objectives, supply road,
 raft, split, join, hold, disband).
 
+An order shows **Sending the order…**, then its result beside the card, including
+the actual change in your purse. New hosts, places and commissioned works have
+an **Open** button in that result. The result remains until **Dismiss result**
+or another order replaces it, including while the full Orders sheet is open.
+An already completed mill or market work says **built** and cannot be paid twice,
+even if it was ordered on the first day of the annals.
+
 A toll house's card shows its toll, for whom it is taken, its keeper's pay and
 its takings this year and last; a town's card lists its toll houses; a road's
 card says who keeps it (its toll houses' owners, or the lords at either end by
@@ -24579,6 +24677,9 @@ then click a town, an enemy host to attack, or open ground to camp.
 Some orders end in a place: a march, a road, a site, an act of Providence.
 A bar at the foot of the screen says what to click; **Cancel** or `Esc` gives
 it up. A road asks twice, for each end. An advisor answers with `game:place`.
+If the chosen target is refused, the prompt stays open so you can choose again;
+the order result gives the reason. Cancel or `Esc` also cancels your selection
+while its answer is on the way.
 
 ## Petitions
 
@@ -24592,6 +24693,9 @@ or your steward decides on the date shown.
 Choose a brush (Street, Square, Wall, Stop up a street, Pull down), drag on
 the map, read the surveyors' price, then **Commission** or **Discard**.
 **Done** closes the brush.
+The brush stays compact beside the map so the ground remains available to draw
+on. Pegs, lines and site rings mark commissioned work; open a mark to read its
+progress and any reason it has halted.
 
 ## The advisor's view of the screen
 

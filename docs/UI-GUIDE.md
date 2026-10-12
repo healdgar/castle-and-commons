@@ -53,6 +53,8 @@ Keys: `Space` pause, `1`–`5` the speeds above, `L` Life pace.
   export it as a text file or copy a link to this realm.
 - **Rates** and **Acts**: Providence's dials and deeds (plague, dragon, fire,
   flood…). Both are sealed while you rule.
+- **Map symbols** explains host badges, trade dots, event rings and construction
+  marks. Hover a mark for its name and current state, or tap it to open its card.
 - **Plan**, **Save**, **Advisor**, **Help**, and **Petitions** when one waits.
 
 ## Taxes and dues
@@ -152,6 +154,13 @@ returns, **Close** or `Esc` dismisses it. A town you govern has **Details** and
 storage); a host of yours has its orders (march, objectives, supply road,
 raft, split, join, hold, disband).
 
+An order shows **Sending the order…**, then its result beside the card, including
+the actual change in your purse. New hosts, places and commissioned works have
+an **Open** button in that result. The result remains until **Dismiss result**
+or another order replaces it, including while the full Orders sheet is open.
+An already completed mill or market work says **built** and cannot be paid twice,
+even if it was ordered on the first day of the annals.
+
 A toll house's card shows its toll, for whom it is taken, its keeper's pay and
 its takings this year and last; a town's card lists its toll houses; a road's
 card says who keeps it (its toll houses' owners, or the lords at either end by
@@ -222,6 +231,9 @@ then click a town, an enemy host to attack, or open ground to camp.
 Some orders end in a place: a march, a road, a site, an act of Providence.
 A bar at the foot of the screen says what to click; **Cancel** or `Esc` gives
 it up. A road asks twice, for each end. An advisor answers with `game:place`.
+If the chosen target is refused, the prompt stays open so you can choose again;
+the order result gives the reason. Cancel or `Esc` also cancels your selection
+while its answer is on the way.
 
 ## Petitions
 
@@ -235,6 +247,9 @@ or your steward decides on the date shown.
 Choose a brush (Street, Square, Wall, Stop up a street, Pull down), drag on
 the map, read the surveyors' price, then **Commission** or **Discard**.
 **Done** closes the brush.
+The brush stays compact beside the map so the ground remains available to draw
+on. Pegs, lines and site rings mark commissioned work; open a mark to read its
+progress and any reason it has halted.
 
 ## The advisor's view of the screen
 
