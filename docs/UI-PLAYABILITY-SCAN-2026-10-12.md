@@ -194,6 +194,13 @@ origin/culture/chronology assessment; the UI batch preserves generated history.
   **0.16/0.49/0.80 → 1.24/0.80/0.88**. Full batch **3,379.27 s CPU**, load
   **1.19/0.90/0.56 → 1.11/1.95/2.68**. Heavy jobs ran serially, with one
   Chromium instance at a time.
+- Publication: game commit [5d77d36](https://github.com/healdgar/furlong-kingdom-annals/commit/5d77d36c900b2cdca9592092a763cd78f0cca2f0),
+  [Pages/container workflow 129](https://github.com/healdgar/furlong-kingdom-annals/actions/runs/38323934003) succeeded.
+  Both container architectures match all nine release payload files; stamped
+  HTML SHA256 is `77910395337af8ebe04b1239d90b88789e5c10d53f2cf3eeb06f9af348675dd2`.
+  The stamp leaves the gated game script unchanged; 35 post-stamp checks pass.
+  Live Pages fetch returned proxy CONNECT 403, and no callable claude.ai
+  artifact publisher is available. Current target limits remain #84.
 - Detailed local run receipts: `/workspace/furlong-ui-scan/`. Publication
   evidence and current limits belong in #84 and the current issue rows.
 
