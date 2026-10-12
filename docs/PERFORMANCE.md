@@ -56,8 +56,10 @@ bodies are reused as the reference. This candidate gate uses 80.22 child CPU /
 `f8917b6e32a0ed82bd8eed9cb54fa6c3bd90d2bbfafb6eb89823010ae9250c9e`. All 2,231 checks across 214 test files pass in one full batch, including
 native paid-castle and royal-eyre save/load continuation. The batch uses
 3835.60 child CPU / 1399.63 wall seconds, load1.25→1.01, peak RSS2397140KB.
-The final candidate is being published; only the visible build stamp changes
-after the gates. The initial Reel-only gate is superseded by this complete
+Release [b741919](https://github.com/healdgar/furlong-kingdom-annals/commit/b741919a2987a8c0e7f136147de4da3f97e8f0d8) is published to Pages and the container; only the visible build
+stamp changes after the gates. Both image architectures match the release HTML,
+assets and LICENSE byte for byte. Live Pages-byte verification and the separate
+claude.ai artifact remain #84. The initial Reel-only gate is superseded by this complete
 extended-candidate validation.
 Current status is solely in [ISSUES.md](ISSUES.md#performance-saves-and-late-worlds).
 Sources and evidence are outside the checkout in `/workspace/furlong-animation-pass/`.
