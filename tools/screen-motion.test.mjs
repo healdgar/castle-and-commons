@@ -53,6 +53,32 @@ test('without readings it runs at most a day and a little past the reported day'
   const s=screen({speed:5,day:100,frac:0});s.run(2000);assert.equal(s.v,100,'Reel holds to the reported day');s.day=130;s.frame();assert.equal(s.v,130);
 });
 
+test('people and traffic blend delivered progress at slow worker throughput, including Fastest and Reel',()=>{
+  for(const speed of [3,4,5]){
+    const s=screen({speed,day:100,frac:0.5}),c=s.c,read=d=>c.motionReading({day:Math.floor(d),frac:d%1,at:c.performance.timeOrigin+c.t});
+    read(100.5);c.t+=2000;s.day=101;read(101.5);const frames=[];
+    for(let i=0;i<360;i++){
+      if(i&&i%120===0){s.day=101+i/120;read(101.5+i/120);}
+      c.t+=1000/60;frames.push(c.motionDay());
+    }
+    const delta=steps(frames);assert.ok(delta.every(d=>Math.abs(d-0.5/60)<1e-8),`speed ${speed}: motion runs every frame at the delivered half day/second, rather than the selected pace`);
+    assert.ok(frames.at(-1)<=c.G.motion.progress,'motion never advances beyond a reading');
+    assert.ok(Math.abs(c.motionPace()-0.5)<1e-12);assert.ok(c.motionHorizon()>=2,'actor forecast covers the slower delivery');
+    const frozen=c.motionDay();c.speedIdx=0;c.motionRepace({day:c.W.clock.day,frac:0.5,at:c.performance.timeOrigin+c.t},frozen);c.t+=3000;
+    assert.equal(c.motionDay(),frozen,'pause freezes the displayed paths');
+    c.motionReading({day:120,frac:0,at:c.performance.timeOrigin+c.t});assert.equal(c.motionDay(),120,'an explicit paused advance is shown');
+  }
+});
+
+test('duplicate and stale motion readings cannot shorten a blend, reverse motion or change the authoritative clock',()=>{
+  const s=screen({speed:4,day:100}),c=s.c,read=(d,at=c.t)=>c.motionReading({day:d,at:c.performance.timeOrigin+at});
+  read(100);c.t+=2000;read(101);const worldBefore=JSON.stringify(c.W);c.t+=1000;assert.equal(c.motionDay(),100.5);
+  read(101);assert.equal(c.G.motion.ms,2000,'a duplicate does not restart the blend');
+  read(500,1);c.t+=500;assert.equal(c.motionDay(),100.75,'an old reply cannot change the curve');
+  assert.equal(JSON.stringify(c.W),worldBefore,'interpolation changes no authoritative calendar or world value');
+  c.W={clock:{day:0}};read(0);assert.equal(c.motionDay(),0,'a new world drops the old motion clock');
+});
+
 test('a late reading is made up smoothly; one far ahead by a single jump forward',()=>{
   const s=screen({speed:1,day:100,frac:0.05}),rate=0.5;let truth=100.05;const tick=()=>{truth+=rate/60;s.day=Math.floor(truth);};
   s.run(300,tick);truth+=0.15*rate;s.read(truth); // the worker is found 0.15 s of pace further on than the screen
@@ -141,6 +167,22 @@ function workerBuild(c,people,t0,frames,{every=()=>9,late=()=>0,lead=()=>0}={}){
     const v=t+lead(k);out.push({t,v,at:packet.tracks.map(R=>c.walkTrackAt(packet.times,R,v)),ahead:packet.times.at(-1)-t});}
   return{out,switches,entry};
 }
+
+test('Fastest and Reel keep real walking paths for interpolation when worker days arrive slowly',()=>{
+  for(const speed of [4,5]){
+    const {c,clone}=town(speed),people=clone(),t0=100.25,entry={people,day:t0,times:[t0]};
+    for(const w of people)c.workerWalkSample(w);
+    c.workerWalkOn(entry,t0,0.25,t0,0.5,2);
+    assert.ok(entry.times.at(-1)>=t0+1,'the forecast spans the next delivered day');
+    assert.ok(entry.times.length<=241,'each request has a bounded prediction budget');
+    const tracks=people.map(w=>c.workerWalkTrack(w)),frames=[];
+    for(let k=0;k<120;k++)frames.push(tracks.map(R=>c.walkTrackAt(entry.times,R,t0+(k+1)*0.5/60)));
+    const moving=frames.slice(1).filter((row,k)=>row.some((w,i)=>w.out&&frames[k][i].out&&Math.hypot(w.x-frames[k][i].x,w.z-frames[k][i].z)>1e-4)).length;
+    assert.ok(moving>60,`speed ${speed}: ${moving} interpolated frames move along the worker's actual paths`);
+    c.clock.day=101;c.workerWalkOn(entry,101.25,0.25,100.9,0.5,2);
+    assert.ok(entry.times[0]<=100.9,'the next reply retains the path at the buffered screen time');
+  }
+});
 
 test('the worker\'s walk is the main-thread screen\'s, frame for frame, over a day and its turning, across replies',()=>{
   for(const speed of [1,2,3]){

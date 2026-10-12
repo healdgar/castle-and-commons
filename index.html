@@ -497,7 +497,7 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
 </head>
 <body>
 <div id="gl"></div>
-<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-12 16:55 UTC · after a23ecc0</div></div>
+<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-12 18:24 UTC · after 70975a2</div></div>
 
 <div id="hud">
   <button type="button" id="brand" class="hudlink" aria-label="About Castle and Commons" aria-controls="contextpanel">Castle and Commons</button>
@@ -6275,7 +6275,7 @@ function renderLordVisits(){for(let hi=0;hi<W.houses.length;hi++){const h=W.hous
 function renderTravellers(){
   if(!G.travMesh){const cp=personParts('citizen');G.travMesh=new THREE.InstancedMesh(cp.tint,agentMat(),400);G.travKit=new THREE.InstancedMesh(cp.fixed,agentMat(),400);
     for(const m of[G.travMesh,G.travKit]){for(let i=0;i<400;i++)m.setColorAt(i,new THREE.Color(1,1,1));m.frustumCulled=false;m.count=0;scene.add(m);}}
-  const T=W.travellers||[],now=displayDay(),t2=performance.now()/1000;let k=0;G.travIdx=[];
+  const T=W.travellers||[],now=motionDay(),t2=performance.now()/1000;let k=0;G.travIdx=[];
   if(cam.cur.dist<1800)for(const t of T){if(k>=400)break;if(now<t.depart)continue;const f=clamp((now-t.depart)/Math.max(0.01,t.arrive-t.depart),0,1),p=polyPos(t.poly,f);if(!p)continue;
     const x=p.x-Math.sin(p.dir||0)*2.5,z=p.z+Math.cos(p.dir||0)*2.5,y=surfY(x,z)+0.28+(speedIdx===LIFE?Math.abs(Math.sin(t2*7+k))*0.06:0),ry=-(p.dir||0)+Math.PI/2,sc=clamp(cam.cur.dist/320,1,4); // seen from afar, drawn a little larger
     if(cam.follow&&cam.follow.pid===t.p.id)cam.follow.pos={x,z,y};setInst(G.travMesh,k,x,y,z,ry,sc,sc,sc);setInst(G.travKit,k,x,y,z,ry,sc,sc,sc);G.travMesh.setColorAt(k,C1.setHex(t.lord!==undefined?W.houses[t.lord]?.sigilHue[0]||0x5a6a7a:t.why==='bride'?0xc9a0a0:t.why==='migrant'?0x7a6448:t.why==='market'?0x8a7a3a:t.why==='kin'?0xa0708a:t.why==='pilgrim'?0xe8e0d0:0x5a6a7a));G.travIdx[k]=t;k++;}
@@ -10263,8 +10263,7 @@ const BEAST_TEXT={sheep:['A flock of sheep','Wool for the looms (spun at home, o
   cattle:['Cattle','Oxen for the plough-teams, cows for milk and cheese, hides for the tanners, beef when they are old. Each drawn beast stands for about two head.'],
   horses:['Horses','Draught horses for the plough and the carts, and the riding horses of the lord and his men: a host has only as many horse as its riders can find. Each drawn beast is one or two.'],
   swine:['Swine','Pigs turned into the wood for the acorns and beech-mast (pannage), and bacon for the winter. Each drawn beast stands for about four head.']};
-function shipPos(sh){ // where a ship is now: on its way in, alongside its berth, or standing out to sea
-  const now=displayDay();
+function shipPos(sh,now=displayDay()){ // where a ship is now: on its way in, alongside its berth, or standing out to sea
   if(sh.phase==='dock'&&sh.berth)return {x:sh.berth.x,z:sh.berth.z,dir:sh.berth.rot+Math.PI/2};
   const f=clamp((now-sh.t0)/Math.max(0.01,sh.t1-sh.t0),0,1),P=sh.poly,t=(sh.phase==='out'?1-f:f)*sh.len;
   let acc=0;for(let k=1;k<P.length;k++){const L=dist2d(P[k-1].x,P[k-1].z,P[k].x,P[k].z);if(acc+L>=t){const u=(t-acc)/(L||1),x=P[k-1].x+(P[k].x-P[k-1].x)*u,z=P[k-1].z+(P[k].z-P[k-1].z)*u;
@@ -10275,7 +10274,7 @@ function renderShips(){
     for(let i=0;i<8;i++){const m=new THREE.Mesh(g,vc);m.castShadow=true;m.visible=false;m.userData.pick={type:'ship',sh:null};scene.add(m);G.shipMeshes.push(m);}}
   const t=performance.now()/1000;let k=0;
   while(G.shipMeshes.length<(W.ships||[]).length){const m=new THREE.Mesh(G.shipMeshes[0].geometry,G.shipMeshes[0].material);m.castShadow=true;m.visible=false;m.userData.pick={type:'ship',sh:null};scene.add(m);G.shipMeshes.push(m);} // more hulls as the trade grows
-  for(const sh of W.ships||[]){if(k>=G.shipMeshes.length)break;const m=G.shipMeshes[k++],p=shipPos(sh);
+  for(const sh of W.ships||[]){if(k>=G.shipMeshes.length)break;const m=G.shipMeshes[k++],p=shipPos(sh,motionDay());
     m.visible=true;m.position.set(p.x,SEA-0.2+Math.sin(t*1.1+k)*0.2,p.z);m.rotation.set(Math.sin(t*0.8+k)*0.03,-(p.dir||0),0);
     m.scale.setScalar(sh.kind==='carrack'?5:sh.kind==='hulk'?4.4:sh.kind==='great cog'?4:3.4);m.userData.pick.sh=sh;}
   for(;k<G.shipMeshes.length;k++)G.shipMeshes[k].visible=false;}
@@ -20092,17 +20091,20 @@ function projectLandscape(){
   if(G.sapRemoved){for(const t of G.sapRemoved){setInst(G.regrow,t.i,0,-500,0,0,0.001,0.001,0.001);if(G.sapFeatures?.has(t)){featTree(t,-1);G.sapFeatures.delete(t);}}G.sapRemoved.length=0;G.regrow.instanceMatrix.needsUpdate=true;}
   if(G.sapDirty){for(const f of G.sapDirty)projectSaplings(f);G.sapDirty.clear();}
 }
-function animateWorld(dt,now){
-  projectLandscape();
-  if(G.houseTintsDirty){houseTints();G.houseTintsDirty=false;}
-  projectStructures();
-  if(planUI&&!planUI.painting&&day()%5===0&&G.planDay!==day()){G.planDay=day();planBarHTML();}
-  if(G.tracksDirty)projectTracks();
-  if(G.fenceDirty&&G.fenceWood){G.fenceDirty=false;projectFences();}
-  if(G.wallsDirty)projectWalls();
+function animateWorld(dt,now,project=true){
+  if(project){ // landscape work has its own budget; existing meshes move every frame
+    projectLandscape();
+    if(G.houseTintsDirty){houseTints();G.houseTintsDirty=false;}
+    projectStructures();
+    if(planUI&&!planUI.painting&&day()%5===0&&G.planDay!==day()){G.planDay=day();planBarHTML();}
+    if(G.tracksDirty)projectTracks();
+    if(G.fenceDirty&&G.fenceWood){G.fenceDirty=false;projectFences();}
+    if(G.wallsDirty)projectWalls();
+    const simDay=displayDay();updateTerrainColors(seasonIdx(),(simDay%90)/90,1); // the calendar and landscape agree at every playback speed
+  }
   G.calm=(G.calm??calmTarget())+(calmTarget()-(G.calm??0))*Math.min(1,dt*1.2); // eases in and out over a second or so, never a jump
   const dayF=currentDayF();
-  const simDay=displayDay();
+  const simDay=motionDay();
   /* --- sun / moon / sky --- */
   const el2=Math.sin((dayF-0.25)*2*Math.PI); // sun elevation: dawn .25, noon .5, dusk .75
   const sunDir=new THREE.Vector3(Math.cos(dayF*Math.PI*2)*0.8,el2,Math.sin(dayF*Math.PI*2)*0.55).normalize();
@@ -20161,8 +20163,6 @@ function animateWorld(dt,now){
     }
     for(let i=ti;i<G.torches.length;i++)G.torches[i].intensity=0;
   }else G.torches.forEach(t=>t.intensity=0);
-  /* --- seasons --- */
-  updateTerrainColors(seasonIdx(),(simDay%90)/90,1); // the calendar and landscape agree at every playback speed
   /* --- water --- */
   G.waterU.uWaterTime.value=now;
   if(G.rivers)G.rivers.position.y=W.flooding>0?2.6:0; // fixed banks; surface ripples belong in the shader
@@ -20510,9 +20510,10 @@ function animateWorld(dt,now){
 let simAccum=0,lastT=0,hudT=0,overlayT=0,uiT=0,errN=0,errT=0;
 function simErr(e){errN++;if(performance.now()-errT>5000){errT=performance.now();console.error('annals: error caught ('+errN+' so far)',e);}} // one bad tick must not freeze the realm
 function projectWorld(dt,now){
-  const changed=G.viewSpeed!==speedIdx;G.viewSpeed=speedIdx;G.viewElapsed=(G.viewElapsed||0)+dt;
-  if(VISUAL.fast()&&!changed&&G.viewT!==undefined&&now-G.viewT<0.1)return false;
-  const elapsed=G.viewElapsed;G.viewElapsed=0;G.viewT=now;animateWorld(elapsed,now);return true;
+  const changed=G.viewSpeed!==speedIdx;G.viewSpeed=speedIdx;
+  const project=!VISUAL.fast()||changed||G.viewT===undefined||now-G.viewT>=0.1;
+  if(project)G.viewT=now;
+  animateWorld(dt,now,project);return project;
 }
 function advanceSimulation(dt,started=performance.now()){
   if(!Number.isFinite(simAccum))simAccum=0;
@@ -21329,18 +21330,21 @@ const WALKER_CARRY=['x','z','ry','t','state','until','route','ri','out','walking
 // Display only.
 const WALK_TRACK={ahead:0.4,behind:0.15,most:60,fine:8}; // seconds of pace walked ahead of the reading and kept behind it; most frames one reply walks; the fastest pace (days a second) walked frame by frame
 function workerWalkSample(c){(c._tr||(c._tr=[])).push(workerRenderFinite(c.x),workerRenderFinite(c.z),workerRenderFinite(c.ry),(c.out?1:0)|(c.walking?2:0));}
-function workerWalkOn(entry,now,frac,view=now){
-  const rate=speedIdx===5?0:SPEEDS[speedIdx]||0,fine=rate>0&&rate<=WALK_TRACK.fine,h=rate/60,T=entry.times,M=entry.marks||(entry.marks=[]),lo=Math.min(now,view),hi=Math.max(now,view),F=WALKER_CARRY.length;
+function workerWalkOn(entry,now,frac,view=now,pace=null,horizon=null){
+  const nominal=speedIdx===5?0:SPEEDS[speedIdx]||0,rate=Number.isFinite(pace)?clamp(pace,0,speedIdx===5?30:nominal):nominal,fine=rate>0&&rate<=WALK_TRACK.fine;
+  const delayed=Number.isFinite(horizon)&&horizon>WALK_TRACK.ahead||rate>0&&(speedIdx===5||nominal>WALK_TRACK.fine),ahead=Number.isFinite(horizon)?clamp(horizon,WALK_TRACK.ahead,4):WALK_TRACK.ahead;
+  const lead=delayed?Math.max(1,ahead*rate):WALK_TRACK.ahead*rate,most=delayed?240:WALK_TRACK.most,h=delayed?Math.max(rate/60,1/240):rate/60;
+  const T=entry.times,M=entry.marks||(entry.marks=[]),lo=Math.min(now,view),hi=Math.max(now,view),F=WALKER_CARRY.length;
   const mark=()=>{const m=new Map();for(const c of entry.people)m.set(c.p.id,[...WALKER_CARRY.map(k=>c[k]),c.fw?c.fw.flip:null]);M.push({day:entry.day,m});};
   const keep=()=>{for(const c of entry.people)workerWalkSample(c);T.push(entry.day);mark();};
   const restart=at=>{entry.day=at;T.length=0;M.length=0;for(const c of entry.people)c._tr=[];keep();};
   if(!M.length)mark();
-  if(fine&&entry.day>hi+2*WALK_TRACK.ahead*rate){ // walked further ahead at a faster pace than this one wants: back to the first step past the screen (the screen goes on to it as it was drawn), and on from there at this pace
+  if(fine&&entry.day>hi+2*lead){ // walked further ahead at a faster pace than this one wants: back to the first step past the screen (the screen goes on to it as it was drawn), and on from there at this pace
     let k=0;while(k<M.length-1&&M[k].day<hi)k++;const i=T.lastIndexOf(M[k].day);
     if(i<0)restart(hi);else{const m=M[k].m;for(const c of entry.people){const r=m.get(c.p.id);if(r){for(let j=0;j<F;j++)c[WALKER_CARRY[j]]=r[j];if(c.fw&&r[F]!==null)c.fw.flip=r[F];}c._tr.length=4*(i+1);}T.length=i+1;M.length=k+1;entry.day=T[i];}}
-  if(hi>entry.day&&(!fine||hi-entry.day>WALK_TRACK.most*h)){const D=hi===now?day():Math.floor(hi),dt=(hi-entry.day)*DAYSEC;for(const c of entry.people)stepWalker(c,dt,hi===now?frac:hi-D,D);if(fine){entry.day=hi;keep();}else restart(hi);} // paused, too fast to follow, or long away: one stride (that the screen goes along, at a pace it can follow)
-  if(fine)for(let n=0,end=hi+WALK_TRACK.ahead*rate;entry.day<end&&n<WALK_TRACK.most;n++){const t=entry.day+h,D=Math.floor(t);for(const c of entry.people)stepWalker(c,h*DAYSEC,t-D,D);entry.day=t;keep();}
-  if(rate>0){const from=lo-WALK_TRACK.behind*rate;let cut=0;while(cut<T.length-1&&T[cut+1]<=from)cut++;if(cut){T.splice(0,cut);for(const c of entry.people)c._tr.splice(0,cut*4);}while(M.length>1&&M[0].day<T[0])M.shift();}
+  if(hi>entry.day&&(!fine||hi-entry.day>most*h)){const D=hi===now?day():Math.floor(hi),dt=(hi-entry.day)*DAYSEC;for(const c of entry.people)stepWalker(c,dt,hi===now?frac:hi-D,D);if(fine){entry.day=hi;keep();}else restart(hi);} // paused, too fast to follow, or long away: one stride (that the screen goes along, at a pace it can follow)
+  if(fine)for(let n=0,end=hi+lead;entry.day<end&&n<most;n++){const t=entry.day+h,D=Math.floor(t);for(const c of entry.people)stepWalker(c,h*DAYSEC,t-D,D);entry.day=t;keep();}
+  if(rate>0){const from=lo-(delayed?Math.max(1.25,ahead*rate):WALK_TRACK.behind*rate);let cut=0;while(cut<T.length-1&&T[cut+1]<=from)cut++;if(cut){T.splice(0,cut);for(const c of entry.people)c._tr.splice(0,cut*4);}while(M.length>1&&M[0].day<T[0])M.shift();}
 }
 function workerWalkTrack(c){const R=c._tr||[];for(let i=4;i<R.length;i++)if(R[i]!==R[i&3])return Float32Array.from(R);return Float32Array.from(R.slice(0,4));} // one place for those who stand
 function workerRenderCitizens(si,options={}){
@@ -21373,7 +21377,7 @@ function workerRenderCitizens(si,options={}){
     }finally{
       if(colorDescriptor)Object.defineProperty(globalThis,'THREE',colorDescriptor);else if(typeof THREE!=='undefined'&&THREE?.Color?.name==='PlanColor')delete globalThis.THREE;
     }
-    workerWalkOn(entry,now,frac,Number.isFinite(options.view)?clamp(options.view,now-1,now+1):now); // the screen's clock, which after a change of pace may stand well ahead of the reading
+    workerWalkOn(entry,now,frac,Number.isFinite(options.view)?clamp(options.view,now-2,now+1):now,options.pace,options.horizon); // the motion clock can trail the latest reading while it blends the last delivered day
     const people=[];
     for(const c of entry.people){
       const p=c.p,col=c.col;
@@ -21467,7 +21471,7 @@ async function workerSetSpeedNow(index){
 }
 // The worker's reply is the speed now. A packet cut before it (an older pull, a pushed view still being laid out) keeps its
 // geometry but cannot put the old speed back; only a packet of a later revision speaks for the speed (installPresentation).
-function workerSpeedReply(reply){if(!reply||!Number.isInteger(reply.speed))return;G.speedRevision=Math.max(G.speedRevision||0,reply.revision||0);backgroundApplying=true;try{setSpeed(reply.speed);}finally{backgroundApplying=false;}presRepace(reply.reading);}
+function workerSpeedReply(reply){if(!reply||!Number.isInteger(reply.speed))return;const v=reply.reading?motionDay():0;G.speedRevision=Math.max(G.speedRevision||0,reply.revision||0);backgroundApplying=true;try{setSpeed(reply.speed);}finally{backgroundApplying=false;}presRepace(reply.reading);motionRepace(reply.reading,v);}
 async function workerRefreshLandscapeBootstrap(){installPresentation(await BACKGROUND.request('view',{kind:'bootstrap'}));}
 // Every caller gets a packet cut after its own request: one already on the wire is followed by (at most) one more.
 function workerRefreshLandscape(){
@@ -21478,6 +21482,7 @@ function workerRefreshLandscape(){
 // A worker clock between landscape packets: the HUD's date, treasury and people keep pace; geometry waits for its packet.
 // G.workerClock keeps the latest {day,frac,speed,at} for a screen clock that runs on between messages.
 function installClock(c){
+  if(c&&W?.clock&&c.day>=W.clock.day)motionReading(c);
   if(c&&W?.clock&&c.day>=W.clock.day)presAnchor(c.day+(c.frac||0),c.at); // every reading sets the screen's clock, of a new day or not
   if(!c||!W?.clock||c.day<W.clock.day)return;G.workerClock=c;if(c.day===W.clock.day)return;
   W.clock.day=c.day;W.treasury=c.treasury;W.legitimacy=c.legitimacy;W.drought=c.drought;W.plagueActive=c.plagueActive;if(W.weather&&c.weather)W.weather.state=c.weather;
@@ -21509,6 +21514,29 @@ function presStep(now=performance.now()){
     v=lag>SCREEN_CLOCK.jump?target:v+dt*rate*clamp(1+lag/SCREEN_CLOCK.ease,0.5,2);}
   else if(speedIdx!==5&&P.av>v)v=P.av; // paused: a reading further on (a bounded advance) is taken at once; Reel holds to the reported day
   P.d=d;return P.v=Math.max(P.v,d,Math.min(v,d+1+SCREEN_CLOCK.slack*rate));}
+// People and traffic follow delivered calendar readings, rather than spending a nominal day's motion and then
+// waiting for an expensive tick. Blend each new reading over the time the preceding progress took. The HUD keeps
+// its own current clock; this disposable motion clock never advances beyond a reading or goes back to the worker.
+function motionDay(now=performance.now()){
+  const M=G.motion;if(!BACKGROUND||!M||M.world!==W)return displayDay();
+  if(speedIdx===0)return M.v;
+  const f=clamp((now-M.at)/Math.max(1000/60,M.ms),0,1);return M.v=Math.max(M.v,M.from+(M.to-M.from)*f);
+}
+function motionReading(c){
+  if(!BACKGROUND||!c||!Number.isFinite(c.day))return;const now=performance.now(),at=Number.isFinite(c.at)?Math.min(now,c.at-performance.timeOrigin):now,v=c.day+(c.frac||0);
+  let M=G.motion;if(!M||M.world!==W)M=G.motion={world:W,v:Math.min(displayDay(),v),from:v,to:v,at:now,ms:1000/60,progressAt:at,progress:v,pace:SPEEDS[speedIdx]||0};
+  if(at<=M.progressAt||v<=M.progress)return;const from=motionDay(now),ms=Math.max(1000/60,at-M.progressAt);
+  M.pace=(v-M.progress)*1000/ms;M.span=ms;M.progressAt=at;M.progress=v;M.from=from;M.to=Math.max(from,v);M.at=now;M.ms=ms;
+  if(speedIdx===0)M.v=M.from=M.to=v; // an explicit bounded advance while paused is shown at once
+}
+function motionRepace(c,v=motionDay()){
+  if(!BACKGROUND||!c||!Number.isFinite(c.day))return;motionReading(c);const M=G.motion,now=performance.now(),value=c.day+(c.frac||0);
+  M.v=v;M.from=v;M.to=speedIdx===0?v:Math.max(v,value);M.at=now;M.ms=Math.min(250,M.span||150);
+  M.progressAt=Number.isFinite(c.at)?Math.min(now,c.at-performance.timeOrigin):now;M.progress=value;M.span=0;
+  if(speedIdx===0)M.pace=0;else if(speedIdx!==5)M.pace=Math.min(SPEEDS[speedIdx],M.pace||SPEEDS[speedIdx]);
+}
+function motionPace(){const r=G.motion?.pace;return BACKGROUND&&Number.isFinite(r)?clamp(r,0,speedIdx===5?30:SPEEDS[speedIdx]||0):speedIdx===5?0:SPEEDS[speedIdx]||0;}
+function motionHorizon(){return clamp((G.motion?.span||0)/1000+(G.actorLatency||0)+0.15,0.4,4);}
 // Where a townsman is at the screen's day v, from the steps of his walk the worker kept (T: their days, R: x, z, yaw and
 // whether he is out of doors and walking, four to a step): between the two steps either side of v, as the main-thread
 // screen walked him a frame at a time; before the first, at the first; past the last, where the last left him.
@@ -21549,12 +21577,12 @@ async function workerGoName(code){
 function workerRefreshActors(herds=false){
   if(!BACKGROUND||!cam.cur.focus)return;const focus={x:cam.cur.focus.x,z:cam.cur.focus.z};let si=-1,d=Infinity;for(let i=0;i<W.settlements.length;i++){const s=W.settlements[i],v=dist2d(s.pos.x,s.pos.z,focus.x,focus.z);if(v<d){d=v;si=i;}}
   if(cam.cur.dist>=700||d>(W.settlements[si]?.extentR||W.settlements[si]?.radius||0)+160)si=-1;
-  return workerQuery('actors',{kind:'actors',si,focus,range:Math.max(1800,cam.cur.dist*2.5),herds,view:displayDay()},packet=>{G.workerCitizens=packet.citizens;G.clockFrac=packet.fraction||0;G.walkDay=packet.day+(packet.fraction||0);presAnchor(packet.day+(packet.fraction||0),packet.at);if(packet.herds){G.herdsDirty=false;G._hPlan={x:focus.x,z:focus.z,R:packet.herds.range,t:performance.now()};G.flocks=reconcileFlocks(G.flocks,packet.herds.flocks);}});
+  const sent=performance.now();return workerQuery('actors',{kind:'actors',si,focus,range:Math.max(1800,cam.cur.dist*2.5),herds,view:motionDay(),pace:motionPace(),horizon:motionHorizon()},packet=>{G.actorLatency=(performance.now()-sent)/1000;G.workerCitizens=packet.citizens;G.clockFrac=packet.fraction||0;G.walkDay=packet.day+(packet.fraction||0);presAnchor(packet.day+(packet.fraction||0),packet.at);motionReading({day:packet.day,frac:packet.fraction,at:packet.at});if(packet.herds){G.herdsDirty=false;G._hPlan={x:focus.x,z:focus.z,R:packet.herds.range,t:performance.now()};G.flocks=reconcileFlocks(G.flocks,packet.herds.flocks);}});
 }
 function renderTransportCitizens(nearest,d){
   const now=performance.now(),si=W.settlements.indexOf(nearest),prior=G.workerActorFocus,close=nearest&&cam.cur.dist<700&&d<(nearest.extentR||nearest.radius)+160;
   if((!prior||dist2d(prior.x,prior.z,cam.cur.focus.x,cam.cur.focus.z)>30||now-prior.t>(speedIdx===5?1000:150))&&!BACKGROUND.reads?.has('actors')){G.workerActorFocus={x:cam.cur.focus.x,z:cam.cur.focus.z,t:now};workerRefreshActors();}
-  const list=close&&G.workerCitizens?.si===si?G.workerCitizens.people:[];let k=0;G.citIdx=[];const vs=clamp(cam.cur.dist/220,1,2.6),v=displayDay(),run=list.length?(v-G.workerCitizens.day)*DAYSEC:0; // calendar seconds since the worker's walkers stood where it last left them
+  const list=close&&G.workerCitizens?.si===si?G.workerCitizens.people:[];let k=0;G.citIdx=[];const vs=clamp(cam.cur.dist/220,1,2.6),v=motionDay(),run=list.length?(v-G.workerCitizens.day)*DAYSEC:0; // calendar seconds since the worker's walkers stood where it last left them
   for(const c of list){const w=k<160&&walkTrackAt(G.workerCitizens.times,c.track,v);if(!w?.out)continue;const bob=w.walking&&speedIdx===LIFE?Math.abs(Math.sin((c.time+run)*8.5))*0.06:0,p={id:c.id,si:c.si,sx:c.sex},y=surfY(w.x,w.z)+.28+bob,sc=c.scale*vs;if(cam.follow&&cam.follow.pid===c.id)cam.follow.pos={x:w.x,z:w.z,y};setInst(G.citizens,k,w.x,y,w.z,w.yaw,sc,sc,sc);setInst(G.citKit,k,w.x,y,w.z,w.yaw,sc,sc,sc);G.citizens.setColorAt(k,new THREE.Color(c.colour.hex).multiplyScalar(c.colour.gain));G.citIdx[k]={p,s:nearest,x:w.x,z:w.z,out:true};k++;}
   G.citizens.count=G.citKit.count=k;G.citizens.instanceMatrix.needsUpdate=G.citKit.instanceMatrix.needsUpdate=true;if(G.citizens.instanceColor)G.citizens.instanceColor.needsUpdate=true;
 }
@@ -21851,7 +21879,7 @@ function simulationWorkerModel(){return{
     if(kind==='plan-quote')return workerCommandPlanQuote({...payload,kind:payload.kindName});
     if(kind==='storage-preview')return workerCommandStoragePreview(payload);
     if(kind==='overlay')return workerOverlayQuery(payload.mode);
-    if(kind==='actors'){const si=Number.isInteger(payload.si)?payload.si:-1;return{day:day(),fraction:payload.fraction,at:performance.timeOrigin+performance.now(),citizens:si>=0?workerRenderCitizens(si,{focus:payload.focus,frac:payload.fraction,view:payload.view}):null,herds:payload.herds?workerRenderHerds(payload.focus,payload.range):null};}
+    if(kind==='actors'){const si=Number.isInteger(payload.si)?payload.si:-1;return{day:day(),fraction:payload.fraction,at:performance.timeOrigin+performance.now(),citizens:si>=0?workerRenderCitizens(si,{focus:payload.focus,frac:payload.fraction,view:payload.view,pace:payload.pace,horizon:payload.horizon}):null,herds:payload.herds?workerRenderHerds(payload.focus,payload.range):null};}
     if(kind==='summary')return{day:day(),ad:AD(),realm:W.name,treasury:W.treasury,speed:speedIdx,revision:WORKER_PRESENTATION.revision,settlements:W.settlements.map((s,id)=>({id,name:s.name,owner:s.owner,pop:s.pop,hunger:s.hunger})),journal:STORAGE_OUTCOMES.status()};
     if(kind==='household'){const h=W.households.get(payload.id);if(!h)throw Error('Unknown household');return{id:h.id,head:h.head?.id??null,members:[...h.members].map(p=>p.id),purse:h.assets.w,debt:h.assets._debt,hunger:h.hunger,pantry:W.settlements.flatMap((s,si)=>{const held=s._owners?.get(h)?.held;return held?[{si,goods:{...held}}]:[];})};}
     if(kind==='audit'&&typeof globalThis.FURLONG_WORKER_AUDIT==='function')return globalThis.FURLONG_WORKER_AUDIT(payload);

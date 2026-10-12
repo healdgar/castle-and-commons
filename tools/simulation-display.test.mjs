@@ -70,15 +70,15 @@ test('traffic interpolation follows calendar time, ignores selected speed, freez
   assert.equal(c.trafficDistance(t,99),16);
 });
 
-test('fast projection accumulates skipped frame time and runs immediately at pause, slower pace, or new world',()=>{
-  const c=run(source.slice(source.indexOf('function projectWorld('),source.indexOf('\nfunction animate(',source.indexOf('function projectWorld('))),{G:{},speedIdx:5,VISUAL:{fast:()=>true},animateWorld:(dt,now)=>(c.calls.push([dt,now])),calls:[]});
+test('Reel budgets landscape projection while animation runs every frame, including speed changes and new worlds',()=>{
+  const c=run(source.slice(source.indexOf('function projectWorld('),source.indexOf('\nfunction animate(',source.indexOf('function projectWorld('))),{G:{},speedIdx:5,VISUAL:{fast:()=>true},animateWorld:(dt,now,project)=>(c.calls.push([dt,now,project])),calls:[]});
   assert.equal(c.projectWorld(0.02,1),true);assert.equal(c.projectWorld(0.03,1.03),false);assert.equal(c.projectWorld(0.04,1.07),false);
-  assert.deepEqual(c.calls,[[0.02,1]]);assert.equal(c.G.viewElapsed,0.07);
-  assert.equal(c.projectWorld(0.01,1.11),true);assert.deepEqual(c.calls[1],[0.08,1.11]);
-  c.speedIdx=4;assert.equal(c.projectWorld(0.02,1.12),true);assert.deepEqual(c.calls[2],[0.02,1.12]);
-  c.speedIdx=0;assert.equal(c.projectWorld(0.01,1.13),true);assert.deepEqual(c.calls[3],[0.01,1.13]);
-  c.speedIdx=5;c.G={};assert.equal(c.projectWorld(0.01,1.14),true);assert.deepEqual(c.calls[4],[0.01,1.14]);
-  c.VISUAL.fast=()=>false;assert.equal(c.projectWorld(0.01,1.15),true);assert.deepEqual(c.calls[5],[0.01,1.15]);
+  assert.deepEqual(c.calls,[[0.02,1,true],[0.03,1.03,false],[0.04,1.07,false]]);
+  assert.equal(c.projectWorld(0.01,1.11),true);assert.deepEqual(c.calls[3],[0.01,1.11,true]);
+  c.speedIdx=4;assert.equal(c.projectWorld(0.02,1.12),true);assert.deepEqual(c.calls[4],[0.02,1.12,true]);
+  c.speedIdx=0;assert.equal(c.projectWorld(0.01,1.13),true);assert.deepEqual(c.calls[5],[0.01,1.13,true]);
+  c.speedIdx=5;c.G={};assert.equal(c.projectWorld(0.01,1.14),true);assert.deepEqual(c.calls[6],[0.01,1.14,true]);
+  c.VISUAL.fast=()=>false;assert.equal(c.projectWorld(0.01,1.15),true);assert.deepEqual(c.calls[7],[0.01,1.15,true]);
 });
 
 function animationFixture(){

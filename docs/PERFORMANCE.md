@@ -1,5 +1,67 @@
 # Simulation performance
 
+## Animation cadence investigation, 12 October 2026
+
+The user identifies people and vehicles as the primary symptom. At paced high
+speeds, `presStep` spends the nominal pace and reaches its bounded prediction
+limit while the worker is completing an expensive day. `workerWalkOn` also
+emits a single position at nominal Fastest/Reel rather than a walking track,
+even when actual delivered progress is slow. Traffic and people therefore hold
+and jump despite continuing page frames. Separately, Reel’s `projectWorld`
+guard has wrapped all of `animateWorld` since `e0cd7e5` (5 October), limiting
+motion to 10 Hz alongside landscape work. Release `02d5ece` did not change
+these clocks, worker delivery, mesh invalidation or the render loop.
+
+The local repair keeps the HUD’s current clock and the authoritative worker.
+People and traffic interpolate delivered readings over the time their preceding
+progress took, using a disposable motion clock that never runs past a reading.
+Repeated/stale readings do not restart its blend, pause freezes it and a new
+world resets it. No motion clock or pacing decision enters the saved simulation.
+Worker walking plans use that delivered pace and retain bounded past/future
+path samples across slower replies; delayed forecasts are limited to 240 steps
+per request. They reuse the existing semantic street/walking planner and meshes.
+Reel still budgets landscape projection while updating mesh motion each frame.
+Direct draw callers still project by default; simulation ticks, commands,
+storage and packet acknowledgements are unchanged.
+
+A serial worker-browser probe runs all six moving speeds near the Porthcrug
+mill in 1001:42 sea, AD1066/default9km. GPU submission is excluded after native
+WebGL initialization because this cloud host’s software GPU took seconds per
+drawn frame; actual animation, worker, projection, details and UI paths run.
+In the current eight-second candidate windows, Fastest vehicle positions change
+on 375 of 429 page frames, while the original screen clock changes on 12 frames;
+Reel positions change on 471 of 479 frames while its original clock changes on
+two. People move on 278/429 and 287/479 frames respectively; standing/indoors
+actors are counted without forcing them to move. These are pose-cadence counts,
+not hardware FPS or simulation throughput. The baseline eight-second windows
+move vehicles on 20/417 Fastest frames and
+5/476 Reel frames. People move on 0/417 and 1/476 frames, but the Fastest
+baseline has no displayed people during that window; these are not matched
+cohorts. Independent sweeps reach different days and actor populations. Baseline
+load0 is 0.19→1.65, candidate 0.08→1.88, with no browser exceptions.
+
+Most measured daily packets do not invalidate structures/details/roads. Actual
+changes can still invoke whole-scene feature and road work, causing occasional
+main-thread hitches. Worker throughput remains #15/#16 and those structural
+hitches remain part of #88.
+
+Eighty-seven focused display/clock/deferral/readonly/worker-boundary/source checks
+pass. The final native comparison matches complete save-body bytes, private hash
+counters and every RNG at days0/50/100/150, plus every byte of 1,812 raw journal
+rows. Inventory/fault checks are clean and final cash residual is 1.01e-10,
+identical to the baseline. The deployed baseline’s simulation script is
+byte-identical to the earlier performance-gated source; its completed native
+bodies are reused as the reference. This candidate gate uses 80.22 child CPU /
+61.80 wall seconds, load0.50→1.25, peak RSS913504KB. Final HTML SHA256:
+`f8917b6e32a0ed82bd8eed9cb54fa6c3bd90d2bbfafb6eb89823010ae9250c9e`. All 2,231 checks across 214 test files pass in one full batch, including
+native paid-castle and royal-eyre save/load continuation. The batch uses
+3835.60 child CPU / 1399.63 wall seconds, load1.25→1.01, peak RSS2397140KB.
+The final candidate is being published; only the visible build stamp changes
+after the gates. The initial Reel-only gate is superseded by this complete
+extended-candidate validation.
+Current status is solely in [ISSUES.md](ISSUES.md#performance-saves-and-late-worlds).
+Sources and evidence are outside the checkout in `/workspace/furlong-animation-pass/`.
+
 ## Local simulation performance pass, 12 October 2026
 
 The leading cost in the current AD1066 coastal profile is first-castle geometry. Failed-site memory has zero hits across 217 fresh misses
