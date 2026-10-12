@@ -239,3 +239,10 @@ from its hover label; camp inspection still queries the actual membership.
 The focused source checks, a label smoke check and the final 150-day identity
 proof cover that last caption change. Machine-readable receipts preserve the
 batch and final source hashes, fixture failures/rechecks and the one-line delta.
+
+The repair was released as [13447ff](https://github.com/healdgar/furlong-kingdom-annals/commit/13447ff55dfa6387f19a7bedad706c2a3380652c).
+Pages/container workflow [127](https://github.com/healdgar/furlong-kingdom-annals/actions/runs/38305044317) succeeded; both linux/amd64 and
+linux/arm64 payloads match all nine HTML/asset/license files. The stamped HTML
+SHA256 is `af6e4ed426c403f42f80938535add793f3bebd8fd030c8902b9cb0361a7bd49c`;
+image index at publication is `sha256:f42df8024e4063a99b93dc8015675b38429992a54a48b1bb3f874b97d56d859c`.
+The live Pages hostname and claude.ai artifact limitations are retained in #84.
