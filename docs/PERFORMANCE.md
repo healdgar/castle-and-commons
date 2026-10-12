@@ -46,8 +46,11 @@ uses 4238.88 child CPU / 1542.68 wall seconds, load1.48→1.16, peak RSS2354588K
 the serial recheck uses 190.61 CPU / 170.55 wall seconds, load0.59→1.29.
 Paid castle and AD1200 royal-eyre native save/load continuation, current mill
 opening/save checks, projection checks and the new reservation/ray regressions
-are included. These are test-runner costs, not game throughput. No release has
-been published from this local pass.
+are included. These are test-runner costs, not game throughput. Release
+`02d5ece` publishes this candidate to Pages and the container; only the visible
+build stamp changed after these gates. Both container architectures contain
+byte-identical HTML, assets and LICENSE. Pages live-byte verification and the
+separate claude.ai artifact remain #84.
 
 The baseline snapshot already includes the local river-mill changes; both sides
 hold those intended model changes constant. Baseline HTML SHA256:
