@@ -31,7 +31,7 @@ const projectEvent=extract('function projectEvent(ev){','function referenceRegex
 const storageArchive=extractHTML('const STORAGE_ARCHIVE_DB = (() => {','\nif(!MODEL_ONLY)window.FURLONG_STORAGE_LOG=backgroundStorageLog();');
 const fortSeams=extract('function fortCircuitKey(s,c){','function objectiveBuilding(')+'\n'+extract('function casRing(s){','function casR(s,R){');
 const fortReads=extract('function wallKindAt(s,a){','/* Circuits own their shape');
-const foregroundAdapters=extract('function workerQuery(key,payload,install){','function workerRefreshCourt(');
+const foregroundAdapters=extract('function workerQuery(','function workerRefreshCourt(');
 const hud=extract('function hudFigures(){','/* =========================================================================\n   PER-FRAME WORLD ANIMATION');
 const chronicle=extract('function chronicleAdd(evs){','function reignHeader(n){');
 const forbidden=new Set(['_owners','_hh','household','households','account','ownerAccount','beneficiary','storage','ledger','holdings','rng','simulationRNG']);

@@ -417,7 +417,7 @@ body[data-ui-size=large] #insp ul.tree,body[data-ui-size=large] #insp ol.tline{f
 #contextbar{display:flex;gap:4px;align-items:center;padding:10px 12px;flex:none;}
 #contexttitle{flex:1;min-width:0;cursor:zoom-in;border:0;background:transparent;text-align:left;font:23px 'IM Fell English',Georgia,serif;color:var(--ink);display:flex;gap:10px;align-items:center;overflow-wrap:anywhere;}
 #contexttitle img{width:30px;height:30px;object-fit:contain;flex:none;}
-#contextsize,#contextclose{flex:none;min-height:44px;border:0;background:transparent;color:var(--ink2);font-size:13px;cursor:pointer;padding:4px 6px;}
+#contextback,#contextsize,#contextclose{flex:none;min-height:44px;border:0;background:transparent;color:var(--ink2);font-size:13px;cursor:pointer;padding:4px 6px;}
 #contextcontent{min-height:0;overflow:auto;padding:0 16px 14px;flex:1;overscroll-behavior:contain;}
 #contextcontent>*{display:none !important;position:static !important;inset:auto !important;transform:none !important;width:100% !important;max-width:none !important;max-height:none !important;height:auto !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;padding:0 !important;background:transparent !important;color:var(--ink);}
 #contextpanel[data-kind=insp] #insp,#contextpanel[data-kind=drawer] #drawer,#contextpanel[data-kind=chron] #chron{display:flex !important;}
@@ -457,7 +457,7 @@ body[data-ui-size=large] #insp ul.tree,body[data-ui-size=large] #insp ol.tline{f
 /* The map card stays brief; its full sheet uses a reading size, including inherited legacy annotations. */
 #contextpanel{--card-text:16px;--card-meta:15px;font-size:var(--card-text);line-height:1.5;}
 #contextpanel.expanded{--card-text:18px;--card-meta:16px;}#contextpanel #contextcontent>*{font-size:var(--card-text);}
-#contextpanel #contextsize,#contextpanel #contextclose,#contextpanel #contextactions button,#contextpanel #inspnav button,#contextpanel #inspfollow,#contextpanel #dtabs .t,#contextpanel #chronfilters button,#contextpanel #chronfoot button{font-size:16px;}
+#contextpanel #contextback,#contextpanel #contextsize,#contextpanel #contextclose,#contextpanel #contextactions button,#contextpanel #inspnav button,#contextpanel #inspfollow,#contextpanel #dtabs .t,#contextpanel #chronfilters button,#contextpanel #chronfoot button{font-size:16px;}
 #contextpanel .centry,#contextpanel #insp .row,#contextpanel .cstat,#contextpanel .houserow,#contextpanel .wrow,#contextpanel .amb,#contextpanel .succline,#contextpanel .vrow,#contextpanel ul.tree,#contextpanel ol.tline,#contextpanel .slrow label,#contextpanel .cbtn,#contextpanel #inspacts .cbtn,#contextpanel .wbtn,#contextpanel .actbtn,#contextpanel .ovbtn{font-size:var(--card-text);line-height:1.5;}
 #contextpanel #insp .note,#contextpanel .note,#contextpanel .tag,#contextpanel small,#contextpanel .cbtn small,#contextpanel .cbtn .cost,#contextpanel .vwhy,#contextpanel .vrow .vp,#contextpanel .tlab,#contextpanel .centry .cd,#contextpanel .chouse .hb button{font-size:var(--card-meta);line-height:1.5;}
 #contextpanel #insp .agline{font-size:var(--card-text) !important;line-height:1.5;}
@@ -494,8 +494,9 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
 #infobody .detail-jumps{flex-wrap:wrap;}
 @media(max-width:600px){#hud #brand{font-size:19px;}#hud .hudlink{padding:4px 0;}}
 
+#hud.menu-open{z-index:56;}
 #orderfeedback{position:fixed;bottom:16px;left:12px;z-index:54;width:420px;max-width:calc(100vw - 24px);max-height:30dvh;overflow:auto;padding:12px 14px;background:var(--parch);color:var(--ink);border:1px solid var(--edge);border-radius:6px;box-shadow:0 3px 12px #0004;font-size:14px;line-height:1.4;}
-#orderfeedback[hidden],#maphover[hidden],#contextsize[hidden]{display:none !important;}
+#orderfeedback[hidden],#maphover[hidden],#contextsize[hidden],#contextback[hidden]{display:none !important;}
 #contextpanel>#orderfeedback{position:static;width:auto;max-width:none;max-height:24dvh;margin:0 16px 8px;box-shadow:none;flex:none;}
 #orderfeedback p{margin:6px 0;}#orderfeedback nav{display:flex;gap:8px;flex-wrap:wrap;}#orderfeedback button{min-height:44px;padding:6px 10px;border:1px solid var(--edge);border-radius:4px;background:transparent;color:var(--ink);font:inherit;cursor:pointer;}
 #maphover{position:fixed;z-index:40;pointer-events:none;max-width:min(360px,calc(100vw - 24px));padding:8px 10px;border-radius:5px;background:#201a12;color:#f0e6cf;border:1px solid #c4a24a;font-size:14px;line-height:1.4;}
@@ -504,7 +505,7 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
 </head>
 <body>
 <div id="gl"></div>
-<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-12 20:33 UTC · after ed01fb6</div></div>
+<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-12 23:45 UTC · after e2117cd</div></div>
 
 <div id="hud">
   <button type="button" id="brand" class="hudlink" aria-label="About Castle and Commons" aria-controls="contextpanel">Castle and Commons</button>
@@ -565,7 +566,7 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
 <button id="drawertoggle" aria-controls="drawer" aria-expanded="false">Panels</button>
 
 <section id="contextpanel" hidden aria-label="Selected object" class="detached">
-  <header id="contextbar"><button id="contexttitle" aria-expanded="false" aria-controls="contextcontent" title="Expand card">The realm</button><button id="contextsize" aria-expanded="false" aria-controls="contextcontent">Expand</button><button id="contextclose" aria-label="Close card">Close</button></header>
+  <header id="contextbar"><button id="contexttitle" aria-expanded="false" aria-controls="contextcontent" title="Expand card">The realm</button><button id="contextback" hidden aria-label="Back to previous view">Back</button><button id="contextsize" aria-expanded="false" aria-controls="contextcontent">Expand</button><button id="contextclose" aria-label="Close card">Close</button></header>
   <div id="contextcontent"></div><div id="contextpointer" aria-hidden="true"></div>
 </section>
 <div id="insp">
@@ -8509,7 +8510,7 @@ function planToggle(){ // the brush is the ruler's: as the crown or as the lord 
   if(!sovOn()){jot({k:'sov',on:true,hi:W.player&&W.player.house||0});setSovereign(true,W.player&&W.player.house||0);if(!sovOn())return;}
   planOpen(plyH());}
 function planOpen(payer){planUI={payer,brush:null,stroke:null,draft:null};const el=document.getElementById('planbar');el.style.display='block';sheet('plan');planBarHTML();setPlaceMode(null);document.body.classList.add('planning');scheduleLayout();}
-function planClose(){if(!planUI)return;planClear();planUI=null;document.getElementById('planbar').style.display='none';document.body.classList.remove('planning');if(contextUI.ready&&contextUI.kind==='plan'){contextExpand(false);contextUI.kind=null;document.getElementById('contextpanel').hidden=true;}scheduleLayout();}
+function planClose(){if(!planUI)return;planClear();planUI=null;document.getElementById('planbar').style.display='none';document.body.classList.remove('planning');if(contextUI.ready&&contextUI.kind==='plan'){contextExpand(false);contextUI.kind=null;document.getElementById('contextpanel').hidden=true;document.getElementById('contextpanel').removeAttribute('aria-busy');}scheduleLayout();}
 function planBarHTML(){const P=planUI;if(!P)return;const who=P.payer>0?W.houses[P.payer].name:'The crown',fund=Math.round(purse(P.payer));
   let x=`<div class="pbrow"><b>Plan with the brush</b> <span class="pbfund">${esc(who)} · ${fund.toLocaleString()} gold</span></div><div class="pbrow">`;
   x+=`<button class="pbb${!P.brush?' on':''}" data-pb="pan" aria-pressed="${!P.brush}">Pan</button>`;
@@ -11336,7 +11337,7 @@ function nearestSettlementIdx(x,z){
 
 
 /* ---------------- one contextual card: UI state, never simulation state ---------------- */
-const contextUI={ready:false,kind:null,expanded:false,scroll:new Map(),side:null,lastPosition:''};
+const contextUI={ready:false,kind:null,expanded:false,scroll:new Map(),side:null,lastPosition:'',navigation:0,history:[],restoring:false};
 const CONTEXT_IDS={insp:'insp',drawer:'drawer',chron:'chron',plan:'planbar',petition:'petition',legend:'terrlegend',info:'infopanel',event:'eventpanel'};
 // These sheets read existing records. Opening them must not create accounts, quotes or journal entries.
 // Explanations belong to visible events, not a global notification queue.
@@ -11457,11 +11458,12 @@ function infoHTML(){
   }return h;
 }
 function openInfo(kind,town=null,reference=null){
+  if(!MODEL_ONLY&&kind!=='accounts-refresh')contextRemember(contextInfoKey(kind,town,reference));
   if(!MODEL_ONLY&&BACKGROUND)return workerOpenInfo(kind,town,reference);
   const active=document.activeElement;if(active?.closest('#hud'))contextUI.opener=active.closest('#toolmenu')?document.getElementById('menubtn'):active;else if(contextUI.kind!=='info')contextUI.opener=null;
   if(inspTarget)hideInspect();
   const refresh=kind==='accounts-refresh',content=document.getElementById('contextcontent'),scroll=refresh?content.scrollTop:0;
-  if(!refresh){infoUI.kind=kind;infoUI.town=town;infoUI.reference=reference;contextUI.scroll.delete('info');}
+  if(!refresh){infoUI.kind=kind;infoUI.town=town;infoUI.reference=reference;infoUI.title=kind==='reference'?referenceTitle(reference):null;contextUI.scroll.delete('info');}
   setHTML(document.getElementById('infobody'),infoHTML());contextShow('info');contextExpand(infoUI.kind==='accounts'||infoUI.kind==='reference');
   content.scrollTop=scroll;
   if(!document.getElementById('contextpanel').contains(document.activeElement))document.getElementById(contextUI.expanded?'contextsize':'contexttitle').focus();
@@ -11476,7 +11478,7 @@ function contextAnchor(pk){
     case 'event':p=pk.ev?.pos;break;
     case 'army':p=agentPos(pk.a||pk.army);break;
     case 'notable':case 'tree':{const n=pk.n||pk.x;if(isN(n)){const w=notableWhere(n);p=w?.army?agentPos(w.army):w;}else p=n?.bh||W.settlements[n?.si]?.pos;break;}
-    case 'person':{const t=(W.travellers||[]).find(t=>t.p===pk.p&&day()>=t.depart&&day()<t.arrive);if(t)p=polyPos(t.poly,clamp((displayDay()-t.depart)/Math.max(0.01,t.arrive-t.depart),0,1));if(!p){const c=(G.citList||[]).find(c=>c.p===pk.p&&c.out);p=c||detailHead(pk.p)?.bh||pk.s?.pos;}break;}
+    case 'person':{if(pk.a&&!pk.p.dead){p=agentPos(pk.a);break;}const t=(W.travellers||[]).find(t=>t.p===pk.p&&day()>=t.depart&&day()<t.arrive);if(t)p=polyPos(t.poly,clamp((displayDay()-t.depart)/Math.max(0.01,t.arrive-t.depart),0,1));if(!p){const c=(G.citList||[]).find(c=>c.p===pk.p&&c.out);p=c||detailHead(pk.p)?.bh||pk.s?.pos;}break;}
     case 'caravan':p=agentPos(pk.c);break;
     case 'envoy':p=agentPos(pk.e);break;
     case 'dragon':p=G.dragonMesh?.position;break;
@@ -11501,19 +11503,46 @@ function contextPlacement(anchor,width,height,viewport,side){
 function contextTitle(){
   const k=contextUI.kind;
   if(k==='event')return esc(eventTitle(eventUI.current));
-  if(k==='info')return infoUI.kind==='reference'?esc(referenceTitle(infoUI.reference)):infoUI.kind==='symbols'?'Map symbols':infoUI.kind==='about'?'About Castle and Commons':infoUI.kind==='timeline'?'The timeline':infoUI.town?esc(infoUI.town.name)+' · Accounts':'Kingdom ledger';
+  if(k==='info')return infoUI.kind==='reference'?esc(infoUI.title||'Reference'):infoUI.kind==='symbols'?'Map symbols':infoUI.kind==='about'?'About Castle and Commons':infoUI.kind==='timeline'?'The timeline':infoUI.town?esc(infoUI.town.name)+' · Accounts':'Kingdom ledger';
   if(k==='insp')return document.getElementById('insptitle').innerHTML;
   if(k==='drawer')return {crown:'The Crown',rates:'Rates',acts:'Acts',over:'Map overlays',world:'The realm'}[drawerTab];
   if(k==='chron')return esc('The Annals of '+W.name);
   if(k==='petition')return esc(W.petitions[0]?.title||'Petitions');
   return k==='plan'?'Plan works':k==='legend'?esc(document.querySelector('#terrlegend .lh')?.textContent||'Map legend'):'The realm';
 }
+// A short trail of screen routes, not cached records or saved world state.
+function contextRoute(){
+  if(!contextUI.ready||!contextUI.kind||document.getElementById('contextpanel').hidden)return null;
+  const route={kind:contextUI.kind,expanded:contextUI.expanded,scroll:document.getElementById('contextcontent').scrollTop,camera:typeof cam!=='undefined'?{x:cam.focus.x,z:cam.focus.z,dist:cam.dist}:null};
+  if(route.kind==='insp'){const pk=inspTarget,code=pk?.workerCode||inspectorPickCode(pk);if(!pk||!code&&pk.type!=='project')return null;return{...route,key:'insp:'+(code||pk.key),code,project:pk.type==='project'?pk.key:null,view:inspectorView};}
+  if(route.kind==='info')return{...route,key:contextInfoKey(infoUI.kind,infoUI.town,infoUI.reference),infoKind:infoUI.kind,town:infoUI.town?W.settlements.indexOf(infoUI.town):null,reference:infoUI.reference};
+  if(route.kind==='drawer')return{...route,key:'drawer:'+drawerTab,tab:drawerTab,section:crownSection,ledgerOpen:G.ledgerOpen};
+  if(route.kind==='chron')return{...route,key:'chron',filter:chronFilter};
+  if(route.kind==='event')return{...route,key:'event',event:eventUI.current};
+  return null;
+}
+function contextInfoKey(kind,town,reference){return 'info:'+kind+':'+(town?W.settlements.indexOf(town):'realm')+':'+(reference||'');}
+function contextRemember(next){
+  if(contextUI.restoring)return;const route=contextRoute();if(!route||route.key===next)return;
+  const trail=contextUI.history||(contextUI.history=[]);if(trail.at(-1)?.key!==route.key)trail.push(route);if(trail.length>24)trail.shift();
+}
+function contextBack(){
+  const route=contextUI.history?.pop();if(!route)return;contextUI.restoring=true;let opened;
+  try{contextExpand(route.expanded);if(route.kind==='insp')opened=showInspect(route.project?{type:'project',key:route.project}:BACKGROUND?{type:'reference',workerCode:route.code}:workerInspectionTarget(route.code));
+    else if(route.kind==='info')opened=openInfo(route.infoKind,route.town!=null?W.settlements[route.town]:null,route.reference);
+    else if(route.kind==='drawer'){crownSection=route.section;G.ledgerOpen=route.ledgerOpen;selectTab(route.tab);setDrawerClosed(false);contextShow('drawer');if(BACKGROUND)opened=route.tab==='crown'?workerRefreshCourt(true):route.tab==='world'?workerRefreshHousePanel(true):null;}
+    else if(route.kind==='chron'){setChronMin(false);chronFilter=route.filter;document.querySelectorAll('#chronfilters [data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f===chronFilter));document.querySelectorAll('.centry').forEach(e=>e.style.display=chronFilter==='all'||e.dataset.cat===chronFilter?'':'none');contextShow('chron');}
+    else if(route.kind==='event')showEventDialog(route.event);
+  }finally{contextUI.restoring=false;}
+  const navigation=contextUI.navigation;
+  return Promise.resolve(opened).then(()=>{if(contextUI.navigation!==navigation)return;contextExpand(route.expanded);if(route.kind==='insp')setInspectorView(route.view);contextSync();if(route.camera){markManual();flyTo(route.camera.x,route.camera.z,route.camera.dist);}document.getElementById('contextcontent').scrollTop=route.scroll;document.getElementById(contextUI.history?.length?'contextback':'contextsize').focus();});
+}
 function contextTown(){const c=inspTarget?.workerCode;return inspTarget?.type==='settlement'?inspTarget.s:/^s\d+$/.test(c||'')?W.settlements[+c.slice(1)]||null:null;} // a town's card, opened by a click or by name
 function contextSync(){
   if(!contextUI.ready||!contextUI.kind)return;
   const el=document.getElementById('contextpanel');setHTML(document.getElementById('contexttitle'),contextTitle());
   el.setAttribute('aria-label',document.getElementById('contexttitle').textContent);el.dataset.kind=contextUI.kind;
-  const drawing=contextUI.kind==='plan';document.getElementById('contextsize').hidden=drawing;document.getElementById('contexttitle').disabled=drawing;
+  const drawing=contextUI.kind==='plan';document.getElementById('contextback').hidden=drawing||!contextUI.history?.length;document.getElementById('contextsize').hidden=drawing;document.getElementById('contexttitle').disabled=drawing;
   if(drawing)document.getElementById('contexttitle').title='Plan works beside the map';
   orderFeedbackPosition();
   if(contextUI.kind==='insp'){
@@ -11521,12 +11550,13 @@ function contextSync(){
     const selected=inspTarget?.type==='settlement'?rows.filter(r=>['Population','Unrest','Opening housing'].includes(r.firstElementChild?.textContent)):rows.slice(0,2);
     document.getElementById('contextaccounts').hidden=!contextTown();
     document.getElementById('contextorders').hidden=!document.getElementById('inspacts').innerHTML.trim();
-    setHTML(document.getElementById('contextsummary'),selected.length?selected.map(r=>r.outerHTML).join(''):'<div class="note">Open details</div>');
+    setHTML(document.getElementById('contextsummary'),selected.length?selected.map(r=>r.outerHTML).join(''):source.querySelector('[role=status],[role=alert]')?.outerHTML||'<div class="note">Open details</div>');
   }
 }
 function contextShow(kind){
   if(!contextUI.ready||!CONTEXT_IDS[kind])return;
   const changed=contextUI.kind!==kind;
+  if(changed){document.getElementById('contextpanel').removeAttribute('aria-busy');contextUI.navigation=(contextUI.navigation||0)+1;if(!contextUI.restoring&&['drawer','chron','plan','legend','petition'].includes(kind))contextUI.history=[];}
   contextUI.kind=kind;contextUI.side=changed?null:contextUI.side;
   if(kind==='plan'&&contextUI.expanded)contextExpand(false);
   const el=document.getElementById('contextpanel');el.hidden=false;
@@ -11551,7 +11581,8 @@ function contextExpand(on){
 }
 function contextDismiss(){
   if(!contextUI.ready)return;
-  const kind=contextUI.kind,opener=kind==='info'?contextUI.opener:null;contextUI.opener=null;contextExpand(false);contextUI.kind=null;document.getElementById('contextpanel').hidden=true;
+  contextUI.navigation=(contextUI.navigation||0)+1;contextUI.history=[];
+  const kind=contextUI.kind,opener=kind==='info'?contextUI.opener:null;contextUI.opener=null;contextExpand(false);contextUI.kind=null;document.getElementById('contextpanel').hidden=true;document.getElementById('contextpanel').removeAttribute('aria-busy');
   if(kind==='insp')hideInspect();else if(kind==='drawer')setDrawerClosed(true);else if(kind==='chron')setChronMin(true);else if(kind==='plan')planClose();else if(kind==='petition')document.getElementById('petition').classList.add('min');else if(kind==='legend')document.getElementById('terrlegend')?.classList.add('min');
   if(kind==='event'){eventUI.current=null;eventUI.referenceRequest++;}
   (opener?.isConnected?opener:document.getElementById('menubtn')).focus();document.dispatchEvent(new Event('contextchange'));orderFeedbackPosition();
@@ -11589,11 +11620,12 @@ function initContextUI(){
   document.getElementById('contextsize').onclick=()=>contextExpand(!contextUI.expanded);
   document.getElementById('contexttitle').onclick=()=>contextExpand(!contextUI.expanded);
   document.getElementById('contextclose').onclick=contextDismiss;
+  document.getElementById('contextback').onclick=contextBack;
   document.getElementById('contextdetails').onclick=()=>{setInspectorView('details');contextExpand(true);};
   document.getElementById('contextaccounts').onclick=()=>{const s=contextTown();if(s)openInfo('accounts',s);};
   document.getElementById('contextorders').onclick=()=>{setInspectorView('orders');contextExpand(true);};
   panel.addEventListener('click',e=>{const info=e.target.closest('[data-info]');if(info){openInfo(info.dataset.info);return;}const account=e.target.closest('[data-account-town]');if(account){const s=W.settlements[+account.dataset.accountTown];if(s)openInfo('accounts',s);return;}const annals=e.target.closest('[data-info-annals]');if(annals){setChronMin(false);contextShow('chron');contextExpand(true);return;}const jump=e.target.closest('[data-detail-jump]');if(jump){document.getElementById(jump.dataset.detailJump)?.scrollIntoView({block:'start'});return;}const place=e.target.closest('[data-detail-settlement]');if(place){const s=W.settlements[+place.dataset.detailSettlement];if(s){showInspect({type:'settlement',s});document.getElementById('contextsize').focus();}return;}const building=e.target.closest('[data-detail-building]');if(building){const [si,bi]=building.dataset.detailBuilding.split(':').map(Number),b=W.settlements[si]?.buildings[bi];if(b){showInspect({type:'building',b});document.getElementById('contextsize').focus();}return;}if(!contextUI.expanded&&!e.target.closest('button,a,input,select,textarea,summary,[data-cmd],[role=tab]'))contextExpand(true);});
-  document.getElementById('contextsummary').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();contextExpand(true);}};
+  document.getElementById('contextsummary').onkeydown=e=>{if(e.target===e.currentTarget&&(e.key==='Enter'||e.key===' ')){e.preventDefault();contextExpand(true);}};
   document.getElementById('inspnav').addEventListener('click',e=>{if(e.target.closest('button'))contextExpand(true);});
   document.getElementById('toolmenu').addEventListener('click',e=>{const b=e.target.closest('[data-context-tab]');if(b){selectTab(b.dataset.contextTab);sheet('drawer');setDrawerClosed(false);contextShow('drawer');}});
   document.getElementById('menuannals').onclick=()=>{sheet('chron');setChronMin(false);contextShow('chron');};
@@ -11650,14 +11682,18 @@ function detailPlaceBack(s){return `<nav class="detail-jumps" aria-label="Return
 function detailJumps(items){return `<nav class="detail-jumps" aria-label="Detail sections">${items.map(([id,t])=>`<button data-detail-jump="${id}">${t}</button>`).join('')}</nav>`;}
 function openingCapacityNote(s){const q=s.openingCapacity;if(!q?.exhausted)return '';
   return `At opening, ${q.capacity} household places could be fitted for ${q.goal} households.`;}
+function displayDateStr(d){
+  if(!Number.isFinite(d))return 'date not recorded';if(d>=0)return dateStr(d);
+  const years=Math.floor(d/360),within=d-years*360;return SEASONS[Math.floor(within/90)]+' '+(Math.floor(within%90)+1)+', AD '+(((W&&W.startAD)||850)+years);
+}
 function inspectorCard(pk,full=false){
   if(!pk)return null;
-  if(pk.type==='event'){const ev=pk.ev;return ev?{title:eventTitle(ev),sub:dateStr(ev.day)+' · '+eventTitle(ev),body:esc(ev.text),actions:'',follow:null}:null;}
+  if(pk.type==='event'){const ev=pk.ev;return ev?{title:eventTitle(ev),sub:displayDateStr(ev.day)+' · '+eventTitle(ev),body:esc(ev.text),actions:'',follow:null}:null;}
   const title={innerHTML:''},sub={textContent:'',innerHTML:''},body={innerHTML:''},acts={innerHTML:''};
   let follow=null,actsH='',h='';
   const setHTML=(el,h)=>{el.innerHTML=h;};
   const fb={style:{},textContent:''};
-  const flyToBtn=(button,label,fn)=>{follow={label,type:pk.type,code:inspectorPickCode(pk)};};
+  const flyToBtn=(button,label,fn,intent)=>{follow={label,type:pk.type,code:inspectorPickCode(pk),...intent};};
   full=!!full;
   const row=(k,v)=>`<div class="row${String(v).replace(/<[^>]*>/g,'').length>26?' long':''}"><span>${k}</span><b>${v}</b></div>`; // a long value reads left to right under itself, not squeezed against its label
   const name=detailNaming();
@@ -11712,7 +11748,7 @@ function inspectorCard(pk,full=false){
     if(s.infected>0.5)h+=row('Plague',Math.round(s.infected)+' sick, '+Math.round(s.plagueDead)+' dead');
     if(s.siegeBy)h+=row('Under siege by',s.siegeBy.houseName);
     if(s.ruinCount)h+=row('Ruins',s.ruinCount);
-    if(s.quarantineUntil>day())h+=row('Gates','sealed until '+dateStr(s.quarantineUntil));
+    if(s.quarantineUntil>day())h+=row('Gates','sealed until '+displayDateStr(s.quarantineUntil));
     {const H=portHealthHTML(s);if(H)h+=row('Harbor isolation',H);}
     if(full)h+=detailSettlement(s,name);
     if(s.history&&s.history.length)h+=`<section class="detail-section" id="detail-history" aria-labelledby="detail-history-title"><h4 class="dhead" id="detail-history-title">History</h4><div class="agline">${s.history.map(x=>(x.yr?`<i>AD ${W.startAD+x.yr-1}:</i> `:x.ago?`<i>c. ${x.ago} years before the annals:</i> `:'')+esc(x.t)).join('<br>')}</div></section>`;
@@ -11726,7 +11762,7 @@ function inspectorCard(pk,full=false){
     h+=row('Access',yard.adjunct?'Footpath from the church':'Beside the church');
     h+=row('Grave spaces',`${markers.length} · fixed plot; reused after 20 years`);
     h+=row('Recorded burials',detailNumber(chOf(b).burials||0));
-    if(recent.length)h+=detailTable('detail-burials','Recent burials',['Person','Died'],recent.map(p=>[detailPerson(p),esc(dateStr(p.dd))]));
+    if(recent.length)h+=detailTable('detail-burials','Recent burials',['Person','Died'],recent.map(p=>[detailPerson(p),esc(displayDateStr(p.dd))]));
     flyToBtn(fb,'Visit',()=>flyTo(yard.x,yard.z,100));
   }else if(pk.type==='building'){
     const b=pk.b;
@@ -11765,7 +11801,7 @@ function inspectorCard(pk,full=false){
     sub.textContent=now<e.arrive?'riding to '+t.name:now<e.decide?'at '+t.name+', awaiting an answer':'riding home to '+W.capital.name;
     h+=row('About',esc(e.about));
     if(e.riders&&e.riders.length)h+=row('Riders',e.riders.map(q=>`<a class="pp" data-pid="${q.id}">${esc(folkName(q))}</a>`).join(', '));
-    h+=row(now<e.decide?'Answer expected':'Bearing the answer',now<e.decide?dateStr(e.decide):'to the crown');
+    h+=row(now<e.decide?'Answer expected':'Bearing the answer',now<e.decide?displayDateStr(e.decide):'to the crown');
   }else if(pk.type==='tree'){
     const x=pk.x;setHTML(title,esc('Family of '+tName(x)));sub.textContent=isN(x)?(houseOf(x)?houseOf(x).name:''):(famName(x)||'');
     h+=`<div class="note">${isN(x)?`<a class="nm" data-nm="n${x.id}">Open the card</a>`:!x.dead?`<a class="pp" data-pid="${x.id}">Open the card</a>`:''}</div>`+treeHTML(x);
@@ -11783,7 +11819,7 @@ function inspectorCard(pk,full=false){
     if((n.role==='Bandit King'||n.role==='justice')&&n.fp)h+=row('Folk',`<a class="pp" data-pid="${n.fp.id}">${esc(folkName(n.fp))}${n.fp.dead?' †':''}</a>`);
     if(n.spouse){const sp=notableById(n.spouse);if(sp)h+=row('Spouse',nl(sp));}
     if(n.heirs.length)h+=row('Children',n.heirs.map(id=>notableById(id)).filter(Boolean).map(nl).join(', '));
-    if(n.alive){const w=notableWhere(n);if(w)h+=row('Now',w.army?`with ${esc(w.army.name)}`:w.camp?'at the outlaw camp':`at ${esc(w.s.name)}`);flyToBtn(fb,w&&w.army?'Find and follow':'Find',()=>goNotable(n));}
+    if(n.alive){const w=notableWhere(n);if(w){h+=row('Now',w.army?`with ${esc(w.army.name)}`:w.camp?'at the outlaw camp':`at ${esc(w.s.name)}`);flyToBtn(fb,w.army?'Find and follow':'Find',()=>goNotable(n),w.army?{type:'army',code:'a'+w.army.id}:undefined);}else h+=row('Now','No current location shown');}
     h+=`<div class="agline">“${esc(n.agenda)}.”</div>`;
     if(n.role==='head'&&n.house>0&&W.houses[n.house]&&!W.houses[n.house].exiled){const hh=W.houses[n.house];
       h+=row('Purse',Math.round(hh.gold||0).toLocaleString()+' g ('+((hh.lastNet||0)>=0?'+':'')+Math.round(hh.lastNet||0)+' a month)');h+=houseDetailHTML(n.house,full);}
@@ -11814,7 +11850,7 @@ function inspectorCard(pk,full=false){
     sub.textContent=W.settlements[c.origin].name+' → '+W.settlements[c.dest].name;
     h+=row('Cargo',c.good+' × '+Math.round(c.qty));
     h+=row('Value',Math.round(c.value)+' gold');
-    {const Q=portQuarantineSummary(c);if(Q)h+=row('Harbor isolation',Q.holding?`${Q.served} supported days · release ${dateStr(Q.until)} · ${Q.wages.toFixed(1)} attendant wages, ${Q.demurrage.toFixed(1)} delay expenses${Q.lost?'; '+Q.lost.toFixed(1)+' cargo spoiled':''}`:esc(Q.reason));}
+    {const Q=portQuarantineSummary(c);if(Q)h+=row('Harbor isolation',Q.holding?`${Q.served} supported days · release ${displayDateStr(Q.until)} · ${Q.wages.toFixed(1)} attendant wages, ${Q.demurrage.toFixed(1)} delay expenses${Q.lost?'; '+Q.lost.toFixed(1)+' cargo spoiled':''}`:esc(Q.reason));}
     if(c.crew)h+=row(c.sea?'Master':c.river?'Bargeman':'Carter',`<a class="pp" data-pid="${c.crew.id}">${esc(folkName(c.crew))}</a> of ${esc(W.settlements[c.origin].name)}`);
     flyToBtn(fb,'Follow',()=>{markManual();cam.follow=c;cam.dist=140;});
   }else if(pk.type==='land'){
@@ -11907,8 +11943,9 @@ function inspectorCard(pk,full=false){
     setHTML(title,esc(folkName(p)));{const fem=p.sex==='f'||p.sx==='f';sub.textContent=`${a}, ${a<14?(fem?'girl':'boy'):a<18?(fem?'young woman':'young man'):fem?(p.sp?'wife':'woman'):p.sp?'husband':'man'}${p.tr&&a>=14?' · '+p.tr:''} · ${s.name}`;}
     if(full)h+=detailPlaceBack(s);
     {const aw=awayNow(p),t=pk.t||(W.travellers||[]).find(x=>x.p===p);
-      if(t)h+=row('Now',`on the road from ${esc(W.settlements[t.from]?.name||'?')} to ${esc(W.settlements[t.to]?.name||'?')} — ${t.home?{market:'home from market',kin:'home from seeing her mother',pilgrim:'home from pilgrimage'}[t.why]||'coming home':{bride:'a bride going to her husband\'s house',migrant:'leaving for a new home',market:'to market, with eggs, cheeses and wool to sell',kin:'to see her mother',pilgrim:'on pilgrimage to the shrine'}[t.why]||'on the road'}; there ${dateStr(Math.ceil(t.arrive))}`);
-      else if(aw)h+=row('Now',esc(aw.what)+`; home by ${dateStr(Math.ceil(aw.until))}`);
+      if(pk.a&&!p.dead)h+=row('Now',`with <a class="nm" data-nm="a${pk.a.id}">${esc(pk.a.name)}</a>`);
+      else if(t)h+=row('Now',`on the road from ${esc(W.settlements[t.from]?.name||'?')} to ${esc(W.settlements[t.to]?.name||'?')} — ${t.home?{market:'home from market',kin:'home from seeing her mother',pilgrim:'home from pilgrimage'}[t.why]||'coming home':{bride:'a bride going to her husband\'s house',migrant:'leaving for a new home',market:'to market, with eggs, cheeses and wool to sell',kin:'to see her mother',pilgrim:'on pilgrimage to the shrine'}[t.why]||'on the road'}; there ${displayDateStr(Math.ceil(t.arrive))}`);
+      else if(aw)h+=row('Now',esc(aw.what)+`; home by ${displayDateStr(Math.ceil(aw.until))}`);
       else if(pk.c&&pk.c.doing)h+=row('Now',esc(pk.c.doing));}
     if(home)h+=row('Home',`${esc(name(home)||((TIERNAME[home.tier]||'')+' '+ARCH[home.arch][4]))} in the ${esc(home.district||'')} quarter`);
     if(p.sp&&!p.sp.dead)h+=row(p.sx==='f'?'Husband':'Wife',pl(p.sp));
@@ -11921,13 +11958,13 @@ function inspectorCard(pk,full=false){
     {const hh=detailHead(p);if(hh.w!==undefined){const counts={};for(const {head} of detailHouseholds(s))if(head?.tr&&!head.outlawCampId)counts[head.tr]=(counts[head.tr]||0)+1;const inc=tradeIncome(s,hh.tr,counts),herd=s._owners?.get(p._hh||hh._hh)?.animals||{},rh=hh.bh&&hh.bh.rural?(hh.bh.ownerId===hh.id?'their own farmstead out on the land':'a farmstead on the land they work, let by its owner'):null;
       h+=row('Living',`${hh.tr?esc(hh.tr):'labouring'}: about ${Math.round(inc)} crowns a year here${beastsWord(herd)?`; ${beastsWord(herd)}`:''}${rh?`; lives in ${rh}`:''}${p!==hh&&ageYrs(p)>=18&&!p.sp?(p.own?'; has set up house':'; still under the family roof'):''}`);}}
     {const o=officeTitle(p);if(o)h+=row('Office',esc(o));}h+=freedomPersonHTML(p);
-    if(fm)h+=row('Family',`${esc(fm.n)} — ${{occ:'named for a founder\'s trade',loc:'named for where the first of them lived',nick:'named for how a founder looked or carried himself',patr:'named for a founder\'s father',fitz:'a lord\'s natural line'}[fm.k]||'an old name'}, first in ${esc(W.settlements[fm.home]?.name||'the realm')}`);
+    if(fm)h+=row('Family',`<a class="nm" data-nm="family:${p.fam}">${esc(fm.n)}</a> — ${{occ:'named for a founder\'s trade',loc:'named for where the first of them lived',nick:'named for how a founder looked or carried himself',patr:'named for a founder\'s father',fitz:'a lord\'s natural line'}[fm.k]||'an old name'}, first in ${esc(W.settlements[fm.home]?.name||'the realm')}`);
     h+=`<div class="note"><a class="tr" data-tree="${tKey(p)}">Family tree</a></div>`;
     if(full){h+=detailHousehold(s,p,name);h+=detailTable('detail-skills','Learning and skills',['Skill','Ability'],SKILLS.map((k,i)=>[esc(k),`${esc(skillWord(p.sk?.[i]||0)||'untaught')} · ${detailNumber((p.sk?.[i]||0)*100)}%`]));}
-    h+=row('Nature',p.nat??natureWords(p));h+=row('Learning',p.lrn??learningWords(p));if(p.dead&&p.dd!=null)h+=row('Died',dateStr(p.dd)+`, aged ${Math.floor((p.dd-p.b)/360)}`);
-    {const E=p.ev||[];h+=`<div class="dhead" style="margin-top:6px">Life</div><div class="note">Born ${dateStr(p.b)}</div>`+E.map(([d,t])=>`<div class="note">${dateStr(d)}: ${esc(t)}</div>`).join('');}
-    if(!p.dead)flyToBtn(fb,'Find and follow',()=>goPerson(p,s)); // the card has one button: the living are found where they are
-    else if(home)flyToBtn(fb,'Show home',()=>{flyTo(home.x,home.z,60);showInspect({type:'building',b:home});});
+    h+=row('Nature',p.nat??natureWords(p));h+=row('Learning',p.lrn??learningWords(p));if(p.dead&&p.dd!=null)h+=row('Died',displayDateStr(p.dd)+`, aged ${Math.floor((p.dd-p.b)/360)}`);
+    {const E=p.ev||[];h+=`<div class="dhead" style="margin-top:6px">Life</div><div class="note">Born ${displayDateStr(p.b)}</div>`+E.map(([d,t])=>`<div class="note">${displayDateStr(d)}: ${esc(t)}</div>`).join('');}
+    if(!p.dead)flyToBtn(fb,pk.a?'Find and follow host':'Find and follow',()=>goPerson(p,s),pk.a?{type:'army',code:'a'+pk.a.id}:undefined); // the card has one button: the living are found where they are
+    else if(home)flyToBtn(fb,'Show home',()=>{flyTo(home.x,home.z,60);showInspect({type:'building',b:home});},{type:'building',code:buildingReference(home),at:{x:home.x,z:home.z},inspect:true});
   }else if(pk.type==='track'){
     const s=W.settlements[nearestSettlementIdx(pk.x,pk.z)];setHTML(title,esc('Farm track'));sub.textContent=s?`in the fields of ${s.name}`:'';
     h+=`<div class="agline">Worn by carts and beasts between the fields and the village. It keeps to the bounds between holdings, not across anyone's corn, and no lord or crown mends it.</div>`;
@@ -11935,7 +11972,7 @@ function inspectorCard(pk,full=false){
     const sh=pk.sh,s=sh&&W.settlements[sh.port],nm=o=>Object.entries(o||{}).filter(([,q])=>q>0).map(([g,q])=>`${detailNumber(q)} ${g}`).join(', ')||'—';
     setHTML(title,esc(sh?`A ${sh.kind} of ${sh.from}`:'A ship'));sub.textContent=sh?(sh.phase==='in'?`bound for ${s.name}`:sh.phase==='dock'?`alongside at ${s.name}`:`homeward to ${sh.from}`):'';
     if(sh){h+=row('From',esc(sh.from)+', beyond the map');h+=row('Brought',esc(nm(sh.cargo)));if(sh.phase!=='in')h+=row('Loaded',esc(nm(sh.load)));
-      if(sh.phase==='dock')h+=row('Sails',dateStr(sh.until));if(sh.waited)h+=row('Lay off the port',sh.waited+' days, waiting for a berth');
+      if(sh.phase==='dock')h+=row('Sails',displayDateStr(sh.until));if(sh.waited)h+=row('Lay off the port',sh.waited+' days, waiting for a berth');
       flyToBtn(fb,'Visit '+s.name,()=>flyTo(s.pos.x,s.pos.z,300));}
   }else if(pk.type==='beast'){
     const s=W.settlements[pk.si],T=BEAST_TEXT[pk.k]||[pk.k,''],n=Math.round(s&&s.stores[pk.k]||0);
@@ -12094,7 +12131,7 @@ function workerUIQuery(payload={}){
   if(kind==='info'){
     const prior={kind:infoUI.kind,town:infoUI.town,reference:infoUI.reference};
     try{infoUI.kind=String(payload.infoKind||'about');infoUI.town=Number.isInteger(payload.town)?W.settlements[payload.town]||null:null;infoUI.reference=typeof payload.reference==='string'?payload.reference:null;
-      return{html:linkNames(infoHTML(),infoUI.town)};}
+      return{html:linkNames(infoHTML(),infoUI.town),title:infoUI.kind==='reference'?referenceTitle(infoUI.reference):null};}
     finally{Object.assign(infoUI,prior);}
   }
   if(kind==='petitions'){
@@ -12127,6 +12164,7 @@ function workerUIQuery(payload={}){
 }
 function showInspect(pk){
   if(MODEL_ONLY)return;
+  if(!backgroundApplying){contextRemember('insp:'+(pk?.workerCode||inspectorPickCode(pk)||pk?.key));contextUI.navigation=(contextUI.navigation||0)+1;}
   if(pk?.type==='project'){const q=(W.projects||[]).find(q=>projectMarkerKey(q)===pk.key);pk.workerCard=projectMarkerCard(q);pk._anchor=q?projectMarkerAnchor(q):pk._anchor;}
   if(pk?.type==='project'&&!backgroundApplying){backgroundApplying=true;try{return showInspect(pk);}finally{backgroundApplying=false;}}
   if(BACKGROUND&&!backgroundApplying)return workerShowInspector(pk);
@@ -12143,7 +12181,7 @@ function showInspect(pk){
   if(opening)sheet('insp');el.style.display='flex';document.body.classList.add('inspecting');document.getElementById('inspx').textContent=inspectReturn?'Back':'Close';document.getElementById('inspx').setAttribute('aria-label',inspectReturn?'Back to realm controls':'Close inspector');
   if(changed){inspectorView='details';contextUI.side=null;contextUI.scroll.delete('insp');document.getElementById('contextcontent').scrollTop=0;}setInspectorView(inspectorView);contextShow('insp');scheduleLayout();
 }
-function followInspector(pk){if(BACKGROUND&&pk._anchor&&['notable','person','tree'].includes(pk.type)){flyTo(pk._anchor.x,pk._anchor.z,90);if(pk.type==='person'&&pk.p?.id!=null)cam.follow={pid:pk.p.id,pos:{x:pk._anchor.x,z:pk._anchor.z,y:hAt(pk._anchor.x,pk._anchor.z)}};return;}
+function followInspector(pk){if(BACKGROUND&&pk.workerCard?.follow)return workerFollowInspector(pk);if(BACKGROUND&&pk._anchor&&['notable','person','tree'].includes(pk.type)){flyTo(pk._anchor.x,pk._anchor.z,90);if(pk.type==='person'&&pk.p?.id!=null)cam.follow={pid:pk.p.id,pos:{x:pk._anchor.x,z:pk._anchor.z,y:hAt(pk._anchor.x,pk._anchor.z)}};return;}
   if(pk.type==='settlement'){const s=pk.s;flyTo(s.pos.x,s.pos.z,s.kind==='capital'?520:340);return;}
   if(pk.type==='churchyard'){flyTo(pk.yard.x,pk.yard.z,100);return;}
   if(pk.type==='building'){flyTo(pk.b.x,pk.b.z,60);return;}
@@ -12153,7 +12191,7 @@ function followInspector(pk){if(BACKGROUND&&pk._anchor&&['notable','person','tre
   if(pk.type==='dragon'){cam.follow=W.dragon;cam.dist=300;return;}
   if(pk.type==='person'){
     const p=pk.p,s=pk.s,home=detailHead(p).bh;
-    if(!p.dead)goPerson(p,s);else if(home){flyTo(home.x,home.z,60);showInspect({type:'building',b:home});}return;
+    if(!p.dead&&pk.a){cam.follow=pk.a;cam.dist=260;}else if(!p.dead)goPerson(p,s);else if(home){flyTo(home.x,home.z,60);showInspect({type:'building',b:home});}return;
   }
   if(pk.type==='ship'){const s=pk.sh&&W.settlements[pk.sh.port];if(s)flyTo(s.pos.x,s.pos.z,300);return;}
   if(pk.type==='beast'){const s=W.settlements[pk.si];if(s)flyTo(s.pos.x,s.pos.z,300);return;}
@@ -18224,12 +18262,32 @@ function linkAnnals(){
   });
 }
 function referenceTitle(code){const [kind,si,key]=String(code||'').split(':');if(kind==='family')return W.fams[+si]?.n+' family';if(kind==='surname')return decodeURIComponent(si)+' family';if(kind==='household'){const h=W.households?.get(si);return (h?.head?famName(h.head)||folkName(h.head):si)+' household';}if(kind==='choose')return 'Choose a reference';if(kind==='good'||kind==='trade')return key[0].toUpperCase()+key.slice(1);if(kind==='structure')return ARCH[key]?.[4]||key;return 'Reference';}
+function referenceChoiceContext(code,examples,target){
+  const [kind,id]=code.split(':');if(kind==='family'){
+    const f=W.fams?.[+id],origin=f&&W.settlements[f.home],example=examples.get(+id);if(!example)return null;
+    return [origin?'first recorded at '+origin.name:'',example.label+(example.age!=null?' · aged '+example.age:'')+(example.trade?' · '+example.trade:''),example.place+(example.alive?'':' · deceased'),example.count+' listed '+(example.count===1?'member':'members')].filter(Boolean).join(' · ');
+  }return (target||referenceTarget(code))?.town?.name||'';
+}
 function referenceInfoHTML(){
   const code=infoUI.reference,[kind,id,key]=code.split(':'),s=infoUI.town,towns=s?[s]:W.settlements;
   const personRows=P=>P.map(p=>[detailPerson(p),esc(W.settlements[p.si]?.name||'Away'),esc(p.dead?'Deceased':p.tr||'No recorded trade')]);
   if(kind==='household'){const h=W.households?.get(id);if(!h)return '<p>This household is no longer recorded.</p>';return h.head?'<p>'+detailPerson(h.head)+' · '+esc(referenceTitle(code))+'</p>'+detailHousehold(W.settlements[h.head.si]||h.home,h.head):detailTable('reference-household',referenceTitle(code),['Person','Place','Trade'],personRows([...(h.members||[])]));}
-  if(kind==='family'||kind==='surname'){const name=kind==='surname'?decodeURIComponent(id):null,P=[];for(const t of W.settlements)for(const p of [...(t.folk||[]),...(t.dead||[])])if(name?famName(p)===name:p.fam===+id)P.push(p);return detailTable('reference-family',referenceTitle(code),['Person','Place','Trade'],personRows(P));}
-  if(kind==='choose'){const codes=JSON.parse(decodeURIComponent(code.slice(7)));return '<p>Several recorded entities share this name.</p>'+codes.map(c=>{const target=referenceTarget(c);return `<p><a class="nm" data-nm="${esc(c)}">${esc(target?.label||referenceTitle(c))}</a>${target?.town?' · '+esc(target.town.name):''}</p>`;}).join('');}
+  if(kind==='family'||kind==='surname'||kind==='choose'){
+    const codes=kind==='choose'?JSON.parse(decodeURIComponent(code.slice(7))):null,selected=new Set((codes||[]).filter(c=>c.startsWith('family:')).map(c=>+c.slice(7))),name=kind==='surname'?decodeURIComponent(id):null,P=[],examples=new Map(),elsewhere=new Map(),seen=new Set();
+    // Use the actual rosters too: being called to arms or travelling does not erase a family.
+    if(!codes||selected.size){
+      for(const a of W.armies||[])if(!a.gone)for(const p of a.men||[])elsewhere.set(p,{s:W.settlements[p.home]||W.settlements[p.si]||W.settlements[a.at],place:'with '+a.name,trade:'Under arms'+(p.tr?' · '+p.tr:'')});
+      for(const t of W.travellers||[])if(t.p&&day()>=t.depart&&day()<t.arrive&&!elsewhere.has(t.p))elsewhere.set(t.p,{s:W.settlements[t.to],place:'travelling to '+(W.settlements[t.to]?.name||'an unrecorded destination')});
+      for(const n of W.notables||[])if(n.fp)elsewhere.set(n.fp,{s:W.settlements[n.fp.si],code:'n'+n.id,label:fullTitle(n),place:'recorded in the annals',alive:!!n.alive,age:Math.floor(ageOf(n))});
+      const visit=(p,t)=>{if(!p||seen.has(p)||!(codes?selected.has(p.fam):name?famName(p)===name:p.fam===+id))return;seen.add(p);const away=elsewhere.get(p)||{},entry={p,s:away.s||t,code:'p'+p.id,label:folkName(p),place:t?.name||'Away',alive:!p.dead,age:typeof p.b==='number'?Math.floor(ageYrs(p)):null,trade:p.tr||'',...away};
+        if(codes){const old=examples.get(p.fam),count=(old?.count||0)+1;examples.set(p.fam,!old||!old.alive&&entry.alive?{...entry,count}:{...old,count});}else P.push(entry);};
+      // One census for every family in an opened chooser, never one world search per option.
+      for(const t of W.settlements)for(const p of [...(t.folk||[]),...(t.dead||[])])visit(p,t);
+      for(const [p,where]of elsewhere)visit(p,where.s);
+    }
+    if(!codes)return detailTable('reference-family',referenceTitle(code),['Person','Place','Trade'],P.map(e=>[`<a class="nm" data-nm="${esc(e.code)}">${esc(e.label)}</a>${e.age!=null?' · aged '+e.age:''}`,esc(e.place),esc(e.alive?e.trade||'No recorded trade':'Deceased')]));
+    let empty=0;const choices=codes.map(c=>{const target=referenceTarget(c),context=referenceChoiceContext(c,examples,target);if(context===null){empty++;return '';}return `<p><a class="nm" data-nm="${esc(c)}">${esc(target?.label||referenceTitle(c))}</a>${context?' · '+esc(context):''}</p>`;}).join('');return '<p>Several recorded entities share this name.</p>'+choices+(empty?`<p class="note">${empty} other ${empty===1?'family has':'families have'} no named members currently recorded.</p>`:'');
+  }
   if(kind==='trade')return detailTable('reference-trade',referenceTitle(code),['Person','Place','Trade'],personRows(towns.flatMap(t=>(t.folk||[]).filter(p=>!p.dead&&p.tr===key))));
   if(kind==='good')return detailTable('reference-good',referenceTitle(code),['Place','In store','Crowns / unit'],towns.map(t=>[`<a class="nm" data-nm="s${W.settlements.indexOf(t)}">${esc(t.name)}</a>`,detailNumber(t.stores?.[key]||0),detailNumber(t.px?.[key]??GOODBASE[key])]));
   if(kind==='structure')return detailTable('reference-structures',referenceTitle(code),['Building','Place','State'],towns.flatMap(t=>(t.buildings||[]).filter(b=>b.arch===key&&!b.removed).map(b=>[detailBuilding(b,t),`<a class="nm" data-nm="s${W.settlements.indexOf(t)}">${esc(t.name)}</a>`,esc(b.state)])));
@@ -18244,7 +18302,9 @@ function referenceTarget(code){const [kind,si,bi]=code.split(':'),s=W.settlement
   if(kind==='street'){const st=s?.streets[+bi];return st?{pick:{type:'street',s,st},label:st.name||STREET_NAME[st.kind],town:s}:null;}
   if(kind==='land'){const f=s?.furl[+bi];return f?{pick:{type:'land',f,x:f.x,z:f.z},label:landName(f),town:s}:null;}
   if(kind==='camp'){const camp=W.banditCamps.find(c=>c.id===+si);return camp?{pick:{type:'camp',camp},label:camp.name||'Bandit camp'}:null;}
-  if(/^p\d+$/.test(code)){const f=findPerson(+code.slice(1));return f?{pick:{type:'person',...f},label:folkName(f.p),town:f.s}:null;}
+  if(/^p\d+$/.test(code)){const id=+code.slice(1),f=findPerson(id);if(f)return{pick:{type:'person',...f},label:folkName(f.p),town:f.s};
+    for(const a of W.armies||[])if(!a.gone){const p=(a.men||[]).find(p=>p.id===id);if(p){const town=W.settlements[p.home]||W.settlements[p.si]||W.settlements[a.at];return{pick:town?{type:'person',p,s:town,a}:{type:'army',a},label:folkName(p),town};}}
+    const n=(W.notables||[]).find(n=>n.fp?.id===id);return n?{pick:{type:'notable',n},label:fullTitle(n)}:null;}
   if(/^n\d+$/.test(code)){const n=notableById(+code.slice(1));return n?{pick:{type:'notable',n},label:fullTitle(n)}:null;}
   if(/^s\d+$/.test(code)){const town=W.settlements[+code.slice(1)];return town?{pick:{type:'settlement',s:town},label:town.name,town}:null;}
   if(/^h\d+$/.test(code)){const house=W.houses[+code.slice(1)],town=house&&W.settlements[house.seat];return house?{label:house.name,town}:null;}
@@ -18285,10 +18345,10 @@ function goName(code){if(BACKGROUND)return workerGoName(code); // fly to it and 
   else if(t==='h'){const h=W.houses[v],s=h&&W.settlements[h.seat],n=h&&notableById(h.head);if(s)flyTo(s.pos.x,s.pos.z,520);if(n)showInspect({type:'notable',n});else if(s)showInspect({type:'settlement',s});}
   else if(t==='n'){const n=notableById(v);if(n){goNotable(n);showInspect({type:'notable',n});}}
   else if(t==='a'){const a=W.armies.find(x=>x.id===v&&!x.gone);if(a){const p=armyDisplayPos(a);flyTo(p.x,p.z,260);cam.follow=a;showInspect({type:'army',a});}}
-  else if(t==='p'){const f=findPerson(v);if(f){goPerson(f.p,f.s);showInspect({type:'person',p:f.p,s:f.s,t:f.t});}}}
+  else if(t==='p'){const pk=referenceTarget(code)?.pick;if(pk?.type==='person'){if(pk.a){const p=agentPos(pk.a);flyTo(p.x,p.z,260);cam.follow=pk.a;}else goPerson(pk.p,pk.s);showInspect(pk);}else if(pk)goName(inspectorPickCode(pk));}}
 if(!MODEL_ONLY)document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#crownchip')&&W&&W.monarch&&W.monarch.alive){if(BACKGROUND)workerGoName('n'+W.monarch.id);else{goNotable(W.monarch);showInspect({type:'notable',n:W.monarch});}return;}
   const tq=e.target.closest&&e.target.closest('a.tr');if(tq){e.stopPropagation();e.preventDefault();if(BACKGROUND){workerGoName('tree:'+tq.dataset.tree);return;}const x=TREE.get(tq.dataset.tree);if(x)showInspect({type:'tree',x});return;}
-  const q=e.target.closest&&e.target.closest('a.pp');if(q){e.stopPropagation();e.preventDefault();if(BACKGROUND){workerGoName('p'+q.dataset.pid);return;}const f=findPerson(+q.dataset.pid);if(f){goPerson(f.p,f.s);showInspect({type:'person',p:f.p,s:f.s,t:f.t});}return;}
+  const q=e.target.closest&&e.target.closest('a.pp');if(q){e.stopPropagation();e.preventDefault();goName('p'+q.dataset.pid);return;}
   const a=e.target.closest&&e.target.closest('a.nm');if(!a)return;e.stopPropagation();e.preventDefault();goName(a.dataset.nm);},true);
 function chronicleAdd(evs){ // one entry, or a packet's run of them: measured once, appended once, scrolled once
   const list=chronList(),frag=document.createDocumentFragment(),all=Array.isArray(evs)?evs:[evs];
@@ -19555,7 +19615,7 @@ function decorateControls(root){
   for(const e of root.querySelectorAll('input,select,textarea'))if(!e.hasAttribute('aria-label')&&!e.labels?.length){const label=e.closest('.wrow,.slrow')?.querySelector('label')?.textContent||e.closest('.wrow')?.firstChild?.textContent||e.placeholder||e.id;e.setAttribute('aria-label',label.trim());}
   uiConfirmShow(root);
 }
-function closeToolMenu(){document.getElementById('menubtn').setAttribute('aria-expanded','false');document.getElementById('toolmenu').hidden=true;}
+function closeToolMenu(){document.getElementById('hud').classList.remove('menu-open');document.getElementById('menubtn').setAttribute('aria-expanded','false');document.getElementById('toolmenu').hidden=true;}
 function helpUI(){
   const box=document.getElementById('savebox');box.style.display='flex';box.innerHTML=`<div class="egbox"><h2>Explore the realm</h2>
   <p>Tap or click a place, person or name to inspect it. Use Menu for the court, annals, overlays and realm settings. Click a card to expand it; Minimize or Escape returns to its compact form.</p>
@@ -19586,15 +19646,16 @@ function initAccessibleUI(){
   for(const id of ['savebox','endgame'])new MutationObserver(syncDialog).observe(document.getElementById(id),{attributes:true,attributeFilter:['style'],childList:true,subtree:true});
   new MutationObserver(syncDialog).observe(document.body,{childList:true});document.addEventListener('contextchange',syncDialog);
   document.addEventListener('keydown',e=>{
-    if(activeUIDialog){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();if(activeUIDialog.id==='contextpanel')contextExpand(false);else if(activeUIDialog.id==='mapview')activeUIDialog.remove();else activeUIDialog.style.display='none';return;}if(e.key==='Tab'){const list=focusable(activeUIDialog),i=list.indexOf(document.activeElement);if(!list.length){e.preventDefault();return;}if(e.shiftKey&&i<=0){e.preventDefault();list.at(-1).focus();}else if(!e.shiftKey&&(i===list.length-1||i<0)){e.preventDefault();list[0].focus();}}return;}
+    if(activeUIDialog){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();if(activeUIDialog.id==='contextpanel')contextExpand(false);else if(activeUIDialog.id==='mapview')activeUIDialog.remove();else activeUIDialog.style.display='none';return;}if(e.key==='Tab'){const list=focusable(activeUIDialog),i=list.indexOf(document.activeElement);if(!list.length){e.preventDefault();return;}if(e.shiftKey&&i<=0){e.preventDefault();list.at(-1).focus();}else if(!e.shiftKey&&(i===list.length-1||i<0)){e.preventDefault();list[0].focus();}return;}}
+    if(e.defaultPrevented)return;
     if(e.key==='Escape'&&document.getElementById('menubtn').getAttribute('aria-expanded')==='true'){e.preventDefault();closeToolMenu();document.getElementById('menubtn').focus();return;}
-    const custom=e.target.closest('[role=button]');if(custom&&(e.key==='Enter'||e.key===' ')){e.preventDefault();custom.click();return;}
+    const custom=e.target.closest('[role=button]');if(custom&&!e.target.closest('button,a,input,select,textarea,summary,[role=tab]')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();custom.click();return;}
     const tab=e.target.closest('[role=tab]');if(tab&&['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){const tabs=[...tab.closest('[role=tablist]').querySelectorAll('[role=tab]')].filter(b=>!b.hidden),i=tabs.indexOf(tab);const n=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;e.preventDefault();tabs[n].click();tabs[n].focus();}
   },true);
   document.getElementById('dbody').addEventListener('click',e=>{const b=e.target.closest('[data-cview]');if(b){crownSection=b.dataset.cview;if(BACKGROUND)workerRefreshCourt(true);else setHTML(document.getElementById('dbody'),crownPanelHTML());document.getElementById('dbody').scrollTop=0;document.getElementById('contextcontent').scrollTop=0;document.getElementById('court-'+crownSection)?.focus();}});
   document.getElementById('inspnav').addEventListener('click',e=>{const b=e.target.closest('[data-iview]');if(b){setInspectorView(b.dataset.iview);document.getElementById('inspscroll').scrollTop=0;}});
   document.getElementById('drawerclose').onclick=()=>{setDrawerClosed(true);document.getElementById('drawertoggle').focus();};
-  document.getElementById('menubtn').onclick=()=>{const b=document.getElementById('menubtn'),open=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',String(open));document.getElementById('toolmenu').hidden=!open;};
+  document.getElementById('menubtn').onclick=()=>{const b=document.getElementById('menubtn'),open=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',String(open));document.getElementById('hud').classList.toggle('menu-open',open);document.getElementById('toolmenu').hidden=!open;};
   document.getElementById('toolmenu').addEventListener('click',e=>{if(e.target.closest('button'))closeToolMenu();});
   document.addEventListener('pointerdown',e=>{if(!e.target.closest('#toolmenu,#menubtn'))closeToolMenu();const panel=e.target.closest('#drawer,#insp,#chron,#planbar,#terrlegend,#petition');if(panel)primaryPanel=({planbar:'plan',terrlegend:'legend'})[panel.id]||panel.id;});
   document.getElementById('petitionbtn').onclick=()=>{renderPetition(true);const p=document.getElementById('petition');p.classList.remove('min');sheet('petition');p.querySelector('#petitionfold')?.setAttribute('aria-expanded','true');};
@@ -21525,9 +21586,9 @@ function mapHoverHide(){const el=document.getElementById('maphover');if(el)el.hi
 
 function workerNotice(error){backgroundApplying=true;try{setSpeed(0);}finally{backgroundApplying=false;}if(BACKGROUND&&!BACKGROUND.closed)BACKGROUND.request('pause').then(reply=>workerSpeedReply(reply)).catch(()=>{});console.error('Background simulation:',error);storageFaultNotice('The simulation is paused: '+String(error.message||error)+'. Save or reload the last committed game.');}
 function workerHTML(html){return String(html||'').replace(/worker-sigil:(\d+)/g,(_,hi)=>sigURL(+hi));}
-function workerQuery(key,payload,install){
+function workerQuery(key,payload,install,options={}){
   const pending=BACKGROUND.reads||(BACKGROUND.reads=new Map());if(pending.has(key)){ADV_PENDING?.push(pending.get(key));return pending.get(key);}
-  const query=BACKGROUND.request('view',payload).then(install).catch(error=>{console.error('Game query:',error);if(typeof orderFeedbackBegin==='function'&&typeof document!=='undefined')orderFeedbackFinish(orderFeedbackBegin({k:'view'}),{accepted:false,reason:'This view could not be opened: '+String(error.message||error)+'. Try opening it again.'});return null;}).finally(()=>pending.delete(key));pending.set(key,query);ADV_PENDING?.push(query);return query;
+  const query=BACKGROUND.request('view',payload).then(install).catch(error=>{if(options.current&&!options.current())return null;console.error('Game query:',error);if(options.error){options.error(error);return null;}if(typeof orderFeedbackBegin==='function'&&typeof document!=='undefined')orderFeedbackFinish(orderFeedbackBegin({k:'view'}),{accepted:false,reason:'This view could not be opened: '+String(error.message||error)+'. Try opening it again.'});return null;}).finally(()=>pending.delete(key));pending.set(key,query);ADV_PENDING?.push(query);return query;
 }
 // An advisor's press gathers what it sent (ADV_PENDING), so it can answer with the worker's own reply instead of a guess.
 let ADV_PENDING=null;
@@ -21638,8 +21699,15 @@ function workerRefreshCourt(force=false){if(drawerTab!=='crown'||!force&&(!drawe
 function workerRefreshHousePanel(force=false){if(drawerTab!=='world'||!force&&!drawerVisible())return;return workerQuery('houses',{kind:'ui',panel:'house-panel'},view=>{if(drawerTab!=='world')return;setHTML(document.getElementById('housepanel'),workerHTML(view.houses));setHTML(document.getElementById('succpanel'),workerHTML(view.succession));});}
 function workerOpenInfo(kind,town=null,reference=null){
   const refresh=kind==='accounts-refresh',content=document.getElementById('contextcontent'),scroll=refresh?content.scrollTop:0;
-  if(!refresh){infoUI.kind=kind;infoUI.town=town;infoUI.reference=reference;contextUI.scroll.delete('info');}hideInspect();
-  return workerQuery('info:'+infoUI.kind+':'+reference,{kind:'ui',panel:'info',infoKind:infoUI.kind,town:town?W.settlements.indexOf(town):null,reference:infoUI.reference},view=>{setHTML(document.getElementById('infobody'),workerHTML(view.html));contextShow('info');contextExpand(infoUI.kind==='accounts'||infoUI.kind==='reference');content.scrollTop=scroll;});
+  if(!refresh){infoUI.kind=kind;infoUI.town=town;infoUI.reference=reference;infoUI.title=null;contextUI.scroll.delete('info');}
+  const requested={kind:infoUI.kind,town:infoUI.town,reference:infoUI.reference};hideInspect();
+  if(!refresh)setHTML(document.getElementById('infobody'),'<p class="note" role="status">Opening this view…</p>');
+  contextShow('info');const token=contextUI.navigation=(contextUI.navigation||0)+1,current=()=>contextUI.navigation===token&&contextUI.kind==='info';
+  document.getElementById('contextpanel').setAttribute('aria-busy','true');
+  const key=contextInfoKey(requested.kind,requested.town,requested.reference)+':'+token;
+  return workerQuery(key,{kind:'ui',panel:'info',infoKind:requested.kind,town:requested.town?W.settlements.indexOf(requested.town):null,reference:requested.reference},view=>{
+    if(!current())return;infoUI.title=view.title||null;setHTML(document.getElementById('infobody'),workerHTML(view.html));contextSync();contextExpand(requested.kind==='accounts'||requested.kind==='reference');content.scrollTop=scroll;document.getElementById('contextpanel').removeAttribute('aria-busy');
+  },{current,error: error=>{setHTML(document.getElementById('infobody'),'<p role="alert">'+esc('This view could not be opened: '+String(error.message||error))+'. Close it and try again.</p>');document.getElementById('contextpanel').removeAttribute('aria-busy');}});
 }
 function workerRenderPetition(open=false){
   const el=document.getElementById('petition'),button=document.getElementById('petitionbtn');button.hidden=!W.petitions.length||!sovOn();button.textContent='Petitions ('+W.petitions.length+')';
@@ -21648,12 +21716,28 @@ function workerRenderPetition(open=false){
 }
 function workerShowInspector(pk){
   const code=pk.workerCode||inspectorPickCode(pk);if(!code){if(pk.type==='event')return showEventDialog(pk.ev);return;}
-  inspTarget=pk;const full=contextUI.expanded;
-  return workerQuery('inspect:'+code+':'+full,{kind:'inspect',code,full},card=>{if(inspTarget!==pk)return;pk.workerCode=code;pk.workerCard={...card,title:workerHTML(card.title),sub:workerHTML(card.sub),body:workerHTML(card.body),actions:workerHTML(card.actions)};pk._anchor=card.anchor;backgroundApplying=true;try{showInspect(pk);}finally{backgroundApplying=false;}});
+  const changing=(inspTarget?.workerCode||inspectorPickCode(inspTarget))!==code;
+  inspTarget=pk;pk.workerCode=code;const full=contextUI.expanded;
+  if(changing){setHTML(document.getElementById('insptitle'),'Opening card…');setHTML(document.getElementById('inspsub'),'');setHTML(document.getElementById('inspbody'),'<p class="note" role="status">Opening card…</p>');setHTML(document.getElementById('inspacts'),'');document.getElementById('inspfollow').style.display='none';setInspectorView('details');contextShow('insp');}
+  const navigation=contextUI.navigation,current=()=>inspTarget===pk&&contextUI.navigation===navigation&&contextUI.expanded===full&&contextUI.kind==='insp';
+  document.getElementById('contextpanel').setAttribute('aria-busy','true');
+  return workerQuery('inspect:'+code+':'+full+':'+navigation,{kind:'inspect',code,full},card=>{if(!current())return;pk.workerCard={...card,title:workerHTML(card.title),sub:workerHTML(card.sub),body:workerHTML(card.body),actions:workerHTML(card.actions)};pk._anchor=card.anchor;backgroundApplying=true;try{showInspect(pk);}finally{backgroundApplying=false;}document.getElementById('contextpanel').removeAttribute('aria-busy');},
+    {current,error:error=>{setHTML(document.getElementById('insptitle'),'Card unavailable');setHTML(document.getElementById('inspbody'),'<p role="alert">'+esc(String(error.message||error))+'. Close this card and try again.</p>');setHTML(document.getElementById('inspacts'),'');document.getElementById('inspfollow').style.display='none';contextSync();document.getElementById('contextpanel').removeAttribute('aria-busy');}});
 }
 async function workerGoName(code){
-  if(/^(household|family|surname|choose|good|trade|structure):/.test(code)){const si=+code.split(':')[1];return openInfo('reference',W.settlements[si]||null,code);}
-  const pk={type:'reference',workerCode:code};await workerShowInspector(pk);if(pk._anchor){markManual();flyTo(pk._anchor.x,pk._anchor.z,260);}
+  if(/^(household|family|surname|choose|good|trade|structure):/.test(code)){const scoped=/^(good|trade|structure):/.test(code),si=+code.split(':')[1];return openInfo('reference',scoped?W.settlements[si]||null:null,code);}
+  const pk={type:'reference',workerCode:code};await showInspect(pk);if(inspTarget===pk&&pk._anchor){markManual();flyTo(pk._anchor.x,pk._anchor.z,260);}
+}
+function workerFollowInspector(pk){
+  const f=pk.workerCard.follow,code=f.code||pk.workerCode,type=f.type,at=f.at||pk._anchor;let actor=null;
+  if(type==='army')actor=W.armies.find(a=>a.id===+code.slice(1)&&!a.gone);
+  else if(type==='caravan'){const parts=code.split(':');actor=parts[1]==='k'?W.caravans.find(c=>c.renderKey===decodeURIComponent(parts.slice(2).join(':'))&&!c.gone):W.caravans[+parts[1]];}
+  else if(type==='dragon')actor=W.dragon;
+  if(['army','caravan','dragon'].includes(type)){if(!actor){orderFeedbackFinish(orderFeedbackBegin({k:'view'}),{accepted:false,reason:'This traveller is no longer on the map. Open its card again for the latest state.'});return;}cam.follow=actor;cam.dist=type==='army'?260:type==='caravan'?140:300;return;}
+  if(!at)return;let range={person:150,notable:220,tree:220,building:60,churchyard:100,camp:260,ship:300,beast:300}[type]||260;
+  if(type==='settlement'){const s=W.settlements[+code.slice(1)];range=s?.kind==='capital'?520:340;}
+  flyTo(at.x,at.z,range);if(type==='person')cam.follow={pid:+code.slice(1),pos:{x:at.x,z:at.z,y:hAt(at.x,at.z)}};
+  if(f.inspect)showInspect({type:'reference',workerCode:code});
 }
 function workerRefreshActors(herds=false){
   if(!BACKGROUND||!cam.cur.focus)return;const focus={x:cam.cur.focus.x,z:cam.cur.focus.z};let si=-1,d=Infinity;for(let i=0;i<W.settlements.length;i++){const s=W.settlements[i],v=dist2d(s.pos.x,s.pos.z,focus.x,focus.z);if(v<d){d=v;si=i;}}
@@ -22561,7 +22645,7 @@ const ADV={muted:false,
   ID:{pausebtn:'pause',speedselect:'speed',menubtn:'menu',rulebtn:'rule',goldchip:'ledger',datechip:'timeline',brand:'about',crownchip:'monarch',drawertoggle:'panels',uiback:'controls',
     chronmin:'fold',btnexport:'export',btnshare:'share',menuexport:'export',menushare:'copy-link',menuaccounts:'accounts',menuannals:'annals',menulegend:'legend',menumarkers:'symbols',savebtn:'save',advbtn:'advisor',helpbtn:'help',planbtn:'plan',petitionbtn:'petitions',
     placecancel:'cancel',perfcopy:'copy-report',eventlocate:'locate',eventinspect:'inspect',eventbubbleclose:'dismiss',eventbubbledetails:'details',seedin:'seed',fatein:'fate',erain:'era',emap:'land',ecoast:'coast',
-    btnreforge:'reforge',btnmap:'map',btndaycycle:'day-cycle',btnlabels:'labels',btnwatch:'watch',inspx:'close',inspfollow:'follow',contextorders:'orders',contextdetails:'details',contextaccounts:'accounts',drawerclose:'close-drawer',guideclose:'got-it'},
+    btnreforge:'reforge',btnmap:'map',btndaycycle:'day-cycle',btnlabels:'labels',btnwatch:'watch',inspx:'close',inspfollow:'follow',contextorders:'orders',contextdetails:'details',contextaccounts:'accounts',contextback:'back',drawerclose:'close-drawer',guideclose:'got-it'},
   DATA:[['contextTab',''],['rulerRate',''],['o',''],['cview','view:'],['iview','view:'],['info',''],['accountTown','accounts:'],['infoAnnals','annals'],['f','filter:'],['pi','answer:'],['pv','show'],['pb','plan:'],['sv',''],['eg','endgame:'],['s','speed:'],['nm','go:']],
   NAMED:{'plan:x':'plan:done','plan:go':'plan:commission','plan:no':'plan:discard','endgame:on':'play-on','endgame:close':'close'},
   keyOf(el){const d=el.dataset||{};
@@ -22617,7 +22701,7 @@ const ADV={muted:false,
     return true;},
   // What a press means where no element says it: the card's two views (a press never expands the card), the panel's frame, the dialog.
   synthetic(scope){const f=(key,label,act)=>({name:scope+':'+key,label,scope,kind:'button',disabled:false,_act:act});
-    if(scope==='context')return [f('close','Close the open card or panel',()=>contextDismiss()),contextUI.expanded?f('minimize','Minimize the panel to its compact card',()=>contextExpand(false)):f('expand','Expand the panel to its full sheet',()=>contextExpand(true))];
+    if(scope==='context')return [...(contextUI.kind!=='plan'&&contextUI.history?.length?[f('back','Return to the previous linked view',()=>contextBack())]:[]),f('close','Close the open card or panel',()=>contextDismiss()),...(contextUI.kind==='plan'?[]:[contextUI.expanded?f('minimize','Minimize the panel to its compact card',()=>contextExpand(false)):f('expand','Expand the panel to its full sheet',()=>contextExpand(true))])];
     if(scope==='dialog')return [f('close','Close the dialog',()=>{const m=ADV.modal();if(m){if(m.id==='mapview')m.remove();else m.style.display='none';}})];
     return [];},
   VIEWS:{inspdetails:'details',insporders:'orders',contextdetails:'details',contextorders:'orders'},
@@ -24595,10 +24679,20 @@ are available and officers can be paid.
 Click anything on the map, or a name in a card or the annals, to open its
 card. A card is compact beside what it shows; **Expand** gives the whole sheet
 (accounts, stores and prices, buildings, households, muster), **Minimize**
-returns, **Close** or `Esc` dismisses it. A town you govern has **Details** and
+returns. **Back** returns through linked cards and accounts, restoring the previous
+view and camera; **Close** starts a fresh trail. `Esc` minimizes an expanded
+sheet, then dismisses its compact card. A town you govern has **Details** and
 **Orders** (relief grain, the watch, levies, walls, quarantine, works,
 storage); a host of yours has its orders (march, objectives, supply road,
 raft, split, join, hold, disband).
+
+**Find**, **Visit** and **Follow** use the place or traveller recorded on the
+card. A person's **Family** link opens that person's family; shared names offer
+choices with place, age, trade and member context. Family records include people
+on journeys or serving in a host; those links open the actual person or annals
+record. Opening a view shows its pending state;
+closing it or choosing another view prevents a late reply replacing that view.
+**Refresh balances** retains the town or kingdom accounts you opened.
 
 An order shows **Sending the order…**, then its result beside the card, including
 the actual change in your purse. New hosts, places and commissioned works have
@@ -24703,7 +24797,7 @@ An advisor sees the same controls by name, `scope:command:argument`, such as
 `crown:h-honour:3` (honour house 3) or `card:s-relief:5` (relief grain for town
 5). The scopes are `hud`, `menu`, `crown`, `rates`, `acts`, `over`, `world`,
 `annals`, and while they are open `card`, `petition`, `plan`, `context` (the
-card's frame: close, expand, minimize), `info`, `event`, `legend`, `place` and
+card's frame: back when a trail exists, close, expand, minimize), `info`, `event`, `legend`, `place` and
 `dialog`. A closed panel still lists its controls. Names do not change from day
 to day; each control says its cost, why it is disabled, what it acts on, and
 any risk (Reforge and loading a game need the player's word). A press answers

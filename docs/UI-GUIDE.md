@@ -149,10 +149,20 @@ are available and officers can be paid.
 Click anything on the map, or a name in a card or the annals, to open its
 card. A card is compact beside what it shows; **Expand** gives the whole sheet
 (accounts, stores and prices, buildings, households, muster), **Minimize**
-returns, **Close** or `Esc` dismisses it. A town you govern has **Details** and
+returns. **Back** returns through linked cards and accounts, restoring the previous
+view and camera; **Close** starts a fresh trail. `Esc` minimizes an expanded
+sheet, then dismisses its compact card. A town you govern has **Details** and
 **Orders** (relief grain, the watch, levies, walls, quarantine, works,
 storage); a host of yours has its orders (march, objectives, supply road,
 raft, split, join, hold, disband).
+
+**Find**, **Visit** and **Follow** use the place or traveller recorded on the
+card. A person's **Family** link opens that person's family; shared names offer
+choices with place, age, trade and member context. Family records include people
+on journeys or serving in a host; those links open the actual person or annals
+record. Opening a view shows its pending state;
+closing it or choosing another view prevents a late reply replacing that view.
+**Refresh balances** retains the town or kingdom accounts you opened.
 
 An order shows **Sending the order…**, then its result beside the card, including
 the actual change in your purse. New hosts, places and commissioned works have
@@ -257,7 +267,7 @@ An advisor sees the same controls by name, `scope:command:argument`, such as
 `crown:h-honour:3` (honour house 3) or `card:s-relief:5` (relief grain for town
 5). The scopes are `hud`, `menu`, `crown`, `rates`, `acts`, `over`, `world`,
 `annals`, and while they are open `card`, `petition`, `plan`, `context` (the
-card's frame: close, expand, minimize), `info`, `event`, `legend`, `place` and
+card's frame: back when a trail exists, close, expand, minimize), `info`, `event`, `legend`, `place` and
 `dialog`. A closed panel still lists its controls. Names do not change from day
 to day; each control says its cost, why it is disabled, what it acts on, and
 any risk (Reforge and loading a game need the player's word). A press answers

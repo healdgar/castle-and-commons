@@ -8,7 +8,7 @@ const fn=name=>source.match(new RegExp(`^function ${name}\\b[\\s\\S]*?(?=^functi
 
 function fixture({classes=[],contextReady=false,contextKind=null}={}){
   const nodes=new Map(),writes=[];let crownCalls=0,houseReads=0;
-  const node=id=>{if(!nodes.has(id))nodes.set(id,{id,hidden:id==='contextpanel',innerHTML:'',textContent:'',dataset:{},parentElement:{id:'old-parent'},classList:{contains:k=>classes.includes(k)},setAttribute(){},append(child){child.parentElement=this;},querySelector(){return null;}});return nodes.get(id);};
+  const node=id=>{if(!nodes.has(id))nodes.set(id,{id,hidden:id==='contextpanel',innerHTML:'',textContent:'',dataset:{},parentElement:{id:'old-parent'},classList:{contains:k=>classes.includes(k)},setAttribute(){},removeAttribute(){},append(child){child.parentElement=this;},querySelector(){return null;}});return nodes.get(id);};
   const document={body:{classList:{contains:k=>classes.includes(k)}},getElementById:node};
   node('contextpanel').hidden=!(contextReady&&contextKind==='drawer');
   const W=new Proxy({monarch:null,houses:[null,{name:'House Alder',head:3,loyalty:61,gold:120,exiled:false}]},{get(target,key,receiver){if(key==='houses')houseReads++;return Reflect.get(target,key,receiver);}});

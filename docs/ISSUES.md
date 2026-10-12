@@ -118,6 +118,32 @@ the stamped HTML, assets and LICENSE byte for byte. Target parity limits remain
 | 93 | Ground markers have no persistent explanation or hover labels | Published | Menu → Map symbols explains host badges, trade dots, event rings and construction marks. Existing picking supplies named hover labels; project pegs/bands/rings open actual progress, payments and stalled-state cards through renderer records with stable project keys. Browser checks pass for host hover and actual paving-band hover/map inspection. The user's exact other symbols remain unidentified. |
 | 94 | Expanded planning sheet disables the map it asks the player to draw on | Published | Active planning stays compact, hides Expand and refuses programmatic expansion. A real 390×844 worker browser flow drags a street on the available map, receives its native survey refusal and closes with Escape. |
 
+## Further UI and playability scan
+
+Eight repairs (#95–101 and #103) are verified locally. The fresh worker-browser
+scan and before/after evidence are in
+[UI-PLAYABILITY-SCAN-2026-10-12.md](UI-PLAYABILITY-SCAN-2026-10-12.md).
+The full batch had 2,232 passes and three diagnosed failures: two stale fixture
+interfaces and a new repeated family search. Unchanged assertions pass after
+fixture corrections and a single-census implementation; all 116 affected checks
+and 35 final control/source checks pass. This verifies 2,273 distinct checks
+across the batch and rechecks, not one 2,273-pass batch. Final native 150-day
+coastal and 30-day inland bodies, private counters, every RNG and all 2,276 raw
+outcomes match the previous release, with clean cash/goods/fault checks. No repair
+awaits user acceptance. Publication is the remaining step for this batch.
+
+| # | Issue | Status | Next action / current evidence |
+|---|---|---|---|
+| 95 | Refreshing town accounts shows kingdom figures under the town heading | Verified locally | Town refresh preserves its requested scope, body and scroll; keys distinguish town/reference/view. Native Rougecastel refresh retains 18,484.62 gold, and concurrent-town reply checks keep the latest town. |
+| 96 | Late information replies replace a newer screen or restore a closed panel | Verified locally | Pending views show status, current errors are recoverable inside the view, and navigation/full-view ownership guards discard stale replies/errors. Actual held worker ledger delivery cannot replace Crown or reopen a closed panel; departure clears busy state. |
+| 97 | Find, Visit and Follow can do nothing on cards opened by name | Verified locally | Camera controls consume authoritative worker type/code/position metadata. Native named monarch Find and live-host Follow work, including an actual enlisted person opened through Family. UI references resolve real army rolls and promoted people; dead-person Show home uses its exact building. The simulation person finder is unchanged. |
+| 98 | Expanded sheets disable keyboard tabs and nested links can trigger their parent control | Verified locally | Expanded tabs support arrows/Home/End and focus; custom buttons work inside dialogs while native nested anchors/buttons retain their own activation. Native Enter on the compact host's town link opens the town; Tab/Escape behavior remains verified. |
+| 99 | Linked-card navigation has no way back to the previous screen | Verified locally | Back keeps at most 24 renderer routes, resolves current records and restores expansion/view/scroll/camera. Native spouse and account returns, foreground references and superseded-completion guards pass. Close/new roots reset the trail. The advisor discovers and presses Back and omits unavailable planning expansion. |
+| 100 | Known family links become indistinguishable choices | Verified locally | Known Family links use exact IDs and native headings. One census adds age/trade/place/member counts, retains real army rolls, active travellers and promoted people without duplicates, and explains genuinely empty records. All 28 native Dumont choices are distinct before and after call-out; a real soldier link opens its person card and follows its live host. Trade reference scope remains verified. |
+| 101 | Persistent order results cover phone Menu controls | Verified locally | Opened Menu rises above the floating result. At 390×844 its actual Help click opens the modal, and closing Help retains the native call-out result. |
+| 102 | AD1066 towns receive arbitrary Roman or later planned grids | Open | Starting layouts use early = AD() < 1000. Beyond that gate every border town is assigned roman, capitals draw 30% roman and market towns draw 55% planned (the source models Freiburg); these are chosen from role/chance, without evidence of a Roman predecessor or a date appropriate to the particular foundation. The generic five/six layout epochs also date the Roman founding story 280/330 years before the annals (AD786/736 for a 1066 opening), contradicting the asserted ancient origin. Surviving Roman and earlier medieval planned streets can be valid in 1066; derive layout from actual town origin, culture and dated foundation rather than banning straight streets or treating every border town as Roman. Model generation is unchanged in the current UI repair batch. |
+| 103 | Birthdays and earlier life dates display undefined seasons and negative days | Verified locally | Card display normalizes earlier-year offsets and reports missing dates as unrecorded. The actual Yves Dumont birthday now reads Born Winter 84, AD1034. Negative-year/season boundaries and current/future compatibility pass; the simulation formatter, birth/event records and final native history are unchanged. |
+
 ## Inspection, geometry and advisor
 
 | # | Issue | Status | Next action / current evidence |
