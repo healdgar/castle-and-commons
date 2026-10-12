@@ -72,3 +72,33 @@ no field/title/mask writer, permission, private hash stamp or cache lifetime is
 added. The castle certificate stays at 49 readers. Only the Cells source pin
 changes in this follow-up; Fields, Box and the other 38 pins remain exact.
 Current-source native/history/save/performance release gates remain root work.
+
+## Fresh-survey reservation envelope, 12 October 2026
+
+The current performance pass filters compound/fabric/citadel reservation polygons
+only within a fresh synchronous survey. It constructs their same native ordered
+polygons and bounds once, then removes only polygons wholly beyond the survey's
+conservative probe envelope. Roads and planned streets still enter the original
+segment hash; castle circles, storage, clearings, squares and walls retain their
+original point tests. Retained paid sites use all current reservations.
+
+Candidate centres are within `reach-40` of the settlement. Their initial radial
+limits are at most `1.37*minR`; fitting only reduces them. Float32 yard radii,
+interior raster probes, corners, doors and straight frontage connectors fit
+inside the deliberately wider `reach+6*minR+maxAbsAnchorWidth+128` box, including
+the largest point-clearance padding. Polygons touching that box remain. Invalid,
+oversized or nonpositive query values and replaced native helpers disable the
+envelope. No previous operation's spatial exclusion is reused.
+
+`compoundPolys` is pure geometry: early projection neither rasterizes rights nor
+changes native state or private hash stamps. All surviving polygons retain their
+order and exact containment/distance predicates. Building and road hash queries
+retain their original order and count. The existing full-world failed-survey
+certificate is unchanged and still conservatively invalidates remote edits;
+this change reduces work in a fresh miss, rather than broadening null reuse.
+
+`placeFitRadii` also computes each ray's sine and cosine once. The callback sees
+the same coordinates in the same order; multiplication, interpolation, minimum
+radius and stopping rules remain unchanged. Only Site and Fit source pins are
+renewed after this dependency review. Native history and timing evidence is
+recorded in PERFORMANCE.md when its gates complete.

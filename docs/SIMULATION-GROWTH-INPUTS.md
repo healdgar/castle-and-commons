@@ -167,7 +167,46 @@ all-speed comparisons match complete logical graphs, daily RNG/commands/annals
 and every accepted storage outcome. Both one-year browser worlds conserve money
 and inventory and have no simulation faults. The broad gate verifies 1,517
 checks; its only parallel VM capture timeout passes unchanged in isolation.
-Final browser/save/release evidence and source hashes are recorded in HANDOFF.md.
+Final browser/save/release evidence and source hashes are recorded in the [historical validation record](https://github.com/healdgar/furlong-kingdom-annals/blob/a23ecc032754a303c70f84a4d4e90ea8cbba0101/docs/HANDOFF.md).
 These checks cover that historical bounded implementation. Daily paid
 housing/fabric progress and native first-castle foundations are now integrated;
-the current assembled release gates are recorded in HANDOFF.md.
+current remaining validation is recorded in [ISSUES.md](ISSUES.md#institution-validation).
+
+## Rural homestead diagnosis, 12 October 2026
+
+Rural homes have not been removed. `tickHouseholds` considers them on each
+settlement's annual `dueOn(si,360,29)` review. Direct-era opening fabric places
+homes in settlements; it does not run this decision or seed outlying homesteads.
+A household must already have a home, an assigned rural work site, sufficient
+savings (or a funded landlord), and a twelve-year benefit covering the bill.
+Placement then requires a clear plot outside settlements with actual road or
+built-track access; no new access lane is commissioned here.
+
+Two recent changes affect their visibility: `96b1fbd` / `bac0df7` on October5
+require connected road/track access, and `896e471` on October10 switches ordinary
+new games to a direct AD1066 opening. Previously, a requested AD1066 world started
+from AD850 and played 216 years before opening; direct starts do not inherit
+any homesteads formed by that prior simulation. This does not establish how
+many homesteads the old history actually produced. See
+[DIRECT-ERA-INITIALIZATION.md](DIRECT-ERA-INITIALIZATION.md).
+
+A read-only census of the current native 1001:42 sea world, AD1066/default9km,
+at closed day60 checks 2,651 headed households: 494 have no home, 2,017 have no
+qualifying rural work site, and 140 have a home and work site. Of those 140,
+46 fail the 375m distance condition and 94 fail the calculated benefit versus
+cost. None reaches funding or placement/access checks, and no rural home exists.
+This is a point-in-time eligibility census, not 2,651 actual annual reviews or a
+proof that homesteads can never arise in other worlds or later years.
+
+The 140 sites comprise 104 farm, 17 wood and 19 water sites. Of 500 non-role
+households classed as tillers, 364 have no assigned strip under their head's ID.
+That is a diagnostic observation, not proof of erroneous title allocation.
+Farm targets use an area-weighted strip centroid. Benefits use the trade's
+expected income from `tradeIncome`, rather than the household's own field
+return or measured walking routes; village amenities and protection oppose
+moving away. A first annual review can also record less than a full year of
+income. These inputs need calibration against actual holdings, subsistence and
+walking work before altering costs, distance rules or creating paid access.
+Issue #87 tracks that investigation; road access is not the measured first
+blocker in this census. Raw census evidence stays outside the tracked tree in
+`/workspace/furlong-performance-pass/`.

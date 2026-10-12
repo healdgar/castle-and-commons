@@ -1,5 +1,64 @@
 # Simulation performance
 
+## Local simulation performance pass, 12 October 2026
+
+The leading cost in the current AD1066 coastal profile is first-castle geometry. Failed-site memory has zero hits across 217 fresh misses
+in 60 days: unrelated changes to the full-world geometry certificate force new
+surveys. Each yard probe then scans reservations throughout the realm.
+
+Fresh surveys now project the same native reservation polygons once and omit
+only geometry wholly outside that operation's conservative probe envelope.
+Retained paid sites still check all current reservations. Roads, exact nearby
+predicates, candidate order and private hash-query counts remain unchanged.
+Radius fitting also reuses each ray's sine/cosine. The dependency proof and
+fallbacks are in [CASTLE-FOUNDATION-DEPENDENCIES.md](CASTLE-FOUNDATION-DEPENDENCIES.md#fresh-survey-reservation-envelope-12-october-2026).
+
+Serial measurements on this cloud host (fate42, default9km):
+
+| Start / world | Days | Measurement | Baseline CPU ms/day | Candidate CPU ms/day | Reduction | Baseline / candidate load |
+|---|---:|---|---:|---:|---:|---|
+| AD1066, 1001 sea | 60 | Profiled process CPU | 3822.33 | 2340.19 | 38.8% | 0.4→1.1 / 0.7→1.5 |
+| AD1066, 2002 land | 30 | Unprofiled tick CPU | 4888.57 | 3176.21 | 35.0% | 1.19→1.06 / 1.06→1.48 |
+| AD850, 1001 sea | 150 | Unprofiled tick CPU | 630.16 | 581.86 | 7.7% | 0.39→1.04 / 1.04→1.19 |
+
+Comparisons are within each row; instrumentation and windows differ and are not
+pooled. The coastal phase timer attributes 1897.92→640.14 ms/day to castle work;
+those nested timers measure synchronous elapsed time, whereas the table uses
+process CPU. The raw journal uses an acknowledgement sink in memory. Browser
+compression, IndexedDB, view delivery and drawing are excluded. The unprofiled
+runs flush at closed-day boundaries and perform checkpoint audits outside the
+tick timer; their allocations can still influence later GC. These are bounded
+native measurements, not shipping worker throughput or a century-scale result.
+
+The 60-day coastal run matches the full simulation capture and every RNG stream.
+The native comparison matches complete save-body bytes, private hash counters
+and every RNG at days0/50/100/150 in AD850 sea, and days0/30 in AD1066 inland.
+Every raw journal byte matches (1812 and 464 accepted rows respectively).
+Checkpoint inventory checks pass; cash residuals are identical to baseline,
+with maximum absolute residual 5.87e-10. The combined native gate uses 528.35
+child CPU / 433.17 wall seconds, load0.39→1.48, peak RSS1410180KB.
+
+The full suite reports 2,227 passes and one 30-second initial-graph-capture
+timeout across 214 files / 2,228 checks. The unchanged headless startup/replay
+check passes serially with the same capture limit: all 2,228 unique checks are
+verified across those runs, not one clean parallel-suite pass. The full batch
+uses 4238.88 child CPU / 1542.68 wall seconds, load1.48→1.16, peak RSS2354588KB;
+the serial recheck uses 190.61 CPU / 170.55 wall seconds, load0.59→1.29.
+Paid castle and AD1200 royal-eyre native save/load continuation, current mill
+opening/save checks, projection checks and the new reservation/ray regressions
+are included. These are test-runner costs, not game throughput. No release has
+been published from this local pass.
+
+The baseline snapshot already includes the local river-mill changes; both sides
+hold those intended model changes constant. Baseline HTML SHA256:
+`3fdd0a6aec38f657827f3a8608eefc33cf548a4311ecd349cc082b4f209fc429`.
+Candidate HTML SHA256:
+`e1cdc4c9e8331e021b67b93db22d94fa064001344aff201ae62bcd988fd7a6bf`.
+Local sources, profiles, native bodies and measurements are retained outside the
+checkout in `/workspace/furlong-performance-pass/`. Current validation/release
+status remains solely in [ISSUES.md](ISSUES.md#performance-saves-and-late-worlds).
+
+
 **Frozen connected-layout prefix (`55b32a9`):** HTML `4a8eed633cde8de3bf1813d2de43b8040996aa3e200258e9086fc7fe6fafd1bc` was deliberately stopped at compared audited closed day 60, with 366 accepted raw outcomes, two abbeys, and clean cash/goods/faults. Reference and bounded-reservation runs match the complete graph and every RNG stream through that boundary; this is not a 150-day proof. The source-matched checkpoint reload/resave is exact (`179b5881fc8d825cae6019642d01cfc74a124eb62c24d28286a26f9cc7c4b73e`). Total child CPU was `613.785417` / wall `567.454874`, load `0.058594→1.313965`, RSS `1852884` KB. Audited step CPU `113.900951` reference / `96.385633` candidate is partial same-model evidence, not browser throughput. The initial merged 43-check fixture batch failed during helper initialization; actual imports are repaired, with the final assembled rerun pending. The continuation audit confirmed a private-purpose housing/refit bypass and an incomplete Abbey church-fabric quote. Church growth already runs through `tickChurches→tickChurchBodies→abbeyFabric`; its budget omits timber and technology-adjusted costs. The earlier claim of a missing caller was incorrect. Those two repairs are being assembled before the next native batch. Frozen source, original checks/deadlines, marker and closed-save evidence remain in ignored `institutions-connected-20261011`; none is retagged as the new phase.
 
 **Assembled continuation:** shared connected Abbey/College layouts and exact operation-local reservation bounds are integrated; journaled patron grants and the private-path mask-width correction are implemented; private-purpose housing and the complete Abbey fabric quote are being repaired. This intentionally extends the model. Their native completion/save, worker, drawing and release gates have not passed yet. The bounds optimization needs a same-model 150-day reference comparison, distinct from the prior model’s evidence. The last published game remains `318811d`.
@@ -67,8 +126,8 @@ across that batch and the reviewed three-file rerun (1.37 CPU seconds, load
 0.20→0.20). These are test costs, not daily simulation throughput; subsequent source corrections await their own integrated gate.
 The final native 150-day comparison preserves full world/globals/layouts/closure code, every RNG stream and all 906 accepted raw rows at all seven speeds. A day-37 native save/resave/replay also matches through day 150. Its controlled reference uses original full native craft/ground/mint/lodging selectors and disables castle survey/work reuse, with all intended model changes and candidate-cache maintenance common to both sides. Audited step CPU is 623.96 versus 230.08 seconds over 150 days; the complete comparison/replay runner costs 2,127.22 CPU / 1,989.30 wall seconds, load 0.10→1.34. These costs include inventory audits and serialization, omit browser persistence, and do not establish game throughput.
 
-Earlier exact-reuse diagnostics and failures are retained in
-[HANDOFF.md](HANDOFF.md); they are not a final 150-day or shipping speed result.
+Earlier exact-reuse diagnostics and failures are retained in the
+[historical validation record](https://github.com/healdgar/furlong-kingdom-annals/blob/a23ecc032754a303c70f84a4d4e90ea8cbba0101/docs/HANDOFF.md); they are not a final 150-day or shipping speed result.
 
 The current institution integration uses daily housing, road, castle and
 institution decisions with actual paid component projects. The assembled daily
@@ -111,7 +170,7 @@ model: live values, reachable annual growth assessments and generated layouts
 deliberately change history. Compression/IndexedDB and late-world scaling are
 excluded. The remaining early-world gap to 100 years/minute is about 62× before
 durable writes. Final identity/conservation gates and source hashes are recorded
-in the handoff; evidence is in `tools/soak-results/live-growth-20261010/`.
+in the [historical validation record](https://github.com/healdgar/furlong-kingdom-annals/blob/a23ecc032754a303c70f84a4d4e90ea8cbba0101/docs/HANDOFF.md); evidence is in `tools/soak-results/live-growth-20261010/`.
 
 The user’s target is hundreds of simulated years per real minute, with exactly the
 same history at every speed for the same seed and commands on the same simulation
@@ -159,7 +218,7 @@ is claimed.
 This early-world measurement still exceeds the 100-years/minute budget by roughly
 52× before durable browser storage. It is not a century-scale clearance or a
 Safari/browser throughput claim. The Mac’s late farm snapshots remain unavailable.
-Validation and artifact hashes follow in HANDOFF.md. Local evidence is in
+Validation and artifact hashes are retained in the [historical validation record](https://github.com/healdgar/furlong-kingdom-annals/blob/a23ecc032754a303c70f84a4d4e90ea8cbba0101/docs/HANDOFF.md). Local evidence is in
 `tools/soak-results/fast-forward-20261009/`.
 
 To measure the current raw capture path without profiles:
@@ -200,7 +259,7 @@ matching tested views that leave the world/RNG unchanged. It also exposed an
 existing bounded-advance bug when a petition restores speed: completion now
 pauses at its target, covered separately by host tests and the final browser
 gate. Exact source hashes, test results, the initial failed comparisons and
-their diagnoses are recorded in `HANDOFF.md`. Local evidence:
+their diagnoses are recorded in the [historical validation record](https://github.com/healdgar/furlong-kingdom-annals/blob/a23ecc032754a303c70f84a4d4e90ea8cbba0101/docs/HANDOFF.md). Local evidence:
 `tools/soak-results/daily-order-20261010/`. Late-world, hardware drawing, Safari
 and centuries-per-minute throughput remain unverified.
 
@@ -230,7 +289,7 @@ late-world scaling and hardware/Safari throughput are outside these measurements
 The remaining CPU gap to 100 years/minute is about 58×, before durable writes.
 
 Evidence is in `tools/soak-results/daily-kernels-20261010/`; validation and exact
-source hashes are recorded in HANDOFF.md. The 19 new focused cases compare the
+source hashes are recorded in the [historical validation record](https://github.com/healdgar/furlong-kingdom-annals/blob/a23ecc032754a303c70f84a4d4e90ea8cbba0101/docs/HANDOFF.md). The 19 new focused cases compare the
 current dealer/driver selectors against frozen `8980908` and singleton planning
 against the unchanged general path, including live intervening mutations,
 ranked custody, missed loads, RNG, spoilage, crumbs, transit and callback fallbacks.
@@ -264,7 +323,7 @@ Native 150-day steady/changing-speed runs match the full logical graph at days
 outcomes. The 23 new focused cases cover live economics/ownership, interleaved
 fallbacks, graph edits, paid-day construction and the necessary street filter.
 Local evidence: `tools/soak-results/daily-storage-20261010/`; full validation and
-source hashes follow in HANDOFF.md.
+source hashes are retained in the [historical validation record](https://github.com/healdgar/furlong-kingdom-annals/blob/a23ecc032754a303c70f84a4d4e90ea8cbba0101/docs/HANDOFF.md).
 
 The subsequent growth/input batch, summarized above, follows
 [SIMULATION-GROWTH-INPUTS.md](SIMULATION-GROWTH-INPUTS.md). It removes the six-day

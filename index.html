@@ -497,7 +497,7 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
 </head>
 <body>
 <div id="gl"></div>
-<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-11 22:49 UTC · after 8de36b6</div></div>
+<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-12 16:55 UTC · after a23ecc0</div></div>
 
 <div id="hud">
   <button type="button" id="brand" class="hudlink" aria-label="About Castle and Commons" aria-controls="contextpanel">Castle and Commons</button>
@@ -2585,8 +2585,8 @@ const PLN=20;
 function placeFitRadii(p,clear,stretch=1,minimum=null){ // star-shaped shared ground bounded by the first terrain/frontage obstruction
   if(!clear(p.x,p.z))return null;
   const n=p.r.length,caps=[],r=p.r.map(v=>v*stretch),step=0.75;
-  for(let j=0;j<n*4;j++){const f=j/4,k=Math.floor(f),t=f-k,a=f/n*Math.PI*2,limit=r[k]*(1-t)+r[(k+1)%n]*t;let d=0;
-    for(let q=step;q<=limit+step;q+=step){const R=Math.min(q,limit);if(!clear(p.x+Math.cos(a)*R,p.z+Math.sin(a)*R))break;d=R;if(R===limit)break;}
+  for(let j=0;j<n*4;j++){const f=j/4,k=Math.floor(f),t=f-k,a=f/n*Math.PI*2,limit=r[k]*(1-t)+r[(k+1)%n]*t,c=Math.cos(a),sn=Math.sin(a);let d=0;
+    for(let q=step;q<=limit+step;q+=step){const R=Math.min(q,limit);if(!clear(p.x+c*R,p.z+sn*R))break;d=R;if(R===limit)break;}
     caps[j]=Math.max(0,d-1.5);if(minimum!==null&&caps[j]<minimum)return null;} // a required clearance cannot survive this cap; other place surveys keep their original path
   for(let j=0;j<n*4;j++){const k=Math.floor(j/4);r[k]=Math.min(r[k],caps[j]);if(j%4)r[(k+1)%n]=Math.min(r[(k+1)%n],caps[j]);}
   return r.every(v=>Number.isFinite(v)&&v>=3)?r:null;
@@ -2616,7 +2616,6 @@ const ROLE_NAME={seat:'seat of the crown',fort:'fortress town',border:'border fo
    streets; sieges raze suburbs that grow back. Every town keeps its story. */
 function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out place's context (worldLoad): its closures are made again over it, and nothing is laid out
   const idx=saved?saved.idx:W.settlements.indexOf(s),rng=layoutRng(idx),rr=()=>rng(),rpick=a=>a[Math.floor(rng()*a.length)];
-  const pondOptions=[];
   let isCap=saved?saved.isCap:s.kind==='capital',isTown=saved?saved.isTown:s.kind==='town',isVil=saved?saved.isVil:s.kind==='village';
   const role=saved?saved.role:s.role||(isCap?'seat':isTown?'market':'farm');if(!saved)s.role=role;
   const C=saved?saved.C:s.pos;let R0=saved?saved.R0:isCap?440:isTown?310:170,Rmax=saved?saved.Rmax:R0; // the reach of the built-up town; it widens as the town outgrows it
@@ -2730,28 +2729,8 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
     if(pts.length>=2){addStreet(pts,RHW,'road',{ri});s.roadSpoke[ri]=pts;}
   });
   const roads=saved?saved.roads:s.streets.filter(t=>t.kind==='road');
-  /* a mill dam above the town: the river is held back to drive the mills, and the pond spreads into a lake
-     (Hamburg's Alster was dammed so, c.1190) */
-  if(!saved&&s.river&&!isVil&&rr()<(role==='crossing'?0.6:0.35)*(early?0.35:1)){
-    let bst=null,bk=-1,bd=1e9;
-    for(const rs of W.rivStrips)if(!rs.canal)rs.pts.forEach((q,k)=>{const d=dist2d(q.x,q.z,C.x,C.z);if(d<bd){bd=d;bst=rs;bk=k;}});
-    if(bst&&bd<Rmax*0.6)for(let k=bk;k>8&&!s.lake;k--){
-      const D=bst.pts[k],dd=dist2d(D.x,D.z,C.x,C.z);if(dd<200)continue;if(dd>400)break;
-      const L=bst.ys[k]+3.2; // the pond may stand above the town's floor: the dam holds it, but it must not reach the houses
-      const U=bst.pts[k-6],ul=dist2d(U.x,U.z,D.x,D.z)||1,base=Math.atan2((U.z-D.z)/ul,(U.x-D.x)/ul);
-      const nx=-Math.sin(base),nz=Math.cos(base),span=millDamSpan(D.x,D.z,nx,nz,L);if(!span)continue;
-      const NR=40,rad=[];let closed=true;
-      for(let i=0;i<=NR;i++){const a=base+(i/NR*2-1)*1.75;let r=6;
-        for(;r<320;r+=4)if(hAt(D.x+Math.cos(a)*r,D.z+Math.sin(a)*r)>L)break;
-        if(r>=320){closed=false;break;}rad.push(r);}
-      if(!closed)continue;
-      for(let it=0;it<3;it++)for(let i=1;i<NR;i++)rad[i]=Math.min(rad[i],(rad[i-1]+rad[i+1])/2*1.3); // no fingers: the shore is drawn a little inside the true waterline
-      const poly=[{x:D.x,z:D.z},...rad.map((r,i)=>{const a=base+(i/NR*2-1)*1.75;return{x:D.x+Math.cos(a)*r,z:D.z+Math.sin(a)*r};})];
-      if(poly.some(q=>dist2d(q.x,q.z,C.x,C.z)<110)||inPoly(poly,C.x,C.z))continue;
-      if(W.roads.some(rd=>rd.path.some(q=>inPoly(poly,q.x,q.z))))continue; // it would drown a highway
-      pondOptions.push({poly,y:L-0.2,dam:{x:D.x,z:D.z,a:base,w:span.width,lo:span.min,hi:span.max,bed:Math.min(hAt(D.x,D.z)-2.5,bst.ys[k]-2.5)}});
-    }
-  }
+  // Retain the old opening draw so dropping speculative reservoirs does not reroll the town's lots.
+  if(!saved&&s.river&&!isVil)rr();
   const roadTan=(st,i)=>{const a=st.pts[Math.max(0,i-1)],b=st.pts[Math.min(st.pts.length-1,i+1)];const L=dist2d(a.x,a.z,b.x,b.z)||1;return[(b.x-a.x)/L,(b.z-a.z)/L];};
 
   /* ---- the founders' nucleus ---- */
@@ -3779,26 +3758,14 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
   const context=saved||{};s._lay.historyState=()=>Object.assign(context,{idx,role,C,count,HW,RHW,era,early,motteAge,E,FRAC,roads,t0x,t0z,rAng,mode,ux,uz,vx,vz,quay,vilName,HOME,TRADES,wallAges,bastioned,
     isCap,isTown,isVil,R0,Rmax,curE,live,foundLine,oldVil,plazaC,church,keep,focus,built,parishes,friaryDone,neuDone});
   s._lay.historyRng=rng;if(!saved){fortPrepare(s);for(const b of churches())churchAccess(b);}
-  // Commit a speculative millpond only after the final town fabric can supply
-  // both a dry mill parcel and a connected, river-safe service lane.
-  const pondWet=(L,x,z)=>hAt(x,z)<L.y&&inPoly(L.poly,x,z),lineWet=(L,pts)=>{
-    for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],n=Math.max(1,Math.ceil(dist2d(a.x,a.z,b.x,b.z)/6));
-      for(let k=0;k<=n;k++)if(pondWet(L,lerp(a.x,b.x,k/n),lerp(a.z,b.z,k/n)))return true;}return false;};
-  const pondClear=L=>!s.buildings.some(b=>{const P=[...obbCorners(b.x,b.z,b.w,b.d,b.rot),{x:b.x,z:b.z}];for(let i=0;i<4;i++)P.push({x:(P[i].x+P[(i+1)%4].x)/2,z:(P[i].z+P[(i+1)%4].z)/2});return P.some(p=>pondWet(L,p.x,p.z));})&&
-    !s.streets.some(st=>st.pts.length>1&&lineWet(L,st.pts))&&!W.roads.some(rd=>lineWet(L,rd.path));
   // A mill stands only where its miller's lane can reach a street: each fitting site, nearest first, is surveyed round its own footprint
   // before anything is raised; sites on one bank share what a failed survey learned (see serviceRoadPlan).
   const siteMill=()=>{const sites=millBankSites(s,Rmax).filter(f=>fits(f,1,'mill')),banks={floods:[],span:sites.map(f=>serviceDoor({...f,arch:'mill'})),memo:new Map()};
     for(let i=0;i<sites.length;i++){const plan=serviceRoadPlan(s,banks.span[i],placed,null,1.3,null,sites[i],banks);if(!plan)continue;
       const b=place('mill',1,sites[i],'artisan',1,{inst:true,millWater:sites[i].millWater});serviceAccess(b,plan);return s.mill=b;}
     return null;};
-  let pondAccepted=false;
-  if(!saved)for(const L of pondOptions){s.lake=L;if(!pondClear(L)){s.lake=null;continue;}
-    pondAccepted=!!siteMill();
-    if(pondAccepted){hist(1,'The river was dammed above the town to drive its mill; a contained mill-pond spread into a lake.');break;}
-    s.lake=null;
-  }
-  if(!saved&&!pondAccepted){s.lake=null;if(s.river)siteMill();}
+  // Flowing bank water already drives the wheel; a mill is not a licence to flood a valley.
+  if(!saved&&s.river)siteMill();
   if(!saved)for(let i=0;i<s.places.length;i++){const p=s.places[i],r=placeFitRadii(p,(x,z)=>groundClear(x,z,p.kind==='green',p),1.45);
     if(!r)continue;p.r=r;const edge=s.streets.find(st=>st.kind==='edge'&&st.placeId===i);if(edge){edge.pts=placeEdge(p);edge.cands=null;}}
 }
@@ -7191,7 +7158,7 @@ function riverBankIntervals(a,b,others){ // retain only exposed banks, excluding
 }
 function renderedWaterNear(x,z,pad=0){
   if(W.coastal&&hAt(x,z)<=SEA_SURFACE+pad)return true;
-  for(const s of W.settlements)if(s.lake&&(inPoly(s.lake.poly,x,z)||s.lake.poly.some((p,i)=>segDist(x,z,p,s.lake.poly[(i+1)%s.lake.poly.length])<pad)))return true;
+  for(const s of W.settlements)if(s.lake&&millPondSide(s.lake,x,z)>=-pad&&(inPoly(s.lake.poly,x,z)||s.lake.poly.some((p,i)=>segDist(x,z,p,s.lake.poly[(i+1)%s.lake.poly.length])<pad)))return true;
   if(W.rivHash&&riverAt(x,z,pad))return true;
   return false;
 }
@@ -7591,12 +7558,8 @@ function buildTerrain(){
   G.riverCrossVertices=riv.p.length/3;levelRiverJoins(riv,G.drawRivRuns.filter(r=>r.join).map(r=>r.join));levelRiverRuns(riv,G.drawRivRuns);
   for(const F of [...footprints,...banks])for(const q of F)q.y=riv.p[q.id*3+1];
   for(const st of G.drawRivRuns)if(st.join){const F=st.join;appendRiverJoin(riv,F,0,true);F.allEdges=true;footprints.push(F);banks.push(F);}
-  const lk=newAcc(); // mill-ponds: a flat, opaque sheet at the dam's level (the shore is where the ground rises through it; the drowned channel stays hidden)
-  for(const s of W.settlements)if(s.lake){
-    const P=s.lake.poly,base=lk.p.length/3,y=s.lake.y;
-    for(const q of P){lk.p.push(q.x,y,q.z);lk.n.push(0,1,0);C1.setHex(0x356a8f);lk.c.push(C1.r,C1.g,C1.b);}
-    for(let i=1;i<P.length-1;i++)lk.i.push(base,base+i+1,base+i);
-  }
+  const lk=newAcc(); // the raised water stops at the upstream face of its dam
+  for(const s of W.settlements)if(s.lake)appendMillPondWater(lk,s.lake);
   if(lk.i.length){G.lakes=accMesh(lk,waterMaterial({vertexColors:true,side:THREE.DoubleSide}));scene.add(G.lakes);}
   cutRiverTerrain(g,footprints,riv,banks);G.rivers=accMesh(riv,waterMaterial({vertexColors:true,transparent:true,depthWrite:false,side:THREE.DoubleSide,
     polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-3},true));
@@ -8119,8 +8082,21 @@ function rebuildMillWheels(){
   if(raceWood.length){const geo=mergeGeoms(raceWood);for(const [g]of raceWood)g.dispose();G.millRaceWood=new THREE.Mesh(geo,G.millRaceWoodMat);G.millRaceWood.castShadow=true;G.millRaceWood.receiveShadow=true;scene.add(G.millRaceWood);}
   if(hasRace&&waterPos.length){const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(waterPos,3));geo.setAttribute('aSurfaceUV',new THREE.Float32BufferAttribute(waterUv,2));geo.setIndex(waterIdx);geo.computeVertexNormals();G.millRaceWater=new THREE.Mesh(geo,G.millRaceWaterMat);G.millRaceWater.renderOrder=3;scene.add(G.millRaceWater);}
 }
-function millSluiceSlots(s){ // cut the dam where the actual fitted wheel's feeder crosses it
-  const dm=s.lake.dam,dx=-Math.cos(dm.a),dz=-Math.sin(dm.a),nx=-dz,nz=dx,out=[];for(const b of s.buildings)if(b.lockWater&&!b.removed&&b.state==='sound'){const F=b.lockWater.f,u=(F.x-dm.x)*nx+(F.z-dm.z)*nz,lo=dm.lo??-dm.w/2,hi=dm.hi??dm.w/2;out.push([Math.max(lo,u-F.w/2-.7),Math.min(hi,u+F.w/2+.7)]);}
+const MILL_DAM_HALF=0.6; // a 1.2 m weir wall; its surveyed length still reaches both banks
+function millPondSide(L,x,z){const D=L.dam;return D?(x-D.x)*Math.cos(D.a)+(z-D.z)*Math.sin(D.a)-MILL_DAM_HALF:Infinity;}
+function millPondFaces(L){ // clip each original fan triangle: a concave shore must not be filled across its bays
+  const faces=[],P=L.poly;
+  for(let i=1;i<P.length-1;i++){const T=[P[0],P[i+1],P[i]],Q=[];
+    for(let j=0;j<3;j++){const p=T[j],q=T[(j+1)%3],a=millPondSide(L,p.x,p.z),b=millPondSide(L,q.x,q.z);
+      if(a>=0)Q.push(p);if((a>=0)!==(b>=0)){const t=a/(a-b);Q.push({x:p.x+(q.x-p.x)*t,z:p.z+(q.z-p.z)*t});}}
+    if(Q.length>=3)faces.push(Q);
+  }return faces;
+}
+function appendMillPondWater(A,L){
+  for(const P of millPondFaces(L)){const base=A.p.length/3;for(const q of P){A.p.push(q.x,L.y,q.z);A.n.push(0,1,0);C1.setHex(0x356a8f);A.c.push(C1.r,C1.g,C1.b);}for(let i=1;i<P.length-1;i++)A.i.push(base,base+i,base+i+1);}
+}
+function millSluiceSlots(s){ // the slots and the masonry use the same bank axis, including asymmetric spans
+  const dm=s.lake.dam,dx=-Math.cos(dm.a),dz=-Math.sin(dm.a),nx=dz,nz=-dx,out=[];for(const b of s.buildings)if(b.lockWater&&!b.removed&&b.state==='sound'){const F=b.lockWater.f,u=(F.x-dm.x)*nx+(F.z-dm.z)*nz,lo=dm.lo??-dm.w/2,hi=dm.hi??dm.w/2,a=Math.max(lo,u-F.w/2-.7),c=Math.min(hi,u+F.w/2+.7);if(c>a)out.push([a,c]);}
   for(const b of s.buildings)if(b.arch==='mill'&&!b.removed&&b.state!=='gone'&&b.millWater){
     const feed=millWheelPose(s,b).feed;if(!feed)continue;
     const a=feed.a,c=feed.b,da=(a.x-dm.x)*dx+(a.z-dm.z)*dz,dc=(c.x-dm.x)*dx+(c.z-dm.z)*dz;if(da>=0||dc<=0)continue;
@@ -8275,6 +8251,8 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
     if(CASTLE_FOUNDATION_SURVEYS.work===false)return compoundGround(q.site).polys.map(P=>({P,box:null}));
     let parts=projectGround.get(q);if(!parts){parts=compoundPolys(q.site).map(P=>({P,box:bounds(P)}));projectGround.set(q,parts);}return parts;
   };
+  // Only these projects have a point-clearance predicate; road and lane reservations stay in H.
+  let clearProjects=projects.filter(q=>q.type==='castle'&&q.site||(q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')&&q.site||q.type==='storage'||q.type==='clear'||q.type==='plan'&&(q.kind==='square'||q.kind==='wall'));
   const addBlock=b=>{const r=Math.max(Math.hypot(b.w||0,b.d||0)/2,...[b.poly,b.lot].flatMap(p=>p?.map(q=>dist2d(b.x,b.z,q.x,q.z))||[]));
     if(dist2d(b.x,b.z,s.pos.x,s.pos.z)>reach+r)return;const copy={...b},polys=[bounds(b.poly),bounds(b.lot)],parts=[bounds(obbCorners(b.x,b.z,b.w||0,b.d||0,b.rot||0)),...polys].filter(Boolean),box=parts.length?{minX:Math.min(...parts.map(q=>q.minX)),maxX:Math.max(...parts.map(q=>q.maxX)),minZ:Math.min(...parts.map(q=>q.minZ)),maxZ:Math.max(...parts.map(q=>q.maxZ))}:null;blockBounds.set(copy,{box,polys});B.add(copy,r+3);};
   const addLine=(a,b,hw,st,pending=false)=>{if(segDist(s.pos.x,s.pos.z,a,b)>reach+hw)return;H.add({a,b,hw,st,pending,x:(a.x+b.x)/2,z:(a.z+b.z)/2,minX:Math.min(a.x,b.x),maxX:Math.max(a.x,b.x),minZ:Math.min(a.z,b.z),maxZ:Math.max(a.z,b.z)},dist2d(a.x,a.z,b.x,b.z)/2+hw+3);};
@@ -8285,6 +8263,14 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
   for(const key of W.trackSet||[]){const e=W.tg.E.get(key);if(e)addLine(W.tg.pts[e.a],W.tg.pts[e.b],1.8,null);}
   for(const q of projects){if(q.type==='road'){const P=q.P?.path||[];for(let k=1;k<P.length;k++)addLine(P[k-1],P[k],4,null,true);}
     if(q.type==='plan')for(const st of q.kind==='quarter'?q.sts||[]:q.kind==='street'?[q.st]:[])if(st)for(let k=1;k<st.pts.length;k++)addLine(st.pts[k-1],st.pts[k],st.hw||2,null,true);}
+  // Every fresh probe lies in this deliberately wide envelope of the candidate centres,
+  // radial yards and door-to-frontage connectors. Keep uncertain and retained sites unfiltered.
+  const native=typeof CASTLE_FOUNDATION_SURVEYS!=='undefined'&&CASTLE_FOUNDATION_SURVEYS.work!==false&&typeof CASTLE_FOUNDATION_SURVEY_NATIVE!=='undefined'&&castleFoundationSurveyNative(),span=Math.max(0,...anchors.map(g=>Math.abs(g.hw))),extent=reach+6*(Math.hypot(spec.w,spec.d)/2+13)+span+128;
+  if(!retained&&native&&[s.pos.x,s.pos.z,spec.w,spec.d,reach,span,extent].every(v=>Number.isFinite(v)&&Math.abs(v)<=1048576)&&spec.w>0&&spec.d>0&&reach>0){
+    const x0=s.pos.x-extent,x1=s.pos.x+extent,z0=s.pos.z-extent,z1=s.pos.z+extent;
+    clearProjects=clearProjects.filter(q=>{if(!(q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')||!q.site)return true;
+      const parts=reservedPolys(q).filter(({box})=>!box||!(box.maxX<x0||box.minX>x1||box.maxZ<z0||box.minZ>z1));projectGround.set(q,parts);return parts.length>0;});
+  }
   const publicAt=(x,z)=>anchors.some(g=>castleFoundationBoxMayHit(x,z,g,g.hw+0.2)&&segDist(x,z,g.a,g.b)<g.hw+0.2);
   const clear=(x,z,pad=0,access=false)=>{
     if(!planCellOK(x,z)||riverAt(x,z,1)||lakeAt(s,x,z,2))return false;
@@ -8295,7 +8281,7 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
     if(H.near(x,z,pad+8).some(g=>(!access||g.pending)&&castleFoundationBoxMayHit(x,z,g,g.hw+pad)&&segDist(x,z,g.a,g.b)<g.hw+pad))return false;
     for(const p of protectedGround){if(p.place&&placeHit(p.place,x,z,pad+1)||p.circle&&dist2d(x,z,p.circle.x,p.circle.z)<p.circle.r+pad+1||p.ring&&Math.abs(dist2d(x,z,p.ring.x,p.ring.z)-p.ring.r)<pad+3.5||p.a&&segDist(x,z,p.a,p.b)<pad+3.5)return false;}
     for(const R of circuits){const C=fortCenter(R),d=dist2d(x,z,C.x,C.z),r=wallRadAt(R,Math.atan2(z-C.z,x-C.x));if(Math.abs(d-r)<pad+7)return false;}
-    for(const q of projects){if(q.type==='castle'&&q.site){if(dist2d(x,z,q.site.ward.x,q.site.ward.z)<q.site.ward.r+pad+2)return false;for(let k=1;k<q.site.path.length;k++)if(segDist(x,z,q.site.path[k-1],q.site.path[k])<pad+2)return false;}
+    for(const q of clearProjects){if(q.type==='castle'&&q.site){if(dist2d(x,z,q.site.ward.x,q.site.ward.z)<q.site.ward.r+pad+2)return false;for(let k=1;k<q.site.path.length;k++)if(segDist(x,z,q.site.path[k-1],q.site.path[k])<pad+2)return false;}
       if((q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')&&q.site){if(reservedPolys(q).some(({P,box})=>castleFoundationBoxMayHit(x,z,box,pad+2)&&(inPoly(P,x,z)||P.some((p,k)=>segDist(x,z,p,P[(k+1)%P.length])<pad+2))))return false;}
       if(q.type==='storage'&&dist2d(x,z,q.x,q.z)<Math.hypot(...ARCH[q.arch].slice(0,2))/2+pad+2)return false;
       if(q.type==='clear'&&dist2d(x,z,q.x,q.z)<q.r+pad+2)return false;
@@ -9316,7 +9302,7 @@ function projectWalls(){
     }
   };
   for(const s of W.settlements){
-    if(s.lake){const dm=s.lake.dam,nx=-Math.sin(dm.a),nz=Math.cos(dm.a),dx=Math.cos(dm.a)*2.5,dz=Math.sin(dm.a)*2.5,lo=dm.lo??-dm.w/2,hi=dm.hi??dm.w/2,
+    if(s.lake){const dm=s.lake.dam,nx=-Math.sin(dm.a),nz=Math.cos(dm.a),dx=Math.cos(dm.a)*MILL_DAM_HALF,dz=Math.sin(dm.a)*MILL_DAM_HALF,lo=dm.lo??-dm.w/2,hi=dm.hi??dm.w/2,
         bed=(x,z)=>Math.min(hAt(x,z),dm.bed+3);
       const segment=(a,b)=>{if(b<=a)return;prism([{x:dm.x+nx*a-dx,z:dm.z+nz*a-dz},{x:dm.x+nx*a+dx,z:dm.z+nz*a+dz},{x:dm.x+nx*b+dx,z:dm.z+nz*b+dz},{x:dm.x+nx*b-dx,z:dm.z+nz*b-dz}],s.lake.y+1,0x8f877a,0x9a917f,bed);};
       let edge=lo;for(const [a,b]of millSluiceSlots(s)){segment(edge,a);edge=Math.max(edge,b);}segment(edge,hi);}
@@ -9925,7 +9911,7 @@ function featInit(){
   // water: rivers and canals, mill-ponds, the sea
   for(const st of W.rivStrips||[])featStroke(0,st.pts,k=>st.hw[k]);
   for(const s of W.settlements)if(s.lake){const P=s.lake.poly;let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;for(const q of P){x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);z0=Math.min(z0,q.z);z1=Math.max(z1,q.z);}
-    featRect(x0,z0,x1,z1,(i,x,z)=>{if(inPoly(P,x,z))F.src[0][i]=1;});}
+    featRect(x0,z0,x1,z1,(i,x,z)=>{if(millPondSide(s.lake,x,z)>=0&&inPoly(P,x,z))F.src[0][i]=1;});}
   for(let j=0;j<FR;j++)for(let i=0;i<FR;i++){const x=(i+0.5)*FPX-SIZE/2,z=(j+0.5)*FPX-SIZE/2,c=cIdx(toCell(x),toCell(z));
     if(hAt(x,z)<SEA+0.2)F.src[0][j*FR+i]=1; // survey the rendered coastline, not the coarse water-cell outline
   }
@@ -10899,8 +10885,8 @@ function projectStructures(){
 }
 function projectLakeWater(){ // Native reservoir geometry only; opening or drawing water produces no fish or rights.
   if(G.lakes){scene.remove(G.lakes);disposeTree(G.lakes);G.lakes=null;}const A=newAcc();
-  for(const s of W.settlements)if(s.lake){const L=s.lake,base=A.p.length/3;for(const q of L.poly){A.p.push(q.x,L.y,q.z);A.n.push(0,1,0);C1.setHex(0x356a8f);A.c.push(C1.r,C1.g,C1.b);}for(let i=1;i<L.poly.length-1;i++)A.i.push(base,base+i+1,base+i);
-    if(G.feat){const P=L.poly,x=P.map(p=>p.x),z=P.map(p=>p.z);featRect(Math.min(...x),Math.min(...z),Math.max(...x),Math.max(...z),(i,wx,wz)=>{if(inPoly(P,wx,wz))G.feat.src[0][i]=1;});}}
+  for(const s of W.settlements)if(s.lake){const L=s.lake;appendMillPondWater(A,L);
+    if(G.feat){const P=L.poly,x=P.map(p=>p.x),z=P.map(p=>p.z);featRect(Math.min(...x),Math.min(...z),Math.max(...x),Math.max(...z),(i,wx,wz)=>{if(millPondSide(L,wx,wz)>=0&&inPoly(P,wx,wz))G.feat.src[0][i]=1;});}}
   if(A.i.length){G.lakes=accMesh(A,waterMaterial({vertexColors:true,side:THREE.DoubleSide}));scene.add(G.lakes);}if(G.feat)featDirty(-SIZE/2,-SIZE/2,SIZE/2,SIZE/2);
 }
 function houseTints(){ // the land edged in each lord's own colour; the territory map uses colours chosen to be told apart at a glance
@@ -24157,7 +24143,9 @@ What happens is decided by quantities the economy produces, not by numbers cross
   and the merchants' waterfront, with canals cut inland (Hamburg); a
   **market town** may be laid out by a duke: one broad market street with
   runnels (Bächle), back streets, a minster square and a castle on the hill
-  above (Freiburg). Mill dams upstream of river towns back up a pond.
+  above (Freiburg). River mills use flowing bank water; founding a mill does not
+  automatically dam the river or flood a valley. Existing ponds can feed a sluiced
+  mill race, but a reservoir is not required for grinding.
 - Towns keep growing while you play. Empty houses are re-let first, then
   open frontage is built on, nearest the heart first; when there is none the
   town reaches further out along its highways and lays new lanes, and when it

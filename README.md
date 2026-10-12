@@ -1032,7 +1032,9 @@ What happens is decided by quantities the economy produces, not by numbers cross
   and the merchants' waterfront, with canals cut inland (Hamburg); a
   **market town** may be laid out by a duke: one broad market street with
   runnels (Bächle), back streets, a minster square and a castle on the hill
-  above (Freiburg). Mill dams upstream of river towns back up a pond.
+  above (Freiburg). River mills use flowing bank water; founding a mill does not
+  automatically dam the river or flood a valley. Existing ponds can feed a sluiced
+  mill race, but a reservoir is not required for grinding.
 - Towns keep growing while you play. Empty houses are re-let first, then
   open frontage is built on, nearest the heart first; when there is none the
   town reaches further out along its highways and lays new lanes, and when it

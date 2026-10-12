@@ -22,7 +22,9 @@ Port-Neuf began both comparisons with 133.048 people, 1,100.152 grain, 883.058 f
 
 The extra purchase conserved realm money to floating-point precision (3.6e−12 coin difference). This isolates the provisioning defect without attributing later divergent histories to one mechanism.
 
-Local replay outputs: [original](../tools/soak-results/provision-replay/baseline.json), [fixed](../tools/soak-results/provision-replay/fixed.json). The replay script and source hashes are retained beside them.
+These historical output paths are git-ignored and are not shipped in a fresh checkout.
+
+Local replay outputs: original (`tools/soak-results/provision-replay/baseline.json`), fixed (`tools/soak-results/provision-replay/fixed.json`). The replay script and source hashes are retained beside them.
 
 ## Twenty-year comparison
 
@@ -45,7 +47,7 @@ All ten fixed worlds completed without recorded simulation errors, nonfinite pop
 
 The extra market work increases population-phase cost (12.1% of measured tick time in the fixed cohort versus 3.2% originally). Final places range from 15 to 124 versus 13 to 89 originally; therefore total timing differences also include changed realm sizes. This is a correctness fix, not a performance improvement. Profiles are retained for future optimization.
 
-Local evidence: [fixed summary](../tools/soak-results/provision-final-20/summary.md), [original summary](../tools/soak-results/provision-baseline-20/summary.md), [weighted calculations](../tools/soak-results/provision-final-20/comparison.json). Frozen source hashes are original `da2f5569408bccf4dec95b0d1f88f320229fef62797f0e2f21d459695a33389f` and fixed `f5b61c00e0805588288809d57b16532a526d3d5211717aaaaa1afd54d146a6b5`.
+Local evidence: fixed summary (`tools/soak-results/provision-final-20/summary.md`), original summary (`tools/soak-results/provision-baseline-20/summary.md`), weighted calculations (`tools/soak-results/provision-final-20/comparison.json`). Frozen source hashes are original `da2f5569408bccf4dec95b0d1f88f320229fef62797f0e2f21d459695a33389f` and fixed `f5b61c00e0805588288809d57b16532a526d3d5211717aaaaa1afd54d146a6b5`.
 
 ## Checks
 
@@ -58,6 +60,6 @@ node tools/soak.mjs --seeds 688673834,1001,2002,3003,4004 \
 
 Fourteen focused tests cover an exhausted larder after growth, fish/grain substitution, penniless producers' own food, inability to pay, funded and exhausted credit, craft fees and the lord's payment limit, other farmers' grain reserves, ownership of new catches, spoilage, fair allocation of scarce food, and avoiding purchases when the larder is sufficient. Eleven defect cases fail against the original source; all fourteen pass against the fixed source. Unrelated rendering, land and political systems are stubbed in these tests; complete-world runs exercise them together.
 
-A separate animated smoke run exercised realm and street views at maximum speed on the Metal GPU, advancing both from AD 850 to AD 855 without recorded errors. [Drawing measurements](../tools/soak-results/provision-render-smoke/s688673834-sea.render.json) are retained; this was not a matched before/after performance comparison. Its zero-year annual summary does not measure famine or money.
+A separate animated smoke run exercised realm and street views at maximum speed on the Metal GPU, advancing both from AD 850 to AD 855 without recorded errors. Drawing measurements (`tools/soak-results/provision-render-smoke/s688673834-sea.render.json`) are retained; this was not a matched before/after performance comparison. Its zero-year annual summary does not measure famine or money.
 
-The 200-year soak was interrupted when work was redirected to this fix; neither cohort establishes long-term calibration. The change is isolated on `codex/provisioning`, based on `36648d5`, in `/Users/alexwall/.codex/worktrees/provisioning/furlong-kingdom-annals`. Integration status and final ownership validation are recorded separately in the local worker handoff.
+The 200-year soak was interrupted when work was redirected to this fix; neither cohort establishes long-term calibration. The change is isolated on `codex/provisioning`, based on `36648d5`, in `/Users/alexwall/.codex/worktrees/provisioning/furlong-kingdom-annals`. Integration status and final ownership validation are recorded in the [historical validation record](https://github.com/healdgar/furlong-kingdom-annals/blob/a23ecc032754a303c70f84a4d4e90ea8cbba0101/docs/HANDOFF.md); current work is tracked in [ISSUES.md](ISSUES.md).

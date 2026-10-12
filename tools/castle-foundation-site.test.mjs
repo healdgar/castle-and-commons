@@ -103,6 +103,16 @@ test('minimum-radius cutoff rejects the same later-ray and road-clearance failur
   run((x,z)=>!(x>13&&Math.abs(z)<1.2)); // a narrow road corridor rejected by the clearance callback
 });
 
+test('ray directions preserve the former ordered clearance samples and fitted radii',()=>{
+  for(const n of [20,32])for(const obstruct of [()=>true,(x,z)=>x<18,(x,z)=>Math.abs(z)<23]){
+    const p={x:7,z:-3,r:Array.from({length:n},(_,k)=>25+k%7)},before=[],after=[],R=runtime();
+    const old=legacyPlaceFitRadii(p,(x,z)=>{before.push([x,z]);return obstruct(x,z);});
+    const now=R.C.placeFitRadii(p,(x,z)=>{after.push([x,z]);return obstruct(x,z);});
+    assert.deepEqual(after,before,'every exact callback coordinate and its order is retained');
+    assert.deepEqual(now&&Array.from(now),old);
+  }
+});
+
 
 test('operation-local bounds preserve exact surveys with moved lots, long narrow polygons, and roads',()=>{
   const R=runtime(),b={x:500,z:500,w:8,d:8,rot:0,state:'sound'};R.s.buildings.push(b);const initial=R.survey();assert.ok(initial);

@@ -901,3 +901,39 @@ Era gates, following the kept historical gates:
 10. **Institutions arrive through the technology tree's learning** (#44), calibrated so that average play reaches them near their historical years.
 11. **Goods that mattered get added** (e.g. venison, rabbits, pigeons, fish from ponds) when their system needs them.
 12. **Abbeys hold their own purses and land in the money census;** the order and the wider Church (bishops, chapters, the papacy) are separate holders, some abroad, and real flows leave the realm to them (tenths, Peter's Pence, the order's contributions).
+
+## Accepted economy and growth decisions
+
+These decisions were carried in the retired work log. Current implementation
+and unfinished work are tracked only in [ISSUES.md](ISSUES.md).
+
+- **Prices and purchasing (2026-10-08):** keep supply/demand price discovery;
+  expensive goods require a supply/transport response rather than price caps.
+  Trade should answer quickly; manufacturing can be slower. Household purchases
+  follow need × (price / production-or-landed worth)^(−elasticity). Food is
+  inelastic (0); elasticity is 0.3 for fuel/building timber, 0.6 for tools, 1.2
+  for cloth, 1.5 for wine and 2 for spice/silk. Spend on food, then owed shelter,
+  fuel, tools, cloth and luxuries. Do not repeat the rejected food elasticity of
+  0.1, which left families hungry despite having cash.
+- **Meat:** real herd increase and actual butchers supply the inelastic food
+  need; households choose among bread, fish and meat by price and means. Salted
+  meat keeps longer than fresh. Salting, slaughter and actual livestock must
+  provide the goods; they are not a free food premium.
+- **Customary services:** roads without a toll house are maintained by the
+  endpoint lords beyond their reserves; toll houses can exist from AD850.
+  Mill farms are paid from actual takings at quarter days, not a year's advance;
+  arrears affect renewal and go to the courts.
+- **Late-world stock:** retire dead cargo/empty extinct-owner state first.
+  Moving families sell or pay to carry their goods home, and spoilage can be
+  inferred when stock is touched. The original 0.01-unit crumb proposal was
+  revised after it discarded families' last food: the retained cutoff is a
+  mouthful, one hundredth of a soul's day of food, with moving families retaining
+  a month's own food. Preserve the separately accepted dealer-stock behavior.
+- **Ordinary decisions and speed (2026-10-10):** ordinary decisions should be
+  daily; any other interval needs a simulation reason. Changes to generated
+  worlds/history are allowed when intentional and recorded, but the same model
+  must produce the same history at every speed. The century-per-minute target
+  remains an unachieved performance requirement (#15).
+- **Mill water (2026-10-11):** a mill's need does not justify a speculative
+  valley-wide reservoir. Use flowing bank water and a modest race where it
+  suffices; keep actual pond and funded fishpond mechanisms distinct (#83).

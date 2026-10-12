@@ -31,7 +31,10 @@ const sha=s=>createHash('sha256').update(s).digest('hex').slice(0,16);
 // Reviewed lifecycle bundle: private walks remain blockers but cannot anchor a public
 // first castle. The survey read includes their actual compoundPrivate Boolean;
 // only Site/Read/serviceDoor changed, and the other 38 pins are retained.
-const PINNED={"castleFoundationSite":"e3edaa610d029602","castleFoundationCentersPossible":"97f734a95ed5fce1","castleFoundationSurveyRead":"c84a41a0ff93d4d2","castleFoundationLandOK":"1c1323d61765ed95","castleFoundationGround":"dba79eab8b76f97a","castleFoundationBoxMayHit":"430a45b7b287d2d6","castleFoundationSegmentMayHitBox":"c1ff83639ad0c277","slopeAt":"f04f3db9f54bcfa6","hAt":"f459c5ff2804ca09","riverAt":"c4bda44c2b489b2e","lakeAt":"6a14ce0b475936f4","furlongAt":"aca164d39bde3f54","compoundGround":"800cfe4973552f94","occupiedGroundCells":"eb2ca800f0707890","occupiedGroundFields":"c5efe8ec6f058487","computeFurlongPoly":"605c31b180f2da7f","graveyardPolygonsOverlap":"65258af15a0c47a1","inPoly":"abebffb4a9abafff","inPolyXZ":"641dd4b3ae9a6dad","fortContains":"9f6ca02fc957e17d","fortCircuits":"7eca461ef4c3091c","fortCenter":"70fbd07bf1bf54a1","casRing":"a6921fd1103e167c","wallRadAt":"fbbec3db03bd0ce6","circuitLen":"9deb244c96e6486c","placeFitRadii":"8a45384e2759f058","placeR":"63335d5f5f19eb27","placeHit":"62746e6b8c8200de","serviceDoor":"edaca1b65a0dd2c9","locW":"833ae0c87356ca4b","obbCorners":"490b7d06b8d4a63f","obbOverlap":"5267c37bd7733324","streetFootprintOverlap":"ba1725bce82e34ce","segDist":"01b34b3baef31aff","segSegDist":"debb34048a0acf69","resample":"a590253bb5bcd7f5","lerpPt":"f218c11d09086fc4","makeHash":"b1d9816147e072f3","helpers":"626d791b92980e90","compoundPolys":"2059f5631f5d5e48","occupiedGroundBoxMayHit":"74c4c88f63dabba5"};
+// Reviewed performance pass: radius directions are reused within each ray;
+// fresh surveys omit only reservation polygons wholly outside a conservative
+// operation-local probe envelope. All exact tests and private stamps remain.
+const PINNED={"castleFoundationSite":"4c51b004ab068646","castleFoundationCentersPossible":"97f734a95ed5fce1","castleFoundationSurveyRead":"c84a41a0ff93d4d2","castleFoundationLandOK":"1c1323d61765ed95","castleFoundationGround":"dba79eab8b76f97a","castleFoundationBoxMayHit":"430a45b7b287d2d6","castleFoundationSegmentMayHitBox":"c1ff83639ad0c277","slopeAt":"f04f3db9f54bcfa6","hAt":"f459c5ff2804ca09","riverAt":"c4bda44c2b489b2e","lakeAt":"6a14ce0b475936f4","furlongAt":"aca164d39bde3f54","compoundGround":"800cfe4973552f94","occupiedGroundCells":"eb2ca800f0707890","occupiedGroundFields":"c5efe8ec6f058487","computeFurlongPoly":"605c31b180f2da7f","graveyardPolygonsOverlap":"65258af15a0c47a1","inPoly":"abebffb4a9abafff","inPolyXZ":"641dd4b3ae9a6dad","fortContains":"9f6ca02fc957e17d","fortCircuits":"7eca461ef4c3091c","fortCenter":"70fbd07bf1bf54a1","casRing":"a6921fd1103e167c","wallRadAt":"fbbec3db03bd0ce6","circuitLen":"9deb244c96e6486c","placeFitRadii":"7efd7d2d35c18bdb","placeR":"63335d5f5f19eb27","placeHit":"62746e6b8c8200de","serviceDoor":"edaca1b65a0dd2c9","locW":"833ae0c87356ca4b","obbCorners":"490b7d06b8d4a63f","obbOverlap":"5267c37bd7733324","streetFootprintOverlap":"ba1725bce82e34ce","segDist":"01b34b3baef31aff","segSegDist":"debb34048a0acf69","resample":"a590253bb5bcd7f5","lerpPt":"f218c11d09086fc4","makeHash":"b1d9816147e072f3","helpers":"626d791b92980e90","compoundPolys":"2059f5631f5d5e48","occupiedGroundBoxMayHit":"74c4c88f63dabba5"};
 test('the certified survey still reads the reviewed native helpers',()=>{
   assert.deepEqual(Object.fromEntries([...READS.map(n=>[n,sha(fn(n))]),['helpers',sha(HELPERS.map(line).join('\n'))]]),PINNED,
     'Survey dependency changed: audit the writer certificate and private hash stamps before repinning.');
@@ -181,4 +184,23 @@ test('operation-local bounds preserve successful and retained-site geometry with
   for(const c of[off,on])run(c,'globalThis.retained=castleFoundationSite(town,spec,fixed);');
   assert.ok(run(on,'retained'));assert.equal(run(on,'JSON.stringify(retained)'),run(off,'JSON.stringify(retained)'));
   assert.equal(run(on,'graph()'),run(off,'graph()'),'retained authority uses the same hash-query count');
+});
+
+test('fresh survey envelope preserves remote reservations, crossing approaches and same-count moves',()=>{
+  const off=realm(false),on=realm(false);
+  for(const c of[off,on])run(c,`town.buildings=[];W.projects=Array.from({length:3},(_,k)=>({type:'fabric',site:{f:{x:1200+k*20,z:1200,w:12,d:15,rot:.3}}}));`);
+  run(off,'castleFoundationSurveyNative=()=>false;');
+  const equal=label=>{
+    for(const c of[off,on])run(c,'globalThis.fixed=castleFoundationSite(town,spec);');
+    assert.equal(run(on,'JSON.stringify(fixed)'),run(off,'JSON.stringify(fixed)'),label+' exact surveyed geometry');
+    assert.equal(run(on,'graph()'),run(off,'graph()'),label+' exact native state and private stamps');
+  };
+  equal('remote footprints');assert.ok(run(on,'fixed'));
+  for(const c of[off,on])run(c,'W.projects[0].site.path=[{x:-100,z:10},{x:100,z:10}];');
+  equal('remote project with a local approach');
+  for(const c of[off,on])run(c,'W.projects[1].site.f.x=fixed.f.x;W.projects[1].site.f.z=fixed.f.z;');
+  equal('same-count footprint moves into the surveyed ground');
+  for(const c of[off,on])run(c,'globalThis.retained=castleFoundationSite(town,spec,fixed);');
+  assert.equal(run(on,'JSON.stringify(retained)'),run(off,'JSON.stringify(retained)'));
+  assert.equal(run(on,'graph()'),run(off,'graph()'),'retained sites still use all current reservations');
 });
