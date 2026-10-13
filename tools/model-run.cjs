@@ -17,6 +17,7 @@
      --ru path            a program printing "instructions cycles cputime" for a pid (macOS proc_pid_rusage), for instruction counts
      --serve PORT         afterwards stay idle and run POSTed probe code (body of an async function with RUN, tick(n),
                           prof(n,file), require and fs in scope; returns JSON); POST /exit ends it
+   An existing --out report accepts only the same source and opening configuration; use a fresh path for comparisons.
    Each profiled window is scored by tools/cpu-score.mjs: functions (own and total time) and parts of the day in ms per
    simulated day, printed, kept in the output, and added to the hot list with the change since this world's last run.
    A V8 startup snapshot of a played world also works (pass options in MODEL_RUN_ARGS):
@@ -27,16 +28,28 @@
 const fs=require('fs'),vm=require('vm'),v8=require('v8'),os=require('os'),path=require('path');
 const HIDE=['localStorage','sessionStorage','navigator']; // browser-only globals the headless game must not see (V8 cannot snapshot them)
 const BUILD=v8.startupSnapshot.isBuildingSnapshot(),HERE=__dirname;
+// A report may accumulate windows only for the same source and opening world.
+function readModelReport(file, world) {
+  if (!file || !fs.existsSync(file)) return null;
+  const report = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const changed = ['srcSHA', 'seed', 'fate', 'coast', 'startAD', 'km'].filter(key =>
+    key === 'km' ? (report[key] ?? null) !== (world[key] ?? null) : report[key] !== world[key]);
+  if (changed.length) throw new Error(`Existing report ${file} belongs to a different simulation source/world (${changed.join(', ')}); choose a new --out path.`);
+  return report;
+}
 function args(){const a=process.env.MODEL_RUN_ARGS!==undefined?process.env.MODEL_RUN_ARGS.split(/\s+/).filter(Boolean):process.argv.slice(2),o={};
   for(let i=0;i<a.length;i++)if(a[i].startsWith('--')){const k=a[i].slice(2);o[k]=a[i+1]!==undefined&&!a[i+1].startsWith('--')?a[++i]:'1';}return o;}
 const RUN=c=>vm.runInThisContext(c);
-const PARTS=require('./cpu-score.mjs').DAY_PARTS;
+// Node's snapshot builder can read files but cannot require user modules.
+const PARTS=BUILD?JSON.parse(fs.readFileSync(path.join(HERE,'cpu-score.mjs'),'utf8').match(/export const DAY_PARTS=(\[[^\n]+\]);/)[1]):require('./cpu-score.mjs').DAY_PARTS;
 function load(A){
   for(const k of HIDE)Object.defineProperty(globalThis,k,{value:undefined,writable:true,configurable:true});
   const src=path.resolve(A.src||path.join(HERE,'..','index.html'));
   const html=fs.readFileSync(src,'utf8'),m='<script>',a=html.indexOf(m),b=html.indexOf(m,a+m.length)+m.length,source=html.slice(b,html.indexOf('</script>',b));
   const seed=+(A.seed??1001),fate=+(A.fate??42),coast=A.coast||'sea',startAD=+(A.y||850);
   const km=A.km?+A.km:null,hash=`#s=${seed>>>0}&f=${fate>>>0}${coast==='none'?'':'&c='+coast}&y=${startAD}${km?'&km='+km:''}`;
+  const identity={src,seed,fate,coast,startAD,km,srcSHA:require('crypto').createHash('sha256').update(html).digest('hex')};
+  readModelReport(A.out,identity); // reject mixed reports before spending time opening the world
   Object.assign(globalThis,{FURLONG_HEADLESS:true,FURLONG_OPTIONS:{hash},addEventListener(){},removeEventListener(){},requestAnimationFrame(){}});
   vm.runInThisContext(source,{filename:'index.html',lineOffset:html.slice(0,b).split('\n').length-1}); // profile lines are index.html's
   const sibling=path.join(path.dirname(src),'tools/simulation-boundary.mjs'),bt=fs.readFileSync(A.boundary||(fs.existsSync(sibling)?sibling:path.join(HERE,'simulation-boundary.mjs')),'utf8');
@@ -47,7 +60,7 @@ function load(A){
       digest.update('{');const keys=Object.keys(v);for(let i=0;i<keys.length;i++){if(i)digest.update(',');digest.update(JSON.stringify(keys[i])+':');feed(v[keys[i]]);}digest.update('}');};
     feed(graph);return {sha256:digest.digest('hex'),nodes:graph.state.length,changes:graph.changes.length,functions:graph.code.length};};
   globalThis.__CAPTURE=new Function(bt.slice(i0+'export function captureExpression(){'.length,i1))();
-  globalThis.__STATE={src,seed,fate,coast,startAD,km,ticks:0,srcSHA:require('crypto').createHash('sha256').update(html).digest('hex')};
+  globalThis.__STATE={...identity,ticks:0};
   if(A.phases==='1'||BUILD)wrapParts();
 }
 function wrapParts(){ // a timer on each part of the day, running only inside measured windows
@@ -97,7 +110,7 @@ async function play(A){
   const prof=BUILD?[]:A.prof!==undefined?win(A.prof):days>0?[...new Set([1,Math.ceil(years/2),years])].map(yearWin):[];
   const digestAt=new Set((A.digest||'').split(',').filter(Boolean).map(Number));
   if(A.phases==='1'&&!globalThis.__PHWRAPPED)wrapParts();
-  const R=(A.out&&fs.existsSync(A.out)?JSON.parse(fs.readFileSync(A.out,'utf8')):null)||{src:S.src,srcSHA:S.srcSHA,seed:S.seed,fate:S.fate,coast:S.coast,startAD:S.startAD,windows:[],digests:{},counts:[],scores:{}};
+  const R=readModelReport(A.out,S)||{src:S.src,srcSHA:S.srcSHA,seed:S.seed,fate:S.fate,coast:S.coast,startAD:S.startAD,km:S.km,windows:[],digests:{},counts:[],scores:{}};
   R.scores=R.scores||{};R.runs=(R.runs||[]).concat([{argv:process.argv.slice(2),fromTick:S.ticks,loadAtStart:os.loadavg(),started:new Date().toISOString()}]);
   const save=()=>{if(A.out)fs.writeFileSync(A.out,JSON.stringify(R,null,1));};
   const cpu=()=>{const u=process.cpuUsage();return (u.user+u.system)/1000;};

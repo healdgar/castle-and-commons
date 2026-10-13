@@ -1,5 +1,73 @@
 # Simulation performance
 
+## Follow-up measurements and report integrity, 13 October 2026
+
+The next castle-survey pass established no reliable additional CPU gain.
+Fixed-shape blocker views increased profiled process CPU by 8.1% in their
+matched 30-day coastal pair (3055.62→3303.55 ms/day, load0.5→1.1 / 1.1→1.4).
+A smaller combined-bound rejection preserved complete native history, but its
+unprofiled tick CPU moved in opposite directions across the three worlds:
+
+| Start / world | Days | Baseline / prototype CPU ms/day | Baseline / prototype load0 |
+|---|---:|---:|---|
+| AD850, 1001 sea | 150 | 741.65 / 818.60 | 1.20→1.19 / 1.19→1.59 |
+| AD1066, 2002 land | 30 | 4351.54 / 5058.42 | 1.59→1.18 / 1.18→1.56 |
+| AD1066, 1001 sea | 30 | 2457.00 / 1851.89 | 1.56→1.57 / 1.57→1.40 |
+
+The bound prototype matches every native save-body byte, RNG stream and hash
+counter at days0/50/100/150 in sea AD850 and days0/30 in the AD1066 worlds.
+All 1812/465/372 raw journal rows match, with no inventory/fault failures and
+maximum absolute cash residual 6.56e-10. Its combined comparison uses 923.89
+child CPU / 701.62 wall seconds, load1.20→1.40, peak RSS1462788KB. These are
+proofs for a discarded experiment; the released survey implementation is retained.
+
+Broader private-bucket reuse, terrain-cell caching and splitting clearance
+functions also failed to establish a consistent benefit in fixed native-world
+survey probes. The repeated-probe CPU varied materially between runs, and the
+split's lower mean coincided with baseline outliers and a higher median.
+These prototypes are discarded too. Current absolute timings are higher than
+in the previous pass; comparisons use fresh source pairs. No extra speedup is
+claimed, and actual worker/storage throughput and the century-per-minute goal
+remain #15/#16. The updated profiles still put castle clearance first, followed
+by growth, economy and institutional foundations.
+
+Investigation found a measurement bug: `model-run` could append a different
+build or opening world's windows to an existing `--out` report while retaining
+its old source hash and world metadata. Its first window could also belong to
+an older invocation. Raw CPU-profile files and hot-list records identified the
+current input correctly; the report header did not. The comparisons above use
+the matching latest window, frozen source files and the independent native gate.
+
+`model-run` now checks an existing report's source SHA, seed, fate, coast,
+opening year and map-size argument before opening a world, and again before
+appending. A mismatch requests a fresh `--out` path and preserves the old file.
+New reports record map size; legacy reports without it accept the default map
+only. Matching reports retain all their prior windows and runs. Eleven checks
+cover every mismatch, legacy defaults, malformed evidence and the actual CLI's
+refusal before boot. A single-file startup-snapshot smoke also serializes the guard and the actual day-parts list; snapshot builds read that list through built-in fs instead of the unsupported user-module loader. Two additional native survey regressions compare fresh
+and retained sites, complete graphs/counters, removal and uncertain-dimension
+coercions across rectangles, lots, polygons, empty polygons and graveyards.
+
+The 2,298-check full batch has 2,297 passes and one initial-world capture
+timeout in the unchanged headless eight-day save/replay check. Its original
+30-second limit and every assertion pass in isolation, alongside all eleven
+final tooling checks. This verifies 2,299 distinct checks across the batch and
+rechecks, including the native paid-castle and AD1200 royal-eyre save/load
+continuations. The batch uses 6337.99 child CPU / 2328.85 wall seconds,
+load0.04→1.04, peak RSS2314388KB. The 12-check recheck uses 208.49 child CPU /
+184.17 wall seconds, load0.62→1.23, peak RSS1404128KB. These are test-runner
+costs. The actual native snapshot build resumes one day with the same full
+digest, world graph, world-only graph, RNG hash and census as a fresh
+AD850/1001:42 coastal run. Its three serial jobs use 164.45 child CPU /
+147.56 wall seconds, load0.40→1.35, peak RSS755868KB; this proves one-day
+continuation, without establishing snapshot throughput or long-term validity.
+Publication checks are running. No simulation code changes are included in
+this tools update. The baseline HTML SHA256 is
+`26916db4b4c65a8efefe29a9c81e1c00821071485a760c79d3897428fb862296`.
+Frozen sources, native bodies, profiles and probe receipts remain outside the
+checkout in `/workspace/furlong-performance-clearance/`. Current status and next
+work belong in [ISSUES.md](ISSUES.md#performance-saves-and-late-worlds).
+
 ## First-castle survey allocation pass, 12 October 2026
 
 The current Roman-origin release's AD1066 coastal profile attributes 30.5% of

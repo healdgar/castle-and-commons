@@ -320,3 +320,35 @@ test('private bucket reuse preserves ordered results, every object stamp and the
     }
   }
 });
+
+test('blocker shapes preserve rectangles, lots, polygons and graveyards across fresh and retained surveys',()=>{
+  const shapes=[
+    `{x:40,z:20,w:12,d:35,rot:.6,state:'sound'}`,
+    `{x:120,z:70,w:12,d:15,rot:.3,lot:[{x:-50,z:-20},{x:140,z:-20},{x:140,z:90},{x:-50,z:90}],state:'sound'}`,
+    `{x:50,z:30,w:10,d:15,rot:.3,poly:[{x:25,z:0},{x:75,z:0},{x:75,z:60},{x:25,z:60}],state:'sound'}`,
+    `{x:0,z:0,w:100,d:100,rot:.3,poly:[],lot:[],state:'sound'}`,
+    `{x:100,z:80,w:12,d:15,rot:.3,state:'sound',_graveyard:{x:30,z:0,poly:[{x:0,z:-40},{x:60,z:-40},{x:60,z:40},{x:0,z:40}]}}`,
+    `{x:40,z:20,w:'12',d:35,rot:'0.6',state:'sound'}`,
+  ];
+  for(const shape of shapes){const off=realm(false),on=realm(false);
+    for(const c of[off,on])run(c,'town.buildings=[];globalThis.retained=castleFoundationSite(town,spec);');
+    run(off,'CASTLE_FOUNDATION_SURVEYS.work=false;');
+    for(const c of[off,on])run(c,`town.buildings=[${shape}];`);
+    for(const suffix of['',',retained']){
+      assert.equal(run(on,`JSON.stringify(castleFoundationSite(town,spec${suffix}))`),run(off,`JSON.stringify(castleFoundationSite(town,spec${suffix}))`),shape+' exact candidate');
+      assert.equal(run(on,'graph()'),run(off,'graph()'),shape+' full native graph and query counter');
+    }
+    for(const c of[off,on])run(c,'town.buildings[0].removed=true;');
+    assert.equal(run(on,'JSON.stringify(castleFoundationSite(town,spec))'),run(off,'JSON.stringify(castleFoundationSite(town,spec))'),'a new operation observes removal');
+    assert.equal(run(on,'graph()'),run(off,'graph()'));
+  }
+});
+
+test('uncertain blocker dimensions retain original coercions during point clearance',()=>{
+  const off=realm(false),on=realm(false);
+  for(const c of[off,on])run(c,`let widthReads=0;town.buildings=[{x:40,z:20,w:{valueOf(){widthReads++;return 12}},d:35,rot:.6,state:'sound'}];`);
+  run(off,'CASTLE_FOUNDATION_SURVEYS.work=false;');
+  assert.equal(run(on,'JSON.stringify(castleFoundationSite(town,spec))'),run(off,'JSON.stringify(castleFoundationSite(town,spec))'));
+  assert.equal(run(on,'graph()'),run(off,'graph()'));
+  assert.equal(run(on,'widthReads'),run(off,'widthReads'),'no eager arithmetic on an uncertain dimension');
+});
