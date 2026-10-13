@@ -1005,3 +1005,12 @@ Screenshots: [850 core](screenshots/roman-origins-2026-10-12/roman-core-850.png)
 [1066 history](screenshots/roman-origins-2026-10-12/roman-history-1066.png).
 Local machine receipts are in /workspace/furlong-roman-origin/; the final unstamped
 HTML SHA256 is 2dd2d3c744435733b7ff9647522089d858dc6d9ce8f81ea62247f155b31121d5.
+
+
+Published in [1f065c9](https://github.com/healdgar/furlong-kingdom-annals/commit/1f065c90a7a7185e93bb8496f7d3c04c7195e990).
+Pages/container workflow [131](https://github.com/healdgar/furlong-kingdom-annals/actions/runs/38334224698)
+succeeded; both container architectures match stamped HTML SHA256
+8e5dc2c8b74f2bcde120d60c0ad67d161fcc1203febf70663f6ff03a9170b989,
+all seven assets and LICENSE. Stamping left the tested game script unchanged.
+Live Pages returned HTTP403 here; separate artifact publication is unavailable.
+Those target-verification limits remain #84.
