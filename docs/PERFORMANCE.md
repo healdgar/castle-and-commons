@@ -56,6 +56,16 @@ regressions. The batch uses 3727.39 child CPU / 1399.88 wall seconds,
 load0.92→1.11, peak RSS2562324KB. These are test-runner costs, not game
 throughput. Only the visible build stamp changes after these gates.
 
+Release [9ae52b6](https://github.com/healdgar/furlong-kingdom-annals/commit/9ae52b60b6db88e84d6be4c279d74cb871b24adb)
+is published to Pages and the container; workflow
+[133](https://github.com/healdgar/furlong-kingdom-annals/actions/runs/38345084189)
+succeeded. Both image architectures contain byte-identical stamped HTML, all
+seven assets and LICENSE. Release HTML SHA256:
+`26916db4b4c65a8efefe29a9c81e1c00821071485a760c79d3897428fb862296`.
+Fresh live Pages verification is blocked by the proxy's CONNECT HTTP403;
+no callable claude.ai artifact publisher is available. Those external parity
+limits remain #84. Documentation-only receipts retain this same game build.
+
 Baseline HTML SHA256: `8e5dc2c8b74f2bcde120d60c0ad67d161fcc1203febf70663f6ff03a9170b989`.
 Frozen candidate HTML SHA256: `07e5823ccf464751df797ac174a3752eabea0bcaea8e5742318e7307771903a5`.
 Sources, prototypes, native bodies, profiles and timing receipts remain outside
