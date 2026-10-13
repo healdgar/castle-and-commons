@@ -937,3 +937,71 @@ and unfinished work are tracked only in [ISSUES.md](ISSUES.md).
 - **Mill water (2026-10-11):** a mill's need does not justify a speculative
   valley-wide reservoir. Use flowing bank water and a modest race where it
   suffices; keep actual pond and funded fishpond mechanisms distinct (#83).
+
+
+## Settlement origins and surviving Roman streets
+
+Accepted direction (#102): a Roman town can retain an ancient rectangular core
+and main routes in both AD850 and AD1066. Medieval lanes, subdivided plots and
+terrain shape the later town; Roman origin does not imply a pristine grid over
+its whole footprint.
+
+Opening settlements now record a seeded predecessor, absolute foundation date
+and layout independently of the medieval layout RNG. The same seed, settlement
+index and culture preserve the same Roman origin, core dimensions and retained
+street lines across opening dates and current capital/border/market roles.
+Roman foundations date to AD50–349; later growth has its own approximate dates.
+History cards show these as approximate calendar dates rather than dating the
+ancient foundation from the number of medieval building epochs.
+
+For invented realms, the current naming culture is a proxy for possible former
+Roman territory. Opening legacy weights (Italian .65, Iberian .55, French .45,
+English .25, Celtic .15, German .15; Norse and Slavic zero) are generation customs,
+not measured historical population shares or a reconstruction of imperial
+boundaries. Villages do not receive urban Roman grids. Most selected Roman
+predecessors have a planned core; some retain irregular older routes instead.
+The planned core retains its main axes and a seeded subset of secondary streets,
+clipped by usable ground, water and the forum. Shore surveys also split around
+standing building footprints, including their full quay width; smoothing cannot
+cut through a church or other retained building. The existing frontage and lane
+solver lays medieval streets among them; later growth does not extend the grid.
+
+Medieval planted markets use a dated charter foundation (AD950–1249), only when
+it predates the opening. Their description is a generic planted market, without
+asserting Freiburg's specific water infrastructure. Player-founded settlements
+record their actual foundation year and explicit planned/village layout; they
+cannot acquire a fictional Roman predecessor. Saved layout contexts retain the
+origin record and its geometry. Generated openings and their histories change
+intentionally; older build identity proofs do not certify these new worlds.
+
+
+**Verification (12 October 2026).** The full release batch reported 2,276 passes
+and two failures: the new worker-only origin field lacked its projection-contract
+entry, and a new Roman coastal layout exposed a quay crossing a standing church.
+The explicit worker-only contract and the quay's full-width footprint survey
+repair both; 74 affected checks pass on the final source, including two added
+quay regressions. This verifies 2,280 distinct checks across the batch and
+rechecks, not one fully passing 2,280-check batch. The full batch consumed
+3,586.86 CPU seconds, with load average 1.07/.59/.26 → 1.23/2.43/2.97.
+
+Native AD850/AD1066 worlds retain the same Roman origin and core street geometry,
+with visible irregular medieval lanes. Both preserve their exact save bytes and
+every RNG after load and three continued days. Three street worlds pass 120 days,
+including the coastal seed 287970763:370450810 that exposed the quay collision;
+four longer saved-world campaigns retain exact continuation, including actual
+paid first-castle work and native AD1200 royal justice. Three further 30-day
+campaigns (1001:42 sea at AD850 and AD1066; 2002:42 inland at AD1066) conserve money
+within 1e-7 and inventory with no simulation faults. Together they consumed
+148.67 CPU seconds, with first-load average .42 and final-load average 1.38.
+These checks do not establish economic calibration or century-per-minute speed.
+
+Fresh local worker-browser views show the same Rougecastel foundation, c. AD296,
+in separate AD850 and AD1066 realms. Camera/frame calls and software WebGL provide
+static render evidence, not animation throughput. Origin planning records stay
+in the worker; the renderer receives street geometry and queries history cards.
+Screenshots: [850 core](screenshots/roman-origins-2026-10-12/roman-core-850.png),
+[1066 core](screenshots/roman-origins-2026-10-12/roman-core-1066.png),
+[850 history](screenshots/roman-origins-2026-10-12/roman-history-850.png), and
+[1066 history](screenshots/roman-origins-2026-10-12/roman-history-1066.png).
+Local machine receipts are in /workspace/furlong-roman-origin/; the final unstamped
+HTML SHA256 is 2dd2d3c744435733b7ff9647522089d858dc6d9ce8f81ea62247f155b31121d5.

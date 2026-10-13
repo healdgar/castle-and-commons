@@ -187,3 +187,21 @@ test('quay access detours along the dry bank with lane-width clearance, without 
   for(let k=1;k<plan.path.length;k++){const a=plan.path[k-1],b=plan.path[k],n=Math.ceil(distance(a.x,a.z,b.x,b.z));
     for(let j=0;j<=n;j++)assert.equal(C.riverAt(a.x+(b.x-a.x)*j/n,a.z+(b.z-a.z)*j/n,2.6),null);}
 });
+
+test('a quay survey splits around a standing rotated footprint across its full width',()=>{
+  const C=shoreRuntime(),B={x:0,z:0,w:12,d:18,rot:Math.PI/4};
+  vm.runInContext(fn('streetFootprintOverlap'),C);
+  const blocked=(a,b,hw)=>C.streetFootprintOverlap(B,{a,b,hw},0.3),P=[-40,-20,-10,10,20,40].map(x=>({x,z:0}));
+  const runs=C.shoreRoadRuns({},P,4,blocked);
+  assert.equal(runs.length,2);assert.ok(runs.every(run=>run.slice(1).every((q,k)=>!blocked(run[k],q,4))));
+  assert.ok(runs[0].at(-1).x<0&&runs[1][0].x>0);
+});
+
+test('quay smoothing cannot cut through a standing building when the surveyed bend is clear',()=>{
+  const C=shoreRuntime(),B={x:0,z:5,w:3,d:3,rot:0},P=[{x:-20,z:0},{x:0,z:20},{x:20,z:0}];
+  vm.runInContext(fn('streetFootprintOverlap'),C);
+  const blocked=(a,b,hw)=>C.streetFootprintOverlap(B,{a,b,hw},0.3),before=JSON.stringify(P);
+  const runs=C.shoreRoadRuns({},P,1,blocked);
+  assert.equal(runs.length,1);assert.equal(JSON.stringify(runs[0]),before);
+  assert.ok(runs[0].slice(1).every((q,k)=>!blocked(runs[0][k],q,1)));
+});

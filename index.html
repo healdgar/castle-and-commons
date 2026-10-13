@@ -505,7 +505,7 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
 </head>
 <body>
 <div id="gl"></div>
-<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-12 23:45 UTC · after e2117cd</div></div>
+<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-13 01:48 UTC · after 70478d4</div></div>
 
 <div id="hud">
   <button type="button" id="brand" class="hudlink" aria-label="About Castle and Commons" aria-controls="contextpanel">Castle and Commons</button>
@@ -2161,6 +2161,22 @@ function riverRoute(ai,bi){
    scattering. A private RNG per town keeps layout tweaks from reshuffling
    the rest of the world. */
 function layoutRng(idx){return seedStreams((SEED^Math.imul(idx+1,0x9E3779B1))>>>0).gen;}
+function settlementOrigin(s,idx,era,newFoundation=false){
+  if(newFoundation)return{kind:'medieval',foundedAD:era,layout:s.forceMode||(s.kind==='village'?'village':'grown'),live:true};
+  // #102 opening customs, not historical population shares: culture is a proxy for former Roman territory in invented realms.
+  // This separate seed records the predecessor before medieval layout dice; changing the opening year cannot create a Roman past.
+  const r=seedStreams((SEED^Math.imul(idx+1,0x85EBCA6B)^0x524F4D45)>>>0).gen;
+  const legacy={italian:0.65,french:0.45,iberian:0.55,anglo:0.25,celtic:0.15,german:0.15},roll=r();
+  if(s.kind!=='village'&&roll<(legacy[s.cult]||0)){
+    const foundedAD=50+Math.floor(r()*300),planned=r()<0.8;
+    const hl=90+r()*25,hw=65+r()*20,spacing=36+r()*6;
+    const retained=reach=>{const out=[0];for(let o=spacing;o<reach;o+=spacing)for(const side of[-1,1])if(r()<0.65)out.push(o*side);return out;};
+    return{kind:'roman',foundedAD,layout:planned?'roman':'grown',core:{hl,hw,spacing,rows:retained(hw),cols:retained(hl)}};
+  }
+  const foundedAD=620+Math.floor(r()*200),charterAD=950+Math.floor(r()*300),planted=r()<0.35;
+  const layout=s.forceMode||(s.kind==='village'?'village':s.role==='market'&&planted&&charterAD<=era?'planned':s.role==='port'&&era>=1000?'twin':'grown');
+  return{kind:'medieval',foundedAD:layout==='planned'?charterAD:foundedAD,layout};
+}
 function obbCorners(x,z,w,d,rot){ // footprint corners; three.js Y-rotation maps local x→(cos,−sin)
   const c=Math.cos(rot),sn=Math.sin(rot),o=[];
   for(const[ox,oz]of[[w/2,d/2],[-w/2,d/2],[-w/2,-d/2],[w/2,-d/2]])o.push({x:x+ox*c+oz*sn,z:z-ox*sn+oz*c});
@@ -2268,10 +2284,11 @@ function shoreRoadClear(s,a,b,hw){
     for(const off of[-hw,0,hw])if(hAt(x+nx*off,z+nz*off)<=SEA_SURFACE||lakeAt(s,x+nx*off,z+nz*off,0))return false;
   }return true;
 }
-function shoreRoadRuns(s,P,hw){
-  const smoothed=smoothPath(P,2),Q=smoothed.every((q,k)=>shoreRoadClear(s,k?smoothed[k-1]:q,q,hw))?smoothed:P,runs=[];let run=[];
-  for(const q of Q){if(!shoreRoadClear(s,q,q,hw)){if(run.length>1)runs.push(run);run=[];continue;}
-    if(run.length&&!shoreRoadClear(s,run.at(-1),q,hw)){if(run.length>1)runs.push(run);run=[];}run.push(q);
+function shoreRoadRuns(s,P,hw,blocked=null){
+  const clear=(a,b)=>shoreRoadClear(s,a,b,hw)&&(!blocked||!blocked(a,b,hw)); // a quay keeps standing buildings as well as the dry bank
+  const smoothed=smoothPath(P,2),Q=smoothed.every((q,k)=>clear(k?smoothed[k-1]:q,q))?smoothed:P,runs=[];let run=[];
+  for(const q of Q){if(!clear(q,q)){if(run.length>1)runs.push(run);run=[];continue;}
+    if(run.length&&!clear(run.at(-1),q)){if(run.length>1)runs.push(run);run=[];}run.push(q);
   }if(run.length>1)runs.push(run);return runs;
 }
 function serviceDoor(b,pad=1.2){
@@ -2639,10 +2656,12 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
   const segH=makeHash(24),placed=makeHash(16);
   let curE=saved?saved.curE:0;
   const era=saved?saved.era:AD(),early=saved?saved.early:era<1000,motteAge=saved?saved.motteAge:!constructionCapability(s,'stoneKeep',era).available; // generated keep material uses the same #44 fallback gate
+  const origin=saved?saved.origin:s.origin||settlementOrigin(s,idx,era);if(!saved)s.origin=origin;
   const E=saved?saved.E:early?(isVil?2:3):isCap?6:isTown?5:3;
   const FRAC=saved?saved.FRAC:early?(E===2?[0.5,1]:[0.3,0.65,1]):isCap?[0.06,0.16,0.32,0.52,0.76,1]:isTown?[0.1,0.26,0.5,0.76,1]:[0.4,0.75,1];
-  const agoYears=e=>Math.round((E-e)*(isVil?70:55)/10)*10;
-  let live=saved?saved.live:false;const hist=(e,t)=>s.history.push(live?{yr:year(),t}:{ago:agoYears(e),t}); // live entries are dated in the annals' own years
+  const growthAD=origin.kind==='roman'?Math.max(origin.foundedAD+100,era-E*55):origin.foundedAD;
+  const historyAD=e=>Math.round(growthAD+(era-growthAD)*e/E);
+  let live=saved?saved.live:false;const hist=(e,t)=>{const ad=historyAD(e);s.history.push(live||origin.live?{yr:year(),t}:{ad,ago:W.startAD-ad,t});}; // ancient foundation and medieval growth have separate dates
   const addSeg=(a,b,hw,st)=>{const o={a,b,hw,st,x:(a.x+b.x)/2,z:(a.z+b.z)/2};segH.add(o,dist2d(a.x,a.z,b.x,b.z)/2+hw+2);};
   const addStreet=(pts,hw,kind,extra)=>{
     if(pts.length<2)return null;
@@ -2769,12 +2788,11 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
   let foundLine=saved?saved.foundLine:'';
   /* like Göttingen: an older farming village with its own church stood a little way along the road;
      the trading town was founded beside it, and the village stayed outside the first wall */
-  // how the town began: grown about an older village (Göttingen), a Roman grid (Metz), founded in one
-  // stroke as a planned market (Freiburg), or twin cores — a cathedral-burg and a merchants' waterfront (Hamburg)
-  const mode=saved?saved.mode:s.forceMode||(isVil?'village':early?'grown':role==='border'?'roman':(isCap&&rr()<0.3)?'roman':(role==='market'&&rr()<0.55)?'planned':role==='port'?'twin':'grown');
+  // The recorded predecessor supplies the core; the current lord's role does not create an ancient foundation.
+  const mode=saved?saved.mode:origin.layout;
   if(!saved)s.mode=mode;
   let oldVil=saved?saved.oldVil:null;
-  if(!saved){if(mode==='grown'&&(role==='market'||role==='crossing'||role==='seat')&&roads.length){
+  if(!saved){if(mode==='grown'&&origin.kind!=='roman'&&(role==='market'||role==='crossing'||role==='seat')&&roads.length){
     const rd=roads[Math.floor(rr()*roads.length)];
     for(let i=0;i<rd.pts.length&&!oldVil;i++){
       const q=rd.pts[i],d=dist2d(q.x,q.z,C.x,C.z);if(d<150)continue;if(d>240)break;
@@ -2835,18 +2853,18 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
     const out=[];let run=[];for(const q of resample([{x:ax,z:az},{x:bx,z:bz}],8)){if(ok(q.x,q.z))run.push(q);else{if(run.length>=3)out.push(run);run=[];}}
     if(run.length>=3)out.push(run);return out;};
   let church=saved?saved.church:null;
-  if(!saved){if(mode==='roman'){ // Divodurum: a grid of streets about the forum; its wall a rectangle
-    const hl=isCap?125:92,hw=isCap?96:70,sp=isCap?42:37;
-    for(let o=-hw;o<=hw+0.1;o+=sp){if(Math.abs(o)<1)continue; // the road through the forum is the decumanus
-      for(const r of lineRuns(C.x-ux*hl+vx*o,C.z-uz*hl+vz*o,C.x+ux*hl+vx*o,C.z+uz*hl+vz*o,(x,z)=>buildable(x,z)&&!inPlace(x,z,2)))addStreet(r,HW,'grid',{straight:true,roman:true});}
-    for(let o=-hl;o<=hl+0.1;o+=sp)
-      for(const r of lineRuns(C.x-vx*hw+ux*o,C.z-vz*hw+uz*o,C.x+vx*hw+ux*o,C.z+vz*hw+uz*o,(x,z)=>buildable(x,z)&&!inPlace(x,z,2)))addStreet(r,Math.abs(o)<1?HW*1.25:HW,'grid',{straight:true,roman:true});
+  if(!saved){if(mode==='roman'){ // only the inherited core is rectangular; later lanes use the terrain and existing frontage
+    const{hl,hw,rows,cols}=origin.core;
+    for(const o of rows){ // the old main routes remain; some secondary streets were lost to later plots
+      for(const r of lineRuns(C.x-ux*hl+vx*o,C.z-uz*hl+vz*o,C.x+ux*hl+vx*o,C.z+uz*hl+vz*o,(x,z)=>buildable(x,z)&&!inPlace(x,z,2)))addStreet(r,HW,'grid',{straight:true,roman:true,foundedAD:origin.foundedAD});}
+    for(const o of cols)
+      for(const r of lineRuns(C.x-vx*hw+ux*o,C.z-vz*hw+uz*o,C.x+vx*hw+ux*o,C.z+vz*hw+uz*o,(x,z)=>buildable(x,z)&&!inPlace(x,z,2)))addStreet(r,Math.abs(o)<1?HW*1.25:HW,'grid',{straight:true,roman:true,foundedAD:origin.foundedAD});
     setRectWall(s,rAng,hl+16,hw+16);
     s.romanWall=true;
     church=aroundPlace('temple',2,1.15,1.15,'temple',{cathedral:true});
-    foundLine=`Founded by the Romans as a walled town of straight streets about a forum${s.river?', on the rise above the river':''}. The grid still runs beneath the later lanes; the forum became the cathedral square.`;
+    foundLine=`Founded in Roman times about a forum${s.river?', on the rise above the river':''}. Parts of the ancient street grid survive in the core; medieval lanes and subdivided plots grew around them.`;
   }
-  if(mode==='planned'){ // Freiburg: founded in one stroke — a broad market street, a cross street, parallel back streets, equal lots
+  if(mode==='planned'){ // a dated planted market: main street, cross street and back streets
     const L=Rmax*0.36,ok=(x,z)=>buildable(x,z);
     let opp=null,best=0.5;for(const r of roads){if(r===roads[0])continue;const[tx,tz]=roadTan(r,2);const dot=tx*ux+tz*uz;if(dot<-best){best=-dot;opp=r;}}
     const half=st=>st.pts.filter(q=>dist2d(q.x,q.z,C.x,C.z)<L);
@@ -2865,8 +2883,7 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
       if(probe(f).every(q=>buildable(q.x,q.z)&&!nearStreet(q.x,q.z,1))){church=place('temple',2,f,'temple',1.1,{inst:true,cathedral:true});if(!church._graveyard||!churchAccess(church)){unplace(church);church=null;}}
       plazaC=p;
     }
-    s.baechle=true;
-    foundLine='Founded in one stroke by the duke as a free market town: a broad market street where the market is held, crossed by a second road; back streets run parallel, the lots are all of a size, and clear runnels — Bächle — carry water along every street.';
+    foundLine='Founded as a planted market town: a broad market street crossed by a second road, with back streets and plots laid out for settlers.';
   }
   if(!isVil&&!motteAge&&(role==='seat'||role==='fort')&&rr()<0.65){ // Freiburg's Schlossberg: the castle on the hill above the town
     let best=null,bh=hAt(C.x,C.z)+16;
@@ -2959,7 +2976,7 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
       for(let d=1;d<NA/2;d++){const k=(bk-d+NA)%NA;if(!coast[k]||Math.abs(coast[k]-coast[(k+1)%NA])>40)break;run.unshift(k);}
       const q=run.map(k=>{const a=k/NA*Math.PI*2,r=coast[k]-11;return{x:C.x+Math.cos(a)*r,z:C.z+Math.sin(a)*r};})
         .filter(p=>cellOK(p.x,p.z)&&dist2d(p.x,p.z,C.x,C.z)<Rmax*(isVil?0.8:0.6));
-      if(q.length>=3)layQuays(shoreRoadRuns(s,q,4),4);
+      if(q.length>=3)layQuays(shoreRoadRuns(s,q,4,laneHitsBldg),4);
     }
     foundLine=role==='port'?'Began as a landing on the shore, where boats could be drawn up out of the swell.':'Began as a row of fishers’ huts above the shingle.';
   }}
@@ -3002,7 +3019,7 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
     const paths=[],nearQuay=(x,z)=>paths.some(P=>P.some((q,k)=>k&&segDist(x,z,P[k-1],q)<HW*0.9+1)); // runs proposed so far keep their ground as laid streets do
     for(const rs of W.rivStrips)for(const side of[-1,1]){
       let run=[];
-      const take=()=>{if(run.length>=4)paths.push(...shoreRoadRuns(s,run,HW*0.9));run=[];};
+      const take=()=>{if(run.length>=4)paths.push(...shoreRoadRuns(s,run,HW*0.9,laneHitsBldg));run=[];};
       for(let k=0;k<rs.pts.length;k++){
         const a=rs.pts[Math.max(0,k-1)],b=rs.pts[Math.min(rs.pts.length-1,k+1)],L=dist2d(a.x,a.z,b.x,b.z)||1;
         const off=rs.hw[k]+HW+3,x=rs.pts[k].x-(b.z-a.z)/L*off*side,z=rs.pts[k].z+(b.x-a.x)/L*off*side;
@@ -3017,13 +3034,14 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
   }
   if(!foundLine)foundLine=isVil?({farm:'A handful of farms about a green, where the plough-land is good.',timber:'A clearing of woodcutters and charcoal-burners at the forest’s edge.',mining:'Huts of miners under the scarp, where the ore comes near the surface.'}[role]||'A handful of farms about a green.')
     :'Farms and an alehouse about a green where the roads meet; a weekly market was granted in its second age.';}
+  if(!saved&&origin.kind==='roman')foundLine=mode==='roman'?`Founded in Roman times about a forum${s.river?', on the rise above the river':''}. Parts of the ancient street grid survive in the core; medieval lanes and subdivided plots grew around them.`:'An older settlement grew into a town in Roman times. Its main routes survive, with irregular medieval lanes and plots shaped by the ground.';
   const vilName=saved?saved.vilName:oldVil?rpick(NAMEB.pfx).replace(/[aeiou]?$/,'')+rpick(['ingi','ithi','ede','heim','um']):'';
   let focus=saved?saved.focus:null;
   if(!saved){if(oldVil){
     hist(0,`The old village of ${vilName}: farms about a green, with a little church, beside the road.`);
     const oc=aroundPlace('temple',1,0.7,0.62,'temple',{old:true,q:'village'},oldVil);
     oldVil.vil=true;focus=oldVil;
-  }else hist(0,foundLine);}
+  }else if(origin.kind==='roman')s.history.push({ad:origin.foundedAD,ago:W.startAD-origin.foundedAD,t:foundLine});else hist(0,foundLine);}
   const foundTown=()=>{
     if(oldVil)hist(1,foundLine.replace(/^Farms and an alehouse about a green where the roads meet/,'The market town was founded beside the old village, where the roads meet')+
       (oldVil?` The old village kept its own church, outside the town’s bounds.`:''));
@@ -3354,6 +3372,7 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
   };
   if(!saved){for(let e=0;e<E;e++){
     curE=e;
+    if(e===0&&mode==='roman')branch(isCap?8:5,false,Math.max(origin.core.hl,origin.core.hw)); // medieval lanes between the retained ancient routes
     if(e===1&&oldVil){focus=null;foundTown();}
     if(!isVil&&!neuDone&&era>=1150&&e===Math.max(2,E-3)&&(role==='crossing'||isCap&&s.river))neustadt(e);
     const target=Math.round(count*FRAC[e]),maxD=Rmax*(0.2+0.8*Math.pow((e+1)/E,0.8));
@@ -3765,7 +3784,7 @@ function layoutSettlement(s,saved,openingMethods=false){ // saved: a laid-out pl
   if(typeof ABBEY_FOUND_SURVEYS!=='undefined')ABBEY_FOUND_SURVEYS.set(liveOps.compoundSite,{s,layout:s._lay,live:liveOps,placed,segH,fits,makeHash,placedNear:placed.near,placedAdd:placed.add,placedCells:placed.historyCells,placedCell:placed.near.cell,segNear:segH.near,segAdd:segH.add,segCells:segH.historyCells,segCell:segH.near.cell});
   STORAGE_INVESTMENT_SURVEYS.add(liveOps.storageSite);
   // History owns a stable context object; observing it never advances a random stream.
-  const context=saved||{};s._lay.historyState=()=>Object.assign(context,{idx,role,C,count,HW,RHW,era,early,motteAge,E,FRAC,roads,t0x,t0z,rAng,mode,ux,uz,vx,vz,quay,vilName,HOME,TRADES,wallAges,bastioned,
+  const context=saved||{};s._lay.historyState=()=>Object.assign(context,{idx,role,C,count,HW,RHW,era,early,motteAge,origin,E,FRAC,roads,t0x,t0z,rAng,mode,ux,uz,vx,vz,quay,vilName,HOME,TRADES,wallAges,bastioned,
     isCap,isTown,isVil,R0,Rmax,curE,live,foundLine,oldVil,plazaC,church,keep,focus,built,parishes,friaryDone,neuDone});
   s._lay.historyRng=rng;if(!saved){fortPrepare(s);for(const b of churches())churchAccess(b);}
   // A mill stands only where its miller's lane can reach a street: each fitting site, nearest first, is surveyed round its own footprint
@@ -11751,7 +11770,7 @@ function inspectorCard(pk,full=false){
     if(s.quarantineUntil>day())h+=row('Gates','sealed until '+displayDateStr(s.quarantineUntil));
     {const H=portHealthHTML(s);if(H)h+=row('Harbor isolation',H);}
     if(full)h+=detailSettlement(s,name);
-    if(s.history&&s.history.length)h+=`<section class="detail-section" id="detail-history" aria-labelledby="detail-history-title"><h4 class="dhead" id="detail-history-title">History</h4><div class="agline">${s.history.map(x=>(x.yr?`<i>AD ${W.startAD+x.yr-1}:</i> `:x.ago?`<i>c. ${x.ago} years before the annals:</i> `:'')+esc(x.t)).join('<br>')}</div></section>`;
+    if(s.history&&s.history.length)h+=`<section class="detail-section" id="detail-history" aria-labelledby="detail-history-title"><h4 class="dhead" id="detail-history-title">History</h4><div class="agline">${s.history.map(x=>(x.ad!=null?`<i>c. AD ${x.ad}:</i> `:x.yr?`<i>AD ${W.startAD+x.yr-1}:</i> `:x.ago?`<i>c. ${x.ago} years before the annals:</i> `:'')+esc(x.t)).join('<br>')}</div></section>`;
     flyToBtn(fb,'Visit',()=>flyTo(s.pos.x,s.pos.z,s.kind==='capital'?520:340));
     if(sovOn())actsH=settlementActsHTML(s);
   }else if(pk.type==='churchyard'){
@@ -11928,7 +11947,7 @@ function inspectorCard(pk,full=false){
     if(kinds[3])h+=row('Hillside',Math.round(kinds[3]/n*100)+'% rides a falling slope');
     if(s.citadel)h+=row('Citadel','a star fort astride the walls');
     if(s.oldWalls&&s.oldWalls.length)h+=row('Older circuits',s.oldWalls.length+', their lines now streets');
-    const built=(s.history||[]).filter(x=>/wall|palisade/i.test(x.t)).map(x=>(x.yr?'AD '+(W.startAD+x.yr-1):'c. '+x.ago+' yrs before')+': '+x.t);
+    const built=(s.history||[]).filter(x=>/wall|palisade/i.test(x.t)).map(x=>(x.ad!=null?'c. AD '+x.ad:x.yr?'AD '+(W.startAD+x.yr-1):'c. '+x.ago+' yrs before')+': '+x.t);
     if(built.length)h+=`<div class="agline" style="font-size:11.5px">${built.map(esc).join('<br>')}</div>`;
   }else if(pk.type==='dragon'){
     const d=W.dragon;
@@ -18023,7 +18042,7 @@ function doAct(act,p,opt){
         if(rs){W.usedSites.add(rs.n);W.usedNames.add(rs.n);s.name=rs.n;s.cult=rs.c;s.real=true;}
         else{const keys=siteKeys(s,siteFeatures(p.x,p.z)),r=nameRng(day()*7+si);s.name=dau?daughterName(s,fr,keys,r):culturedName(s.cult,keys,r);}
       }
-      layoutSettlement(s);
+      s.origin=settlementOrigin(s,si,AD(),true);layoutSettlement(s);
       const jl=bj>=0&&W.settlements[bj]._lay;if(jl&&jl.joinRoad(W.roads.length-1))syncLive(W.settlements[bj]); // the track enters the old place as a street (none when it stands alone on its land)
       stitchRoads();
       for(const b of s.buildings){b.idx=W.bldList.length;W.bldList.push(b);updateBuildingInstance(b);}
