@@ -11,7 +11,7 @@ Read `docs/ISSUES.md` first. It is the sole current record of unfinished work, n
 - Preserve issue IDs. Distinguish implemented code, verified scenarios and publication; retire completed issues rather than carrying their old pending labels forward. Track unresolved external tasks and user questions on the relevant issue.
 
 ## The game
-- Everything runs from `index.html` (about 2.2 MB, very long lines) plus three textures in `assets/`. No build step, no dependencies; Three.js r128 from cdnjs.
+- The game runs from `index.html` (very long lines) and static files in `assets/`. The optional grown-tree preview uses `assets/woodland-renderer.js` and the finished exports in `assets/woodland/`; no growth engine runs in the game. No application build step or runtime dependencies beyond Three.js r128 from cdnjs. Offline woodland import and optional browser capture tools have their own documented Python dependencies.
 - The simulation runs in a Web Worker that owns the world `W`. The screen's `W` is a disposable projection installed by `installPresentation` from packets built by `workerPresentation`. Anything the renderer reads must be projected; `tools/simulation-projection-drift.test.mjs` guards this. `#foreground=1` runs the same simulation on the main thread (the reference driver the Chrome harnesses use).
 - Speeds: `SPEEDS=[0,0.5,2,8,30,360,1/1800]`; 1 Normal, 4 Fastest (30 days/s), 5 Reel years (360 days/s nominal), 6 Life.
 

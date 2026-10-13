@@ -56,6 +56,10 @@ Keys: `Space` pause, `1`–`5` the speeds above, `L` Life pace.
 - **Map symbols** explains host badges, trade dots, event rings and construction
   marks. Hover a mark for its name and current state, or tap it to open its card.
 - **Plan**, **Save**, **Advisor**, **Help**, and **Petitions** when one waits.
+- **Preview grown trees** switches this realm to a trial woodland palette;
+  **Use original trees** switches it back. Tree positions, clearings and the
+  calendar stay the same. The trial includes oak, birch, fir and larch shapes;
+  their close-up foliage still needs refinement.
 
 ## Taxes and dues
 

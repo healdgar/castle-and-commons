@@ -1,10 +1,77 @@
 # Rendering and woodland review — 13 October 2026
 
-This is the rendering assessment and proposed asset contract. Unfinished work
-is tracked only in [ISSUES.md](ISSUES.md), under #104–106. No game rendering or
-simulation changes were made for this review.
+This records the original rendering assessment, followed by the grown woodland
+integration trial below. Unfinished work is tracked only in [ISSUES.md](ISSUES.md),
+under #104–106. The original review was read-only; the trial changes presentation.
 
-## Evidence
+## Grown woodland integration trial
+
+**Menu → Preview grown trees** selects the seven native Forestmodeler specimens
+in the current realm. **Use original trees** reverses the display immediately.
+The URL's `?woodland=1` selects the trial on opening; the default still uses the
+original palette. Source species are retained in the manifest: these are North
+American genomes, not newly authored medieval European trees. The generator
+and its engine stay in Forestmodeler; only finished meshes, PNGs and provenance
+are imported into `assets/woodland/`.
+
+Native placement, per-tree variation, land clearing and the ground feature mask
+are reused. Display height is normalized to the old tree categories by uniform
+scaling; it is not a biological growth or age claim. Variant selection uses the
+existing coordinate hash, without consuming a simulation RNG. Original and
+grown displays synchronize visibility and instance transforms when switched.
+
+The directional colour/normal/16-bit-depth atlases share three 2048×1024 PNGs.
+Packing copies native pixels verbatim, so a variant does not require another
+far draw call. Far trees use two triangles and spatial instance batches. Near
+and middle pools are capped globally at 256/2,048 trees, with source geometry
+budgets of 500/64 triangles. Screen-size bands blend the representations with
+ordered coverage; camera changes rebucket at most every 150ms and an unchanged
+view does no rebucketing. Clearing invalidates the buckets immediately.
+
+The main light's shadow caster uses a fixed light-facing directional sample and
+the native baked depth, independently of the player's camera and beauty tier.
+Near/middle meshes receive shadows but share that caster. The existing PCF,
+snapped coverage, 1,600m cutoff and night lighting remain; this does not close
+#105. Regrowing saplings also retain the original representation.
+
+The first captures show more silhouette variation and actual winter branches,
+but coarse leaf cards remain plainly angular at extreme close range, especially
+for conifers. The 48px impostors are intended for small screen footprints, not
+close inspection. This is an opt-in visual trial, not accepted final art or a
+hardware performance claim.
+
+The 150-day native comparison preserves complete save bytes, every RNG and
+private stamp at days0/50/100/150, and every byte of 1,812 raw outcome rows
+(seed1001/fate42, AD1066, sea). A 30-day seed2002 inland pair also matches,
+including all 465 rows, with clean money, inventory and fault audits. The paired
+gate uses 501.703 process CPU seconds, load2.01→1.34. All 2,306 full regression
+checks pass in one batch: 3,902.653 CPU seconds, load1.34→1.00. These gate costs
+are verification overhead, not a rendering benchmark. Detailed evidence and
+matched source snapshots are in `/workspace/furlong-woodland-trial/`.
+
+Final WebGL2 and forced-WebGL1 runs each pass 11 views with no page/shader
+errors, intact instance visibility across switching, clearing/restoration, and
+restoration of a tree hidden before loading the preview. The winter shadow map
+retains SHA256 `dffab0dd410657cb30c7b2fd7f2586a4792e8472e58882b3532581f8111a646d`
+across camera bearings0.6/2.1 in both backends. The matched realm view submits
+1,809,759 triangles in79 main-pass draws against the original3,072,113/100.
+Close views can increase draw calls; counts exclude shadow work. No phone,
+Safari or hardware throughput acceptance is claimed. Local browser evidence
+is in `final-desktop/` and `final-webgl1/` under the evidence directory.
+
+To import another complete native export into a fresh destination, run
+`node tools/import-woodland.mjs SOURCE DEST`. The import checks native file
+receipts and tier ceilings. Atlas packing needs Python/Pillow offline; set
+`WOODLAND_PYTHON` to Forestmodeler's `.venv/bin/python` when needed. Runtime and
+normal game serving require no Python, Pillow or Forestmodeler code.
+
+The optional `tools/woodland-play-check.py --out FRESH_DIRECTORY` capture needs
+Python Playwright and Chrome/Chromium. It opens the actual worker build, pauses
+the native realm, clicks the preview control, captures matched summer/winter/map
+views and verifies switching, display clearing and fixed winter shadows. Pass
+`--webgl1` to exercise r128’s fallback without changing the shipped game.
+
+## Original review evidence
 
 Current Furlong source: `075d97e09e3f4f96a9593ab59d1f3ce340d12b6e`;
 HTML SHA256 `c77c0501f0852dd7cf3a80415c034765c8e946b8d7f1efe75f7e47ec285e91c1`.
