@@ -44,7 +44,10 @@ appending. A mismatch requests a fresh `--out` path and preserves the old file.
 New reports record map size; legacy reports without it accept the default map
 only. Matching reports retain all their prior windows and runs. Eleven checks
 cover every mismatch, legacy defaults, malformed evidence and the actual CLI's
-refusal before boot. A single-file startup-snapshot smoke also serializes the guard and the actual day-parts list; snapshot builds read that list through built-in fs instead of the unsupported user-module loader. Two additional native survey regressions compare fresh
+refusal before boot. A single-file startup-snapshot smoke also serializes the
+guard and the actual day-parts list; snapshot builds read that list through
+built-in fs instead of the unsupported user-module loader. Two additional
+native survey regressions compare fresh
 and retained sites, complete graphs/counters, removal and uncertain-dimension
 coercions across rectangles, lots, polygons, empty polygons and graveyards.
 
@@ -61,8 +64,15 @@ digest, world graph, world-only graph, RNG hash and census as a fresh
 AD850/1001:42 coastal run. Its three serial jobs use 164.45 child CPU /
 147.56 wall seconds, load0.40→1.35, peak RSS755868KB; this proves one-day
 continuation, without establishing snapshot throughput or long-term validity.
-Publication checks are running. No simulation code changes are included in
-this tools update. The baseline HTML SHA256 is
+Tools/coverage release [9598442](https://github.com/healdgar/furlong-kingdom-annals/commit/9598442e32f842000d0c55c841298bb4138fac5f) is published to Pages and the container;
+workflow [135](https://github.com/healdgar/furlong-kingdom-annals/actions/runs/38436558919) succeeded. Both linux/amd64 and linux/arm64 contain the
+exact stamped HTML, seven assets and LICENSE. Release HTML SHA256:
+`c77c0501f0852dd7cf3a80415c034765c8e946b8d7f1efe75f7e47ec285e91c1`. The game script is byte-identical to the
+previous release (SHA256 `aba38b0f90ad5842c981858b08c841cbeaa5e982a3cbb5d16c2d88429cd99381`);
+only its visible build stamp changes. A fresh live Pages fetch is still
+blocked by proxy CONNECT HTTP403, and no callable claude.ai artifact publisher
+is available; external target parity remains #84. Documentation receipts retain
+this build. The baseline HTML SHA256 is
 `26916db4b4c65a8efefe29a9c81e1c00821071485a760c79d3897428fb862296`.
 Frozen sources, native bodies, profiles and probe receipts remain outside the
 checkout in `/workspace/furlong-performance-clearance/`. Current status and next
