@@ -1,5 +1,68 @@
 # Simulation performance
 
+## First-castle survey allocation pass, 12 October 2026
+
+The current Roman-origin release's AD1066 coastal profile attributes 30.5% of
+sampled CPU to first-castle decisions. The largest costs are repeated point
+clearance and writing the full-world failure certificate. This pass preserves
+all geometry, financial decisions, retry cadence and recorded certificate inputs.
+
+Native surveys reuse consecutive equal private building/road bucket results,
+including their exact ordered objects, counter increment and object stamps.
+Copied finite bounds avoid allocating a validation array at every probe;
+field permissions and copied building rotations are reused only within the
+synchronous survey. The certificate reader overwrites its owned arrays and
+truncates completed reads, retaining their storage and every original value.
+External buffers, replaced helpers/writers, inherited future stamps and unsafe
+counters retain the documented reference paths. The complete dependency proof
+is in [CASTLE-FOUNDATION-DEPENDENCIES.md](CASTLE-FOUNDATION-DEPENDENCIES.md#native-point-reuse-within-a-survey-12-october-2026).
+
+Fresh serial baseline/candidate native measurements (fate42, default9km):
+
+| Start / world | Days | Baseline tick CPU ms/day | Candidate tick CPU ms/day | Reduction | Baseline / candidate load0 |
+|---|---:|---:|---:|---:|---|
+| AD1066, 1001 sea | 30 | 1364.80 | 1096.57 | 19.7% | 1.24→1.30 / 1.30→1.27 |
+| AD1066, 2002 land | 30 | 1526.39 | 1472.24 | 3.5% | 0.93→1.16 / 1.16→1.24 |
+| AD850, 1001 sea | 150 | 335.43 | 305.07 | 9.0% | 0.06→0.75 / 0.75→0.93 |
+
+These are individual matched windows, not universal speed guarantees. Early
+point-only prototypes gave mixed small changes; only the final source's fresh
+paired measurements above describe this release candidate. Native ticks use an
+in-memory raw journal acknowledgement sink. Compression, IndexedDB, rendering
+and view delivery are excluded; checkpoint audits/encoding are outside the
+tick timer, though their allocations can affect subsequent GC.
+
+A separate matched 30-day coastal profile measures process CPU at
+1430.36→1231.03 ms/day (13.9% less), load0.1→0.5 / 0.4→0.8. Its sampled
+castle attribution falls 318.67→202.94 ms/day (36.3% less); all sampled CPU
+falls 1043.69→861.26 ms/day. Sampling totals, process CPU and nested phase
+elapsed timers are different measurements and are not pooled. Castle work
+still leads the updated hot list, followed by economy and institutional
+foundations. This does not establish browser-worker throughput or the
+century-per-minute goal; #15/#16 remain open for those larger limits.
+
+Complete native save-body bytes, every RNG stream and the private hash counter
+match at days0/50/100/150 in AD850 sea and days0/30 in both AD1066 worlds.
+Every raw outcome byte matches: 1812, 465 and 372 accepted rows respectively.
+Survey reads/misses/hits are identical too; no surveys were deferred or omitted.
+Checkpoint inventory/fault checks pass and cash residuals match the reference,
+with maximum absolute residual 6.56e-10. The combined six-run native gate uses
+362.75 child CPU / 270.15 wall seconds, load0.06→1.27, peak RSS1332476KB.
+
+All 2,286 checks across 217 test files pass in one full batch, including the
+paid first-castle and AD1200 royal-eyre native save/load continuations, the
+current Roman-origin openings, projection checks and the six added survey
+regressions. The batch uses 3727.39 child CPU / 1399.88 wall seconds,
+load0.92→1.11, peak RSS2562324KB. These are test-runner costs, not game
+throughput. Only the visible build stamp changes after these gates.
+
+Baseline HTML SHA256: `8e5dc2c8b74f2bcde120d60c0ad67d161fcc1203febf70663f6ff03a9170b989`.
+Frozen candidate HTML SHA256: `07e5823ccf464751df797ac174a3752eabea0bcaea8e5742318e7307771903a5`.
+Sources, prototypes, native bodies, profiles and timing receipts remain outside
+the checkout in `/workspace/furlong-performance-next/`. Current regression and
+publication status belongs solely in [ISSUES.md](ISSUES.md#performance-saves-and-late-worlds).
+
+
 ## Animation cadence investigation, 12 October 2026
 
 The user identifies people and vehicles as the primary symptom. At paced high

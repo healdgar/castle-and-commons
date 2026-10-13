@@ -34,7 +34,14 @@ const sha=s=>createHash('sha256').update(s).digest('hex').slice(0,16);
 // Reviewed performance pass: radius directions are reused within each ray;
 // fresh surveys omit only reservation polygons wholly outside a conservative
 // operation-local probe envelope. All exact tests and private stamps remain.
-const PINNED={"castleFoundationSite":"4c51b004ab068646","castleFoundationCentersPossible":"97f734a95ed5fce1","castleFoundationSurveyRead":"c84a41a0ff93d4d2","castleFoundationLandOK":"1c1323d61765ed95","castleFoundationGround":"dba79eab8b76f97a","castleFoundationBoxMayHit":"430a45b7b287d2d6","castleFoundationSegmentMayHitBox":"c1ff83639ad0c277","slopeAt":"f04f3db9f54bcfa6","hAt":"f459c5ff2804ca09","riverAt":"c4bda44c2b489b2e","lakeAt":"6a14ce0b475936f4","furlongAt":"aca164d39bde3f54","compoundGround":"800cfe4973552f94","occupiedGroundCells":"eb2ca800f0707890","occupiedGroundFields":"c5efe8ec6f058487","computeFurlongPoly":"605c31b180f2da7f","graveyardPolygonsOverlap":"65258af15a0c47a1","inPoly":"abebffb4a9abafff","inPolyXZ":"641dd4b3ae9a6dad","fortContains":"9f6ca02fc957e17d","fortCircuits":"7eca461ef4c3091c","fortCenter":"70fbd07bf1bf54a1","casRing":"a6921fd1103e167c","wallRadAt":"fbbec3db03bd0ce6","circuitLen":"9deb244c96e6486c","placeFitRadii":"7efd7d2d35c18bdb","placeR":"63335d5f5f19eb27","placeHit":"62746e6b8c8200de","serviceDoor":"edaca1b65a0dd2c9","locW":"833ae0c87356ca4b","obbCorners":"490b7d06b8d4a63f","obbOverlap":"5267c37bd7733324","streetFootprintOverlap":"ba1725bce82e34ce","segDist":"01b34b3baef31aff","segSegDist":"debb34048a0acf69","resample":"a590253bb5bcd7f5","lerpPt":"f218c11d09086fc4","makeHash":"b1d9816147e072f3","helpers":"626d791b92980e90","compoundPolys":"2059f5631f5d5e48","occupiedGroundBoxMayHit":"74c4c88f63dabba5"};
+// Reviewed native point reuse: rights keys are actual field objects; copied bounds
+// and lazily calculated building rotations are fixed for this synchronous survey.
+// Helper replacement/work=false keeps the original calls. Site is repinned;
+// no persistent input certificate, writer category or private hash count changes.
+// Reviewed certificate storage reuse: internally created arrays overwrite through
+// a cursor and truncate only when complete. Read's ordered values/writers stay exact;
+// external buffers or replaced push retain the original clear-and-push path.
+const PINNED={"castleFoundationSite":"556c42f915aec8e8","castleFoundationCentersPossible":"97f734a95ed5fce1","castleFoundationSurveyRead":"8553b1cd6f245360","castleFoundationLandOK":"1c1323d61765ed95","castleFoundationGround":"dba79eab8b76f97a","castleFoundationBoxMayHit":"430a45b7b287d2d6","castleFoundationSegmentMayHitBox":"c1ff83639ad0c277","slopeAt":"f04f3db9f54bcfa6","hAt":"f459c5ff2804ca09","riverAt":"c4bda44c2b489b2e","lakeAt":"6a14ce0b475936f4","furlongAt":"aca164d39bde3f54","compoundGround":"800cfe4973552f94","occupiedGroundCells":"eb2ca800f0707890","occupiedGroundFields":"c5efe8ec6f058487","computeFurlongPoly":"605c31b180f2da7f","graveyardPolygonsOverlap":"65258af15a0c47a1","inPoly":"abebffb4a9abafff","inPolyXZ":"641dd4b3ae9a6dad","fortContains":"9f6ca02fc957e17d","fortCircuits":"7eca461ef4c3091c","fortCenter":"70fbd07bf1bf54a1","casRing":"a6921fd1103e167c","wallRadAt":"fbbec3db03bd0ce6","circuitLen":"9deb244c96e6486c","placeFitRadii":"7efd7d2d35c18bdb","placeR":"63335d5f5f19eb27","placeHit":"62746e6b8c8200de","serviceDoor":"edaca1b65a0dd2c9","locW":"833ae0c87356ca4b","obbCorners":"490b7d06b8d4a63f","obbOverlap":"5267c37bd7733324","streetFootprintOverlap":"ba1725bce82e34ce","segDist":"01b34b3baef31aff","segSegDist":"debb34048a0acf69","resample":"a590253bb5bcd7f5","lerpPt":"f218c11d09086fc4","makeHash":"b1d9816147e072f3","helpers":"626d791b92980e90","compoundPolys":"2059f5631f5d5e48","occupiedGroundBoxMayHit":"74c4c88f63dabba5"};
 test('the certified survey still reads the reviewed native helpers',()=>{
   assert.deepEqual(Object.fromEntries([...READS.map(n=>[n,sha(fn(n))]),['helpers',sha(HELPERS.map(line).join('\n'))]]),PINNED,
     'Survey dependency changed: audit the writer certificate and private hash stamps before repinning.');
@@ -203,4 +210,113 @@ test('fresh survey envelope preserves remote reservations, crossing approaches a
   for(const c of[off,on])run(c,'globalThis.retained=castleFoundationSite(town,spec,fixed);');
   assert.equal(run(on,'JSON.stringify(retained)'),run(off,'JSON.stringify(retained)'));
   assert.equal(run(on,'graph()'),run(off,'graph()'),'retained sites still use all current reservations');
+});
+
+test('native point reuse expires between surveys after terrain, title and rotation edits',()=>{
+  const off=realm(false),on=realm(false);
+  for(const c of[off,on])run(c,'town.buildings=[];');
+  run(off,'CASTLE_FOUNDATION_SURVEYS.work=false;');
+  const equal=label=>{
+    for(const c of[off,on])run(c,'globalThis.fixed=castleFoundationSite(town,spec);');
+    assert.equal(run(on,'JSON.stringify(fixed)'),run(off,'JSON.stringify(fixed)'),label+' exact site');
+    assert.equal(run(on,'graph()'),run(off,'graph()'),label+' full state and private queries');
+  };
+  equal('open land');assert.ok(run(on,'fixed'));
+  for(const c of[off,on])run(c,'globalThis.saved=fixed;W.water.fill(1);');
+  equal('flooded land');assert.equal(run(on,'fixed'),null);
+  for(const c of[off,on])run(c,'W.water.fill(0);W.h.fill(0);');
+  equal('low terrain');assert.equal(run(on,'fixed'),null);
+  for(const c of[off,on])run(c,'W.h.fill(10);W.land.F[0].title={own:{owner:7},work:{owner:-1}};');
+  equal('new holding');assert.equal(run(on,'fixed'),null);
+  for(const c of[off,on])run(c,'W.land.F[0].title.own.owner=-1;town.buildings=[{x:saved.f.x,z:saved.f.z,w:12,d:45,rot:.2,state:"sound"}];');
+  equal('new rotated obstruction');
+  for(const c of[off,on])run(c,'town.buildings[0].rot=1.1;');
+  equal('same-count rotation');
+  for(const c of[off,on])run(c,'globalThis.retained=castleFoundationSite(town,spec,saved);');
+  assert.equal(run(on,'JSON.stringify(retained)'),run(off,'JSON.stringify(retained)'));
+  assert.equal(run(on,'graph()'),run(off,'graph()'),'retained-site current obstruction and query count');
+});
+
+test('replaced terrain and rights readers retain every original point call',()=>{
+  const off=realm(false),on=realm(false);
+  for(const c of[off,on])run(c,`town.buildings=[];
+    let groundCalls=0,rightsCalls=0;const groundOriginal=slopeAt,rightsOriginal=castleFoundationLandOK;
+    slopeAt=(x,z)=>{groundCalls++;return groundOriginal(x,z)};
+    castleFoundationLandOK=(f,s,si)=>{rightsCalls++;return rightsOriginal(f,s,si)};`);
+  run(off,'CASTLE_FOUNDATION_SURVEYS.work=false;');
+  for(const c of[off,on])run(c,'globalThis.fixed=castleFoundationSite(town,spec);');
+  assert.ok(run(on,'fixed'));
+  assert.equal(run(on,'JSON.stringify(fixed)'),run(off,'JSON.stringify(fixed)'));
+  assert.equal(run(on,'graph()'),run(off,'graph()'));
+  assert.ok(run(on,'groundCalls')>100,'the fixture exercises repeated point clearance');
+  assert.equal(run(on,'groundCalls'),run(off,'groundCalls'),'no memoized replaced terrain reads');
+  assert.equal(run(on,'rightsCalls'),run(off,'rightsCalls'),'no memoized replaced title reads');
+});
+
+test('certified scratch bounds retain exact hypot boundaries and uncertain-input fallback',()=>{
+  const c=realm(false),local=fn('castleFoundationSite').match(/  const boxMayHit=[\s\S]*?\n  };/)[0];
+  run(c,`const native=true;${local};globalThis.hit=boxMayHit;`);
+  run(c,`const box={minX:-3,maxX:7,minZ:-5,maxZ:9,finite:true};let comparisons=0;
+    for(const pad of[-2,0,1e-8,1,3,17])for(const x of[-Infinity,NaN,-20,-3,0,7,30])for(const z of[-Infinity,NaN,-30,-5,0,9,40]){
+      if(hit(x,z,box,pad)!==castleFoundationBoxMayHit(x,z,box,pad))throw Error('scratch predicate differs');comparisons++;
+    }
+    for(const pad of[0,1,3,17])for(const a of[0,.01,.3,.8,Math.PI/2])for(const scale of[1-1e-12,1,1+1e-12]){
+      const x=box.maxX+Math.cos(a)*(pad+1e-6)*scale,z=box.maxZ+Math.sin(a)*(pad+1e-6)*scale;
+      if(hit(x,z,box,pad)!==castleFoundationBoxMayHit(x,z,box,pad))throw Error('hypot boundary differs');comparisons++;
+    }`);
+  assert.equal(run(c,'comparisons'),354);
+  run(c,`box.finite=false;let reads=0;Object.defineProperty(box,'minX',{get(){reads++;return -3}});
+    globalThis.answer=hit(20,30,box,1);globalThis.actualReads=reads;reads=0;
+    globalThis.original=castleFoundationBoxMayHit(20,30,box,1);`);
+  assert.equal(run(c,'answer'),run(c,'original'));
+  assert.equal(run(c,'actualReads'),run(c,'reads'),'uncertified bounds retain every original getter read');
+});
+
+test('owned survey buffers retain every certificate value and remove their previous tail',()=>{
+  const c=realm(false);
+  run(c,`const external=[];globalThis.owned=castleFoundationSurveyRead();globalThis.original=castleFoundationSurveyRead(external);
+    globalThis.ownedBySurvey=CASTLE_FOUNDATION_SURVEYS.buffers.has(owned);globalThis.externalOwned=CASTLE_FOUNDATION_SURVEYS.buffers.has(external);`);
+  assert.equal(run(c,'ownedBySurvey'),true);assert.equal(run(c,'externalOwned'),false);
+  assert.equal(run(c,'owned.length===original.length&&owned.every((v,k)=>Object.is(v,original[k]))'),true);
+  const before=run(c,'owned.length');
+  run(c,`town.buildings=[];town.streets=[];W.projects=[];globalThis.reused=castleFoundationSurveyRead(owned);globalThis.fresh=castleFoundationSurveyRead([]);`);
+  assert.equal(run(c,'reused===owned'),true);assert.ok(run(c,'reused.length')<before);
+  assert.equal(run(c,'reused.length===fresh.length&&reused.every((v,k)=>Object.is(v,fresh[k]))'),true,'same shortened certificate with no stale tail');
+  run(c,`town.streets=[{kind:'lane',hw:2,pts:[{x:0,z:-100},{x:0,z:100}]}];town.buildings=Array.from({length:12},(_,k)=>({x:k*20,z:0,w:10,d:15,rot:.3,state:'sound'}));
+    castleFoundationSurveyRead(owned);globalThis.grown=castleFoundationSurveyRead([]);`);
+  assert.equal(run(c,'owned.length===grown.length&&owned.every((v,k)=>Object.is(v,grown[k]))'),true,'same growing certificate, exact value order');
+});
+
+test('external survey buffers and a replaced Array push retain original write semantics',()=>{
+  const c=realm(false);
+  run(c,`globalThis.owned=castleFoundationSurveyRead();const push=Array.prototype.push;let calls=0;
+    Array.prototype.push=function(v){calls++;return push.call(this,v)};
+    castleFoundationSurveyRead(owned);globalThis.ownedCalls=calls;calls=0;
+    globalThis.external=castleFoundationSurveyRead([]);globalThis.externalCalls=calls;Array.prototype.push=push;`);
+  assert.equal(run(c,'owned.length===external.length&&owned.every((v,k)=>Object.is(v,external[k]))'),true);
+  assert.ok(run(c,'ownedCalls')>100,'the full certificate uses the replaced writer');
+  assert.equal(run(c,'ownedCalls'),run(c,'externalCalls'),'owned storage also falls back for a replaced writer');
+});
+
+test('private bucket reuse preserves ordered results, every object stamp and the saved counter',()=>{
+  const local=fn('castleFoundationSite').match(/  const privateNear=[\s\S]*?\n  };/)[0];
+  for(const future of[false,true]){
+    const off=realm(false),on=realm(false);
+    for(const c of[off,on])run(c,`const native=true;${local};const hash=makeHash(24);
+      hash.add({x:0,z:0,id:'a',${future?'__hs:1,':''}},50);hash.add({x:24,z:24,id:'b'},40);hash.add({x:-24,z:0,id:'c'},30);
+      globalThis.query=privateNear(hash,${!future});globalThis.hashGraph=()=>JSON.stringify([...hash.historyCells]);`);
+    run(off,'query=(x,z,r)=>hash.near(x,z,r);');
+    const queries=[[0,0,7],[.5,.5,7],[1,1,7],[2,2,7],[12,0,7],[13,1,7],[-10,-10,7],[-11,-11,7],[0,0,0],[1,1,0],[0,0,70],[1,1,70],[NaN,0,7],[0,0,7]];
+    for(const[x,z,r]of queries){const args=[x,z,r].map(v=>Number.isNaN(v)?'NaN':String(v)).join(',');
+      assert.equal(run(on,`JSON.stringify(query(${args}))`),run(off,`JSON.stringify(query(${args}))`),'same ordered deduplicated results');
+      assert.equal(run(on,'hashGraph()'),run(off,'hashGraph()'),'same actual stamp on every private object');
+      assert.equal(run(on,'HASH_STAMP'),run(off,'HASH_STAMP'),'same saved global query counter');
+    }
+    for(const c of[off,on])run(c,'HASH_STAMP=Number.MAX_SAFE_INTEGER;');
+    for(let k=0;k<3;k++){
+      assert.equal(run(on,'JSON.stringify(query(0,0,7))'),run(off,'JSON.stringify(query(0,0,7))'),'unsafe counter uses native collision behavior');
+      assert.equal(run(on,'hashGraph()'),run(off,'hashGraph()'));
+      assert.equal(run(on,'HASH_STAMP'),run(off,'HASH_STAMP'));
+    }
+  }
 });

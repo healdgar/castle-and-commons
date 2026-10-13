@@ -102,3 +102,98 @@ the same coordinates in the same order; multiplication, interpolation, minimum
 radius and stopping rules remain unchanged. Only Site and Fit source pins are
 renewed after this dependency review. Native history and timing evidence is
 recorded in PERFORMANCE.md when its gates complete.
+
+## Native point reuse within a survey, 12 October 2026
+
+A certified native survey reuses `castleFoundationLandOK` by the actual field
+object, including null/undefined fields. The settlement index and owner are
+fixed for the call; that predicate reads the field's demesne, lord,
+ownership/work title and crofts. These native inputs are unchanged during a
+synchronous survey. The Map is created anew for every operation, including
+retained-site checks. No persistent title invalidation is required. Terrain
+queries retain every original point call; an initial terrain Map prototype
+failed to improve the matched coastal measurement and is not included.
+
+Copied building blockers compute sine/cosine from their copied rotation on
+first use, then reuse those same values. Unvisited blockers do no additional
+trigonometry. The exact `rot||0`, Math functions, point/OBB tests, padding and
+traversal remain unchanged. Native building records are freshly copied on each
+operation and never acquire scratch stamps.
+
+The survey's own copied bounds certify their four finite coordinates once.
+The local point predicate then checks finite query coordinates/padding and
+performs the identical axis rejection and `Math.hypot(dx,dz)<=pad+1e-6` test,
+without allocating the seven-element validation array on every point. Bounds
+are plain scratch records: validation of copied road/frontage coordinates adds
+no reads of their original world endpoints. Polygon bounds and their aggregate
+building boxes are finite by construction. Uncertain inputs and uncertified
+bounds use the original helper, including all its property reads. This does
+not alter the global predicate or broaden its callers' permissions.
+
+Helper replacement or `work=false` retains original rights, bound and
+trigonometric predicates. Native certification moves before index building;
+it has no random, state or hash-query effects. No coordinate, terrain/river/lake
+predicate, public-frontage rule, spatial-hash query, right raster, candidate
+order or stopping rule changes. Logical B/H queries retain their original
+count/order, counter increments and object stamps; consecutive private bucket
+reuse is described below. The
+full-world failed-survey certificate, writer categories and native-helper
+identity list are unchanged. Only Site is repinned; all other pinned reader
+bodies remain exact.
+
+Tests compare fresh/retained native answers and full fixture graphs after
+water, elevation, title and same-count rotation edits, verify all original
+calls for replaced terrain/title readers, and compare the scratch bound test
+with the global predicate at exact hypot boundaries and uncertain inputs.
+Native history and CPU gates are recorded separately in PERFORMANCE.md.
+
+## Owned certificate storage, 12 October 2026
+
+The ordered full-world certificate remains identical. The reader now overwrites
+its own previously created arrays through a cursor and truncates them after a
+complete read, retaining capacity instead of clearing and regrowing it. The
+first and every later certificate records the same values in the same order.
+No field, writer category or equality check is omitted; the token still compares
+length and every value with `Object.is`, and commissioning still clears its
+batch token. Only the two owned work arrays survive between reads, just as before.
+
+A derived WeakSet recognizes arrays created by this reader. External buffers,
+a changed array prototype or a replaced Array push use the original
+clear-and-push path. A failed read returns null without permitting a partial
+certificate into memory; the next complete read overwrites its entire prefix
+and removes any old tail. Cold scratch state starts at null so each alternating
+internal buffer is created/recognized by the reader itself. These buffer
+identities, capacities and the captured push function never enter saved state,
+worker packets, random streams or decisions. Only the Read body pin is renewed
+in addition to Site; all other reader bodies and their dependencies stay exact.
+Tests compare every value using `Object.is` after growth/shrinkage, plus the
+external/replaced-writer fallback and the existing writer invalidation cases.
+
+## Consecutive private bucket reuse, 12 October 2026
+
+`makeHash.near` selects an ordered, deduplicated list solely by its four cell
+bounds. The B/H indexes are privately created and never gain entries after
+survey construction. Consecutive queries with equal cell bounds therefore have
+the same ordered result even when point coordinates or padding differ. Native
+surveys retain only the last result per index and replay its original single
+`HASH_STAMP` increment and each returned object's exact new `__hs` stamp,
+without repeating bucket traversal or allocating another result array.
+Every consumer iterates/tests the result immediately and does not mutate it.
+
+The B cache is disabled if a copied building has a numeric stamp ahead of the
+current counter. Such a stamp could collide with a future first query and
+change the result; the original method preserves that behavior. H entries
+are freshly created without inherited stamps. Unsafe/saturated counters,
+nonfinite queries, replaced Math floor and uncertified helpers use the original
+method. While
+caching is eligible the counter strictly increases, so no past stamp can
+collide with a later query. No world index is memoized: river and land queries
+still run normally and receive exactly the same global counter sequence.
+
+Tests compare ordered lists, every actual private object stamp and the saved
+counter across repeated buckets, changed buckets, negative coordinates,
+nonfinite input, future inherited stamps and saturated counters. The existing
+native-world/retained-site tests still compare the whole graph and counter.
+The Site pin reflects this additional local proof; makeHash and all its other
+callers are unchanged. Native save bytes, every RNG and raw outcome records
+remain a separate release gate.

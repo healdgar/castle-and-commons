@@ -505,7 +505,7 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
 </head>
 <body>
 <div id="gl"></div>
-<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-13 01:48 UTC · after 70478d4</div></div>
+<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-13 04:07 UTC · after 6b59259</div></div>
 
 <div id="hud">
   <button type="button" id="brand" class="hudlink" aria-label="About Castle and Commons" aria-controls="contextpanel">Castle and Commons</button>
@@ -8268,6 +8268,7 @@ function castleFoundationCentersPossible(s,spec){ // necessary first clear() pre
 }
 function castleFoundationSite(s,spec,retained=null){ // fresh operation-local geometry; a retained project is rechecked, never treated as a validity cache
   if(!retained&&!castleFoundationCentersPossible(s,spec))return null;
+  const native=typeof CASTLE_FOUNDATION_SURVEYS!=='undefined'&&CASTLE_FOUNDATION_SURVEYS.work!==false&&typeof CASTLE_FOUNDATION_SURVEY_NATIVE!=='undefined'&&castleFoundationSurveyNative();
   const si=W.settlements.indexOf(s),B=makeHash(24),H=makeHash(24),anchors=[],blockBounds=new WeakMap(),reach=(s.radius||90)+100,near=(x,z,r)=>dist2d(x,z,s.pos.x,s.pos.z)<reach+r+10,circuits=W.settlements.flatMap(t=>fortCircuits(t)).filter(R=>{const C=fortCenter(R);return near(C.x,C.z,R.wallRad?Math.max(...R.wallRad):R.r||0);}),protectedGround=[];
   for(const t of W.settlements){for(const p of t.places||[])if(near(p.x,p.z,Math.max(...p.r)))protectedGround.push({place:p});
     if(t.citadel&&near(t.citadel.x,t.citadel.z,t.citadel.S))protectedGround.push({circle:{x:t.citadel.x,z:t.citadel.z,r:t.citadel.S*0.85}});
@@ -8275,43 +8276,63 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
     if(t.burgRing&&near(t.burgRing.x,t.burgRing.z,t.burgRing.r))protectedGround.push({ring:t.burgRing});
     for(const P of t.relicWalls||[])for(let k=0;k<P.length;k++)if(segDist(s.pos.x,s.pos.z,P[k],P[(k+1)%P.length])<reach+10)protectedGround.push({a:P[k],b:P[(k+1)%P.length]});}
   const projects=(W.projects||[]).filter(q=>!q.dead&&q.site!==retained),projectGround=new Map();
-  const bounds=P=>{if(!P?.length||P.some(q=>!Number.isFinite(q.x)||!Number.isFinite(q.z)))return null;let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;for(const q of P){minX=Math.min(minX,q.x);maxX=Math.max(maxX,q.x);minZ=Math.min(minZ,q.z);maxZ=Math.max(maxZ,q.z);}return{minX,maxX,minZ,maxZ};};
+  const bounds=P=>{if(!P?.length||P.some(q=>!Number.isFinite(q.x)||!Number.isFinite(q.z)))return null;let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;for(const q of P){minX=Math.min(minX,q.x);maxX=Math.max(maxX,q.x);minZ=Math.min(minZ,q.z);maxZ=Math.max(maxZ,q.z);}const box={minX,maxX,minZ,maxZ};if(native)box.finite=true;return box;};
   const reservedPolys=q=>{ // immutable during this synchronous survey; no cross-operation geometry permission
     if(CASTLE_FOUNDATION_SURVEYS.work===false)return compoundGround(q.site).polys.map(P=>({P,box:null}));
     let parts=projectGround.get(q);if(!parts){parts=compoundPolys(q.site).map(P=>({P,box:bounds(P)}));projectGround.set(q,parts);}return parts;
   };
   // Only these projects have a point-clearance predicate; road and lane reservations stay in H.
   let clearProjects=projects.filter(q=>q.type==='castle'&&q.site||(q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')&&q.site||q.type==='storage'||q.type==='clear'||q.type==='plan'&&(q.kind==='square'||q.kind==='wall'));
+  let safeBlocks=true;
   const addBlock=b=>{const r=Math.max(Math.hypot(b.w||0,b.d||0)/2,...[b.poly,b.lot].flatMap(p=>p?.map(q=>dist2d(b.x,b.z,q.x,q.z))||[]));
-    if(dist2d(b.x,b.z,s.pos.x,s.pos.z)>reach+r)return;const copy={...b},polys=[bounds(b.poly),bounds(b.lot)],parts=[bounds(obbCorners(b.x,b.z,b.w||0,b.d||0,b.rot||0)),...polys].filter(Boolean),box=parts.length?{minX:Math.min(...parts.map(q=>q.minX)),maxX:Math.max(...parts.map(q=>q.maxX)),minZ:Math.min(...parts.map(q=>q.minZ)),maxZ:Math.max(...parts.map(q=>q.maxZ))}:null;blockBounds.set(copy,{box,polys});B.add(copy,r+3);};
-  const addLine=(a,b,hw,st,pending=false)=>{if(segDist(s.pos.x,s.pos.z,a,b)>reach+hw)return;H.add({a,b,hw,st,pending,x:(a.x+b.x)/2,z:(a.z+b.z)/2,minX:Math.min(a.x,b.x),maxX:Math.max(a.x,b.x),minZ:Math.min(a.z,b.z),maxZ:Math.max(a.z,b.z)},dist2d(a.x,a.z,b.x,b.z)/2+hw+3);};
+    if(dist2d(b.x,b.z,s.pos.x,s.pos.z)>reach+r)return;const copy={...b},polys=[bounds(b.poly),bounds(b.lot)],parts=[bounds(obbCorners(b.x,b.z,b.w||0,b.d||0,b.rot||0)),...polys].filter(Boolean),box=parts.length?{minX:Math.min(...parts.map(q=>q.minX)),maxX:Math.max(...parts.map(q=>q.maxX)),minZ:Math.min(...parts.map(q=>q.minZ)),maxZ:Math.max(...parts.map(q=>q.maxZ))}:null;if(native&&box)box.finite=true;blockBounds.set(copy,{box,polys,c:null,sn:null});if(typeof copy.__hs==='number'&&copy.__hs>HASH_STAMP)safeBlocks=false;B.add(copy,r+3);};
+  const certifyBox=box=>{if(native)box.finite=[box.minX,box.maxX,box.minZ,box.maxZ].every(Number.isFinite);return box;};
+  const addLine=(a,b,hw,st,pending=false)=>{if(segDist(s.pos.x,s.pos.z,a,b)>reach+hw)return;H.add(certifyBox({a,b,hw,st,pending,x:(a.x+b.x)/2,z:(a.z+b.z)/2,minX:Math.min(a.x,b.x),maxX:Math.max(a.x,b.x),minZ:Math.min(a.z,b.z),maxZ:Math.max(a.z,b.z)}),dist2d(a.x,a.z,b.x,b.z)/2+hw+3);};
   for(const t of W.settlements){for(const b of t.buildings||[])if(!b.removed&&b.state!=='gone'){addBlock(b);if(b._graveyard&&!b._graveyard.removed)addBlock(b._graveyard);}
     for(const st of t.streets||[])if(!st.gone&&st.kind!=='edge')for(let k=1;k<st.pts.length;k++){const a=st.pts[k-1],b=st.pts[k];addLine(a,b,st.hw||2,st);
-      if(t===s&&!st.hidden&&!st.compoundPrivate&&!st.planQ&&!st.castlePath&&(st.kind!=='quay'||st.serviceLinked)&&dist2d(a.x,a.z,b.x,b.z)>1)anchors.push({a,b,st,hw:st.hw||2,minX:Math.min(a.x,b.x),maxX:Math.max(a.x,b.x),minZ:Math.min(a.z,b.z),maxZ:Math.max(a.z,b.z)});}}
+      if(t===s&&!st.hidden&&!st.compoundPrivate&&!st.planQ&&!st.castlePath&&(st.kind!=='quay'||st.serviceLinked)&&dist2d(a.x,a.z,b.x,b.z)>1)anchors.push(certifyBox({a,b,st,hw:st.hw||2,minX:Math.min(a.x,b.x),maxX:Math.max(a.x,b.x),minZ:Math.min(a.z,b.z),maxZ:Math.max(a.z,b.z)}));}}
   for(const r of W.roads||[]){const P=r.open||r.path||[];for(let k=1;k<P.length;k++)addLine(P[k-1],P[k],4,null);}
   for(const key of W.trackSet||[]){const e=W.tg.E.get(key);if(e)addLine(W.tg.pts[e.a],W.tg.pts[e.b],1.8,null);}
   for(const q of projects){if(q.type==='road'){const P=q.P?.path||[];for(let k=1;k<P.length;k++)addLine(P[k-1],P[k],4,null,true);}
     if(q.type==='plan')for(const st of q.kind==='quarter'?q.sts||[]:q.kind==='street'?[q.st]:[])if(st)for(let k=1;k<st.pts.length;k++)addLine(st.pts[k-1],st.pts[k],st.hw||2,null,true);}
   // Every fresh probe lies in this deliberately wide envelope of the candidate centres,
   // radial yards and door-to-frontage connectors. Keep uncertain and retained sites unfiltered.
-  const native=typeof CASTLE_FOUNDATION_SURVEYS!=='undefined'&&CASTLE_FOUNDATION_SURVEYS.work!==false&&typeof CASTLE_FOUNDATION_SURVEY_NATIVE!=='undefined'&&castleFoundationSurveyNative(),span=Math.max(0,...anchors.map(g=>Math.abs(g.hw))),extent=reach+6*(Math.hypot(spec.w,spec.d)/2+13)+span+128;
+  const span=Math.max(0,...anchors.map(g=>Math.abs(g.hw))),extent=reach+6*(Math.hypot(spec.w,spec.d)/2+13)+span+128;
   if(!retained&&native&&[s.pos.x,s.pos.z,spec.w,spec.d,reach,span,extent].every(v=>Number.isFinite(v)&&Math.abs(v)<=1048576)&&spec.w>0&&spec.d>0&&reach>0){
     const x0=s.pos.x-extent,x1=s.pos.x+extent,z0=s.pos.z-extent,z1=s.pos.z+extent;
     clearProjects=clearProjects.filter(q=>{if(!(q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')||!q.site)return true;
       const parts=reservedPolys(q).filter(({box})=>!box||!(box.maxX<x0||box.minX>x1||box.maxZ<z0||box.minZ>z1));projectGround.set(q,parts);return parts.length>0;});
   }
-  const publicAt=(x,z)=>anchors.some(g=>castleFoundationBoxMayHit(x,z,g,g.hw+0.2)&&segDist(x,z,g.a,g.b)<g.hw+0.2);
+  const privateNear=(hash,eligible=true)=>{ // consecutive probes often visit the same immutable scratch buckets
+    let last=null;const active=native&&eligible&&Math.floor===CASTLE_FOUNDATION_SURVEYS.floor,cs=active?hash.near.cell:null;
+    return(x,z,r)=>{
+      if(!active||!Number.isSafeInteger(HASH_STAMP)||HASH_STAMP>=Number.MAX_SAFE_INTEGER||!Number.isFinite(x)||!Number.isFinite(z)||!Number.isFinite(r))return hash.near(x,z,r);
+      const i0=Math.floor((x-r)/cs),i1=Math.floor((x+r)/cs),j0=Math.floor((z-r)/cs),j1=Math.floor((z+r)/cs);
+      if(last&&last.i0===i0&&last.i1===i1&&last.j0===j0&&last.j1===j1){const stamp=++HASH_STAMP;for(const o of last.out)o.__hs=stamp;return last.out;}
+      const out=hash.near(x,z,r);last={i0,i1,j0,j1,out};return out;
+    };
+  };
+  const nearB=privateNear(B,safeBlocks),nearH=privateNear(H);
+  const boxMayHit=(x,z,box,pad=0)=>{ // these finite bounds are our own scratch records, never a world object's readers
+    if(!native||!box?.finite||!Number.isFinite(x)||!Number.isFinite(z)||!Number.isFinite(pad))return castleFoundationBoxMayHit(x,z,box,pad);
+    const dx=Math.max(box.minX-x,0,x-box.maxX),dz=Math.max(box.minZ-z,0,z-box.maxZ),limit=pad+1e-6;
+    if(dx>limit||dz>limit)return false;return Math.hypot(dx,dz)<=limit;
+  };
+  const publicAt=(x,z)=>anchors.some(g=>boxMayHit(x,z,g,g.hw+0.2)&&segDist(x,z,g.a,g.b)<g.hw+0.2);
+  // Field rights and copied bounds stay fixed during this synchronous survey; no result survives it.
+  const landChecks=new Map(),landOK=f=>{if(!native)return castleFoundationLandOK(f,s,si);const old=landChecks.get(f);if(old!==undefined)return old;
+    const ok=castleFoundationLandOK(f,s,si);landChecks.set(f,ok);return ok;};
   const clear=(x,z,pad=0,access=false)=>{
     if(!planCellOK(x,z)||riverAt(x,z,1)||lakeAt(s,x,z,2))return false;
     const onPublic=access&&publicAt(x,z),f=W.land&&furlongAt(x,z);
-    if(!onPublic&&!castleFoundationLandOK(f,s,si))return false;
-    for(const b of B.near(x,z,pad+2)){const meta=blockBounds.get(b);for(let k=0;k<2;k++){const poly=k?b.lot:b.poly,box=meta?.polys[k];if(poly?.length&&castleFoundationBoxMayHit(x,z,box,pad)&&(inPoly(poly,x,z)||poly.some((q,j)=>segDist(x,z,q,poly[(j+1)%poly.length])<pad)))return false;}
-      const dx=x-b.x,dz=z-b.z,c=Math.cos(b.rot||0),sn=Math.sin(b.rot||0);if(!b.poly&&castleFoundationBoxMayHit(x,z,meta?.box,Math.SQRT2*pad)&&Math.abs(dx*c-dz*sn)<(b.w||0)/2+pad&&Math.abs(dx*sn+dz*c)<(b.d||0)/2+pad)return false;}
-    if(H.near(x,z,pad+8).some(g=>(!access||g.pending)&&castleFoundationBoxMayHit(x,z,g,g.hw+pad)&&segDist(x,z,g.a,g.b)<g.hw+pad))return false;
+    if(!onPublic&&!landOK(f))return false;
+    for(const b of nearB(x,z,pad+2)){const meta=blockBounds.get(b);for(let k=0;k<2;k++){const poly=k?b.lot:b.poly,box=meta?.polys[k];if(poly?.length&&boxMayHit(x,z,box,pad)&&(inPoly(poly,x,z)||poly.some((q,j)=>segDist(x,z,q,poly[(j+1)%poly.length])<pad)))return false;}
+      if(native&&meta&&meta.c===null){meta.c=Math.cos(b.rot||0);meta.sn=Math.sin(b.rot||0);}const dx=x-b.x,dz=z-b.z,c=native&&meta?meta.c:Math.cos(b.rot||0),sn=native&&meta?meta.sn:Math.sin(b.rot||0);if(!b.poly&&boxMayHit(x,z,meta?.box,Math.SQRT2*pad)&&Math.abs(dx*c-dz*sn)<(b.w||0)/2+pad&&Math.abs(dx*sn+dz*c)<(b.d||0)/2+pad)return false;}
+    if(nearH(x,z,pad+8).some(g=>(!access||g.pending)&&boxMayHit(x,z,g,g.hw+pad)&&segDist(x,z,g.a,g.b)<g.hw+pad))return false;
     for(const p of protectedGround){if(p.place&&placeHit(p.place,x,z,pad+1)||p.circle&&dist2d(x,z,p.circle.x,p.circle.z)<p.circle.r+pad+1||p.ring&&Math.abs(dist2d(x,z,p.ring.x,p.ring.z)-p.ring.r)<pad+3.5||p.a&&segDist(x,z,p.a,p.b)<pad+3.5)return false;}
     for(const R of circuits){const C=fortCenter(R),d=dist2d(x,z,C.x,C.z),r=wallRadAt(R,Math.atan2(z-C.z,x-C.x));if(Math.abs(d-r)<pad+7)return false;}
     for(const q of clearProjects){if(q.type==='castle'&&q.site){if(dist2d(x,z,q.site.ward.x,q.site.ward.z)<q.site.ward.r+pad+2)return false;for(let k=1;k<q.site.path.length;k++)if(segDist(x,z,q.site.path[k-1],q.site.path[k])<pad+2)return false;}
-      if((q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')&&q.site){if(reservedPolys(q).some(({P,box})=>castleFoundationBoxMayHit(x,z,box,pad+2)&&(inPoly(P,x,z)||P.some((p,k)=>segDist(x,z,p,P[(k+1)%P.length])<pad+2))))return false;}
+      if((q.type==='compound'||q.type==='fabric'||q.type==='plan'&&q.kind==='citadel')&&q.site){if(reservedPolys(q).some(({P,box})=>boxMayHit(x,z,box,pad+2)&&(inPoly(P,x,z)||P.some((p,k)=>segDist(x,z,p,P[(k+1)%P.length])<pad+2))))return false;}
       if(q.type==='storage'&&dist2d(x,z,q.x,q.z)<Math.hypot(...ARCH[q.arch].slice(0,2))/2+pad+2)return false;
       if(q.type==='clear'&&dist2d(x,z,q.x,q.z)<q.r+pad+2)return false;
       if(q.type==='plan'){if(q.kind==='square'&&placeHit(q.place,x,z,pad+1))return false;
@@ -8330,9 +8351,9 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
     for(let x=R.x-R.r;x<=R.x+R.r;x+=1.5)for(let z=R.z-R.r;z<=R.z+R.r;z+=1.5)if(fortContains(R,x,z)&&!clear(x,z,1.3))return false;
     for(let k=0;k<R.wallRad.length;k++){const a=k/R.wallRad.length*Math.PI*2,r=R.wallRad[k];if(r<Math.hypot(F.w,F.d)/2+13||!clear(R.x+Math.cos(a)*r,R.z+Math.sin(a)*r,1.3))return false;}
     for(const p of obbCorners(F.x,F.z,F.w,F.d,F.rot))if(!clear(p.x,p.z,1.3))return false;
-    for(const b of B.near(F.x,F.z,Math.hypot(F.w,F.d)/2+3))if(obbOverlap({...F,w:F.w+2.6,d:F.d+2.6},b))return false;
+    for(const b of nearB(F.x,F.z,Math.hypot(F.w,F.d)/2+3))if(obbOverlap({...F,w:F.w+2.6,d:F.d+2.6},b))return false;
     const samples=resample(P,1,true);for(let k=0;k<samples.length;k++){const p=samples[k];if(!clear(p.x,p.z,1.4,true)||k&&Math.abs(hAt(p.x,p.z)-hAt(samples[k-1].x,samples[k-1].z))>dist2d(p.x,p.z,samples[k-1].x,samples[k-1].z)*0.35)return false;}
-    for(let k=1;k<P.length;k++){const g={a:P[k-1],b:P[k],hw:1.3};for(const b of B.near((g.a.x+g.b.x)/2,(g.a.z+g.b.z)/2,dist2d(g.a.x,g.a.z,g.b.x,g.b.z)/2+3)){const box=blockBounds.get(b)?.box;if(box&&!castleFoundationSegmentMayHitBox(g.a,g.b,box,g.hw+0.3))continue;if(streetFootprintOverlap(b,g,0.3))return false;}}
+    for(let k=1;k<P.length;k++){const g={a:P[k-1],b:P[k],hw:1.3};for(const b of nearB((g.a.x+g.b.x)/2,(g.a.z+g.b.z)/2,dist2d(g.a.x,g.a.z,g.b.x,g.b.z)/2+3)){const box=blockBounds.get(b)?.box;if(box&&!castleFoundationSegmentMayHitBox(g.a,g.b,box,g.hw+0.3))continue;if(streetFootprintOverlap(b,g,0.3))return false;}}
     return true;
   };
   if(retained)return check(retained)?retained:null;
@@ -8355,7 +8376,9 @@ function castleFoundationSite(s,spec,retained=null){ // fresh operation-local ge
 // guards stay outside this memory; successful or retained project sites are always surveyed.
 function castleFoundationSurveyNative(){const N=CASTLE_FOUNDATION_SURVEY_NATIVE,C=CASTLE_FOUNDATION_SURVEY_CURRENT();return Object.entries(N).every(([k,f])=>C[k]===f);}
 function castleFoundationSurveyRead(buffer=null){ // exact writer certificate, not a count/version/hash; see docs/CASTLE-FOUNDATION-DEPENDENCIES.md
-  const V=buffer||[];V.length=0;const value=v=>V.push(v),list=A=>{value(A?.length??-1);if(A)for(const x of A)value(x);},point=p=>{value(p?.x);value(p?.z);},poly=P=>{value(P?.length??-1);if(P)for(const p of P)point(p);},polys=A=>{value(A?.length??-1);if(A)for(const P of A)poly(P);},box=f=>{point(f);value(f?.w);value(f?.d);value(f?.rot);},ring=R=>{point(R);point(R?.pos);list(R?.wallRad);value(R?.r);value(R?.wallR);value(R?.summitR);value(R?.coreR);},site=S=>{value(!!S);if(!S)return;box(S.f);ring(S.ring);polys(S.polys);poly(S.poly);poly(S.yard?.poly);polys(S.paths);poly(S.path);value(S.pathWidth);},building=b=>{ // near() stamps only private copies; an inherited stamp ahead of the counter is not certified
+  const V=buffer||[],M=CASTLE_FOUNDATION_SURVEYS;
+  if(!buffer)M.buffers.add(V);const reuse=M.buffers.has(V)&&Object.getPrototypeOf(V)===Array.prototype&&Array.prototype.push===M.push;
+  if(!reuse)V.length=0;let written=0;const value=reuse?v=>{V[written++]=v}:v=>V.push(v),list=A=>{value(A?.length??-1);if(A)for(const x of A)value(x);},point=p=>{value(p?.x);value(p?.z);},poly=P=>{value(P?.length??-1);if(P)for(const p of P)point(p);},polys=A=>{value(A?.length??-1);if(A)for(const P of A)poly(P);},box=f=>{point(f);value(f?.w);value(f?.d);value(f?.rot);},ring=R=>{point(R);point(R?.pos);list(R?.wallRad);value(R?.r);value(R?.wallR);value(R?.summitR);value(R?.coreR);},site=S=>{value(!!S);if(!S)return;box(S.f);ring(S.ring);polys(S.polys);poly(S.poly);poly(S.yard?.poly);polys(S.paths);poly(S.path);value(S.pathWidth);},building=b=>{ // near() stamps only private copies; an inherited stamp ahead of the counter is not certified
     if(typeof b.__hs==='number'&&b.__hs>HASH_STAMP)return false;
     box(b);poly(b.poly);poly(b.lot);return true;};
   value(SIZE);value(GRID);value(CELL);value(FN);value(FG);value(PLN);list(W.h);list(W.water);
@@ -8380,12 +8403,12 @@ function castleFoundationSurveyRead(buffer=null){ // exact writer certificate, n
     if(q.type==='storage'){point(q);value(q.arch);list(ARCH[q.arch]?.slice(0,2));}if(q.type==='clear'){point(q);value(q.r);}
     if(q.type==='plan'){if(q.kind==='square'){point(q.place);list(q.place.r);}if(q.kind==='wall')list(q.rad);
       const A=q.kind==='quarter'?q.sts||[]:q.kind==='street'&&q.st?[q.st]:[];value(A.length);for(const st of A){poly(st.pts);value(st.hw||2);}}}
-  return V;
+  if(reuse)V.length=written;return V;
 }
 function castleFoundationSurveyToken(batch){ // one read per operation-local batch; commissioning invalidates that batch before another decision
   const M=CASTLE_FOUNDATION_SURVEYS;if(batch?.world===W&&batch.token)return batch.token;
   const read=castleFoundationSurveyRead(M.scratch);if(!read)return null;M.reads++;
-  if(M.world!==W||!M.read||read.length!==M.read.length||read.some((v,k)=>!Object.is(v,M.read[k]))){M.world=W;M.scratch=M.read||[];M.read=read;M.token={};}
+  if(M.world!==W||!M.read||read.length!==M.read.length||read.some((v,k)=>!Object.is(v,M.read[k]))){M.world=W;M.scratch=M.read||null;M.read=read;M.token={};}else M.scratch=read;
   if(batch?.world===W)batch.token=M.token;return M.token;
 }
 function castleFoundationFailedSite(s,spec,batch=null){
@@ -8520,7 +8543,7 @@ function drawCourt(b,put){
 const planCellOK=(x,z)=>{const ci=toCell(x),cj=toCell(z);if(!inB(ci,cj))return false;const i=cIdx(ci,cj);return !W.water[i]&&slopeAt(ci,cj)<0.35&&W.h[i]>1;}; // the same test the town's own builders use
 const CASTLE_FOUNDATION_SURVEY_CURRENT=()=>({castleFoundationSite,castleFoundationCentersPossible,castleFoundationSurveyRead,castleFoundationLandOK,castleFoundationGround,castleFoundationBoxMayHit,castleFoundationSegmentMayHitBox,planCellOK,slopeAt,hAt,riverAt,lakeAt,furlongAt,compoundPolys,compoundGround,occupiedGroundBoxMayHit,occupiedGroundCells,occupiedGroundFields,computeFurlongPoly,graveyardPolygonsOverlap,inPoly,inPolyXZ,fortContains,fortCircuits,fortCenter,casRing,wallRadAt,circuitLen,placeFitRadii,placeR,placeHit,serviceDoor,locW,obbCorners,obbOverlap,streetFootprintOverlap,dist2d,segDist,segSegDist,resample,lerpPt,lerp,clamp,toCell,cIdx,inB,cellX,cellZ,makeHash});
 const CASTLE_FOUNDATION_SURVEY_NATIVE=Object.freeze(CASTLE_FOUNDATION_SURVEY_CURRENT());
-const CASTLE_FOUNDATION_SURVEYS={on:true,verify:false,work:true,memory:new WeakMap(),world:null,read:null,scratch:[],token:null,hits:0,misses:0,reads:0}; // derived only; exact null answers plus private hash-query count, never saved
+const CASTLE_FOUNDATION_SURVEYS={on:true,verify:false,work:true,memory:new WeakMap(),buffers:new WeakSet(),push:Array.prototype.push,floor:Math.floor,world:null,read:null,scratch:null,token:null,hits:0,misses:0,reads:0}; // derived only; exact null answers plus private hash-query count, never saved
 const PLAN_YP=25; // years' purchase of a house's rent
 let planUI=null;
 const PLANB={street:{c:0xe0c070,loop:false,n:'Street'},square:{c:0x9ad0e0,loop:true,n:'Square'},wall:{c:0xd08a6a,loop:true,n:'Wall'},stopup:{c:0xb0a8a0,loop:false,n:'Stop up a street'},raze:{c:0xc07060,loop:false,n:'Pull down'}}; // (the old 'new quarter' grid is retired: streets are drawn one by one)
