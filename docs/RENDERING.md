@@ -59,6 +59,11 @@ Close views can increase draw calls; counts exclude shadow work. No phone,
 Safari or hardware throughput acceptance is claimed. Local browser evidence
 is in `final-desktop/` and `final-webgl1/` under the evidence directory.
 
+The game trial is pushed to `main` in [a90fa06](https://github.com/healdgar/castle-and-commons/commit/a90fa06e820af763e109253910271fec69fecaec).
+That push triggers Pages/container publication. This cloud session’s HTTP proxy
+rejects the Actions API and Pages host, so no live deployment or container
+receipt is claimed here; external parity remains #84.
+
 To import another complete native export into a fresh destination, run
 `node tools/import-woodland.mjs SOURCE DEST`. The import checks native file
 receipts and tier ceilings. Atlas packing needs Python/Pillow offline; set
