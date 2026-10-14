@@ -197,7 +197,11 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // authority/reserves/fabric consumers, pure private-purpose housing predicates,
  // guarded reservation bounds and completion-only connection metadata. Existing
  // cash/goods/title writers remain native; source-specific gates are separate.
- assert.equal(digest(source.slice(a,b)),"002b36e7973b16f37a9f7d3438caeeda5d186809361a018b4181210ee9f9dff1");
+ // Pure UI quotes (#27): storageRoute skips writing s._storageRouteSignature and
+ // s._storageGraph when QUERY_LAND_VALUES is active or the settlement is frozen,
+ // caching on the local batch C when provided. Simulation routing, quantity,
+ // title, claim and payment writers are unchanged.
+ assert.equal(digest(source.slice(a,b)),"bd9e0a41a1118ac017811127174cc37509044ac3de2a5263b10612fb263a4096");
  // This explicit worker inspector copies existing balances. Pin the entire line
  // before excluding it so a future mutation cannot hide behind the read exemption.
  const inspectorLine=source.split('\n').find(l=>l.trim().startsWith("if(kind==='household'){const h=W.households.get(payload.id);"));
