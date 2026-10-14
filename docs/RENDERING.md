@@ -150,6 +150,73 @@ Close detail remains limited by the baked resolution; mobile/hardware art and
 throughput acceptance are open under #104. Regrowing saplings retain the original
 representation. The assets remain correctly labelled North American genomes.
 
+## Broadleaf depth textures and seasonal leaf clusters
+
+Oak and birch now use the same exterior perspective colour/normal/depth method
+as the conifers. Each enclosure comes from its own grown directional surfaces,
+so broadleaf crowns retain their rounded, irregular shape. The near/middle
+renderer uses solid native wood plus 36/12-triangle volumes; it does not load or
+draw the old broadleaf cross-card foliage. All seven directional bakes use 124px
+views. Regrowing saplings retain the original game representation.
+
+The broadleaf palette retains its established brightness in both near and far
+views; the conifer colour treatment is retained.
+
+The three broadleaf growth fingerprints and original native near/middle meshes
+are byte-identical to the previous exports. Forestmodeler's existing independent
+compiler generates their companion volumes without changing its growth engine
+or importing game code. Native exports and receipts remain in the asset folders.
+The packed textures omit only unused rows after the six padded directional-view
+rows; every populated colour/normal/depth pixel is copied exactly. Three
+2048×3072 RGBA atlases use 72 MiB uncompressed (previous mixed-resolution set 60 MiB;
+whole large source banks would use 96 MiB). No hardware speed improvement is claimed.
+
+Seasons select opaque leaf clusters through a smooth spatial field tied to each
+tree's local surface and placement. Budding reveals clusters; autumn removes them
+and exposes the actual dormant branch projection on the same ray. The shader
+selects a seasonal surface instead of averaging leafy and bare depths. Solid
+wood persists. The light-facing shadow caster uses the same cluster rule.
+Fir retains foliage and its green palette; deciduous larch sheds with oak/birch.
+Camera-distance tier blending remains the existing ordered coverage transition.
+
+The previous shadow equality receipt was invalid: its
+`dffab0dd…` hash is an entirely white 2048² map. Three.js r128 overwrites a custom
+depth material's side with the beauty material's `shadowSide`. Its default PCF
+back-face choice culled the light-facing tree cards. Setting `shadowSide` on the
+beauty material repairs the caster. The browser check now isolates woodland,
+requires nonempty depth pixels, compares camera bearings and requires additional
+shadow coverage from partial foliage. The older equality claims above are
+superseded by this check, not proof of functioning shadows.
+
+Both WebGL2 and forced WebGL1 pass eight final views covering broadleaf and
+conifer crowns, three spring stages, autumn and winter, with no GL/page errors.
+Woodland-only shadow maps match exactly across camera bearings and backends:
+winter 136,601 occupied pixels (`cf2bcc4e…`), partial spring 289,733
+(`7e26835a…`). All 57,320 instance transforms/visibility survive switching and
+clearing/restoration. Opaque-frame loading uses no fetch calls. The earlier 31-view
+run also covers every individual in summer/winter; its empty shadow receipt is
+superseded. Extreme close detail and mobile/hardware performance remain open.
+
+The native 150-day coastal seed 1001/fate 42 and 30-day inland seed 2002 comparisons
+preserve every save byte, RNG stream, private stamp and raw outcome against the
+previous published game program, with clean cash/inventory/fault checks. The
+reference build is byte-identical to the previously executed baseline. These
+candidate runs use 254.111 process CPU seconds (coastal load 4.00→1.31, inland
+1.31→1.87). The subsequent caster fix only changes the embedded renderer; the
+verified game program remains byte-identical. The full regression gate passes all
+2,311 tests with zero failures (4,023.730 process CPU seconds, load 2.85→1.06).
+The stamped page also starts under `/castle-and-commons/?woodland=1` with
+57,320 grown-tree instances, linked shaders and no GL/page errors while separate
+woodland requests are blocked. All eleven final source/bundle checks pass. The
+cloud proxy still rejects the public Pages connection with HTTP 403; live target
+verification remains #84.
+
+A native person-card link also reproduces and verifies the town navigation fix:
+four half-second refreshes share one pending request, Rougecastel opens, and
+Back/accounts navigation succeeds. All 30 focused navigation tests pass, including
+slow replies and reopening the same place from another panel. Evidence is in
+`/workspace/furlong-canopy-cards/`; remaining work is only in #104–107.
+
 ## Original review evidence
 
 Current Furlong source: `075d97e09e3f4f96a9593ab59d1f3ce340d12b6e`;

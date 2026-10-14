@@ -27,7 +27,7 @@ for(const row of library.plants){
   if(JSON.stringify(t.rect)!==JSON.stringify(expected)||t.season!==(i<24?'leafy':'dormant')||Math.abs(t.azimuth-(i%8)*Math.PI/4)>1e-8||Math.abs(t.elevation-(Math.floor(i/8)%3)*35*Math.PI/180)>1e-8)throw Error('Unexpected atlas ordering');});
  const lods=m.lods.map((lod,i)=>{const mesh=read(path.join(dir,lod.file));if(mesh.triangles>lod.budget||mesh.triangles>(i?64:500))throw Error('Mesh exceeds game budget');return{file:lod.file,texture:mesh.foliageTexture,triangles:mesh.triangles};});
  const [role,height]=roles[row.key],scale=height/a.bounds[1][1];
- const representation=role==='pine'&&m.volume&&a.tileSize>=96?'volume':'mesh';
+ const representation=m.volume&&a.tileSize>=96?'volume':'mesh';
  if(m.volume)for(const [file,limit]of [[m.volume.file,36],[m.volume.middleFile,12]]){const v=read(path.join(dir,file));if(v.triangles>limit||v.indices.length/3!==v.triangles||!v.positions.flat().every(Number.isFinite))throw Error('Invalid woodland volume');}
  plants.push({id:row.id,role,representation,species:m.species,seed:m.seed,sourceFingerprint:m.sourceFingerprint,scale,season:m.dormantFoliage/m.peakFoliage,
   wood:m.materials.wood.colour,lods,...(m.volume?{volume:m.volume.file,middleVolume:m.volume.middleFile,...(m.volume.middleWoodFile?{middleWood:m.volume.middleWoodFile}:{})}:{}),atlas:{centre:a.centre,radius:a.radius,size:a.size[0],tileSize:a.tileSize,padding:a.padding,colour:a.colour,normal:a.normal,depth:a.depth},dir,manifest:m});

@@ -49,15 +49,15 @@ test('the packed runtime atlases retain their checksums and complete bank dimens
   assert.equal(b.readUInt32BE(16),library.atlas.width);assert.equal(b.readUInt32BE(20),library.atlas.height);}
 });
 
-test('mixed-resolution banks fit without overlap and conifers use bounded 3D volumes',()=>{
+test('populated view banks fit without overlap and every tree uses its own bounded 3D volume',()=>{
  const boxes=[];
- for(const p of library.plants){const [x,y]=p.atlas.origin,size=p.atlas.size;assert(x>=0&&y>=0&&x+size<=library.atlas.width&&y+size<=library.atlas.height);
-  for(const [a,b,s]of boxes)assert(x+size<=a||a+s<=x||y+size<=b||b+s<=y,'atlas banks overlap');boxes.push([x,y,size]);
-  if(p.role==='pine'){assert.equal(p.representation,'volume');assert(p.atlas.tileSize>=96);
+ for(const p of library.plants){const [x,y]=p.atlas.origin,[width,height]=p.atlas.packedSize;assert(x>=0&&y>=0&&x+width<=library.atlas.width&&y+height<=library.atlas.height);
+  assert.equal(height,6*(p.atlas.tileSize+2*p.atlas.padding));
+  for(const [a,b,w,h]of boxes)assert(x+width<=a||a+w<=x||y+height<=b||b+h<=y,'atlas banks overlap');boxes.push([x,y,width,height]);
+  assert.equal(p.representation,'volume');assert(p.atlas.tileSize>=96);
    for(const [i,file]of [p.volume,p.middleVolume].entries()){const v=JSON.parse(fs.readFileSync(new URL(p.id+'/'+file,root))),native=JSON.parse(fs.readFileSync(new URL(p.id+'/'+p.lods[i].file,root)));
     const wood=i&&p.middleWood?JSON.parse(fs.readFileSync(new URL(p.id+'/'+p.middleWood,root))):native.wood;
     assert.equal(v.indices.length/3,v.triangles);assert(v.triangles<=(i?12:36));assert(wood.indices.length/3+v.triangles<=(i?64:500));assert(v.positions.flat().every(Number.isFinite));}
-  }else{assert.equal(p.representation,'mesh');assert.equal(p.atlas.tileSize,48);}
  }
 });
 

@@ -1,1 +1,2022 @@
-{"age":20.0,"bakeSourceTier":{"budget":6000,"card_cross":false,"card_fold":0.0,"cards":512,"foliage_tris":2048,"leaves":"cards","max_card":1.4,"max_cluster":25.0,"min_radius":0.3789,"name":"woodland-bake-source","straighten":1.2,"tess":{"radial_base":3,"radial_error":0.05,"radial_falloff":0.55,"radial_max":10,"radial_min":3,"u_scale":0.9,"v_scale":0.22},"why":"Offline source only; never a whole-map runtime tier."},"compilerFiles":{"__init__.py":"c8a8bf9e3e436bcc11780cd91029a1591120a3f494a6cb283e698138d99b9bb3","allocation.py":"b037758bb918a695f0d535cb74568153b465c54a74b44ac1d16be636fbe5e98f","bark.py":"b45a4c23e268e891d0e428194f8d6afdcec85ca1fcef334a94749dc631265204","cache.py":"4e2b3b14d3237a48728b3af4731e0889310fa794e0a8f069bc21ecf7c603a974","card_texture.py":"92f2ecc6f5ceb36a1676107bc8a84760c2c42ac51147f51aa056c8a99771b0f2","checkpoint.py":"cb13a807d324785573c469c4d08009515c589ea5f95865a81b0ffa0667d23a45","climate.py":"32567ac1f2b06ecf57e871e4fc7d2f0101d1996cb47b7ee96fea52d50beb3ffb","colonize.py":"8fd8628f7c6d0c229a5673cbcaf289ffc2b192c7d6cf80a96fcd4961878aa847","export.py":"9c3bf375be62234b8f1cf27c8a6f730ac80fc107de9fab26a94a1dfa78a565fa","grow_colonize.py":"fcd625d922d1d3d38f46c3c8867ef790b8102e043a2d2757fbb0a4e1048d068c","grower.py":"028f3a34397253642a7568c104cf5137430d5b63b5bf4f42b05ba159313bc92e","herbivory.py":"44b63e64c33d461f563b5683db37fd81ce70f210a4fd075bae4acc7a5b01c6c6","hydraulics.py":"4cfddfe6a505bcf08447911253c99e856170d3b251538914e0df97de9d3465ca","impostor.py":"90452851df1484b03668f921c3377e8c23da4cf0c0de37f7a8c07a88382a53d2","light.py":"286a2e10b5fc4da7d04d703843ec8146cd5aa43a17e0cba0c9300ba6cd204b53","lod.py":"5b8a6008ed17016d7e3ce6a66e12f31b3d66eeee11f8b0565efd2f9b50d169ae","mechanics.py":"ea9404ebe519cb51b6de879bf445c64e305e2532a03202283c237d42f424bae7","mesh.py":"241be2be854fa5a04782362017f58ea21b4f1db608e02c2edddae22fb53aafd8","organs.py":"c1816fc4b6df277774ac93d62aa01d4f8c843b6584f456bc929402b228480737","phenology.py":"f4e99d8d7bcc4aeed2077f7b9699d713c4777c3a6f9f2af28d401d52bc26a6fe","plan.py":"bce9a545d0c302c4fa6c098420595aee1122251d63a037feef4daded45183878","preview.py":"5191c385029a1a89749105236cbff990ee5797bf31790bd60829b123d1ed972b","radii.py":"2dc87b0d6511b7c563bd9939fffd4ae813996f586a549149c7d65a68e102e3b3","reaction.py":"4058979d715fc04986a59e105728f60194262a7ac62ba7cfd23665c62b23d6b8","regulation.py":"a6eb017f270fd10c748299325d9b1354a7b812e47741f7edaca0123ff0ac5d61","rings.py":"2a6377c278db344463584c86539e95359de190af9ec47b976111734358ae07da","rng.py":"65d83d008bd2f23cca164bb3997f5a4223d365af329766b7fe0dd9b0f810f67f","roots.py":"fd2c7bc9c02bb48b1a405fd02546bef2c6182411a80bafe79e8f3b6f3424e54a","scaffold.py":"913718d96d14eec2fda93363a5ef5d235250613d69b807c217d8b7a0b92eaf04","scene.py":"a08945c44a8b6941bd1816947e22d8546be6d8f183d5cdc4d7c3ed7fe078b2f8","shedding.py":"3dd0c43d1d783c6719af9e7c2ba10761d5ebd903d0df69e176559305e58570f2","site.py":"7d3a21bbff323adadc6bd0e927b2f050937ef95271d4f63d764263c28a6f853f","skeleton.py":"47df4e3d7bb9e0f937b842310734452f58db392c0388fd88180c152c48662f10","sky.py":"5e589e418804e9d74204a111f2bf7579300cee26d99d99124b3b9f15cc5df101","stand.py":"062506fdd1ae663702f411dc37e8d986bcfecc5eff11e987d05aefa8907e2d05","temporary_crown.py":"070192784cf7c8ebec751c68e3f72f3987d41a8552496e56f2bebf64a3213bd3","terrain.py":"51cd1733105f483f85c430b053cffd103cecba4ce7b95e29585b1edefd96a366","tropism.py":"09cde5187eee287f7752041563dfcf4f204f05c1cd01f8c94944477bdd96ac76","woodland.py":"5a5207e69b4070c6356060a91d21418cd8637d3c6579b5df27755823bea36f9b","woodland_mesh.py":"c4d7d0be6e31e216cc7e439f6906ad73c56f4323284c3a5b1dba9146155ffd4e"},"dormantFoliage":0.0,"files":{"colour.png":{"bytes":11667,"sha256":"3c825ce199bba38cf88e879d57fc4f9530357b967ad34587e512f6e3800ecc79"},"depth.png":{"bytes":37002,"sha256":"500b4377ea1216d82ec4c16ec0d2dc5d30a2be044a2ccfea9a56eb5190220de9"},"normal.png":{"bytes":38377,"sha256":"e421fa8c9992df783dff6367120a39bf9279e0f11d713e75bcfa869e89997713"},"woodland-middle-leaf.png":{"bytes":20959,"sha256":"f90789ac136e81a1868c09c92fa9816f93af1bc6da1f7c7d4d170e61e8ba4e78"},"woodland-middle.json":{"bytes":7354,"sha256":"cb10ffac1936211d09c53b1a4a70c03237f87415508e102fb79f0e175741215f"},"woodland-near-leaf.png":{"bytes":20959,"sha256":"f90789ac136e81a1868c09c92fa9816f93af1bc6da1f7c7d4d170e61e8ba4e78"},"woodland-near.json":{"bytes":70125,"sha256":"fde7e3c2d839d8ad9fdc3040a7bef290fcaa6900202c2a5f49a16476ef27e304"}},"foliageScaling":"sqrt(currentFraction/peakFoliage) around each card centre","format":"gardenplans.woodland","genome":{"acrotony":0.55,"apical_control":0.5639643631592473,"apical_control_decay":0.22,"apical_control_old":0.07177728258390419,"assimilation":0.2217675889441675,"axis":{"branch_angle":[{"clamp":null,"dist":"normal","mean":0.767944870877505,"spread":0.12217304763960307},{"clamp":null,"dist":"normal","mean":0.8726646259971648,"spread":0.13962634015954636},{"clamp":null,"dist":"normal","mean":0.9599310885968813,"spread":0.17453292519943295},{"clamp":null,"dist":"normal","mean":1.0122909661567112,"spread":0.20943951023931956},{"clamp":null,"dist":"normal","mean":1.0471975511965976,"spread":0.24434609527920614}],"branch_probability":[0.22,0.3,0.42,0.5,0.34],"epitrophy":[0.0,0.35,0.4,0.45,0.45],"internode_length":[{"clamp":null,"dist":"normal","mean":0.08,"spread":0.017},{"clamp":null,"dist":"normal","mean":0.066,"spread":0.015},{"clamp":null,"dist":"normal","mean":0.05,"spread":0.013},{"clamp":null,"dist":"normal","mean":0.038,"spread":0.01},{"clamp":null,"dist":"normal","mean":0.028,"spread":0.008}],"internodes_per_cycle":[7.8,4.2,3.2,2.6,2.0],"max_internodes":[null,145,88,42,20],"n_states":5,"phototropism":[0.12,0.28,0.34,0.38,0.4],"target_inclination":[0.0,1.2112585008840648,1.2112585008840648,1.2112585008840648,1.2112585008840648],"tropism_rate":[0.26,0.12,0.1,0.1,0.1],"wander":[0.05,0.12,0.165,0.2,0.235]},"background_mortality":0.008,"bark":{"colour":[0.3,0.27,0.24],"furrow_contrast":0.55,"furrow_depth":0.75,"furrow_onset_dbh":0.12,"gloss":0.16,"lenticels":0.05,"peeling":0.0,"thickness_ratio":0.065},"basal_renewal":0.0,"basal_spread":0.0,"basal_stems":1,"branch_carbon_export":0.002,"branch_local_buds":false,"branch_planarity":0.0,"branch_reach":2.2,"bud_break_light":0.2,"bud_crowding":7,"bud_regulation":{"auxin_export_capacity":1.0,"brc1_sensitivity":1.0,"cytokinin_sensitivity":1.0,"strigolactone_sensitivity":1.0,"strigolactone_synthesis":1.0,"sugar_sensitivity":1.0},"budburst":0.3561643835616438,"buds_per_node":1,"cluster_exponent":1.83,"codominant_inclination":0.3839724354387525,"codominant_ratio":0.75,"codominant_settling":0.15,"etiolation":0.35,"flare":0.55,"flare_height":0.9,"foliage_planarity":0.0,"fork_propensity":0.25773108253035626,"germination":{"apical_control":1.0253897511986312,"forking":0.8591036084345208,"vigor":0.9830123623411681},"growth_cycles":20,"hydraulic_path_gain":0.028,"included_bark_strength":0.35,"individuality":{"apical_control":0.16,"forking":0.2,"vigor":0.18},"leader_abortion":0.1,"leader_abortion_onset":0.22,"leader_min_height":4.0,"leader_min_internodes":30,"leaf_area":0.017,"leaf_attach":{"clamp":null,"dist":"normal","mean":0.9075712110370514,"spread":0.19198621771937624},"leaf_bare":0.8493150684931506,"leaf_bearing_fraction":1.0,"leaf_cluster":1,"leaf_fall":0.7534246575342466,"leaf_full":0.410958904109589,"leaf_inclination_shade":0.2617993877991494,"leaf_inclination_spread":0.20943951023931956,"leaf_inclination_sun":0.8726646259971648,"leaf_mass_per_area":0.085,"leaf_min_order":0,"leaf_retention":{"unbounded":"positive"},"leaf_size_shade":1.24,"leaf_size_sun":0.86,"leaf_size_variation":0.22,"leaf_twig_ratio":1.3,"leaves":[{"aspect_ratio":1.65,"bristle":0.3,"colour":[0.22,0.36,0.19],"gloss":0.1,"hook_depth":0.3,"hook_offset":1.15,"hook_width":0.55,"length":0.225,"lobe_count":4,"lobe_depth":0.82,"lobe_lean":0.9,"lobe_skew":0.55,"material":"Leaf_Generic","name":"quercus_rubra_a","palmate":false,"petiole":0.22,"sinus_taper":0.55,"teeth_per_lobe":2,"tip_sharpness":0.75,"tooth_depth":0.22,"underside":0.3,"widest_at":0.56},{"aspect_ratio":1.8,"bristle":0.34,"colour":[0.22,0.36,0.19],"gloss":0.1,"hook_depth":0.3,"hook_offset":1.15,"hook_width":0.55,"length":0.195,"lobe_count":5,"lobe_depth":0.76,"lobe_lean":1.0,"lobe_skew":0.55,"material":"Leaf_Generic","name":"quercus_rubra_b","palmate":false,"petiole":0.22,"sinus_taper":0.55,"teeth_per_lobe":2,"tip_sharpness":0.75,"tooth_depth":0.22,"underside":0.3,"widest_at":0.52},{"aspect_ratio":1.55,"bristle":0.28,"colour":[0.22,0.36,0.19],"gloss":0.1,"hook_depth":0.3,"hook_offset":1.15,"hook_width":0.55,"length":0.25,"lobe_count":4,"lobe_depth":0.86,"lobe_lean":0.8,"lobe_skew":0.55,"material":"Leaf_Generic","name":"quercus_rubra_c","palmate":false,"petiole":0.22,"sinus_taper":0.55,"teeth_per_lobe":3,"tip_sharpness":0.75,"tooth_depth":0.22,"underside":0.3,"widest_at":0.58}],"leaves_per_metre":31.0,"lifespan":300.0,"light_extinction":0.55,"long_shoot_carbon_relief":0.0,"long_shoot_light_release":0.45,"maintenance":7.0,"masting_threshold":3.0,"maturity":60.0,"max_branch_order":5,"mixed_shoot_grammar":false,"mycorrhiza":"ecto","mycorrhizal_share":0.02,"name":"Quercus rubra","phyllotaxy":2.399963228855328,"pipe_exponent":2.4,"polycyclic":0.25,"provenance":{"apical_control":1.0,"name":"unknown","northness":0.0,"vigor":1.0,"wet_origin":0.0},"proximal_control_suppression":false,"reproductive_fraction":0.2,"reproductive_onset":25.0,"roots":{"anchorage":0.8,"depth_beta":0.975,"drought_deepening":0.025,"fine_cost_factor":0.02,"fine_per_foliage":1.0,"fine_turnover":0.56,"max_depth":2.5,"plate_ratio":6.0,"root_shoot":0.24,"spread_ratio":2.6,"structural_count":6,"taproot":0.45},"scaffolds":{"crown_overlap":0.55,"diameter_ratio":[0.04,0.75],"dominance_margin":1.5,"max_count":8,"max_per_cycle":1,"min_azimuth_sep":1.0471975511965976,"min_count":4,"min_height":3.0,"min_spacing":0.9,"onset":0.18,"released_vigor":1.9,"selection_closes":1.0,"target_count":6,"temporary_shed_bias":2.4},"schema_version":4,"seed":101,"seed_maturation_years":2,"senescent_mortality":0.05,"shed_correlative":0.8,"shed_min_age":2.0,"shed_patience":3,"shed_protect_order":1,"shed_threshold":0.125,"shoot_cost":0.019,"shoot_turgor":0.421,"short_shoot_preformed_nodes":0,"site":{"browse_palatability":0.45,"degree_day_need":2100.0,"flood_tolerance":0.72,"light_demand":0.5,"nutrient_demand":0.52,"reconfigure":0.5,"storm_strength":0.75,"thigmo":0.55,"water_demand":0.38},"starvation_patience":5,"storage_capacity_years":1.5,"storage_fraction":0.3,"sylleptic_fraction":0.0,"terminal_cluster_buds":3,"tip_radius":0.0045,"twig_spacing":0.52,"whorl_count":0,"whorl_jitter":0.25,"winter_foliage":0.0,"wood":{"branch_resistivity":1.8,"cambial_cost_factor":0.04,"density":900.0,"eccentricity_gain":0.35,"maturation_strain_asymmetry":0.0005,"max_ring_width":0.0045,"modulus_of_elasticity":9300000000.0,"modulus_of_rupture":57000000.0,"permanent_deflection_fraction":0.12,"proprioception":0.35,"reaction_wood":"tension","safety_factor":4.0,"sapwood_rings":12}},"impostor":{"bounds":[[-1.8775514364242554,-0.058511827141046524,-1.4371483325958252],[2.05961012840271,8.119834899902344,3.1841440200805664]],"centre":[0.0910293459892273,4.030661536380649,0.8734978437423706],"colour":"colour.png","colourSpace":"sRGB","depth":"depth.png","depthEncoding":"(R*256+G)/65535; near=0, far=1","depthMaterial":{"0":"wood","255":"foliage"},"filter":"colour=linear; normal/depth=nearest; no automatic atlas mipmaps","imageOrigin":"top-left","normal":"normal.png","normalSpace":"object-y-up","padding":2,"radius":4.483633648497362,"runtimeTriangles":2,"sampling":"2x2 nearest covered subpixel; conservative alpha","selection":"azimuth wraps; elevation interpolates/clamps","size":[512,512],"tileSize":48,"tiles":[{"azimuth":0.0,"coverage":0.18098958333333334,"elevation":0.0,"eye":[1.0,0.0,0.0],"rect":[2,2,48,48],"right":[0.0,0.0,-1.0],"season":"leafy","up":[-0.0,1.0,0.0]},{"azimuth":0.7853981633974483,"coverage":0.1488715277777778,"elevation":0.0,"eye":[0.7071067811865476,0.0,0.7071067811865475],"rect":[54,2,48,48],"right":[0.7071067811865475,0.0,-0.7071067811865476],"season":"leafy","up":[-0.0,1.0,0.0]},{"azimuth":1.5707963267948966,"coverage":0.1540798611111111,"elevation":0.0,"eye":[6.123233995736766e-17,0.0,1.0],"rect":[106,2,48,48],"right":[1.0,0.0,-6.123233995736766e-17],"season":"leafy","up":[-0.0,1.0,0.0]},{"azimuth":2.356194490192345,"coverage":0.1857638888888889,"elevation":0.0,"eye":[-0.7071067811865475,0.0,0.7071067811865476],"rect":[158,2,48,48],"right":[0.7071067811865476,0.0,0.7071067811865475],"season":"leafy","up":[0.0,1.0,-0.0]},{"azimuth":3.141592653589793,"coverage":0.18098958333333334,"elevation":0.0,"eye":[-1.0,0.0,1.2246467991473532e-16],"rect":[210,2,48,48],"right":[1.2246467991473532e-16,0.0,1.0],"season":"leafy","up":[0.0,1.0,-0.0]},{"azimuth":3.9269908169872414,"coverage":0.1488715277777778,"elevation":0.0,"eye":[-0.7071067811865477,0.0,-0.7071067811865475],"rect":[262,2,48,48],"right":[-0.7071067811865475,0.0,0.7071067811865477],"season":"leafy","up":[0.0,1.0,0.0]},{"azimuth":4.71238898038469,"coverage":0.1540798611111111,"elevation":0.0,"eye":[-1.8369701987210297e-16,0.0,-1.0],"rect":[314,2,48,48],"right":[-1.0,0.0,1.8369701987210297e-16],"season":"leafy","up":[0.0,1.0,0.0]},{"azimuth":5.497787143782138,"coverage":0.1857638888888889,"elevation":0.0,"eye":[0.7071067811865474,0.0,-0.7071067811865477],"rect":[366,2,48,48],"right":[-0.7071067811865477,0.0,-0.7071067811865474],"season":"leafy","up":[0.0,1.0,0.0]},{"azimuth":0.0,"coverage":0.18359375,"elevation":0.6108652381980153,"eye":[0.8191520442889918,0.573576436351046,0.0],"rect":[2,54,48,48],"right":[0.0,0.0,-1.0],"season":"leafy","up":[-0.573576436351046,0.8191520442889918,0.0]},{"azimuth":0.7853981633974483,"coverage":0.1657986111111111,"elevation":0.6108652381980153,"eye":[0.5792279653395692,0.573576436351046,0.5792279653395691],"rect":[54,54,48,48],"right":[0.7071067811865475,0.0,-0.7071067811865476],"season":"leafy","up":[-0.40557978767263886,0.8191520442889917,-0.4055797876726388]},{"azimuth":1.5707963267948966,"coverage":0.1597222222222222,"elevation":0.6108652381980153,"eye":[5.015859645267624e-17,0.573576436351046,0.8191520442889918],"rect":[106,54,48,48],"right":[1.0,0.0,-6.123233995736766e-17],"season":"leafy","up":[-3.5121427342182706e-17,0.8191520442889918,-0.573576436351046]},{"azimuth":2.356194490192345,"coverage":0.18446180555555555,"elevation":0.6108652381980153,"eye":[-0.5792279653395691,0.573576436351046,0.5792279653395692],"rect":[158,54,48,48],"right":[0.7071067811865476,0.0,0.7071067811865475],"season":"leafy","up":[0.4055797876726388,0.8191520442889917,-0.40557978767263886]},{"azimuth":3.141592653589793,"coverage":0.1762152777777778,"elevation":0.6108652381980153,"eye":[-0.8191520442889918,0.573576436351046,1.0031719290535247e-16],"rect":[210,54,48,48],"right":[1.2246467991473532e-16,0.0,1.0],"season":"leafy","up":[0.573576436351046,0.8191520442889918,-7.024285468436541e-17]},{"azimuth":3.9269908169872414,"coverage":0.1545138888888889,"elevation":0.6108652381980153,"eye":[-0.5792279653395693,0.573576436351046,-0.5792279653395691],"rect":[262,54,48,48],"right":[-0.7071067811865475,0.0,0.7071067811865477],"season":"leafy","up":[0.4055797876726389,0.8191520442889919,0.4055797876726388]},{"azimuth":4.71238898038469,"coverage":0.1723090277777778,"elevation":0.6108652381980153,"eye":[-1.504757893580287e-16,0.573576436351046,-0.8191520442889918],"rect":[314,54,48,48],"right":[-1.0,0.0,1.8369701987210297e-16],"season":"leafy","up":[1.0536428202654811e-16,0.8191520442889918,0.573576436351046]},{"azimuth":5.497787143782138,"coverage":0.1909722222222222,"elevation":0.6108652381980153,"eye":[0.5792279653395691,0.573576436351046,-0.5792279653395693],"rect":[366,54,48,48],"right":[-0.7071067811865477,0.0,-0.7071067811865474],"season":"leafy","up":[-0.40557978767263875,0.8191520442889918,0.4055797876726389]},{"azimuth":0.0,"coverage":0.14149305555555555,"elevation":1.2217304763960306,"eye":[0.3420201433256688,0.9396926207859083,0.0],"rect":[2,106,48,48],"right":[0.0,0.0,-1.0],"season":"leafy","up":[-0.9396926207859083,0.3420201433256688,0.0]},{"azimuth":0.7853981633974483,"coverage":0.1371527777777778,"elevation":1.2217304763960306,"eye":[0.24184476264797533,0.9396926207859083,0.2418447626479753],"rect":[54,106,48,48],"right":[0.7071067811865475,0.0,-0.7071067811865476],"season":"leafy","up":[-0.6644630243886747,0.3420201433256688,-0.6644630243886746]},{"azimuth":1.5707963267948966,"coverage":0.13932291666666666,"elevation":1.2217304763960306,"eye":[2.0942693688384965e-17,0.9396926207859083,0.3420201433256688],"rect":[106,106,48,48],"right":[1.0,0.0,-6.123233995736766e-17],"season":"leafy","up":[-5.753957801139251e-17,0.3420201433256688,-0.9396926207859083]},{"azimuth":2.356194490192345,"coverage":0.13802083333333334,"elevation":1.2217304763960306,"eye":[-0.2418447626479753,0.9396926207859083,0.24184476264797533],"rect":[158,106,48,48],"right":[0.7071067811865476,0.0,0.7071067811865475],"season":"leafy","up":[0.6644630243886746,0.3420201433256688,-0.6644630243886747]},{"azimuth":3.141592653589793,"coverage":0.1388888888888889,"elevation":1.2217304763960306,"eye":[-0.3420201433256688,0.9396926207859083,4.188538737676993e-17],"rect":[210,106,48,48],"right":[1.2246467991473532e-16,0.0,1.0],"season":"leafy","up":[0.9396926207859083,0.3420201433256688,-1.1507915602278503e-16]},{"azimuth":3.9269908169872414,"coverage":0.13020833333333334,"elevation":1.2217304763960306,"eye":[-0.2418447626479754,0.9396926207859083,-0.2418447626479753],"rect":[262,106,48,48],"right":[-0.7071067811865475,0.0,0.7071067811865477],"season":"leafy","up":[0.6644630243886748,0.3420201433256689,0.6644630243886746]},{"azimuth":4.71238898038469,"coverage":0.13802083333333334,"elevation":1.2217304763960306,"eye":[-6.282808106515489e-17,0.9396926207859083,-0.3420201433256688],"rect":[314,106,48,48],"right":[-1.0,0.0,1.8369701987210297e-16],"season":"leafy","up":[1.7261873403417752e-16,0.3420201433256688,0.9396926207859083]},{"azimuth":5.497787143782138,"coverage":0.1480034722222222,"elevation":1.2217304763960306,"eye":[0.24184476264797528,0.9396926207859083,-0.2418447626479754],"rect":[366,106,48,48],"right":[-0.7071067811865477,0.0,-0.7071067811865474],"season":"leafy","up":[-0.6644630243886744,0.3420201433256688,0.6644630243886748]},{"azimuth":0.0,"coverage":0.029947916666666668,"elevation":0.0,"eye":[1.0,0.0,0.0],"rect":[2,158,48,48],"right":[0.0,0.0,-1.0],"season":"dormant","up":[-0.0,1.0,0.0]},{"azimuth":0.7853981633974483,"coverage":0.030381944444444444,"elevation":0.0,"eye":[0.7071067811865476,0.0,0.7071067811865475],"rect":[54,158,48,48],"right":[0.7071067811865475,0.0,-0.7071067811865476],"season":"dormant","up":[-0.0,1.0,0.0]},{"azimuth":1.5707963267948966,"coverage":0.028645833333333332,"elevation":0.0,"eye":[6.123233995736766e-17,0.0,1.0],"rect":[106,158,48,48],"right":[1.0,0.0,-6.123233995736766e-17],"season":"dormant","up":[-0.0,1.0,0.0]},{"azimuth":2.356194490192345,"coverage":0.034722222222222224,"elevation":0.0,"eye":[-0.7071067811865475,0.0,0.7071067811865476],"rect":[158,158,48,48],"right":[0.7071067811865476,0.0,0.7071067811865475],"season":"dormant","up":[0.0,1.0,-0.0]},{"azimuth":3.141592653589793,"coverage":0.029947916666666668,"elevation":0.0,"eye":[-1.0,0.0,1.2246467991473532e-16],"rect":[210,158,48,48],"right":[1.2246467991473532e-16,0.0,1.0],"season":"dormant","up":[0.0,1.0,-0.0]},{"azimuth":3.9269908169872414,"coverage":0.030381944444444444,"elevation":0.0,"eye":[-0.7071067811865477,0.0,-0.7071067811865475],"rect":[262,158,48,48],"right":[-0.7071067811865475,0.0,0.7071067811865477],"season":"dormant","up":[0.0,1.0,0.0]},{"azimuth":4.71238898038469,"coverage":0.028645833333333332,"elevation":0.0,"eye":[-1.8369701987210297e-16,0.0,-1.0],"rect":[314,158,48,48],"right":[-1.0,0.0,1.8369701987210297e-16],"season":"dormant","up":[0.0,1.0,0.0]},{"azimuth":5.497787143782138,"coverage":0.034722222222222224,"elevation":0.0,"eye":[0.7071067811865474,0.0,-0.7071067811865477],"rect":[366,158,48,48],"right":[-0.7071067811865477,0.0,-0.7071067811865474],"season":"dormant","up":[0.0,1.0,0.0]},{"azimuth":0.0,"coverage":0.02734375,"elevation":0.6108652381980153,"eye":[0.8191520442889918,0.573576436351046,0.0],"rect":[2,210,48,48],"right":[0.0,0.0,-1.0],"season":"dormant","up":[-0.573576436351046,0.8191520442889918,0.0]},{"azimuth":0.7853981633974483,"coverage":0.029079861111111112,"elevation":0.6108652381980153,"eye":[0.5792279653395692,0.573576436351046,0.5792279653395691],"rect":[54,210,48,48],"right":[0.7071067811865475,0.0,-0.7071067811865476],"season":"dormant","up":[-0.40557978767263886,0.8191520442889917,-0.4055797876726388]},{"azimuth":1.5707963267948966,"coverage":0.026041666666666668,"elevation":0.6108652381980153,"eye":[5.015859645267624e-17,0.573576436351046,0.8191520442889918],"rect":[106,210,48,48],"right":[1.0,0.0,-6.123233995736766e-17],"season":"dormant","up":[-3.5121427342182706e-17,0.8191520442889918,-0.573576436351046]},{"azimuth":2.356194490192345,"coverage":0.029947916666666668,"elevation":0.6108652381980153,"eye":[-0.5792279653395691,0.573576436351046,0.5792279653395692],"rect":[158,210,48,48],"right":[0.7071067811865476,0.0,0.7071067811865475],"season":"dormant","up":[0.4055797876726388,0.8191520442889917,-0.40557978767263886]},{"azimuth":3.141592653589793,"coverage":0.026041666666666668,"elevation":0.6108652381980153,"eye":[-0.8191520442889918,0.573576436351046,1.0031719290535247e-16],"rect":[210,210,48,48],"right":[1.2246467991473532e-16,0.0,1.0],"season":"dormant","up":[0.573576436351046,0.8191520442889918,-7.024285468436541e-17]},{"azimuth":3.9269908169872414,"coverage":0.029947916666666668,"elevation":0.6108652381980153,"eye":[-0.5792279653395693,0.573576436351046,-0.5792279653395691],"rect":[262,210,48,48],"right":[-0.7071067811865475,0.0,0.7071067811865477],"season":"dormant","up":[0.4055797876726389,0.8191520442889919,0.4055797876726388]},{"azimuth":4.71238898038469,"coverage":0.029513888888888888,"elevation":0.6108652381980153,"eye":[-1.504757893580287e-16,0.573576436351046,-0.8191520442889918],"rect":[314,210,48,48],"right":[-1.0,0.0,1.8369701987210297e-16],"season":"dormant","up":[1.0536428202654811e-16,0.8191520442889918,0.573576436351046]},{"azimuth":5.497787143782138,"coverage":0.029079861111111112,"elevation":0.6108652381980153,"eye":[0.5792279653395691,0.573576436351046,-0.5792279653395693],"rect":[366,210,48,48],"right":[-0.7071067811865477,0.0,-0.7071067811865474],"season":"dormant","up":[-0.40557978767263875,0.8191520442889918,0.4055797876726389]},{"azimuth":0.0,"coverage":0.024305555555555556,"elevation":1.2217304763960306,"eye":[0.3420201433256688,0.9396926207859083,0.0],"rect":[2,262,48,48],"right":[0.0,0.0,-1.0],"season":"dormant","up":[-0.9396926207859083,0.3420201433256688,0.0]},{"azimuth":0.7853981633974483,"coverage":0.024305555555555556,"elevation":1.2217304763960306,"eye":[0.24184476264797533,0.9396926207859083,0.2418447626479753],"rect":[54,262,48,48],"right":[0.7071067811865475,0.0,-0.7071067811865476],"season":"dormant","up":[-0.6644630243886747,0.3420201433256688,-0.6644630243886746]},{"azimuth":1.5707963267948966,"coverage":0.023871527777777776,"elevation":1.2217304763960306,"eye":[2.0942693688384965e-17,0.9396926207859083,0.3420201433256688],"rect":[106,262,48,48],"right":[1.0,0.0,-6.123233995736766e-17],"season":"dormant","up":[-5.753957801139251e-17,0.3420201433256688,-0.9396926207859083]},{"azimuth":2.356194490192345,"coverage":0.018229166666666668,"elevation":1.2217304763960306,"eye":[-0.2418447626479753,0.9396926207859083,0.24184476264797533],"rect":[158,262,48,48],"right":[0.7071067811865476,0.0,0.7071067811865475],"season":"dormant","up":[0.6644630243886746,0.3420201433256688,-0.6644630243886747]},{"azimuth":3.141592653589793,"coverage":0.023003472222222224,"elevation":1.2217304763960306,"eye":[-0.3420201433256688,0.9396926207859083,4.188538737676993e-17],"rect":[210,262,48,48],"right":[1.2246467991473532e-16,0.0,1.0],"season":"dormant","up":[0.9396926207859083,0.3420201433256688,-1.1507915602278503e-16]},{"azimuth":3.9269908169872414,"coverage":0.024739583333333332,"elevation":1.2217304763960306,"eye":[-0.2418447626479754,0.9396926207859083,-0.2418447626479753],"rect":[262,262,48,48],"right":[-0.7071067811865475,0.0,0.7071067811865477],"season":"dormant","up":[0.6644630243886748,0.3420201433256689,0.6644630243886746]},{"azimuth":4.71238898038469,"coverage":0.0234375,"elevation":1.2217304763960306,"eye":[-6.282808106515489e-17,0.9396926207859083,-0.3420201433256688],"rect":[314,262,48,48],"right":[-1.0,0.0,1.8369701987210297e-16],"season":"dormant","up":[1.7261873403417752e-16,0.3420201433256688,0.9396926207859083]},{"azimuth":5.497787143782138,"coverage":0.023871527777777776,"elevation":1.2217304763960306,"eye":[0.24184476264797528,0.9396926207859083,-0.2418447626479754],"rect":[366,262,48,48],"right":[-0.7071067811865477,0.0,-0.7071067811865474],"season":"dormant","up":[-0.6644630243886744,0.3420201433256688,0.6644630243886748]}]},"lods":[{"budget":500,"file":"woodland-near.json","triangles":474},{"budget":64,"file":"woodland-middle.json","triangles":50}],"materials":{"foliage":{"alphaTest":0.5,"colourSpace":"sRGB","depthWrite":true,"doubleSided":true,"gloss":0.1,"textureAlreadyTinted":true},"wood":{"colour":[0.3,0.27,0.24],"colourSpace":"sRGB"}},"peakFoliage":1.0,"pivot":[0,0,0],"rootsIncluded":false,"runtimeTiers":[{"budget":500,"card_cross":true,"card_fold":0.0,"cards":24,"foliage_tris":48,"leaves":"cards","max_card":3.2,"max_cluster":1000000000.0,"min_radius":0.3789,"name":"woodland-near","straighten":1.2,"tess":{"radial_base":3,"radial_error":0.05,"radial_falloff":0.72,"radial_max":3,"radial_min":3,"u_scale":0.9,"v_scale":0.22},"why":"Bounded foreground woodland mesh."},{"budget":64,"card_cross":false,"card_fold":0.0,"cards":8,"foliage_tris":16,"leaves":"cards","max_card":8.0,"max_cluster":1000000000.0,"min_radius":0.3789,"name":"woodland-middle","straighten":2.0,"tess":{"radial_base":3,"radial_error":0.05,"radial_falloff":0.72,"radial_max":3,"radial_min":3,"u_scale":0.9,"v_scale":0.22},"why":"Coarse middle-distance geometry; distant plants use baked views."}],"season":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.3437500000000004,0.7239583333333334,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.8184523809523806,0.6011904761904765,0.3839285714285712,0.16666666666666585,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"seed":101,"sourceCardTexture":{"aspect":1.0,"cluster":8.564453125,"coverage":0.5514234304428101,"textureBlades":9},"sourceFingerprint":"4933fb152acf4934343f15fdb569a76b1cf0d70f8fd623dca02df31a38faa92f","sourceGroundPivotZUp":[0.0,0.0,0.0],"sourceTriangles":4846,"species":"Quercus rubra","toolchain":{"matplotlib":"3.11.1","numpy":"2.5.1"},"units":"metres","upAxis":"Y","version":1}
+{
+  "age": 20.0,
+  "bakeSourceTier": {
+    "budget": 6000,
+    "card_cross": false,
+    "card_fold": 0.0,
+    "cards": 512,
+    "foliage_tris": 2048,
+    "leaves": "cards",
+    "max_card": 1.4,
+    "max_cluster": 25.0,
+    "min_radius": 0.3789,
+    "name": "woodland-bake-source",
+    "straighten": 1.2,
+    "tess": {
+      "radial_base": 3,
+      "radial_error": 0.05,
+      "radial_falloff": 0.55,
+      "radial_max": 10,
+      "radial_min": 3,
+      "u_scale": 0.9,
+      "v_scale": 0.22
+    },
+    "why": "Offline source only; never a whole-map runtime tier."
+  },
+  "compilerFiles": {
+    "__init__.py": "c8a8bf9e3e436bcc11780cd91029a1591120a3f494a6cb283e698138d99b9bb3",
+    "allocation.py": "b037758bb918a695f0d535cb74568153b465c54a74b44ac1d16be636fbe5e98f",
+    "bark.py": "b45a4c23e268e891d0e428194f8d6afdcec85ca1fcef334a94749dc631265204",
+    "cache.py": "4e2b3b14d3237a48728b3af4731e0889310fa794e0a8f069bc21ecf7c603a974",
+    "card_texture.py": "92f2ecc6f5ceb36a1676107bc8a84760c2c42ac51147f51aa056c8a99771b0f2",
+    "checkpoint.py": "cb13a807d324785573c469c4d08009515c589ea5f95865a81b0ffa0667d23a45",
+    "climate.py": "32567ac1f2b06ecf57e871e4fc7d2f0101d1996cb47b7ee96fea52d50beb3ffb",
+    "colonize.py": "8fd8628f7c6d0c229a5673cbcaf289ffc2b192c7d6cf80a96fcd4961878aa847",
+    "export.py": "9c3bf375be62234b8f1cf27c8a6f730ac80fc107de9fab26a94a1dfa78a565fa",
+    "grow_colonize.py": "fcd625d922d1d3d38f46c3c8867ef790b8102e043a2d2757fbb0a4e1048d068c",
+    "grower.py": "028f3a34397253642a7568c104cf5137430d5b63b5bf4f42b05ba159313bc92e",
+    "herbivory.py": "44b63e64c33d461f563b5683db37fd81ce70f210a4fd075bae4acc7a5b01c6c6",
+    "hydraulics.py": "4cfddfe6a505bcf08447911253c99e856170d3b251538914e0df97de9d3465ca",
+    "impostor.py": "90452851df1484b03668f921c3377e8c23da4cf0c0de37f7a8c07a88382a53d2",
+    "light.py": "286a2e10b5fc4da7d04d703843ec8146cd5aa43a17e0cba0c9300ba6cd204b53",
+    "lod.py": "5b8a6008ed17016d7e3ce6a66e12f31b3d66eeee11f8b0565efd2f9b50d169ae",
+    "mechanics.py": "ea9404ebe519cb51b6de879bf445c64e305e2532a03202283c237d42f424bae7",
+    "mesh.py": "241be2be854fa5a04782362017f58ea21b4f1db608e02c2edddae22fb53aafd8",
+    "organs.py": "c1816fc4b6df277774ac93d62aa01d4f8c843b6584f456bc929402b228480737",
+    "phenology.py": "f4e99d8d7bcc4aeed2077f7b9699d713c4777c3a6f9f2af28d401d52bc26a6fe",
+    "plan.py": "bce9a545d0c302c4fa6c098420595aee1122251d63a037feef4daded45183878",
+    "preview.py": "5191c385029a1a89749105236cbff990ee5797bf31790bd60829b123d1ed972b",
+    "radii.py": "2dc87b0d6511b7c563bd9939fffd4ae813996f586a549149c7d65a68e102e3b3",
+    "reaction.py": "4058979d715fc04986a59e105728f60194262a7ac62ba7cfd23665c62b23d6b8",
+    "regulation.py": "a6eb017f270fd10c748299325d9b1354a7b812e47741f7edaca0123ff0ac5d61",
+    "rings.py": "2a6377c278db344463584c86539e95359de190af9ec47b976111734358ae07da",
+    "rng.py": "65d83d008bd2f23cca164bb3997f5a4223d365af329766b7fe0dd9b0f810f67f",
+    "roots.py": "fd2c7bc9c02bb48b1a405fd02546bef2c6182411a80bafe79e8f3b6f3424e54a",
+    "scaffold.py": "913718d96d14eec2fda93363a5ef5d235250613d69b807c217d8b7a0b92eaf04",
+    "scene.py": "a08945c44a8b6941bd1816947e22d8546be6d8f183d5cdc4d7c3ed7fe078b2f8",
+    "shedding.py": "3dd0c43d1d783c6719af9e7c2ba10761d5ebd903d0df69e176559305e58570f2",
+    "site.py": "7d3a21bbff323adadc6bd0e927b2f050937ef95271d4f63d764263c28a6f853f",
+    "skeleton.py": "47df4e3d7bb9e0f937b842310734452f58db392c0388fd88180c152c48662f10",
+    "sky.py": "5e589e418804e9d74204a111f2bf7579300cee26d99d99124b3b9f15cc5df101",
+    "stand.py": "062506fdd1ae663702f411dc37e8d986bcfecc5eff11e987d05aefa8907e2d05",
+    "temporary_crown.py": "070192784cf7c8ebec751c68e3f72f3987d41a8552496e56f2bebf64a3213bd3",
+    "terrain.py": "51cd1733105f483f85c430b053cffd103cecba4ce7b95e29585b1edefd96a366",
+    "tropism.py": "09cde5187eee287f7752041563dfcf4f204f05c1cd01f8c94944477bdd96ac76",
+    "woodland.py": "5a5207e69b4070c6356060a91d21418cd8637d3c6579b5df27755823bea36f9b",
+    "woodland_mesh.py": "c4d7d0be6e31e216cc7e439f6906ad73c56f4323284c3a5b1dba9146155ffd4e",
+    "woodland_volume.py": "9350d8b2d654177eca2f1a217423a0ec8f1fd8246913e44af85cc7ef18eb971f"
+  },
+  "dormantFoliage": 0.0,
+  "files": {
+    "colour.png": {
+      "bytes": 53214,
+      "sha256": "c1f510c30c1a41503edf05d1eca130b7e720a2fe5f0f92b78c6a0526b16b3638"
+    },
+    "depth.png": {
+      "bytes": 185268,
+      "sha256": "b222d2ebe31512c398dc8dc5506db3ddbec2a3f8a0cdd36affc34039f5f7bdf6"
+    },
+    "normal.png": {
+      "bytes": 156498,
+      "sha256": "bcd3a2514418958758d6fb43b31f92f8f3d164d51d8c7f568fba97f1ba4cb28b"
+    },
+    "woodland-middle-leaf.png": {
+      "bytes": 20959,
+      "sha256": "f90789ac136e81a1868c09c92fa9816f93af1bc6da1f7c7d4d170e61e8ba4e78"
+    },
+    "woodland-middle.json": {
+      "bytes": 7354,
+      "sha256": "cb10ffac1936211d09c53b1a4a70c03237f87415508e102fb79f0e175741215f"
+    },
+    "woodland-near-leaf.png": {
+      "bytes": 20959,
+      "sha256": "f90789ac136e81a1868c09c92fa9816f93af1bc6da1f7c7d4d170e61e8ba4e78"
+    },
+    "woodland-near.json": {
+      "bytes": 70125,
+      "sha256": "fde7e3c2d839d8ad9fdc3040a7bef290fcaa6900202c2a5f49a16476ef27e304"
+    },
+    "woodland-volume.json": {
+      "bytes": 15297,
+      "sha256": "4adef389ae549e9390ce7642c3003f04a8716eb35f40fa53375e55d10dc35486"
+    },
+    "woodland-volume-middle.json": {
+      "bytes": 4135,
+      "sha256": "0b316eb109e82da4ad080c668beef1f2e3900eb285815e61f5af551a7debc26a"
+    }
+  },
+  "foliageScaling": "sqrt(currentFraction/peakFoliage) around each card centre",
+  "format": "gardenplans.woodland",
+  "genome": {
+    "acrotony": 0.55,
+    "apical_control": 0.5639643631592473,
+    "apical_control_decay": 0.22,
+    "apical_control_old": 0.07177728258390419,
+    "assimilation": 0.2217675889441675,
+    "axis": {
+      "branch_angle": [
+        {
+          "clamp": null,
+          "dist": "normal",
+          "mean": 0.767944870877505,
+          "spread": 0.12217304763960307
+        },
+        {
+          "clamp": null,
+          "dist": "normal",
+          "mean": 0.8726646259971648,
+          "spread": 0.13962634015954636
+        },
+        {
+          "clamp": null,
+          "dist": "normal",
+          "mean": 0.9599310885968813,
+          "spread": 0.17453292519943295
+        },
+        {
+          "clamp": null,
+          "dist": "normal",
+          "mean": 1.0122909661567112,
+          "spread": 0.20943951023931956
+        },
+        {
+          "clamp": null,
+          "dist": "normal",
+          "mean": 1.0471975511965976,
+          "spread": 0.24434609527920614
+        }
+      ],
+      "branch_probability": [
+        0.22,
+        0.3,
+        0.42,
+        0.5,
+        0.34
+      ],
+      "epitrophy": [
+        0.0,
+        0.35,
+        0.4,
+        0.45,
+        0.45
+      ],
+      "internode_length": [
+        {
+          "clamp": null,
+          "dist": "normal",
+          "mean": 0.08,
+          "spread": 0.017
+        },
+        {
+          "clamp": null,
+          "dist": "normal",
+          "mean": 0.066,
+          "spread": 0.015
+        },
+        {
+          "clamp": null,
+          "dist": "normal",
+          "mean": 0.05,
+          "spread": 0.013
+        },
+        {
+          "clamp": null,
+          "dist": "normal",
+          "mean": 0.038,
+          "spread": 0.01
+        },
+        {
+          "clamp": null,
+          "dist": "normal",
+          "mean": 0.028,
+          "spread": 0.008
+        }
+      ],
+      "internodes_per_cycle": [
+        7.8,
+        4.2,
+        3.2,
+        2.6,
+        2.0
+      ],
+      "max_internodes": [
+        null,
+        145,
+        88,
+        42,
+        20
+      ],
+      "n_states": 5,
+      "phototropism": [
+        0.12,
+        0.28,
+        0.34,
+        0.38,
+        0.4
+      ],
+      "target_inclination": [
+        0.0,
+        1.2112585008840648,
+        1.2112585008840648,
+        1.2112585008840648,
+        1.2112585008840648
+      ],
+      "tropism_rate": [
+        0.26,
+        0.12,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "wander": [
+        0.05,
+        0.12,
+        0.165,
+        0.2,
+        0.235
+      ]
+    },
+    "background_mortality": 0.008,
+    "bark": {
+      "colour": [
+        0.3,
+        0.27,
+        0.24
+      ],
+      "furrow_contrast": 0.55,
+      "furrow_depth": 0.75,
+      "furrow_onset_dbh": 0.12,
+      "gloss": 0.16,
+      "lenticels": 0.05,
+      "peeling": 0.0,
+      "thickness_ratio": 0.065
+    },
+    "basal_renewal": 0.0,
+    "basal_spread": 0.0,
+    "basal_stems": 1,
+    "branch_carbon_export": 0.002,
+    "branch_local_buds": false,
+    "branch_planarity": 0.0,
+    "branch_reach": 2.2,
+    "bud_break_light": 0.2,
+    "bud_crowding": 7,
+    "bud_regulation": {
+      "auxin_export_capacity": 1.0,
+      "brc1_sensitivity": 1.0,
+      "cytokinin_sensitivity": 1.0,
+      "strigolactone_sensitivity": 1.0,
+      "strigolactone_synthesis": 1.0,
+      "sugar_sensitivity": 1.0
+    },
+    "budburst": 0.3561643835616438,
+    "buds_per_node": 1,
+    "cluster_exponent": 1.83,
+    "codominant_inclination": 0.3839724354387525,
+    "codominant_ratio": 0.75,
+    "codominant_settling": 0.15,
+    "etiolation": 0.35,
+    "flare": 0.55,
+    "flare_height": 0.9,
+    "foliage_planarity": 0.0,
+    "fork_propensity": 0.25773108253035626,
+    "germination": {
+      "apical_control": 1.0253897511986312,
+      "forking": 0.8591036084345208,
+      "vigor": 0.9830123623411681
+    },
+    "growth_cycles": 20,
+    "hydraulic_path_gain": 0.028,
+    "included_bark_strength": 0.35,
+    "individuality": {
+      "apical_control": 0.16,
+      "forking": 0.2,
+      "vigor": 0.18
+    },
+    "leader_abortion": 0.1,
+    "leader_abortion_onset": 0.22,
+    "leader_min_height": 4.0,
+    "leader_min_internodes": 30,
+    "leaf_area": 0.017,
+    "leaf_attach": {
+      "clamp": null,
+      "dist": "normal",
+      "mean": 0.9075712110370514,
+      "spread": 0.19198621771937624
+    },
+    "leaf_bare": 0.8493150684931506,
+    "leaf_bearing_fraction": 1.0,
+    "leaf_cluster": 1,
+    "leaf_fall": 0.7534246575342466,
+    "leaf_full": 0.410958904109589,
+    "leaf_inclination_shade": 0.2617993877991494,
+    "leaf_inclination_spread": 0.20943951023931956,
+    "leaf_inclination_sun": 0.8726646259971648,
+    "leaf_mass_per_area": 0.085,
+    "leaf_min_order": 0,
+    "leaf_retention": {
+      "unbounded": "positive"
+    },
+    "leaf_size_shade": 1.24,
+    "leaf_size_sun": 0.86,
+    "leaf_size_variation": 0.22,
+    "leaf_twig_ratio": 1.3,
+    "leaves": [
+      {
+        "aspect_ratio": 1.65,
+        "bristle": 0.3,
+        "colour": [
+          0.22,
+          0.36,
+          0.19
+        ],
+        "gloss": 0.1,
+        "hook_depth": 0.3,
+        "hook_offset": 1.15,
+        "hook_width": 0.55,
+        "length": 0.225,
+        "lobe_count": 4,
+        "lobe_depth": 0.82,
+        "lobe_lean": 0.9,
+        "lobe_skew": 0.55,
+        "material": "Leaf_Generic",
+        "name": "quercus_rubra_a",
+        "palmate": false,
+        "petiole": 0.22,
+        "sinus_taper": 0.55,
+        "teeth_per_lobe": 2,
+        "tip_sharpness": 0.75,
+        "tooth_depth": 0.22,
+        "underside": 0.3,
+        "widest_at": 0.56
+      },
+      {
+        "aspect_ratio": 1.8,
+        "bristle": 0.34,
+        "colour": [
+          0.22,
+          0.36,
+          0.19
+        ],
+        "gloss": 0.1,
+        "hook_depth": 0.3,
+        "hook_offset": 1.15,
+        "hook_width": 0.55,
+        "length": 0.195,
+        "lobe_count": 5,
+        "lobe_depth": 0.76,
+        "lobe_lean": 1.0,
+        "lobe_skew": 0.55,
+        "material": "Leaf_Generic",
+        "name": "quercus_rubra_b",
+        "palmate": false,
+        "petiole": 0.22,
+        "sinus_taper": 0.55,
+        "teeth_per_lobe": 2,
+        "tip_sharpness": 0.75,
+        "tooth_depth": 0.22,
+        "underside": 0.3,
+        "widest_at": 0.52
+      },
+      {
+        "aspect_ratio": 1.55,
+        "bristle": 0.28,
+        "colour": [
+          0.22,
+          0.36,
+          0.19
+        ],
+        "gloss": 0.1,
+        "hook_depth": 0.3,
+        "hook_offset": 1.15,
+        "hook_width": 0.55,
+        "length": 0.25,
+        "lobe_count": 4,
+        "lobe_depth": 0.86,
+        "lobe_lean": 0.8,
+        "lobe_skew": 0.55,
+        "material": "Leaf_Generic",
+        "name": "quercus_rubra_c",
+        "palmate": false,
+        "petiole": 0.22,
+        "sinus_taper": 0.55,
+        "teeth_per_lobe": 3,
+        "tip_sharpness": 0.75,
+        "tooth_depth": 0.22,
+        "underside": 0.3,
+        "widest_at": 0.58
+      }
+    ],
+    "leaves_per_metre": 31.0,
+    "lifespan": 300.0,
+    "light_extinction": 0.55,
+    "long_shoot_carbon_relief": 0.0,
+    "long_shoot_light_release": 0.45,
+    "maintenance": 7.0,
+    "masting_threshold": 3.0,
+    "maturity": 60.0,
+    "max_branch_order": 5,
+    "mixed_shoot_grammar": false,
+    "mycorrhiza": "ecto",
+    "mycorrhizal_share": 0.02,
+    "name": "Quercus rubra",
+    "phyllotaxy": 2.399963228855328,
+    "pipe_exponent": 2.4,
+    "polycyclic": 0.25,
+    "provenance": {
+      "apical_control": 1.0,
+      "name": "unknown",
+      "northness": 0.0,
+      "vigor": 1.0,
+      "wet_origin": 0.0
+    },
+    "proximal_control_suppression": false,
+    "reproductive_fraction": 0.2,
+    "reproductive_onset": 25.0,
+    "roots": {
+      "anchorage": 0.8,
+      "depth_beta": 0.975,
+      "drought_deepening": 0.025,
+      "fine_cost_factor": 0.02,
+      "fine_per_foliage": 1.0,
+      "fine_turnover": 0.56,
+      "max_depth": 2.5,
+      "plate_ratio": 6.0,
+      "root_shoot": 0.24,
+      "spread_ratio": 2.6,
+      "structural_count": 6,
+      "taproot": 0.45
+    },
+    "scaffolds": {
+      "crown_overlap": 0.55,
+      "diameter_ratio": [
+        0.04,
+        0.75
+      ],
+      "dominance_margin": 1.5,
+      "max_count": 8,
+      "max_per_cycle": 1,
+      "min_azimuth_sep": 1.0471975511965976,
+      "min_count": 4,
+      "min_height": 3.0,
+      "min_spacing": 0.9,
+      "onset": 0.18,
+      "released_vigor": 1.9,
+      "selection_closes": 1.0,
+      "target_count": 6,
+      "temporary_shed_bias": 2.4
+    },
+    "schema_version": 4,
+    "seed": 101,
+    "seed_maturation_years": 2,
+    "senescent_mortality": 0.05,
+    "shed_correlative": 0.8,
+    "shed_min_age": 2.0,
+    "shed_patience": 3,
+    "shed_protect_order": 1,
+    "shed_threshold": 0.125,
+    "shoot_cost": 0.019,
+    "shoot_turgor": 0.421,
+    "short_shoot_preformed_nodes": 0,
+    "site": {
+      "browse_palatability": 0.45,
+      "degree_day_need": 2100.0,
+      "flood_tolerance": 0.72,
+      "light_demand": 0.5,
+      "nutrient_demand": 0.52,
+      "reconfigure": 0.5,
+      "storm_strength": 0.75,
+      "thigmo": 0.55,
+      "water_demand": 0.38
+    },
+    "starvation_patience": 5,
+    "storage_capacity_years": 1.5,
+    "storage_fraction": 0.3,
+    "sylleptic_fraction": 0.0,
+    "terminal_cluster_buds": 3,
+    "tip_radius": 0.0045,
+    "twig_spacing": 0.52,
+    "whorl_count": 0,
+    "whorl_jitter": 0.25,
+    "winter_foliage": 0.0,
+    "wood": {
+      "branch_resistivity": 1.8,
+      "cambial_cost_factor": 0.04,
+      "density": 900.0,
+      "eccentricity_gain": 0.35,
+      "maturation_strain_asymmetry": 0.0005,
+      "max_ring_width": 0.0045,
+      "modulus_of_elasticity": 9300000000.0,
+      "modulus_of_rupture": 57000000.0,
+      "permanent_deflection_fraction": 0.12,
+      "proprioception": 0.35,
+      "reaction_wood": "tension",
+      "safety_factor": 4.0,
+      "sapwood_rings": 12
+    }
+  },
+  "impostor": {
+    "bounds": [
+      [
+        -1.8775514364242554,
+        -0.058511827141046524,
+        -1.4371483325958252
+      ],
+      [
+        2.05961012840271,
+        8.119834899902344,
+        3.1841440200805664
+      ]
+    ],
+    "centre": [
+      0.0910293459892273,
+      4.030661536380649,
+      0.8734978437423706
+    ],
+    "colour": "colour.png",
+    "colourSpace": "sRGB",
+    "depth": "depth.png",
+    "depthEncoding": "(R*256+G)/65535; near=0, far=1",
+    "depthMaterial": {
+      "0": "wood",
+      "255": "foliage"
+    },
+    "filter": "colour=linear; normal/depth=nearest; no automatic atlas mipmaps",
+    "imageOrigin": "top-left",
+    "normal": "normal.png",
+    "normalSpace": "object-y-up",
+    "padding": 2,
+    "radius": 4.483633648497362,
+    "runtimeTriangles": 2,
+    "sampling": "2x2 nearest covered subpixel; conservative alpha",
+    "selection": "azimuth wraps; elevation interpolates/clamps",
+    "size": [
+      1024,
+      1024
+    ],
+    "tileSize": 124,
+    "tiles": [
+      {
+        "azimuth": 0.0,
+        "coverage": 0.16148543184183142,
+        "elevation": 0.0,
+        "eye": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "rect": [
+          2,
+          2,
+          124,
+          124
+        ],
+        "right": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "season": "leafy",
+        "up": [
+          -0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 0.7853981633974483,
+        "coverage": 0.13156867845993755,
+        "elevation": 0.0,
+        "eye": [
+          0.7071067811865476,
+          0.0,
+          0.7071067811865475
+        ],
+        "rect": [
+          130,
+          2,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865475,
+          0.0,
+          -0.7071067811865476
+        ],
+        "season": "leafy",
+        "up": [
+          -0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 1.5707963267948966,
+        "coverage": 0.14028355879292403,
+        "elevation": 0.0,
+        "eye": [
+          6.123233995736766e-17,
+          0.0,
+          1.0
+        ],
+        "rect": [
+          258,
+          2,
+          124,
+          124
+        ],
+        "right": [
+          1.0,
+          0.0,
+          -6.123233995736766e-17
+        ],
+        "season": "leafy",
+        "up": [
+          -0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 2.356194490192345,
+        "coverage": 0.16337148803329865,
+        "elevation": 0.0,
+        "eye": [
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865476
+        ],
+        "rect": [
+          386,
+          2,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865476,
+          0.0,
+          0.7071067811865475
+        ],
+        "season": "leafy",
+        "up": [
+          0.0,
+          1.0,
+          -0.0
+        ]
+      },
+      {
+        "azimuth": 3.141592653589793,
+        "coverage": 0.16148543184183142,
+        "elevation": 0.0,
+        "eye": [
+          -1.0,
+          0.0,
+          1.2246467991473532e-16
+        ],
+        "rect": [
+          514,
+          2,
+          124,
+          124
+        ],
+        "right": [
+          1.2246467991473532e-16,
+          0.0,
+          1.0
+        ],
+        "season": "leafy",
+        "up": [
+          0.0,
+          1.0,
+          -0.0
+        ]
+      },
+      {
+        "azimuth": 3.9269908169872414,
+        "coverage": 0.13156867845993755,
+        "elevation": 0.0,
+        "eye": [
+          -0.7071067811865477,
+          0.0,
+          -0.7071067811865475
+        ],
+        "rect": [
+          642,
+          2,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865477
+        ],
+        "season": "leafy",
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 4.71238898038469,
+        "coverage": 0.14028355879292403,
+        "elevation": 0.0,
+        "eye": [
+          -1.8369701987210297e-16,
+          0.0,
+          -1.0
+        ],
+        "rect": [
+          770,
+          2,
+          124,
+          124
+        ],
+        "right": [
+          -1.0,
+          0.0,
+          1.8369701987210297e-16
+        ],
+        "season": "leafy",
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 5.497787143782138,
+        "coverage": 0.16337148803329865,
+        "elevation": 0.0,
+        "eye": [
+          0.7071067811865474,
+          0.0,
+          -0.7071067811865477
+        ],
+        "rect": [
+          898,
+          2,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865477,
+          0.0,
+          -0.7071067811865474
+        ],
+        "season": "leafy",
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 0.0,
+        "coverage": 0.1677939646201873,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          0.8191520442889918,
+          0.573576436351046,
+          0.0
+        ],
+        "rect": [
+          2,
+          130,
+          124,
+          124
+        ],
+        "right": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "season": "leafy",
+        "up": [
+          -0.573576436351046,
+          0.8191520442889918,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 0.7853981633974483,
+        "coverage": 0.15316077003121747,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          0.5792279653395692,
+          0.573576436351046,
+          0.5792279653395691
+        ],
+        "rect": [
+          130,
+          130,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865475,
+          0.0,
+          -0.7071067811865476
+        ],
+        "season": "leafy",
+        "up": [
+          -0.40557978767263886,
+          0.8191520442889917,
+          -0.4055797876726388
+        ]
+      },
+      {
+        "azimuth": 1.5707963267948966,
+        "coverage": 0.14698231009365245,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          5.015859645267624e-17,
+          0.573576436351046,
+          0.8191520442889918
+        ],
+        "rect": [
+          258,
+          130,
+          124,
+          124
+        ],
+        "right": [
+          1.0,
+          0.0,
+          -6.123233995736766e-17
+        ],
+        "season": "leafy",
+        "up": [
+          -3.5121427342182706e-17,
+          0.8191520442889918,
+          -0.573576436351046
+        ]
+      },
+      {
+        "azimuth": 2.356194490192345,
+        "coverage": 0.1716961498439126,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          -0.5792279653395691,
+          0.573576436351046,
+          0.5792279653395692
+        ],
+        "rect": [
+          386,
+          130,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865476,
+          0.0,
+          0.7071067811865475
+        ],
+        "season": "leafy",
+        "up": [
+          0.4055797876726388,
+          0.8191520442889917,
+          -0.40557978767263886
+        ]
+      },
+      {
+        "azimuth": 3.141592653589793,
+        "coverage": 0.16194068678459939,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          -0.8191520442889918,
+          0.573576436351046,
+          1.0031719290535247e-16
+        ],
+        "rect": [
+          514,
+          130,
+          124,
+          124
+        ],
+        "right": [
+          1.2246467991473532e-16,
+          0.0,
+          1.0
+        ],
+        "season": "leafy",
+        "up": [
+          0.573576436351046,
+          0.8191520442889918,
+          -7.024285468436541e-17
+        ]
+      },
+      {
+        "azimuth": 3.9269908169872414,
+        "coverage": 0.1417143600416233,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          -0.5792279653395693,
+          0.573576436351046,
+          -0.5792279653395691
+        ],
+        "rect": [
+          642,
+          130,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865477
+        ],
+        "season": "leafy",
+        "up": [
+          0.4055797876726389,
+          0.8191520442889919,
+          0.4055797876726388
+        ]
+      },
+      {
+        "azimuth": 4.71238898038469,
+        "coverage": 0.1568678459937565,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          -1.504757893580287e-16,
+          0.573576436351046,
+          -0.8191520442889918
+        ],
+        "rect": [
+          770,
+          130,
+          124,
+          124
+        ],
+        "right": [
+          -1.0,
+          0.0,
+          1.8369701987210297e-16
+        ],
+        "season": "leafy",
+        "up": [
+          1.0536428202654811e-16,
+          0.8191520442889918,
+          0.573576436351046
+        ]
+      },
+      {
+        "azimuth": 5.497787143782138,
+        "coverage": 0.1738423517169615,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          0.5792279653395691,
+          0.573576436351046,
+          -0.5792279653395693
+        ],
+        "rect": [
+          898,
+          130,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865477,
+          0.0,
+          -0.7071067811865474
+        ],
+        "season": "leafy",
+        "up": [
+          -0.40557978767263875,
+          0.8191520442889918,
+          0.4055797876726389
+        ]
+      },
+      {
+        "azimuth": 0.0,
+        "coverage": 0.13390998959417275,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          0.3420201433256688,
+          0.9396926207859083,
+          0.0
+        ],
+        "rect": [
+          2,
+          258,
+          124,
+          124
+        ],
+        "right": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "season": "leafy",
+        "up": [
+          -0.9396926207859083,
+          0.3420201433256688,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 0.7853981633974483,
+        "coverage": 0.12929240374609782,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          0.24184476264797533,
+          0.9396926207859083,
+          0.2418447626479753
+        ],
+        "rect": [
+          130,
+          258,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865475,
+          0.0,
+          -0.7071067811865476
+        ],
+        "season": "leafy",
+        "up": [
+          -0.6644630243886747,
+          0.3420201433256688,
+          -0.6644630243886746
+        ]
+      },
+      {
+        "azimuth": 1.5707963267948966,
+        "coverage": 0.13124349635796045,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          2.0942693688384965e-17,
+          0.9396926207859083,
+          0.3420201433256688
+        ],
+        "rect": [
+          258,
+          258,
+          124,
+          124
+        ],
+        "right": [
+          1.0,
+          0.0,
+          -6.123233995736766e-17
+        ],
+        "season": "leafy",
+        "up": [
+          -5.753957801139251e-17,
+          0.3420201433256688,
+          -0.9396926207859083
+        ]
+      },
+      {
+        "azimuth": 2.356194490192345,
+        "coverage": 0.12961758584807492,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          -0.2418447626479753,
+          0.9396926207859083,
+          0.24184476264797533
+        ],
+        "rect": [
+          386,
+          258,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865476,
+          0.0,
+          0.7071067811865475
+        ],
+        "season": "leafy",
+        "up": [
+          0.6644630243886746,
+          0.3420201433256688,
+          -0.6644630243886747
+        ]
+      },
+      {
+        "azimuth": 3.141592653589793,
+        "coverage": 0.12974765868886576,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          -0.3420201433256688,
+          0.9396926207859083,
+          4.188538737676993e-17
+        ],
+        "rect": [
+          514,
+          258,
+          124,
+          124
+        ],
+        "right": [
+          1.2246467991473532e-16,
+          0.0,
+          1.0
+        ],
+        "season": "leafy",
+        "up": [
+          0.9396926207859083,
+          0.3420201433256688,
+          -1.1507915602278503e-16
+        ]
+      },
+      {
+        "azimuth": 3.9269908169872414,
+        "coverage": 0.12018730489073881,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          -0.2418447626479754,
+          0.9396926207859083,
+          -0.2418447626479753
+        ],
+        "rect": [
+          642,
+          258,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865477
+        ],
+        "season": "leafy",
+        "up": [
+          0.6644630243886748,
+          0.3420201433256689,
+          0.6644630243886746
+        ]
+      },
+      {
+        "azimuth": 4.71238898038469,
+        "coverage": 0.1298126951092612,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          -6.282808106515489e-17,
+          0.9396926207859083,
+          -0.3420201433256688
+        ],
+        "rect": [
+          770,
+          258,
+          124,
+          124
+        ],
+        "right": [
+          -1.0,
+          0.0,
+          1.8369701987210297e-16
+        ],
+        "season": "leafy",
+        "up": [
+          1.7261873403417752e-16,
+          0.3420201433256688,
+          0.9396926207859083
+        ]
+      },
+      {
+        "azimuth": 5.497787143782138,
+        "coverage": 0.13937304890738814,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          0.24184476264797528,
+          0.9396926207859083,
+          -0.2418447626479754
+        ],
+        "rect": [
+          898,
+          258,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865477,
+          0.0,
+          -0.7071067811865474
+        ],
+        "season": "leafy",
+        "up": [
+          -0.6644630243886744,
+          0.3420201433256688,
+          0.6644630243886748
+        ]
+      },
+      {
+        "azimuth": 0.0,
+        "coverage": 0.02633975026014568,
+        "elevation": 0.0,
+        "eye": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "rect": [
+          2,
+          386,
+          124,
+          124
+        ],
+        "right": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "season": "dormant",
+        "up": [
+          -0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 0.7853981633974483,
+        "coverage": 0.024063475546305932,
+        "elevation": 0.0,
+        "eye": [
+          0.7071067811865476,
+          0.0,
+          0.7071067811865475
+        ],
+        "rect": [
+          130,
+          386,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865475,
+          0.0,
+          -0.7071067811865476
+        ],
+        "season": "dormant",
+        "up": [
+          -0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 1.5707963267948966,
+        "coverage": 0.026925078043704476,
+        "elevation": 0.0,
+        "eye": [
+          6.123233995736766e-17,
+          0.0,
+          1.0
+        ],
+        "rect": [
+          258,
+          386,
+          124,
+          124
+        ],
+        "right": [
+          1.0,
+          0.0,
+          -6.123233995736766e-17
+        ],
+        "season": "dormant",
+        "up": [
+          -0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 2.356194490192345,
+        "coverage": 0.027835587929240374,
+        "elevation": 0.0,
+        "eye": [
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865476
+        ],
+        "rect": [
+          386,
+          386,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865476,
+          0.0,
+          0.7071067811865475
+        ],
+        "season": "dormant",
+        "up": [
+          0.0,
+          1.0,
+          -0.0
+        ]
+      },
+      {
+        "azimuth": 3.141592653589793,
+        "coverage": 0.02633975026014568,
+        "elevation": 0.0,
+        "eye": [
+          -1.0,
+          0.0,
+          1.2246467991473532e-16
+        ],
+        "rect": [
+          514,
+          386,
+          124,
+          124
+        ],
+        "right": [
+          1.2246467991473532e-16,
+          0.0,
+          1.0
+        ],
+        "season": "dormant",
+        "up": [
+          0.0,
+          1.0,
+          -0.0
+        ]
+      },
+      {
+        "azimuth": 3.9269908169872414,
+        "coverage": 0.024063475546305932,
+        "elevation": 0.0,
+        "eye": [
+          -0.7071067811865477,
+          0.0,
+          -0.7071067811865475
+        ],
+        "rect": [
+          642,
+          386,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865477
+        ],
+        "season": "dormant",
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 4.71238898038469,
+        "coverage": 0.026925078043704476,
+        "elevation": 0.0,
+        "eye": [
+          -1.8369701987210297e-16,
+          0.0,
+          -1.0
+        ],
+        "rect": [
+          770,
+          386,
+          124,
+          124
+        ],
+        "right": [
+          -1.0,
+          0.0,
+          1.8369701987210297e-16
+        ],
+        "season": "dormant",
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 5.497787143782138,
+        "coverage": 0.027835587929240374,
+        "elevation": 0.0,
+        "eye": [
+          0.7071067811865474,
+          0.0,
+          -0.7071067811865477
+        ],
+        "rect": [
+          898,
+          386,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865477,
+          0.0,
+          -0.7071067811865474
+        ],
+        "season": "dormant",
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 0.0,
+        "coverage": 0.025429240374609783,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          0.8191520442889918,
+          0.573576436351046,
+          0.0
+        ],
+        "rect": [
+          2,
+          514,
+          124,
+          124
+        ],
+        "right": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "season": "dormant",
+        "up": [
+          -0.573576436351046,
+          0.8191520442889918,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 0.7853981633974483,
+        "coverage": 0.02269771071800208,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          0.5792279653395692,
+          0.573576436351046,
+          0.5792279653395691
+        ],
+        "rect": [
+          130,
+          514,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865475,
+          0.0,
+          -0.7071067811865476
+        ],
+        "season": "dormant",
+        "up": [
+          -0.40557978767263886,
+          0.8191520442889917,
+          -0.4055797876726388
+        ]
+      },
+      {
+        "azimuth": 1.5707963267948966,
+        "coverage": 0.02432362122788762,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          5.015859645267624e-17,
+          0.573576436351046,
+          0.8191520442889918
+        ],
+        "rect": [
+          258,
+          514,
+          124,
+          124
+        ],
+        "right": [
+          1.0,
+          0.0,
+          -6.123233995736766e-17
+        ],
+        "season": "dormant",
+        "up": [
+          -3.5121427342182706e-17,
+          0.8191520442889918,
+          -0.573576436351046
+        ]
+      },
+      {
+        "azimuth": 2.356194490192345,
+        "coverage": 0.025494276795005204,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          -0.5792279653395691,
+          0.573576436351046,
+          0.5792279653395692
+        ],
+        "rect": [
+          386,
+          514,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865476,
+          0.0,
+          0.7071067811865475
+        ],
+        "season": "dormant",
+        "up": [
+          0.4055797876726388,
+          0.8191520442889917,
+          -0.40557978767263886
+        ]
+      },
+      {
+        "azimuth": 3.141592653589793,
+        "coverage": 0.02484391259105099,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          -0.8191520442889918,
+          0.573576436351046,
+          1.0031719290535247e-16
+        ],
+        "rect": [
+          514,
+          514,
+          124,
+          124
+        ],
+        "right": [
+          1.2246467991473532e-16,
+          0.0,
+          1.0
+        ],
+        "season": "dormant",
+        "up": [
+          0.573576436351046,
+          0.8191520442889918,
+          -7.024285468436541e-17
+        ]
+      },
+      {
+        "azimuth": 3.9269908169872414,
+        "coverage": 0.024193548387096774,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          -0.5792279653395693,
+          0.573576436351046,
+          -0.5792279653395691
+        ],
+        "rect": [
+          642,
+          514,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865477
+        ],
+        "season": "dormant",
+        "up": [
+          0.4055797876726389,
+          0.8191520442889919,
+          0.4055797876726388
+        ]
+      },
+      {
+        "azimuth": 4.71238898038469,
+        "coverage": 0.02633975026014568,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          -1.504757893580287e-16,
+          0.573576436351046,
+          -0.8191520442889918
+        ],
+        "rect": [
+          770,
+          514,
+          124,
+          124
+        ],
+        "right": [
+          -1.0,
+          0.0,
+          1.8369701987210297e-16
+        ],
+        "season": "dormant",
+        "up": [
+          1.0536428202654811e-16,
+          0.8191520442889918,
+          0.573576436351046
+        ]
+      },
+      {
+        "azimuth": 5.497787143782138,
+        "coverage": 0.027770551508844953,
+        "elevation": 0.6108652381980153,
+        "eye": [
+          0.5792279653395691,
+          0.573576436351046,
+          -0.5792279653395693
+        ],
+        "rect": [
+          898,
+          514,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865477,
+          0.0,
+          -0.7071067811865474
+        ],
+        "season": "dormant",
+        "up": [
+          -0.40557978767263875,
+          0.8191520442889918,
+          0.4055797876726389
+        ]
+      },
+      {
+        "azimuth": 0.0,
+        "coverage": 0.02308792924037461,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          0.3420201433256688,
+          0.9396926207859083,
+          0.0
+        ],
+        "rect": [
+          2,
+          642,
+          124,
+          124
+        ],
+        "right": [
+          0.0,
+          0.0,
+          -1.0
+        ],
+        "season": "dormant",
+        "up": [
+          -0.9396926207859083,
+          0.3420201433256688,
+          0.0
+        ]
+      },
+      {
+        "azimuth": 0.7853981633974483,
+        "coverage": 0.0209417273673257,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          0.24184476264797533,
+          0.9396926207859083,
+          0.2418447626479753
+        ],
+        "rect": [
+          130,
+          642,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865475,
+          0.0,
+          -0.7071067811865476
+        ],
+        "season": "dormant",
+        "up": [
+          -0.6644630243886747,
+          0.3420201433256688,
+          -0.6644630243886746
+        ]
+      },
+      {
+        "azimuth": 1.5707963267948966,
+        "coverage": 0.021657127991675337,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          2.0942693688384965e-17,
+          0.9396926207859083,
+          0.3420201433256688
+        ],
+        "rect": [
+          258,
+          642,
+          124,
+          124
+        ],
+        "right": [
+          1.0,
+          0.0,
+          -6.123233995736766e-17
+        ],
+        "season": "dormant",
+        "up": [
+          -5.753957801139251e-17,
+          0.3420201433256688,
+          -0.9396926207859083
+        ]
+      },
+      {
+        "azimuth": 2.356194490192345,
+        "coverage": 0.02029136316337149,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          -0.2418447626479753,
+          0.9396926207859083,
+          0.24184476264797533
+        ],
+        "rect": [
+          386,
+          642,
+          124,
+          124
+        ],
+        "right": [
+          0.7071067811865476,
+          0.0,
+          0.7071067811865475
+        ],
+        "season": "dormant",
+        "up": [
+          0.6644630243886746,
+          0.3420201433256688,
+          -0.6644630243886747
+        ]
+      },
+      {
+        "azimuth": 3.141592653589793,
+        "coverage": 0.02217741935483871,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          -0.3420201433256688,
+          0.9396926207859083,
+          4.188538737676993e-17
+        ],
+        "rect": [
+          514,
+          642,
+          124,
+          124
+        ],
+        "right": [
+          1.2246467991473532e-16,
+          0.0,
+          1.0
+        ],
+        "season": "dormant",
+        "up": [
+          0.9396926207859083,
+          0.3420201433256688,
+          -1.1507915602278503e-16
+        ]
+      },
+      {
+        "azimuth": 3.9269908169872414,
+        "coverage": 0.02087669094693028,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          -0.2418447626479754,
+          0.9396926207859083,
+          -0.2418447626479753
+        ],
+        "rect": [
+          642,
+          642,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865477
+        ],
+        "season": "dormant",
+        "up": [
+          0.6644630243886748,
+          0.3420201433256689,
+          0.6644630243886746
+        ]
+      },
+      {
+        "azimuth": 4.71238898038469,
+        "coverage": 0.0227627471383975,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          -6.282808106515489e-17,
+          0.9396926207859083,
+          -0.3420201433256688
+        ],
+        "rect": [
+          770,
+          642,
+          124,
+          124
+        ],
+        "right": [
+          -1.0,
+          0.0,
+          1.8369701987210297e-16
+        ],
+        "season": "dormant",
+        "up": [
+          1.7261873403417752e-16,
+          0.3420201433256688,
+          0.9396926207859083
+        ]
+      },
+      {
+        "azimuth": 5.497787143782138,
+        "coverage": 0.021071800208116546,
+        "elevation": 1.2217304763960306,
+        "eye": [
+          0.24184476264797528,
+          0.9396926207859083,
+          -0.2418447626479754
+        ],
+        "rect": [
+          898,
+          642,
+          124,
+          124
+        ],
+        "right": [
+          -0.7071067811865477,
+          0.0,
+          -0.7071067811865474
+        ],
+        "season": "dormant",
+        "up": [
+          -0.6644630243886744,
+          0.3420201433256688,
+          0.6644630243886748
+        ]
+      }
+    ]
+  },
+  "lods": [
+    {
+      "budget": 500,
+      "file": "woodland-near.json",
+      "triangles": 474
+    },
+    {
+      "budget": 64,
+      "file": "woodland-middle.json",
+      "triangles": 50
+    }
+  ],
+  "materials": {
+    "foliage": {
+      "alphaTest": 0.5,
+      "colourSpace": "sRGB",
+      "depthWrite": true,
+      "doubleSided": true,
+      "gloss": 0.1,
+      "textureAlreadyTinted": true
+    },
+    "wood": {
+      "colour": [
+        0.3,
+        0.27,
+        0.24
+      ],
+      "colourSpace": "sRGB"
+    }
+  },
+  "peakFoliage": 1.0,
+  "pivot": [
+    0,
+    0,
+    0
+  ],
+  "rootsIncluded": false,
+  "runtimeTiers": [
+    {
+      "budget": 500,
+      "card_cross": true,
+      "card_fold": 0.0,
+      "cards": 24,
+      "foliage_tris": 48,
+      "leaves": "cards",
+      "max_card": 3.2,
+      "max_cluster": 1000000000.0,
+      "min_radius": 0.3789,
+      "name": "woodland-near",
+      "straighten": 1.2,
+      "tess": {
+        "radial_base": 3,
+        "radial_error": 0.05,
+        "radial_falloff": 0.72,
+        "radial_max": 3,
+        "radial_min": 3,
+        "u_scale": 0.9,
+        "v_scale": 0.22
+      },
+      "why": "Bounded foreground woodland mesh."
+    },
+    {
+      "budget": 64,
+      "card_cross": false,
+      "card_fold": 0.0,
+      "cards": 8,
+      "foliage_tris": 16,
+      "leaves": "cards",
+      "max_card": 8.0,
+      "max_cluster": 1000000000.0,
+      "min_radius": 0.3789,
+      "name": "woodland-middle",
+      "straighten": 2.0,
+      "tess": {
+        "radial_base": 3,
+        "radial_error": 0.05,
+        "radial_falloff": 0.72,
+        "radial_max": 3,
+        "radial_min": 3,
+        "u_scale": 0.9,
+        "v_scale": 0.22
+      },
+      "why": "Coarse middle-distance geometry; distant plants use baked views."
+    }
+  ],
+  "season": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.3437500000000004,
+    0.7239583333333334,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.8184523809523806,
+    0.6011904761904765,
+    0.3839285714285712,
+    0.16666666666666585,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "seed": 101,
+  "sourceCardTexture": {
+    "aspect": 1.0,
+    "cluster": 8.564453125,
+    "coverage": 0.5514234304428101,
+    "textureBlades": 9
+  },
+  "sourceFingerprint": "4933fb152acf4934343f15fdb569a76b1cf0d70f8fd623dca02df31a38faa92f",
+  "sourceGroundPivotZUp": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "sourceTriangles": 4846,
+  "species": "Quercus rubra",
+  "toolchain": {
+    "matplotlib": "3.11.1",
+    "numpy": "2.5.1"
+  },
+  "units": "metres",
+  "upAxis": "Y",
+  "version": 1,
+  "volume": {
+    "file": "woodland-volume.json",
+    "triangles": 36,
+    "method": "12 enclosing support planes over every baked depth surface",
+    "middleFile": "woodland-volume-middle.json",
+    "middleTriangles": 12,
+    "compilerSHA256": "e2a93687422fd62e68fdd365a70b4825509c94bfdf05544765168f094c0fdf03",
+    "moduleSHA256": "9350d8b2d654177eca2f1a217423a0ec8f1fd8246913e44af85cc7ef18eb971f"
+  }
+}

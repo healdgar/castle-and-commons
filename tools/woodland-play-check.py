@@ -59,8 +59,14 @@ with sync_playwright() as p:
     pose='(()=>{const r=G.woodland.records.find(r=>r.row.id==='+json.dumps(plant)+'&&r.view.shown&&!r.t.cut&&Math.hypot(r.t.x,r.t.z)<3000);return[r.t.x,r.t.z,45,.6,-.4];})()'
     views.append(('volume-'+plant,pose,1));views.append(('volume-'+plant+'-winter',pose,3))
    views.append(('volume-conifer-eye-level',views[2][1].replace('65,.6,0','25,.6,-.8'),1));views.append(('volume-conifer-reverse',views[2][1].replace('65,.6,0','65,2.1,0'),1))
-  for name,expression,season in views:
-   page.evaluate('(()=>{const q='+expression+';flyTo(...q);cam.pitchBias=cam.cur.pitchBias=q[4];cam.cur.focus.copy(cam.focus);cam.cur.dist=cam.dist;cam.cur.yaw=cam.yaw;updateCamera(0,0);animateWorld(0,0);lastSeasonKey="";updateTerrainColors('+str(season)+',.25,1);scene.updateMatrixWorld(true);if(G.woodland)G.woodland.update(0,true);renderer.render(scene,camera);})()')
+  views.extend([
+   ('broadleaf-spring-buds',views[0][1],0,.08),
+   ('broadleaf-spring-partial',views[0][1],0,.225),
+   ('broadleaf-spring-full',views[0][1],0,.38),
+   ('broadleaf-autumn-shedding',views[0][1],2,.60)])
+  for name,expression,season,*stage in views:
+   blend=stage[0] if stage else .25
+   page.evaluate('(()=>{const q='+expression+';flyTo(...q);cam.pitchBias=cam.cur.pitchBias=q[4];cam.cur.focus.copy(cam.focus);cam.cur.dist=cam.dist;cam.cur.yaw=cam.yaw;updateCamera(0,0);animateWorld(0,0);lastSeasonKey="";updateTerrainColors('+str(season)+','+str(blend)+',1);scene.updateMatrixWorld(true);if(G.woodland)G.woodland.update(0,true);renderer.render(scene,camera);})()')
    inspect=page.evaluate('(()=>{const gl=renderer.getContext();return{woodland:G.woodland?{near:G.woodland.near,middle:G.woodland.middle,records:G.woodland.records.length,batches:G.woodland.far.length,rebuildWallMs:G.woodland.lastRebuildMs,writeDepth:G.woodland.writeDepth}:null,day:day(),camera:camera.position.toArray(),distance:cam.cur.dist,render:{...renderer.info.render},geometry:renderer.info.memory.geometries,textures:renderer.info.memory.textures,shadowEnabled:G.sun.castShadow,shadowExtent:G.sun.shadow.camera.right,shadowTexel:G.sun.shadow.camera.right*2/2048,leafless:G.seasonU.uLeafless.value,glError:gl.getError(),linked:renderer.info.programs.every(p=>gl.getProgramParameter(p.program,gl.LINK_STATUS))};})()')
    data=page.context.new_cdp_session(page).send('Page.captureScreenshot',{'format':'png'})['data'];(out/(name+'.png')).write_bytes(base64.b64decode(data));result['views'].append({'name':name,**inspect});print(name+' '+json.dumps(inspect),flush=True);assert inspect['linked'] and inspect['glError']==0,inspect
   
@@ -70,12 +76,18 @@ with sync_playwright() as p:
    data=page.context.new_cdp_session(page).send('Page.captureScreenshot',{'format':'png'})['data'];(out/(name+'-original.png')).write_bytes(base64.b64decode(data))
    result['views'].append({'name':name+'-original','render':page.evaluate('({...renderer.info.render})')})
   page.evaluate('G.woodland.setEnabled(true)')
-  shadow=[]
-  for yaw in [.6,2.1]:
-   digest=page.evaluate('(async()=>{const t=W.treeSpots.dec.find(t=>Math.hypot(t.x,t.z)<3000);flyTo(t.x,t.z,55,'+str(yaw)+',0);cam.cur.focus.copy(cam.focus);cam.cur.dist=cam.dist;cam.cur.yaw=cam.yaw;updateCamera(0,0);animateWorld(0,0);lastSeasonKey="";updateTerrainColors(3,.25,1);scene.updateMatrixWorld(true);G.woodland.update(0,true);renderer.render(scene,camera);const target=G.sun.shadow.map,pixels=new Uint8Array(target.width*target.height*4);renderer.readRenderTargetPixels(target,0,0,target.width,target.height,pixels);return [...new Uint8Array(await crypto.subtle.digest("SHA-256",pixels))].map(v=>v.toString(16).padStart(2,"0")).join("");})()')
-   shadow.append(digest)
-  assert shadow[0]==shadow[1],shadow
-  result['winterShadow']={'sha256':shadow[0],'cameraOnlyRotationUnchanged':True}
+  # Isolate woodland: unrelated buildings cannot make an empty tree map pass.
+  page.evaluate('window.__otherCasters=[];scene.traverse(m=>{if(m.isMesh&&m.castShadow&&!G.woodland.far.includes(m)){__otherCasters.push(m);m.castShadow=false;}})')
+  for shadowName,season,blend in [('winterShadow',3,.25),('springShadow',0,.225)]:
+   shadow=[]
+   for yaw in [.6,2.1]:
+    digest=page.evaluate('(async()=>{const t=W.treeSpots.dec.find(t=>Math.hypot(t.x,t.z)<3000);flyTo(t.x,t.z,55,'+str(yaw)+',0);cam.cur.focus.copy(cam.focus);cam.cur.dist=cam.dist;cam.cur.yaw=cam.yaw;updateCamera(0,0);animateWorld(0,0);lastSeasonKey="";updateTerrainColors('+str(season)+','+str(blend)+',1);scene.updateMatrixWorld(true);G.woodland.update(0,true);renderer.render(scene,camera);const target=G.sun.shadow.map,pixels=new Uint8Array(target.width*target.height*4);renderer.readRenderTargetPixels(target,0,0,target.width,target.height,pixels);let drawnPixels=0;for(let i=0;i<pixels.length;i+=4)if(pixels[i]!==255||pixels[i+1]!==255||pixels[i+2]!==255||pixels[i+3]!==255)drawnPixels++;return {drawnPixels,sha256:[...new Uint8Array(await crypto.subtle.digest("SHA-256",pixels))].map(v=>v.toString(16).padStart(2,"0")).join("")};})()')
+    assert digest["drawnPixels"]>128,"empty woodland shadow map"
+    shadow.append(digest)
+   assert shadow[0]==shadow[1],shadow
+   result[shadowName]={**shadow[0],'cameraOnlyRotationUnchanged':True}
+  assert result['springShadow']['drawnPixels']>result['winterShadow']['drawnPixels'],'leaf clusters must cast additional shadow'
+  page.evaluate('__otherCasters.forEach(m=>m.castShadow=true)')
   result['ab']=page.evaluate('(()=>{const before=G.woodland.records.map(r=>r.view.shown);G.woodland.setEnabled(false);const original={instances:G.treeChunks.reduce((n,m)=>n+m.count,0),nativeShown:G.woodland.records.map(r=>G.treeInstances.get(r.t).shown)};G.woodland.setEnabled(true);G.woodland.update(0,true);return{before,original,after:G.woodland.records.map(r=>r.view.shown)};})()')
   assert result['ab']['before']==result['ab']['original']['nativeShown']==result['ab']['after']
   result['ab']={'matchedInstances':len(result['ab']['before']),'originalInstances':result['ab']['original']['instances']}

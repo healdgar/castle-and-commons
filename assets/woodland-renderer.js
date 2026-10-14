@@ -54,6 +54,14 @@ uniform mat4 projectionMatrix;
 float woodlandDither(){vec2 p=mod(floor(gl_FragCoord.xy),4.);return (mod(p.x+p.y*2.,4.)*4.+mod(p.y+p.x*2.,4.)+.5)/16.;}
 vec2 tileUV(vec2 q,float tile){float stride=vTile.z+2.*vTile.w;vec2 origin=vTile.xy;return vec2((origin.x+mod(tile,8.)*stride+vTile.w+q.x*vTile.z)/uAtlasSize.x,1.-(origin.y+floor(tile/8.)*stride+vTile.w+q.y*vTile.z)/uAtlasSize.y);}
 bool validUV(vec2 q){return q.x>=0.&&q.y>=0.&&q.x<=1.&&q.y<=1.;}
+// Leaf clusters bud and shed in object space. They stay opaque and keep their
+// pattern as the camera moves; neither screen-door noise nor a whole-tree fade.
+float clusterHash(vec3 p){p=fract(p*.1031);p+=dot(p,p.yzx+33.33);return fract((p.x+p.y)*p.z);}
+float clusterRank(vec3 p){
+ vec3 q=p*9.+vec3(vFrame0.w,0.,vFrame2.w)*.017,i=floor(q),f=fract(q);f=f*f*(3.-2.*f);
+ return mix(mix(mix(clusterHash(i),clusterHash(i+vec3(1.,0.,0.)),f.x),mix(clusterHash(i+vec3(0.,1.,0.)),clusterHash(i+vec3(1.,1.,0.)),f.x),f.y),
+            mix(mix(clusterHash(i+vec3(0.,0.,1.)),clusterHash(i+vec3(1.,0.,1.)),f.x),mix(clusterHash(i+vec3(0.,1.,1.)),clusterHash(i+vec3(1.,1.,1.)),f.x),f.y),f.z);
+}
 void woodlandSample(out vec3 albedo,out vec3 normal,out vec3 hit,out float coverage,out float leaf){
  #ifdef WOODLAND_VOLUME
  vec3 delta=cameraPosition-vec3(vFrame0.w,vFrame1.w,vFrame2.w);
@@ -71,12 +79,12 @@ void woodlandSample(out vec3 albedo,out vec3 normal,out vec3 hit,out float cover
  float loss=uLeafless*(1.-mod(floor(floor(vInfo.w)/16.),2.));
  #ifdef WOODLAND_SHADOW
  // One fixed light-facing sample suffices for a caster; never pay for beauty blending in the shadow map.
- al=floor(ap+.5);aw=0.;el=floor(ep+.5);ew=0.;loss=step(woodlandDither(),loss);
+ al=floor(ap+.5);aw=0.;el=floor(ep+.5);ew=0.;
  #endif
- for(int season=0;season<2;season++){
-  float sw=season==0?1.-loss:loss;if(sw<=0.0001)continue;
-  for(int i=0;i<4;i++){
-   float ai=mod(al+float(i-i/2*2),8.),ei=el+float(i/2),w=sw*(i-i/2*2==0?1.-aw:aw)*(i/2==0?1.-ew:ew);if(w<=0.0001)continue;
+ for(int i=0;i<4;i++){
+  float ai=mod(al+float(i-i/2*2),8.),ei=el+float(i/2),w=(i-i/2*2==0?1.-aw:aw)*(i/2==0?1.-ew:ew);if(w<=0.0001)continue;
+  for(int season=0;season<2;season++){
+   if(season==0&&loss>=.9999||season==1&&loss<=.0001)continue;
    float a=ai*.785398163,e=ei*.610865238,tile=float(season)*24.+ei*8.+ai;
    vec3 se=vec3(cos(e)*cos(a),sin(e),cos(e)*sin(a)),sr=vec3(sin(a),0.,-cos(a)),su=cross(se,sr);
    vec3 p=start;vec2 q=vec2(0.),lastQ=vec2(0.);vec4 d=vec4(0.);float hasHit=0.;
@@ -93,8 +101,12 @@ void woodlandSample(out vec3 albedo,out vec3 normal,out vec3 hit,out float cover
    vec2 projected=vec2(.5+.5*dot(p,sr),.5-.5*dot(p,su));
    if(length(p)>1.03||length(projected-lastQ)>2./vTile.z)continue;
    #endif
+   // When a leafy cluster sheds, reveal the actual dormant branch surface
+   // along this ray. Never blend its depth into the former leaf's depth.
+   if(season==0&&d.b>.5&&loss>clusterRank(p))continue;
    vec2 uv=tileUV(lastQ,tile);vec4 colour=texture2D(uColour,uv);float c=colour.a*w;
-   albedo+=colour.rgb*c;normal+=(texture2D(uNormal,uv).rgb*2.-1.)*c;hit+=p*c;leaf+=d.b*c;coverage+=c;
+   if(colour.a<.1)continue;
+   albedo+=colour.rgb*c;normal+=(texture2D(uNormal,uv).rgb*2.-1.)*c;hit+=p*c;leaf+=d.b*c;coverage+=c;break;
   }
  }
  if(coverage<.1)discard;albedo/=coverage;leaf/=coverage;
@@ -129,11 +141,11 @@ float volumeShadow(vec3 world){
 void main(){
  float d=woodlandDither();if(d<vInfo.x||d>=vInfo.y)discard;
  vec3 albedo,normal,hit;float coverage,leaf;woodlandSample(albedo,normal,hit,coverage,leaf);
- // Native PNG colour is sRGB. Decode the new volume palette before lighting;
- // its metadata also selects this conversion in the distant representation.
+ // Retain the established broadleaf palette. Conifers decode native sRGB
+ // before lighting, with the same selection in their distant representation.
  if(vInfo.w>=32.)albedo=mix(albedo/12.92,pow((albedo+.055)/1.055,vec3(2.4)),step(vec3(.04045),albedo));
  vec3 wn=normalize(vFrame0.xyz*normal.x/dot(vFrame0.xyz,vFrame0.xyz)+vFrame1.xyz*normal.y/dot(vFrame1.xyz,vFrame1.xyz)+vFrame2.xyz*normal.z/dot(vFrame2.xyz,vFrame2.xyz));
- albedo*=mix(vec3(1.),vec3(1.15,.7,.32),leaf*uAutumn)*fract(vInfo.w)*10.;
+ albedo*=mix(vec3(1.),vec3(1.15,.7,.32),leaf*uAutumn*(1.-mod(floor(floor(vInfo.w)/16.),2.)))*fract(vInfo.w)*10.;
  #ifdef WOODLAND_VOLUME
  float shadow=volumeShadow(woodlandWorld(hit));
  #else
@@ -206,7 +218,9 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
  }
  const spec=library.atlasSpec,uniforms=T.UniformsUtils.merge([T.UniformsLib.lights,T.UniformsLib.fog]);
  Object.assign(uniforms,lighting,{uLeafless:G.seasonU.uLeafless,uAtlasSize:{value:new T.Vector2(library.atlas[0].image.width,library.atlas[0].image.height)},uColour:{value:library.atlas[0]},uNormal:{value:library.atlas[1]},uDepth:{value:library.atlas[2]}});
- const material=new T.ShaderMaterial({uniforms,vertexShader:VERTEX,fragmentShader:FRAGMENT,lights:true,fog:true,extensions:{fragDepth:writeDepth},defines:writeDepth?{WRITE_DEPTH:1}:{}});
+ // r128 takes shadowSide from the beauty material even with customDepthMaterial.
+ // The light-facing card would otherwise be culled as a front face in the PCF pass.
+ const material=new T.ShaderMaterial({uniforms,vertexShader:VERTEX,fragmentShader:FRAGMENT,lights:true,fog:true,shadowSide:T.DoubleSide,extensions:{fragDepth:writeDepth},defines:writeDepth?{WRITE_DEPTH:1}:{}});
  const volumeMaterial=new T.ShaderMaterial({uniforms,vertexShader:VERTEX,fragmentShader:FRAGMENT,lights:true,fog:true,side:T.DoubleSide,extensions:{fragDepth:writeDepth},defines:{WOODLAND_VOLUME:1,...(writeDepth?{WRITE_DEPTH:1}:{})}});
  const depth=new T.ShaderMaterial({uniforms,vertexShader:VERTEX,fragmentShader:DEPTH_FRAGMENT,extensions:{fragDepth:writeDepth},defines:{WOODLAND_SHADOW:1,...(writeDepth?{WRITE_DEPTH:1}:{})},side:T.DoubleSide});
  const plants=library.plants.map(row=>{
@@ -214,7 +228,7 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
   for(let tier=0;tier<2;tier++){
    const limit=tier?LIMITS.middle:LIMITS.near,source=row.tiers[tier],volume=row.volumeTiers?.[tier],cover=new T.InstancedBufferAttribute(new Float32Array(limit*2),2),pool=[];
    for(const leaf of [false,true]){const g=(leaf?(volume||source.foliage):source.wood).clone();g.setAttribute('aCover',cover);
-    if(volume&&leaf){const shape=new Float32Array(limit*4),tile=new Float32Array(limit*4),plant=new Float32Array(limit);for(let i=0;i<limit;i++){shape.set([...row.centre.toArray(),row.radius],i*4);tile.set([...row.atlas.origin,row.atlas.tileSize,row.atlas.padding],i*4);plant[i]=row.variant+row.season*16+32;}g.setAttribute('aShape',new T.InstancedBufferAttribute(shape,4));g.setAttribute('aTile',new T.InstancedBufferAttribute(tile,4));g.setAttribute('aPlant',new T.InstancedBufferAttribute(plant,1));}
+    if(volume&&leaf){const shape=new Float32Array(limit*4),tile=new Float32Array(limit*4),plant=new Float32Array(limit);for(let i=0;i<limit;i++){shape.set([...row.centre.toArray(),row.radius],i*4);tile.set([...row.atlas.origin,row.atlas.tileSize,row.atlas.padding],i*4);plant[i]=row.variant+row.season*16+(row.role==='pine'?32:0);}g.setAttribute('aShape',new T.InstancedBufferAttribute(shape,4));g.setAttribute('aTile',new T.InstancedBufferAttribute(tile,4));g.setAttribute('aPlant',new T.InstancedBufferAttribute(plant,1));}
     const m=new T.InstancedMesh(g,volume&&leaf?volumeMaterial:meshMaterial({...row,map:source.map},leaf),limit);m.count=0;m.frustumCulled=false;m.receiveShadow=true;m.userData.woodlandTier=tier?'middle':'near';scene.add(m);pool.push(m);}
    if(pool[1]){pool[1].instanceMatrix=pool[0].instanceMatrix;pool[1].instanceColor=pool[0].instanceColor;}pool.cover=cover;pool.used=0;row[tier?'middle':'near']=pool;state.pools.push(pool);
   }
@@ -232,7 +246,7 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
    bounds.expandByPoint(new T.Vector3(e[12]-radius,e[13]-radius,e[14]-radius));bounds.expandByPoint(new T.Vector3(e[12]+radius,e[13]+radius,e[14]+radius));}
   geometry.boundingSphere=bounds.getBoundingSphere(new T.Sphere());
   const m=new T.InstancedMesh(geometry,material,records.length);m.castShadow=true;m.receiveShadow=true;m.customDepthMaterial=depth;m.userData.woodlandTier='far';
-  records.forEach((r,i)=>{const row=r.row;shape.setXYZW(i,row.centre.x,row.centre.y,row.centre.z,row.radius);plant.setX(i,row.variant+row.season*16+(row.volume?32:0));tile.setXYZW(i,...row.atlas.origin,row.atlas.tileSize,row.atlas.padding);r.old.m.getMatrixAt(r.old.ci,matrix);m.setMatrixAt(i,matrix);m.setColorAt(i,new T.Color().setRGB(.9+r.t.v*.12,.9+r.t.v*.12,.9+r.t.v*.12));cover.setXY(i,0,1);
+  records.forEach((r,i)=>{const row=r.row;shape.setXYZW(i,row.centre.x,row.centre.y,row.centre.z,row.radius);plant.setX(i,row.variant+row.season*16+(row.volume&&row.role==='pine'?32:0));tile.setXYZW(i,...row.atlas.origin,row.atlas.tileSize,row.atlas.padding);r.old.m.getMatrixAt(r.old.ci,matrix);m.setMatrixAt(i,matrix);m.setColorAt(i,new T.Color().setRGB(.9+r.t.v*.12,.9+r.t.v*.12,.9+r.t.v*.12));cover.setXY(i,0,1);
    const v={m,ci:i,shown:r.old.shown};map.set(r.t,v);r.view=v;r.position=new T.Vector3(matrix.elements[12],matrix.elements[13],matrix.elements[14]);r.height=row.centre.y+row.radius;
    r.scale=Math.hypot(matrix.elements[4],matrix.elements[5],matrix.elements[6]);r.cover=cover;state.records.push(r);delete r.old;});
   m.instanceMatrix.needsUpdate=true;scene.add(m);state.far.push(m);

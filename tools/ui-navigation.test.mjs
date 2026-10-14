@@ -78,6 +78,20 @@ test('named-card replies cannot replace a newer card or a newly opened root pane
 test('expanding an inspector invalidates its older compact reply',async()=>{
   const {C,contextUI,requests}=infoRuntime(),installed=[];contextUI.expanded=false;Object.assign(C,{inspTarget:null,inspectorPickCode:p=>p?.workerCode||null,setInspectorView(){},showInspect:p=>installed.push(p.workerCard.body)});C.document.getElementById('inspfollow').style={};vm.runInContext(fn('workerShowInspector'),C);const pick={workerCode:'p1'},compact=C.workerShowInspector(pick);contextUI.expanded=true;const full=C.workerShowInspector(pick);requests[1].resolve({body:'Full record'});await full;requests[0].resolve({body:'Compact record'});await compact;assert.deepEqual(installed,['Full record']);
 });
+test('half-second refreshes share a slow linked town request and let its reply open the card',async()=>{
+  const {C,contextUI,requests,el}=infoRuntime(),installed=[];contextUI.kind='insp';contextUI.expanded=true;contextUI.navigation=7;
+  Object.assign(C,{inspTarget:null,BACKGROUND:C.BACKGROUND,backgroundApplying:false,uiBusy:()=>false,inspectorPickCode:p=>p?.workerCode||null,setInspectorView(){},showInspect:p=>installed.push(p.workerCard.title)});el('inspfollow').style={};
+  vm.runInContext(fn('workerShowInspector')+'\n'+fn('refreshInspect'),C);
+  const pick={type:'reference',workerCode:'s0'},pending=C.workerShowInspector(pick);
+  for(let i=0;i<20;i++)assert.equal(C.refreshInspect(),pending);
+  assert.equal(requests.length,1);assert.equal(contextUI.navigation,7);assert.match(el('insptitle').innerHTML,/Opening card/);
+  requests[0].resolve({title:'Rougecastel'});await pending;assert.deepEqual(installed,['Rougecastel']);assert.equal(el('contextpanel').attrs['aria-busy'],undefined);
+});
+test('reopening the same town from a different panel makes its inspector current',async()=>{
+  const {C,contextUI,requests,el}=infoRuntime(),installed=[];contextUI.kind='drawer';contextUI.expanded=false;
+  Object.assign(C,{inspTarget:{workerCode:'s0'},inspectorPickCode:p=>p?.workerCode||null,setInspectorView(){},showInspect:p=>installed.push(p.workerCard.title)});el('inspfollow').style={};vm.runInContext(fn('workerShowInspector'),C);
+  const pending=C.workerShowInspector({workerCode:'s0'});assert.equal(contextUI.kind,'insp');requests[0].resolve({title:'Rougecastel'});await pending;assert.deepEqual(installed,['Rougecastel']);assert.equal(el('contextpanel').attrs['aria-busy'],undefined);
+});
 test('a surname chooser explains empty family records instead of offering indistinguishable dead ends',()=>{
   const W={fams:[{home:0},{home:0},{home:0}],settlements:[{name:'East',folk:[{fam:0,gn:'Anne'}],dead:[]}]},codes=['family:0','family:1','family:2'],C=vm.createContext({W,infoUI:{reference:'choose:'+encodeURIComponent(JSON.stringify(codes))},referenceTarget:()=>({label:'Shared family'}),referenceTitle:()=> 'Shared family',folkName:p=>p.gn,esc:String});vm.runInContext(fn('referenceChoiceContext')+'\n'+fn('referenceInfoHTML'),C);const result=C.referenceInfoHTML();assert.equal((result.match(/data-nm=/g)||[]).length,1);assert.match(result,/Anne/);assert.match(result,/2 other families have no named members currently recorded/);assert.equal(C.referenceChoiceContext('family:1',new Map()),null);
 });

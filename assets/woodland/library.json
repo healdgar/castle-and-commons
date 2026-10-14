@@ -11,13 +11,13 @@
     "normal": "normal.png",
     "depth": "depth.png",
     "width": 2048,
-    "height": 2560
+    "height": 3072
   },
   "plants": [
     {
       "id": "oak-101-20",
       "role": "dec",
-      "representation": "mesh",
+      "representation": "volume",
       "species": "Quercus rubra",
       "seed": 101,
       "sourceFingerprint": "4933fb152acf4934343f15fdb569a76b1cf0d70f8fd623dca02df31a38faa92f",
@@ -40,6 +40,8 @@
           "triangles": 50
         }
       ],
+      "volume": "woodland-volume.json",
+      "middleVolume": "woodland-volume-middle.json",
       "atlas": {
         "centre": [
           0.0910293459892273,
@@ -47,22 +49,26 @@
           0.8734978437423706
         ],
         "radius": 4.483633648497362,
-        "size": 512,
-        "tileSize": 48,
+        "size": 1024,
+        "tileSize": 124,
         "padding": 2,
         "colour": "colour.png",
         "normal": "normal.png",
         "depth": "depth.png",
         "origin": [
           0,
-          2048
+          0
+        ],
+        "packedSize": [
+          1024,
+          768
         ]
       }
     },
     {
       "id": "oak-138-20",
       "role": "dec",
-      "representation": "mesh",
+      "representation": "volume",
       "species": "Quercus rubra",
       "seed": 138,
       "sourceFingerprint": "d6ed78ec6c2ad125c574aa9cd84efb173a289138b2bd3bd94317ce1ac2d8192d",
@@ -85,6 +91,8 @@
           "triangles": 59
         }
       ],
+      "volume": "woodland-volume.json",
+      "middleVolume": "woodland-volume-middle.json",
       "atlas": {
         "centre": [
           -0.11586683988571167,
@@ -92,22 +100,26 @@
           -0.11182278394699097
         ],
         "radius": 4.2493642755848375,
-        "size": 512,
-        "tileSize": 48,
+        "size": 1024,
+        "tileSize": 124,
         "padding": 2,
         "colour": "colour.png",
         "normal": "normal.png",
         "depth": "depth.png",
         "origin": [
-          512,
-          2048
+          1024,
+          0
+        ],
+        "packedSize": [
+          1024,
+          768
         ]
       }
     },
     {
       "id": "birch-101-20",
       "role": "small",
-      "representation": "mesh",
+      "representation": "volume",
       "species": "Betula populifolia",
       "seed": 101,
       "sourceFingerprint": "5f95e34e45082cd44f970c48166b96e0b5e9d07a7186d965f6ce701f2dc3f1c4",
@@ -130,6 +142,8 @@
           "triangles": 50
         }
       ],
+      "volume": "woodland-volume.json",
+      "middleVolume": "woodland-volume-middle.json",
       "atlas": {
         "centre": [
           0.1796439290046692,
@@ -137,15 +151,19 @@
           0.33751600980758667
         ],
         "radius": 2.4027740884480795,
-        "size": 512,
-        "tileSize": 48,
+        "size": 1024,
+        "tileSize": 124,
         "padding": 2,
         "colour": "colour.png",
         "normal": "normal.png",
         "depth": "depth.png",
         "origin": [
+          0,
+          768
+        ],
+        "packedSize": [
           1024,
-          2048
+          768
         ]
       }
     },
@@ -192,8 +210,12 @@
         "normal": "normal.png",
         "depth": "depth.png",
         "origin": [
-          0,
-          0
+          1024,
+          768
+        ],
+        "packedSize": [
+          1024,
+          768
         ]
       }
     },
@@ -239,8 +261,12 @@
         "normal": "normal.png",
         "depth": "depth.png",
         "origin": [
+          0,
+          1536
+        ],
+        "packedSize": [
           1024,
-          0
+          768
         ]
       }
     },
@@ -286,8 +312,12 @@
         "normal": "normal.png",
         "depth": "depth.png",
         "origin": [
-          0,
-          1024
+          1024,
+          1536
+        ],
+        "packedSize": [
+          1024,
+          768
         ]
       }
     },
@@ -333,24 +363,28 @@
         "normal": "normal.png",
         "depth": "depth.png",
         "origin": [
+          0,
+          2304
+        ],
+        "packedSize": [
           1024,
-          1024
+          768
         ]
       }
     }
   ],
   "atlasFiles": {
     "colour.png": {
-      "bytes": 376562,
-      "sha256": "068606b10154bdf198d29082c6b8919da5d8bff5404ba7945825c4dd6a584580"
+      "bytes": 522223,
+      "sha256": "5d4af566ddc8de280ddea3c42adb262f91c39fe6a33a79801fca4f77e0cc7cd5"
     },
     "normal.png": {
-      "bytes": 1061172,
-      "sha256": "16ef8731acaa27b24152a0725c50ee013e227314327db775b17289e9f1b59bd5"
+      "bytes": 1435424,
+      "sha256": "6430b75734f023ee67e9c821ea28f595661fee143e8ae53fd3032a06f629c9ca"
     },
     "depth.png": {
-      "bytes": 1293741,
-      "sha256": "3f9f63a39617568503a7292d33850ca7e63eb1f524cbc6ce3166c310b0a4c6c8"
+      "bytes": 1718307,
+      "sha256": "6d9b6f6cc05e8044fb9943320089aad15a5ec94116ab0c0a3fcd36b8e3632a2c"
     }
   }
 }

@@ -16,12 +16,18 @@ width = size * 2
 x = y = row_height = 0
 for plant in sorted(plants, key=lambda p: -p['atlas']['size']):
     bank = plant['atlas']['size']
+    # Six populated view rows; the power-of-two source bank has unused tail
+    # rows. Keep every tile and its padding verbatim without uploading that tail.
+    used_height = 6 * (plant['atlas']['tileSize'] + 2 * plant['atlas']['padding'])
+    if used_height > bank:
+        raise ValueError('Directional rows exceed the source bank')
     if x + bank > width:
         y += row_height
         x = row_height = 0
     plant['atlas']['origin'] = [x, y]
+    plant['atlas']['packedSize'] = [bank, used_height]
     x += bank
-    row_height = max(row_height, bank)
+    row_height = max(row_height, used_height)
 height = y + row_height
 library['atlas'].update(width=width, height=height, columns=2)
 for channel in ('colour', 'normal', 'depth'):
@@ -30,6 +36,6 @@ for channel in ('colour', 'normal', 'depth'):
         with Image.open(root / plant['id'] / plant['atlas'][channel]) as image:
             if image.size != (plant['atlas']['size'], plant['atlas']['size']):
                 raise ValueError('Source PNG dimensions do not match the manifest')
-            atlas.paste(image.convert('RGBA'), tuple(plant['atlas']['origin']))
+            atlas.paste(image.convert('RGBA').crop((0, 0, *plant['atlas']['packedSize'])), tuple(plant['atlas']['origin']))
     atlas.save(root / (channel + '.png'))
 (root / 'library.json').write_text(json.dumps(library, indent=2) + '\n')
