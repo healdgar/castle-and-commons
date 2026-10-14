@@ -4,7 +4,7 @@ Read `docs/ISSUES.md` first. It is the sole current record of unfinished work, n
 
 ## Repository and release
 - One branch: `main`. No long-lived branches; an experimental build may get a short-lived one, deleted after. Parallel agents work in their own clones (on the user's Mac under `~/dev/.furlong-work/<name>`, remote removed; never under `/tmp`, which a reboot wipes) and hand back patches; only one agent edits the main checkout's `index.html` at a time.
-- One build, three targets. Every push to `main` deploys GitHub Pages and the container image `ghcr.io/healdgar/furlong-kingdom-annals` (`.github/workflows/pages.yml`); the claude.ai artifact is published from the same build.
+- One build, three targets. Every push to `main` deploys GitHub Pages and the container image `ghcr.io/healdgar/castle-and-commons` (`.github/workflows/pages.yml`); the claude.ai artifact is published from the same build.
 - Release: `node tools/embed-advisor.mjs` → `node tools/embed-woodland.mjs` → `node --test --test-concurrency=8 tools/*.test.mjs` → `./tools/stamp.sh` (embeds again and stamps the build) → commit → `git push origin main` → publish `index.html` to the artifact with `assets/` and `LICENSE` as files.
 - The advisor carries copies of `README.md`, `docs/UI-GUIDE.md` and its bridge inside `index.html`; after editing any of them run `node tools/embed-advisor.mjs`, or `tools/advisor-context.test.mjs` fails.
 - `docs/ISSUES.md` is the one list of bugs, simulation debt and planned work. Update it when an issue is found, assigned or fixed.

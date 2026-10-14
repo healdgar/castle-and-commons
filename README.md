@@ -61,7 +61,7 @@ static host. Every push to `main` deploys
 a container image:
 
 ```sh
-docker run --rm -p 8080:80 ghcr.io/healdgar/furlong-kingdom-annals
+docker run --rm -p 8080:80 ghcr.io/healdgar/castle-and-commons
 # then open http://localhost:8080  (the browser fetches three.js from cdnjs)
 ```
 

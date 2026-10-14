@@ -47,3 +47,14 @@ test('opening town orders enforces ownership and play mode without writing a sav
   click(0);click(2);assert.deepEqual(opened,[]);click(1);assert.deepEqual(opened,['Our town']);assert.equal(vm.runInContext('JOURNAL.length',C),0);
   C.W.player.on=false;click(1);assert.deepEqual(opened,['Our town']);
 });
+test('house, succession and army inspection rows open cards in worker and foreground modes without writing a save command',()=>{
+  const C=realm(0),opened=[];C.W.armies=[{id:4,name:'Royal Host'}];
+  Object.assign(C,{backgroundApplying:false,notableById:id=>C.BACKGROUND?undefined:({id,name:'Duke '+id}),armyDisplayPos:()=>({x:10,z:20}),flyTo(){},markManual(){},
+    showInspect:pk=>opened.push(pk.workerCode||pk.n?.name||pk.a?.name),refreshCrownPanel(){},refreshInspect(){},updateHUD(){},renderPetition(){}});
+  vm.runInContext(['runCmd','uiConfirmKey','uiConfirmed'].map(fn).join('\n')+'\n'+source.match(/const cmdClick=e=>\{.*?\};/)[0],C);
+  const click=(cmd,arg)=>{C.e={target:{closest:()=>({dataset:{cmd,arg:String(arg)}})}};vm.runInContext('cmdClick(e)',C);};
+  C.BACKGROUND={};click('notable',7);click('notable','');click('army',4);
+  C.BACKGROUND=null;click('notable',9);
+  assert.deepEqual(opened,['n7','Royal Host','Duke 9']);assert.equal(vm.runInContext('JOURNAL.length',C),0);
+});
+

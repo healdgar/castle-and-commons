@@ -230,6 +230,7 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
    for(const leaf of [false,true]){const g=(leaf?(volume||source.foliage):source.wood).clone();g.setAttribute('aCover',cover);
     if(volume&&leaf){const shape=new Float32Array(limit*4),tile=new Float32Array(limit*4),plant=new Float32Array(limit);for(let i=0;i<limit;i++){shape.set([...row.centre.toArray(),row.radius],i*4);tile.set([...row.atlas.origin,row.atlas.tileSize,row.atlas.padding],i*4);plant[i]=row.variant+row.season*16+(row.role==='pine'?32:0);}g.setAttribute('aShape',new T.InstancedBufferAttribute(shape,4));g.setAttribute('aTile',new T.InstancedBufferAttribute(tile,4));g.setAttribute('aPlant',new T.InstancedBufferAttribute(plant,1));}
     const m=new T.InstancedMesh(g,volume&&leaf?volumeMaterial:meshMaterial({...row,map:source.map},leaf),limit);m.count=0;m.frustumCulled=false;m.receiveShadow=true;m.userData.woodlandTier=tier?'middle':'near';scene.add(m);pool.push(m);}
+   for(let i=0;i<limit;i++)pool[0].setColorAt(i,new T.Color(1,1,1));
    if(pool[1]){pool[1].instanceMatrix=pool[0].instanceMatrix;pool[1].instanceColor=pool[0].instanceColor;}pool.cover=cover;pool.used=0;row[tier?'middle':'near']=pool;state.pools.push(pool);
   }
   return row;
@@ -246,7 +247,7 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
    bounds.expandByPoint(new T.Vector3(e[12]-radius,e[13]-radius,e[14]-radius));bounds.expandByPoint(new T.Vector3(e[12]+radius,e[13]+radius,e[14]+radius));}
   geometry.boundingSphere=bounds.getBoundingSphere(new T.Sphere());
   const m=new T.InstancedMesh(geometry,material,records.length);m.castShadow=true;m.receiveShadow=true;m.customDepthMaterial=depth;m.userData.woodlandTier='far';
-  records.forEach((r,i)=>{const row=r.row;shape.setXYZW(i,row.centre.x,row.centre.y,row.centre.z,row.radius);plant.setX(i,row.variant+row.season*16+(row.volume&&row.role==='pine'?32:0));tile.setXYZW(i,...row.atlas.origin,row.atlas.tileSize,row.atlas.padding);r.old.m.getMatrixAt(r.old.ci,matrix);m.setMatrixAt(i,matrix);m.setColorAt(i,new T.Color().setRGB(.9+r.t.v*.12,.9+r.t.v*.12,.9+r.t.v*.12));cover.setXY(i,0,1);
+  records.forEach((r,i)=>{const row=r.row;shape.setXYZW(i,row.centre.x,row.centre.y,row.centre.z,row.radius);plant.setX(i,row.variant+row.season*16+(row.volume&&row.role==='pine'?32:0));tile.setXYZW(i,...row.atlas.origin,row.atlas.tileSize,row.atlas.padding);r.old.m.getMatrixAt(r.old.ci,matrix);m.setMatrixAt(i,matrix);r.color=new T.Color().setRGB(.9+r.t.v*.12,.9+r.t.v*.12,.9+r.t.v*.12);m.setColorAt(i,r.color);cover.setXY(i,0,1);
    const v={m,ci:i,shown:r.old.shown};map.set(r.t,v);r.view=v;r.position=new T.Vector3(matrix.elements[12],matrix.elements[13],matrix.elements[14]);r.height=row.centre.y+row.radius;
    r.scale=Math.hypot(matrix.elements[4],matrix.elements[5],matrix.elements[6]);r.cover=cover;state.records.push(r);delete r.old;});
   m.instanceMatrix.needsUpdate=true;scene.add(m);state.far.push(m);
@@ -285,9 +286,9 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
    if(far===1)continue;
    r.cover.setXY(r.view.ci,0,far);r.cover.needsUpdate=true;state.promoted.push(r);
    for(const [name,weight,lo,hi]of [['near',near,far+middle,1],['middle',middle,far,far+middle]]){if(!weight)continue;
-    const pool=r.row[name],i=pool.used++;r.view.m.getMatrixAt(r.view.ci,matrix);pool[0].setMatrixAt(i,matrix);pool.cover.setXY(i,lo,hi);state[name]++;}
+    const pool=r.row[name],i=pool.used++;r.view.m.getMatrixAt(r.view.ci,matrix);pool[0].setMatrixAt(i,matrix);pool[0].setColorAt(i,r.color);pool.cover.setXY(i,lo,hi);state[name]++;}
   }
-  for(const pool of state.pools){for(const m of pool)m.count=pool.used;pool[0].instanceMatrix.needsUpdate=true;pool.cover.needsUpdate=true;}
+  for(const pool of state.pools){for(const m of pool)m.count=pool.used;pool[0].instanceMatrix.needsUpdate=true;pool[0].instanceColor.needsUpdate=true;pool.cover.needsUpdate=true;}
   state.rebuilds++;state.lastRebuildMs=performance.now()-start;
  }
  function setEnabled(on){

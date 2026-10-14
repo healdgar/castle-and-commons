@@ -129,3 +129,39 @@ test('card date normalization preserves current/future formatting and world reco
 test('a missing card date is stated as unrecorded rather than fabricated as today',()=>{
   const C=dateRuntime();for(const d of [undefined,null,NaN,Infinity])assert.equal(C.displayDateStr(d),'date not recorded');
 });
+test('Back to a non-inspector view clears inspTarget so half-second refreshes do not reopen the card',async()=>{
+  const {C,contextUI,requests,el}=infoRuntime(),route={kind:'drawer',expanded:false,tab:'crown',section:'houses',ledgerOpen:false,scroll:48};
+  contextUI.ready=true;contextUI.kind='insp';contextUI.history=[{kind:'chron'},route];
+  Object.assign(C,{G:{ledgerOpen:true},crownSection:'overview',inspTarget:{workerCode:'s0'},backgroundApplying:false,uiBusy:()=>false,inspectorPickCode:p=>p?.workerCode||null,
+    hideInspect(){C.inspTarget=null;},selectTab(){},setDrawerClosed(){},workerRefreshCourt:()=>Promise.resolve(),setInspectorView(){},showInspect(){assert.fail('must not reopen');}});
+  el('contextcontent').focus=()=>{};el('contextback').focus=()=>{};el('inspfollow').style={};
+  vm.runInContext([fn('contextBack'),fn('workerShowInspector'),fn('refreshInspect')].join('\n'),C);
+  await C.contextBack();assert.equal(C.inspTarget,null);assert.equal(contextUI.kind,'drawer');assert.equal(contextUI.history.length,1);
+  C.refreshInspect();assert.equal(requests.length,0);assert.equal(contextUI.kind,'drawer');assert.equal(contextUI.history.length,1);assert.equal(el('contextcontent').scrollTop,48);
+});
+test('refreshInspect skips non-inspector panels, refreshes project cards in worker mode, and preserves navigation in foreground mode',()=>{
+  const {C,contextUI}=infoRuntime(),shown=[];contextUI.ready=true;contextUI.kind='info';contextUI.navigation=5;
+  Object.assign(C,{inspTarget:{type:'settlement'},backgroundApplying:false,uiBusy:()=>false,workerShowInspector:()=>assert.fail('inactive inspector'),showInspect:pk=>shown.push([pk.type,C.backgroundApplying])});
+  vm.runInContext(fn('refreshInspect'),C);C.refreshInspect();assert.deepEqual(shown,[]);
+  contextUI.kind='insp';C.inspTarget={type:'project',key:'p0'};C.refreshInspect();assert.deepEqual(shown,[['project',true]]);assert.equal(C.backgroundApplying,false);
+  C.BACKGROUND=null;C.inspTarget={type:'settlement'};C.refreshInspect();assert.deepEqual(shown.at(-1),['settlement',true]);assert.equal(contextUI.navigation,5);
+});
+test('switching between inspector cards in worker mode resets view, side and scroll while Back restoration keeps them',async()=>{
+  const {C,contextUI,requests,el}=infoRuntime(),views=[];contextUI.kind='insp';contextUI.expanded=false;contextUI.side='right';contextUI.scroll.set('insp',140);el('contextcontent').scrollTop=140;
+  Object.assign(C,{inspTarget:{workerCode:'s0'},inspectorView:'orders',inspectorPickCode:p=>p?.workerCode||null,setInspectorView:v=>views.push(v),showInspect(){}});
+  el('inspfollow').style={};vm.runInContext(fn('workerShowInspector'),C);
+  let pending=C.workerShowInspector({workerCode:'s1'});requests[0].resolve({title:'B',sub:'',body:'',actions:''});await pending;
+  assert.equal(C.inspectorView,'details');assert.equal(contextUI.side,null);assert.equal(contextUI.scroll.has('insp'),false);assert.equal(el('contextcontent').scrollTop,0);assert.equal(views.at(-1),'details');
+  C.inspectorView='orders';contextUI.side='left';contextUI.scroll.set('insp',88);el('contextcontent').scrollTop=88;contextUI.restoring=true;
+  pending=C.workerShowInspector({workerCode:'s0'});assert.equal(C.inspectorView,'orders');assert.equal(contextUI.side,'left');assert.equal(el('contextcontent').scrollTop,88);
+  requests[1].resolve({title:'A',sub:'',body:'',actions:''});await pending;
+});
+test('contextShow closes an open drawer when switching to info or inspector panels',()=>{
+  const closed=[],drawer={classList:{contains:k=>k==='closed'&&closed.includes(true)}};
+  const panel={hidden:true,removeAttribute(){}},content={scrollTop:0,append(c){c.parentElement=this;}},info={parentElement:{id:'old'}};
+  const C=vm.createContext({contextUI:{ready:true,kind:'drawer',side:'left',expanded:false,scroll:new Map(),history:[]},CONTEXT_IDS:{drawer:'drawer',info:'infobody'},
+    setDrawerClosed:v=>closed.push(v),contextExpand(){},refreshCrownPanel(){},refreshHousePanel(){},contextSync(){},contextPosition(){},
+    document:{getElementById:id=>({drawer,contextpanel:panel,contextcontent:content,infobody:info})[id]}});
+  vm.runInContext(fn('contextShow'),C);C.contextShow('info');assert.deepEqual(closed,[true]);assert.equal(C.contextUI.kind,'info');
+});
+

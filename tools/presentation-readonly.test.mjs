@@ -113,3 +113,29 @@ test('opening-capacity failure note reads the stored worker result and projects 
   assert.match(source,/completeResidential,refreshExtent/);
   assert.doesNotMatch(source,/s\.coreR\s*=\s*extent/);
 });
+
+test('plan drafts, cold church and keep cards, and storage quotes avoid mutating settlement caches or lazy accounts',()=>{
+  const planDraftCode=extract('planDraft');
+  assert.doesNotMatch(planDraftCode,/buildingName\(/);
+  assert.match(planDraftCode,/detailNaming\(\)/);
+
+  const inspector=source.slice(source.indexOf('function inspectorCard('),source.indexOf('\nfunction inspectorPickCode'));
+  assert.doesNotMatch(inspector,/\bchOf\(b\)/);
+  assert.doesNotMatch(inspector,/\bcasOf\(s\)/);
+  assert.match(inspector,/if\(typeof QUERY_LAND_VALUES!=='undefined'&&!prior\)QUERY_LAND_VALUES=new Map\(\)/);
+
+  const ctx=vm.createContext({
+    GOODBASE:{grain:1,stone:2,timber:2},NEED:{grain:0.01},LU:{grain:1},
+    clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),
+    QUERY_LAND_VALUES:new Map(),
+    nonemptyHouseholds:()=>[],
+    W:Object.freeze({settlements:[],households:new Map()})
+  });
+  vm.runInContext(source.slice(priceStart,priceEnd)+'\n'+extract('price')+'\n'+extract('folkIndex'),ctx);
+  const s=Object.freeze({_want:Object.freeze({grain:2}),stores:Object.freeze({grain:1})});
+  assert.ok(ctx.price(s,'grain')>0);
+  assert.equal(Object.hasOwn(s,'px'),false);
+  assert.equal(ctx.folkIndex().size,0);
+  assert.equal(Object.hasOwn(ctx.W,'_folkIndex'),false);
+});
+

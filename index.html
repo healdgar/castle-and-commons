@@ -505,7 +505,7 @@ body[data-ui-size=large] #contextpanel .row,body[data-ui-size=large] #contextpan
 </head>
 <body>
 <div id="gl"></div>
-<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-14 03:40 UTC · after 155aae6</div></div>
+<div id="loading"><h1 id="loadtitle">CASTLE AND COMMONS</h1><div id="loadsub" style="font-family:'IM Fell English',Georgia,serif;font-style:italic;font-size:17px;letter-spacing:1px;opacity:0.8;margin:-8px 0 14px">A living medieval realm</div><div id="loadline">Forging the realm…</div><div id="loadbar"><div></div></div><div id="buildstamp" style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;opacity:0.55;letter-spacing:0.04em">build 2026-10-14 21:53 UTC · after 671753c</div></div>
 
 <div id="hud">
   <button type="button" id="brand" class="hudlink" aria-label="About Castle and Commons" aria-controls="contextpanel">Castle and Commons</button>
@@ -826,6 +826,7 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
    for(const leaf of [false,true]){const g=(leaf?(volume||source.foliage):source.wood).clone();g.setAttribute('aCover',cover);
     if(volume&&leaf){const shape=new Float32Array(limit*4),tile=new Float32Array(limit*4),plant=new Float32Array(limit);for(let i=0;i<limit;i++){shape.set([...row.centre.toArray(),row.radius],i*4);tile.set([...row.atlas.origin,row.atlas.tileSize,row.atlas.padding],i*4);plant[i]=row.variant+row.season*16+(row.role==='pine'?32:0);}g.setAttribute('aShape',new T.InstancedBufferAttribute(shape,4));g.setAttribute('aTile',new T.InstancedBufferAttribute(tile,4));g.setAttribute('aPlant',new T.InstancedBufferAttribute(plant,1));}
     const m=new T.InstancedMesh(g,volume&&leaf?volumeMaterial:meshMaterial({...row,map:source.map},leaf),limit);m.count=0;m.frustumCulled=false;m.receiveShadow=true;m.userData.woodlandTier=tier?'middle':'near';scene.add(m);pool.push(m);}
+   for(let i=0;i<limit;i++)pool[0].setColorAt(i,new T.Color(1,1,1));
    if(pool[1]){pool[1].instanceMatrix=pool[0].instanceMatrix;pool[1].instanceColor=pool[0].instanceColor;}pool.cover=cover;pool.used=0;row[tier?'middle':'near']=pool;state.pools.push(pool);
   }
   return row;
@@ -842,7 +843,7 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
    bounds.expandByPoint(new T.Vector3(e[12]-radius,e[13]-radius,e[14]-radius));bounds.expandByPoint(new T.Vector3(e[12]+radius,e[13]+radius,e[14]+radius));}
   geometry.boundingSphere=bounds.getBoundingSphere(new T.Sphere());
   const m=new T.InstancedMesh(geometry,material,records.length);m.castShadow=true;m.receiveShadow=true;m.customDepthMaterial=depth;m.userData.woodlandTier='far';
-  records.forEach((r,i)=>{const row=r.row;shape.setXYZW(i,row.centre.x,row.centre.y,row.centre.z,row.radius);plant.setX(i,row.variant+row.season*16+(row.volume&&row.role==='pine'?32:0));tile.setXYZW(i,...row.atlas.origin,row.atlas.tileSize,row.atlas.padding);r.old.m.getMatrixAt(r.old.ci,matrix);m.setMatrixAt(i,matrix);m.setColorAt(i,new T.Color().setRGB(.9+r.t.v*.12,.9+r.t.v*.12,.9+r.t.v*.12));cover.setXY(i,0,1);
+  records.forEach((r,i)=>{const row=r.row;shape.setXYZW(i,row.centre.x,row.centre.y,row.centre.z,row.radius);plant.setX(i,row.variant+row.season*16+(row.volume&&row.role==='pine'?32:0));tile.setXYZW(i,...row.atlas.origin,row.atlas.tileSize,row.atlas.padding);r.old.m.getMatrixAt(r.old.ci,matrix);m.setMatrixAt(i,matrix);r.color=new T.Color().setRGB(.9+r.t.v*.12,.9+r.t.v*.12,.9+r.t.v*.12);m.setColorAt(i,r.color);cover.setXY(i,0,1);
    const v={m,ci:i,shown:r.old.shown};map.set(r.t,v);r.view=v;r.position=new T.Vector3(matrix.elements[12],matrix.elements[13],matrix.elements[14]);r.height=row.centre.y+row.radius;
    r.scale=Math.hypot(matrix.elements[4],matrix.elements[5],matrix.elements[6]);r.cover=cover;state.records.push(r);delete r.old;});
   m.instanceMatrix.needsUpdate=true;scene.add(m);state.far.push(m);
@@ -881,9 +882,9 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
    if(far===1)continue;
    r.cover.setXY(r.view.ci,0,far);r.cover.needsUpdate=true;state.promoted.push(r);
    for(const [name,weight,lo,hi]of [['near',near,far+middle,1],['middle',middle,far,far+middle]]){if(!weight)continue;
-    const pool=r.row[name],i=pool.used++;r.view.m.getMatrixAt(r.view.ci,matrix);pool[0].setMatrixAt(i,matrix);pool.cover.setXY(i,lo,hi);state[name]++;}
+    const pool=r.row[name],i=pool.used++;r.view.m.getMatrixAt(r.view.ci,matrix);pool[0].setMatrixAt(i,matrix);pool[0].setColorAt(i,r.color);pool.cover.setXY(i,lo,hi);state[name]++;}
   }
-  for(const pool of state.pools){for(const m of pool)m.count=pool.used;pool[0].instanceMatrix.needsUpdate=true;pool.cover.needsUpdate=true;}
+  for(const pool of state.pools){for(const m of pool)m.count=pool.used;pool[0].instanceMatrix.needsUpdate=true;pool[0].instanceColor.needsUpdate=true;pool.cover.needsUpdate=true;}
   state.rebuilds++;state.lastRebuildMs=performance.now()-start;
  }
  function setEnabled(on){
@@ -5887,10 +5888,11 @@ let STORAGE_NODE_DIST=new Float64Array(0),STORAGE_NODE_HEAP=new Int32Array(0); /
 function storageRouteBatch(s,fn){if(typeof fn!=='function')return {s,g:null,points:new Map(),paths:new Map()};if(STORAGE_ROUTE_BATCHES.has(s))return fn();STORAGE_ROUTE_BATCHES.set(s,storageRouteBatch(s));try{return fn();}finally{STORAGE_ROUTE_BATCHES.delete(s);}}
 function storageRoute(s,a,b,batch){
   if(s.siegeBy||s.quarantineUntil>day())return Infinity;
-  const fortified=typeof fortCircuits==='function'&&fortCircuits(s).length;
+  const fortified=typeof fortCircuits==='function'&&fortCircuits(s).length,ro=typeof QUERY_LAND_VALUES!=='undefined'&&QUERY_LAND_VALUES||!Object.isExtensible(s),C=batch?.s===s?batch:STORAGE_ROUTE_BATCHES.get(s);
   const signature=(s.streets||[]).map(st=>`${!!st.gone}:${!!st.hidden}:${st.pts?.length||0}`).join('|')+(fortified?':'+streetGraph(s).key:'');
-  if(s._storageRouteSignature!==signature){s._storageRouteSignature=signature;s._storageGraph=streetGraph({...s,_sg:null,streets:(s.streets||[]).filter(st=>!st.gone&&!st.hidden)});}
-  const g=s._storageGraph,C=batch?.s===s?batch:STORAGE_ROUTE_BATCHES.get(s);if(!g.N.length)return Infinity;
+  let g=s._storageRouteSignature===signature?s._storageGraph:ro&&C?._storageRouteSignature===signature?C._storageGraph:null;
+  if(!g){g=streetGraph({...s,_sg:null,streets:(s.streets||[]).filter(st=>!st.gone&&!st.hidden)});if(!ro){s._storageRouteSignature=signature;s._storageGraph=g;}else if(C){C._storageRouteSignature=signature;C._storageGraph=g;}}
+  if(!g.N.length)return Infinity;
   if(C&&C.g!==g){C.g=g;C.points.clear();C.paths.clear();}
   const accessible=p=>{const key=p.x+','+p.z;if(C?.points.has(key))return C.points.get(key);let best=-1;
     // The nearest reachable node, ties to the lowest index: try nodes in (distance, index) order and stop at the first reachable one.
@@ -5975,7 +5977,7 @@ function storageSpoil(s,g,rate,phaseK){if(commodityActive(s))return commoditySpo
   if(s._made?.[g])s._made[g]=Math.max(0,s._made[g]-unassigned);}
 
 function storageBuildingReport(s,b){if(commodityActive(s))return commodityBuildingReport(s,b);const K=s.storage;if(!K)return null;const n=K.locations.get(b.storageId);if(!n)return null;const goods={},owners=new Map();for(const l of K.matching({location:n.id})){goods[l.good]=(goods[l.good]||0)+l.qty;const id=storageOwnerId(l.owner);owners.set(id,(owners.get(id)||0)+l.qty*K.volume(l.good));}return {id:n.id,capacity:n.active?n.capacity:0,used:K.used(n.id),goods,owners:[...owners],protection:n.protection,public:n.public,marketDistance:storageRoute(s,n,(s.places||[]).find(p=>p.kind==='market')||s.pos)};}
-function storageSiteQuote(si,arch,x,z,payer,routes){const s=W.settlements[si],t=STORAGE_TYPES[arch];if(!s||!t||t.buildable===false||!Number.isFinite(x)||!Number.isFinite(z))return {ok:false,reason:'Choose a valid storage site.'};if(!routes&&!STORAGE_ROUTE_BATCHES.has(s))return storageRouteBatch(s,()=>storageSiteQuote(si,arch,x,z,payer));if(!s._lay?.live?.storageSite)return {ok:false,reason:'The town survey is unavailable.'};if(!s._lay.live.storageSite(x,z,arch,'survey'))return {ok:false,reason:'Storage needs suitable ground and a short, dry connection to an open road.'};const site={x,z},mk=(s.places||[]).find(p=>p.kind==='market')||s.pos,marketDistance=storageRoute(s,site,mk,routes);if(!Number.isFinite(marketDistance))return {ok:false,reason:'No open street route to market.'};if((W.projects||[]).some(q=>q.type==='storage'&&!q.dead&&q.si===si&&dist2d(x,z,q.x,q.z)<18))return {ok:false,reason:'Another storage work already reserves this ground.'};const land=planLand([site],ARCH[arch][0]*ARCH[arch][1]).c,claim=storageGroundClaim(s,{arch,x,z,land},payer);if(!claim.ok)return {ok:false,reason:claim.reason==='occupied-holding'?'An occupied holding needs its tenant’s release before storage can be built.':'The building site needs an identified landholder.'};const fields=(s.furl||[]).filter(f=>f.state===LS.TILLED);let productionDistance=Infinity;for(const f of fields)productionDistance=Math.min(productionDistance,storageRoute(s,f,site,routes));return {ok:true,si,arch,x,z,payer:payer??s.owner,capacity:t.capacity,cost:t.cost+land+t.timber*price(s,'timber')+t.stone*price(s,'stone'),labour:t.cost,materialEstimate:t.timber*price(s,'timber')+t.stone*price(s,'stone'),land,days:t.days,timber:t.timber,stone:t.stone,marketDistance,productionDistance,handlingPerLoad:marketDistance*0.00002};}
+function storageSiteQuote(si,arch,x,z,payer,routes){const s=W.settlements[si],t=STORAGE_TYPES[arch];if(!s||!t||t.buildable===false||!Number.isFinite(x)||!Number.isFinite(z))return {ok:false,reason:'Choose a valid storage site.'};if(!routes&&!STORAGE_ROUTE_BATCHES.has(s))return storageRouteBatch(s,()=>storageSiteQuote(si,arch,x,z,payer));if(!s._lay?.live?.storageSite)return {ok:false,reason:'The town survey is unavailable.'};if(!s._lay.live.storageSite(x,z,arch,'survey'))return {ok:false,reason:'Storage needs suitable ground and a short, dry connection to an open road.'};const site={x,z},mk=(s.places||[]).find(p=>p.kind==='market')||s.pos,marketDistance=storageRoute(s,site,mk,routes);if(!Number.isFinite(marketDistance))return {ok:false,reason:'No open street route to market.'};if((W.projects||[]).some(q=>q.type==='storage'&&!q.dead&&q.si===si&&dist2d(x,z,q.x,q.z)<18))return {ok:false,reason:'Another storage work already reserves this ground.'};const land=planLand([site],ARCH[arch][0]*ARCH[arch][1]).c,claim=storageGroundClaim(s,{arch,x,z,land},payer);if(!claim.ok)return {ok:false,reason:claim.reason==='occupied-holding'?'An occupied holding needs its tenant’s release before storage can be built.':'The building site needs an identified landholder.'};const fields=(s.furl||[]).filter(f=>f.state===LS.TILLED);let productionDistance=Infinity;for(const f of fields)productionDistance=Math.min(productionDistance,storageRoute(s,f,site,routes));const quotePrice=g=>s.px&&s.px[g]!=null?s.px[g]:typeof detailPrice==='function'&&(typeof STORAGE_INVESTMENT_NATIVE==='undefined'||price===STORAGE_INVESTMENT_NATIVE.price)?detailPrice(s,g):typeof price0==='function'&&(typeof STORAGE_INVESTMENT_NATIVE==='undefined'||price===STORAGE_INVESTMENT_NATIVE.price)?price0(s,g):price(s,g),timberPx=quotePrice('timber'),stonePx=quotePrice('stone');return {ok:true,si,arch,x,z,payer:payer??s.owner,capacity:t.capacity,cost:t.cost+land+t.timber*timberPx+t.stone*stonePx,labour:t.cost,materialEstimate:t.timber*timberPx+t.stone*stonePx,land,days:t.days,timber:t.timber,stone:t.stone,marketDistance,productionDistance,handlingPerLoad:marketDistance*0.00002};}
 function storageMaterialDemand(s,g){const si=W.settlements.indexOf(s);return (W.projects||[]).reduce((n,q)=>n+(q.type==='storage'&&!q.dead&&!q.materials&&q.si===si?Math.max(0,(q[g]||0)-(q[g+'Installed']||0)):0),0);}
 function storageProjectState(q){const state=storageRecordState(q,{payer:p=>storageOwnerId(typeof p==='number'?houseAcct(p):p)});state.id=q.storageProjectId;return state;}
 
@@ -6636,7 +6638,7 @@ function streetGraph(s,compoundId=null){ // nodes at the street points; streets 
   for(const e of ends){let b=-1,bd=10;for(let i=0;i<N.length;i++){if(N[i].st===N[e].st)continue;const d=dist2d(N[i].x,N[i].z,N[e].x,N[e].z);if(d<bd&&accessClear(N[e],N[i])){bd=d;b=i;}}if(b>=0)link(e,b);} // T-junctions
   let root=-1,bd=90;for(let i=0;i<N.length;i++)if(!N[i].st.castlePath){const d=dist2d(N[i].x,N[i].z,s.pos.x,s.pos.z);if(d<bd&&accessClear(s.pos,N[i])){root=i;bd=d;}}
   const todo=root<0?[]:[root];if(root>=0)N[root].access=true;for(let k=0;k<todo.length;k++)for(const [j]of adj[todo[k]])if(!N[j].access){N[j].access=true;todo.push(j);}
-  const graph={key,N,adj,H};if(!compoundId)s._sg=graph;return graph;}
+  const graph={key,N,adj,H};if(!compoundId&&!(typeof QUERY_LAND_VALUES!=='undefined'&&QUERY_LAND_VALUES)&&Object.isExtensible(s))s._sg=graph;return graph;}
 function streetAccessAt(s,p,g=streetGraph(s)){
   const x=Math.floor(p.x/6),z=Math.floor(p.z/6);for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++)for(const i of g.H.get((x+a)+','+(z+b))||[]){const q=g.N[i];if(q.access&&dist2d(p.x,p.z,q.x,q.z)<12&&roadAccessClear(s,p,q))return true;}
   return false;
@@ -8899,7 +8901,7 @@ function planDown(e){const p=groundPoint(e);if(!p)return false;planClear();planU
 function planMove(e){const p=groundPoint(e),S=planUI.stroke;if(!p||!S)return;const l=S[S.length-1];if(dist2d(l.x,l.z,p.x,p.z)<3)return;S.push({x:p.x,z:p.z});planDraw();}
 function planUp(){const P=planUI;P.painting=false;if(!P.stroke||P.stroke.length<3){planClear();return;}planDraw();
   if(backgroundUserRequest()){const stroke=P.stroke,request={kind:P.brush,st:stroke.map(q=>({x:+q.x.toFixed(2),z:+q.z.toFixed(2)})),p:P.payer};workerPlanQuote(request).then(D=>{if(planUI===P&&P.stroke===stroke){P.draft=D;planBarHTML();}}).catch(e=>{if(planUI===P&&P.stroke===stroke){P.draft={ok:false,why:String(e.message||e)};planBarHTML();}});return;}
-  P.draft=planDraft(P.brush,P.stroke,P.payer);planBarHTML();}
+  const prior=QUERY_LAND_VALUES;QUERY_LAND_VALUES=new Map();try{P.draft=planDraft(P.brush,P.stroke,P.payer);}finally{QUERY_LAND_VALUES=prior;}planBarHTML();}
 function rayPolyR(poly,cx,cz,a){const dx=Math.cos(a),dz=Math.sin(a);let best=0; // the farthest crossing of a ray from (cx,cz) with a closed loop
   for(let i=0,j=poly.length-1;i<poly.length;j=i++){const p=poly[j],q=poly[i],ex=q.x-p.x,ez=q.z-p.z,den=dx*ez-dz*ex;if(Math.abs(den)<1e-9)continue;
     const t=((p.x-cx)*ez-(p.z-cz)*ex)/den,u=((p.x-cx)*dz-(p.z-cz)*dx)/den;if(t>0&&u>=0&&u<=1)best=Math.max(best,t);}return best;}
@@ -8953,7 +8955,7 @@ function planDraft(kind,stroke,payer){
   if(!s._lay||!s._lay.live)return no('The surveyors cannot read the ground there.');
   if((W.projects||[]).some(q=>q.type==='plan'&&q.si===si&&q.kind===kind&&kind!=='street'&&kind!=='stopup'&&kind!=='razewall'&&kind!=='raze'))return no(`A ${PLANB[kind].n.toLowerCase()} is already being made at ${s.name}.`);
   const live=b=>!b.removed&&b.state!=='gone',blocks=b=>b.inst||['temple','keep','hall','guildhall','wall','tower','mill','windmill','court'].includes(b.arch);
-  const named=b=>buildingName(b)||ARCH[b.arch][4];
+  const name=typeof detailNaming==='function'?detailNaming():buildingName,named=b=>name(b)||ARCH[b.arch][4];
   if(kind==='street'){
     let pts=resample(smoothPath(resample(stroke,4),2),4);let joins=0;
     for(const e of[0,pts.length-1]){const n=nearestStreetPt(s,pts[e].x,pts[e].z);if(n&&n.d<14){pts[e]={x:n.x,z:n.z};joins++;}} // joined to the streets it meets
@@ -11889,7 +11891,7 @@ function contextRemember(next){
 }
 function contextBack(){
   const route=contextUI.history?.pop();if(!route)return;contextUI.restoring=true;let opened;
-  try{contextExpand(route.expanded);if(route.kind==='insp')opened=showInspect(route.project?{type:'project',key:route.project}:BACKGROUND?{type:'reference',workerCode:route.code}:workerInspectionTarget(route.code));
+  try{if(route.kind!=='insp'&&inspTarget)hideInspect();contextExpand(route.expanded);if(route.kind==='insp')opened=showInspect(route.project?{type:'project',key:route.project}:BACKGROUND?{type:'reference',workerCode:route.code}:workerInspectionTarget(route.code));
     else if(route.kind==='info')opened=openInfo(route.infoKind,route.town!=null?W.settlements[route.town]:null,route.reference);
     else if(route.kind==='drawer'){crownSection=route.section;G.ledgerOpen=route.ledgerOpen;selectTab(route.tab);setDrawerClosed(false);contextShow('drawer');if(BACKGROUND)opened=route.tab==='crown'?workerRefreshCourt(true):route.tab==='world'?workerRefreshHousePanel(true):null;}
     else if(route.kind==='chron'){setChronMin(false);chronFilter=route.filter;document.querySelectorAll('#chronfilters [data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f===chronFilter));document.querySelectorAll('.centry').forEach(e=>e.style.display=chronFilter==='all'||e.dataset.cat===chronFilter?'':'none');contextShow('chron');}
@@ -11919,6 +11921,7 @@ function contextShow(kind){
   const changed=contextUI.kind!==kind;
   if(changed){document.getElementById('contextpanel').removeAttribute('aria-busy');contextUI.navigation=(contextUI.navigation||0)+1;if(!contextUI.restoring&&['drawer','chron','plan','legend','petition'].includes(kind))contextUI.history=[];}
   contextUI.kind=kind;contextUI.side=changed?null:contextUI.side;
+  if(changed&&kind!=='drawer'&&typeof setDrawerClosed==='function'&&!document.getElementById('drawer')?.classList?.contains('closed'))setDrawerClosed(true);
   if(kind==='plan'&&contextUI.expanded)contextExpand(false);
   const el=document.getElementById('contextpanel');el.hidden=false;
   const child=document.getElementById(CONTEXT_IDS[kind]);if(child&&child.parentElement.id!=='contextcontent')document.getElementById('contextcontent').append(child);
@@ -12050,6 +12053,8 @@ function displayDateStr(d){
 function inspectorCard(pk,full=false){
   if(!pk)return null;
   if(pk.type==='event'){const ev=pk.ev;return ev?{title:eventTitle(ev),sub:displayDateStr(ev.day)+' · '+eventTitle(ev),body:esc(ev.text),actions:'',follow:null}:null;}
+  const prior=typeof QUERY_LAND_VALUES==='undefined'?null:QUERY_LAND_VALUES;if(typeof QUERY_LAND_VALUES!=='undefined'&&!prior)QUERY_LAND_VALUES=new Map();
+  try{
   const title={innerHTML:''},sub={textContent:'',innerHTML:''},body={innerHTML:''},acts={innerHTML:''};
   let follow=null,actsH='',h='';
   const setHTML=(el,h)=>{el.innerHTML=h;};
@@ -12122,7 +12127,7 @@ function inspectorCard(pk,full=false){
     h+=row('Plot',`${detailNumber(yard.area||polyArea(yard.poly))} m² · ${yard.adjunct?'separate parcel with a low boundary wall':'on church property'}`);
     h+=row('Access',yard.adjunct?'Footpath from the church':'Beside the church');
     h+=row('Grave spaces',`${markers.length} · fixed plot; reused after 20 years`);
-    h+=row('Recorded burials',detailNumber(chOf(b).burials||0));
+    h+=row('Recorded burials',detailNumber(b.ch?.burials||0));
     if(recent.length)h+=detailTable('detail-burials','Recent burials',['Person','Died'],recent.map(p=>[detailPerson(p),esc(displayDateStr(p.dd))]));
     flyToBtn(fb,'Visit',()=>flyTo(yard.x,yard.z,100));
   }else if(pk.type==='building'){
@@ -12137,11 +12142,11 @@ function inspectorCard(pk,full=false){
         if(full)h+=row('Members',members.map(q=>`${detailPerson(q)}, ${Math.floor(ageYrs(q))}${q.tr?', '+esc(q.tr):''}`).join('; '));}}
     if(b.state==='sound'&&RESID.has(b.arch))h+=row('Worth',`${propValue(b).toFixed(1)} g a year in rent${b.lot?`, on a lot of ${Math.round((()=>{let a=0;const P=b.lot;for(let i=0,j=P.length-1;i<P.length;j=i++)a+=(P[j].x+P[i].x)*(P[j].z-P[i].z);return Math.abs(a/2);})())} m²`:''}`);
     if(b.wallhouse)h+=row('Built','into the old town wall, of its stone');
-    if(b.arch==='keep'){h+=row('Castle',esc(casDesc(b.s)));const c=casOf(b.s);if(c.next)h+=row('Next work',`${esc(c.next.t)} (~${Math.round(c.next.cost||c.next.cr)} crowns; ${c.next.net>0?'worth it against the danger, when the lord can pay':'not yet worth the cost in this peace'})`);}
-    if(b.arch==='temple'&&b.state!=='gone'){const ch=chOf(b);h+=row('Fabric',esc(chFabric(b)));
+    if(b.arch==='keep'){h+=row('Castle',esc(casDesc(b.s)));const c=b.s.cas||{};if(c.next)h+=row('Next work',`${esc(c.next.t)} (~${Math.round(c.next.cost||c.next.cr)} crowns; ${c.next.net>0?'worth it against the danger, when the lord can pay':'not yet worth the cost in this peace'})`);}
+    if(b.arch==='temple'&&b.state!=='gone'){const ch=b.ch||{fund:0};h+=row('Fabric',esc(chFabric(b)));
       h+=row('Congregation',`room for ~${chCap(b)} standing${ch.cong?`; a parish of ${ch.cong}${chCap(b)<ch.cong*0.5?' — crowded at mass':''}`:''}`);
       h+=row('Fabric fund',`${Math.round(ch.fund)} crowns${ch.next?`; saving for ${ch.next.t} (${Math.round(ch.next.cr+ch.next.st*0.6)} if the stone is bought)`:''}${ch.cramped?'; no room to grow':''}`);
-      if(!b.castle&&!b.friary){const total=ch.burials||0,recent=(b.s.dead||[]).slice(-240).filter(p=>p?.burial?.ch===ch||!p?.burial&&parishOf(b.s)===b).slice(-80);h+=row('Churchyard',`${b._graveyard?`<a class="nm" data-nm="${graveyardReference(b)}">${b._graveyard.adjunct?'separate graveyard, linked by footpath':'churchyard on church property'}</a>`:'no clear plot was available'} · ${total} recorded burial${total===1?'':'s'}${recent.length?` · recent burials: ${recent.map(detailPerson).join(', ')}`:''}${total>recent.length?` · ${total-recent.length} earlier`:''}`);}}
+      if(!b.castle&&!b.friary){const total=ch.burials||0,recent=(b.s.dead||[]).slice(-240).filter(p=>p?.burial?.ch===b.ch||!p?.burial&&parishOf(b.s)===b).slice(-80);h+=row('Churchyard',`${b._graveyard?`<a class="nm" data-nm="${graveyardReference(b)}">${b._graveyard.adjunct?'separate graveyard, linked by footpath':'churchyard on church property'}</a>`:'no clear plot was available'} · ${total} recorded burial${total===1?'':'s'}${recent.length?` · recent burials: ${recent.map(detailPerson).join(', ')}`:''}${total>recent.length?` · ${total-recent.length} earlier`:''}`);}}
     if(b.arch==='keep'||b.arch==='hall'){const residents=notableResidents(b);if(residents.length){h+=row('Lodging',residents.map(n=>`<a class="nm" data-nm="n${n.id}">${esc(fullTitle(n))}</a>`).join(', '));const R=notableResidence(residents[0]);h+=row('Security',b.arch==='keep'?`private chambers in the keep${R.lines?`; ${R.lines} surrounding defensive circuit${R.lines===1?'':'s'} intact`:''}`:'the hall; no keep available');}}
     if(b.home0&&b.why&&b.why.since)h+=row('Opened',`AD ${b.why.since}, in what was a ${ARCH[b.home0][4]}`);
     h+=row('State',b.state);
@@ -12364,6 +12369,7 @@ function inspectorCard(pk,full=false){
   sub._h=null;setHTML(sub,esc(sub.textContent));
   setHTML(body,h);setHTML(acts,actsH);
   return{title:title.innerHTML,sub:sub.innerHTML,body:body.innerHTML,actions:acts.innerHTML,follow};
+  }finally{if(typeof QUERY_LAND_VALUES!=='undefined')QUERY_LAND_VALUES=prior;}
 }
 function inspectorPickCode(pk){
   if(!pk)return null;const s=pk.s||pk.b?.s||(pk.type==='land'&&pk.f?.dom>=0?W.settlements[pk.f.dom]:null)||null,si=s?W.settlements.indexOf(s):-1;
@@ -12560,16 +12566,16 @@ function followInspector(pk){if(BACKGROUND&&pk.workerCard?.follow)return workerF
 }
 
 function flyToBtn(fb,label,fn){fb.style.display='block';fb.textContent=label;fb.onclick=()=>{markManual();fn();};}
-function hideInspect(restore=false){if(MODEL_ONLY)return;const hadFocus=!!document.activeElement?.closest('#insp');document.getElementById('insp').style.display='none';inspTarget=null;document.body.classList.remove('inspecting');if(contextUI.ready&&contextUI.kind==='insp'){contextExpand(false);contextUI.kind=null;document.getElementById('contextpanel').hidden=true;}if(restore&&inspectReturn){primaryPanel='drawer';setDrawerClosed(false);}inspectReturn=false;scheduleLayout();if(restore||hadFocus){const target=document.getElementById('menubtn');target?.focus();}}
+function hideInspect(restore=false){if(MODEL_ONLY)return;const hadFocus=!!document.activeElement?.closest('#insp');document.getElementById('insp').style.display='none';inspTarget=null;uiHover=false;document.body.classList.remove('inspecting');if(contextUI.ready&&contextUI.kind==='insp'){contextExpand(false);contextUI.kind=null;document.getElementById('contextpanel').hidden=true;}if(restore&&inspectReturn){primaryPanel='drawer';setDrawerClosed(false);}inspectReturn=false;scheduleLayout();if(restore||hadFocus){const target=document.getElementById('menubtn');target?.focus();}}
 function refreshInspect(){ // live numbers; close the card when its subject has left the stage
-  const pk=inspTarget;if(!pk||uiBusy())return;
+  const pk=inspTarget;if(!pk||uiBusy()||(contextUI.ready||contextUI.kind)&&contextUI.kind!=='insp')return;
   if((pk.type==='caravan'&&pk.c.gone)||(pk.type==='army'&&(pk.a||pk.army).gone)||
      (pk.type==='camp'&&!W.banditCamps.includes(pk.camp))){hideInspect();return;}
   if(pk.type==='cairn')return;
   // A live-number refresh joins the pending card. It is not a new navigation:
   // invalidating that reply every half second can starve a larger town record.
-  if(BACKGROUND&&!backgroundApplying)return workerShowInspector(pk);
-  return showInspect(pk);
+  if(BACKGROUND&&!backgroundApplying&&pk.type!=='project')return workerShowInspector(pk);
+  const was=backgroundApplying;backgroundApplying=true;try{return showInspect(pk);}finally{backgroundApplying=was;}
 }
 function sigURL(hi){
   if(MODEL_ONLY)return 'worker-sigil:'+hi;
@@ -13585,7 +13591,7 @@ function lvField(s){
   const query=QUERY_LAND_VALUES;if(query?.has(s))return query.get(s);if(!lvNative())return lvCold(s);
   const I=lvInputs(s),prior=LV_BASES.get(s),same=lvSame(prior?.key,I.key),base=same?prior.base:lvKernel(I),walls=lvWalls(s),fear=lvFear(s),field=same&&prior.fear===fear&&lvSame(prior.walls,walls)?prior.value:lvCompose(s,I,base),scale=Math.pow(Math.max(20,s.pop),0.3);
   const value=!query&&field.y===year()&&field.n===s.buildings.length&&field.scale===scale?field:{y:year(),n:s.buildings.length,x0:I.x0,z0:I.z0,cells:I.n,res:field.res,biz:field.biz,scale};
-  if(query)query.set(s,value);else{LV_BASES.set(s,{key:I.key,base,walls,fear,value});s._lvf=value;}return value;}
+  if(query)query.set(s,value);else if(Object.isExtensible(s)){LV_BASES.set(s,{key:I.key,base,walls,fear,value});s._lvf=value;}return value;}
 function lvCold(s){
   const query=QUERY_LAND_VALUES;
   const R=Math.max(s.wallR||0,(s.extentR||s.radius||100))+90,x0=s.pos.x-R,z0=s.pos.z-R,n=Math.ceil(2*R/LVC),N=n*n;
@@ -13607,7 +13613,7 @@ function lvCold(s){
   for(let j=0;j<n;j++)for(let i=0;i<n;i++){const k=j*n+i,x=cx(i),z=cz(j),safe=inWalls(s,x,z)?0.3+0.25*fear:0,stink=Math.min(1,nu[k]);
     res[k]=Math.max(0.03,0.06+0.85*job[k]/mj+0.3*mk[k]/mm+safe-0.35*stink);
     biz[k]=Math.max(0.02,0.05+0.9*ft[k]*(0.4+0.6*hh[k]/mh)+0.45*mk[k]/mm+0.25*hh[k]/mh+safe*0.5-0.15*stink);}
-  const value={y:year(),n:s.buildings.length,x0,z0,cells:n,res,biz,scale:Math.pow(Math.max(20,s.pop),0.3)};if(query)query.set(s,value);else s._lvf=value;return value;}
+  const value={y:year(),n:s.buildings.length,x0,z0,cells:n,res,biz,scale:Math.pow(Math.max(20,s.pop),0.3)};if(query)query.set(s,value);else if(Object.isExtensible(s))s._lvf=value;return value;}
 function lvAtField(F,x,z,use){const i=clamp(Math.floor((x-F.x0)/LVC),0,F.cells-1),j=clamp(Math.floor((z-F.z0)/LVC),0,F.cells-1),k=j*F.cells+i;
   const v=use==='res'?F.res[k]:use==='biz'?F.biz[k]:Math.max(F.res[k],F.biz[k]),out=Math.max(Math.abs(x-F.x0-F.cells*LVC/2),Math.abs(z-F.z0-F.cells*LVC/2))>F.cells*LVC/2?0.3:1;
   return v*out;}
@@ -14610,7 +14616,7 @@ const NEED={paper:0,grain:0.007,fish:0.003,timber:0.0006,ore:0.0002,tools:0.0004
 const FOODS=['grain','fish','meat'],FOOD=NEED.grain+NEED.fish+NEED.meat,SALTING=0.05,FRESH=7; // the foods, one for one against a soul's need of a day (FOOD): bread, fish and meat (the user, 2026-10-08), each bought by its price (provision). A household or a lord's larder salting its Martinmas flesh buys the salt from the salter: about a bushel to four or five pigs, a few pence against their shillings, a twentieth of the meat's worth with his work; fresh, it keeps a week in the November cold, the days of the pig-feast
 const CRUMB=Object.fromEntries([...GOODS.filter(g=>!BEASTS.includes(g)),'char'].map(g=>[g,(FOODS.includes(g)?FOOD:FOOD*GOODBASE.grain/GOODBASE[g==='char'?'timber':g])/100])); // the least anyone keeps or sells: a mouthful, a hundredth of a soul's day of food, or the same worth at base prices of any other good (charcoal as its timber). A store that falls below it is crumbs and sweepings, lost as spoiled (commoditySpoil; the user, 2026-10-08). A soul's whole day was the line first: a family's last crusts and the leavings of its own grain on sale fell under it daily and were thrown away, and famine rose (batch 10b's gate: 1001 sea's second year 0.09 → 0.19)
 function foodIn(x){let n=0;for(const g of FOODS)n+=x[g]||0;return n;} // the food in a larder or a place's stores
-function price(s,g){if(s.px&&s.px[g]!=null)return s.px[g];const v=price0(s,g);(s.px||(s.px={}))[g]=v;return v;} // the price the market last found
+function price(s,g){if(s.px&&s.px[g]!=null)return s.px[g];const v=price0(s,g);if(!(typeof QUERY_LAND_VALUES!=='undefined'&&QUERY_LAND_VALUES)&&Object.isExtensible(s)&&(!s.px||Object.isExtensible(s.px)))(s.px||(s.px={}))[g]=v;return v;} // the price the market last found
 function price0(s,g){ // a first reckoning, before the market has traded: an opening value the market then moves (its 0.3-4x bounds are of that guess only, #23)
   const need=(g==='hay'?(s._hayWant||0)*1.1:g==='stone'?(s._stoneWant||0)*1.2+s.pop*NEED.stone*25:g==='wool'?woolWant(s)*6:LU[g]!==undefined?(s._want?s._want[g]:0)*1.1:s.pop*NEED[g]*25+(s._lux&&s._lux[g]||0)*0.5)+(g==='timber'?(s._timberWant||0)*1.2:0)+5; // a stable short of horses, a village short of plough-oxen, a town of idle looms
   return GOODBASE[g]*clamp(need*(g==='spice'||g==='silk'?(s.kind==='capital'?4:1)*(0.5+s.prosperity/80):1)/((s.stores[g]||0)+2),0.3,4); // the court and the rich towns pay most for the Levant's goods
@@ -17193,7 +17199,7 @@ const PARTIBLE=new Set(['celtic','german','slavic','norse']);
 const TEN_NAME={villein:'in villeinage, owing labour on the lord\'s land',free:'freehold, for a small quit-rent',lease:'on lease, for a money rent',crop:'as a sharecropper, for half the crop',demesne:'the lord\'s demesne, worked by hired hands'};
 const TEN_SHARE={villein:0.62,free:0.85,lease:0.7,crop:0.5}; // the worker's share of his strip's crop by tenure: custom of the manor, which the lord's dues move (#23)
 function tenureNew(){const ad=AD(),r=frand();return ad<1150?(r<0.75?'villein':'free'):ad<1349?(r<0.6?'villein':'free'):(r<0.45?'lease':r<0.8?'free':'villein');}
-function folkIndex(){if(W._folkIndex)return W._folkIndex;const M=new Map();for(const s of W.settlements)for(const p of s.folk||[])M.set(p.id,p);for(const h of nonemptyHouseholds())for(const p of h.members)if(!p.dead)M.set(p.id,p);return W._folkIndex=M;}
+function folkIndex(){if(W._folkIndex)return W._folkIndex;const M=new Map();for(const s of W.settlements)for(const p of s.folk||[])M.set(p.id,p);for(const h of nonemptyHouseholds())for(const p of h.members)if(!p.dead)M.set(p.id,p);if(!(typeof QUERY_LAND_VALUES!=='undefined'&&QUERY_LAND_VALUES)&&Object.isExtensible(W))W._folkIndex=M;return M;}
 function headsOf(s){const out=[];for(const h of householdsOf(s)){const p=h.head;if(p&&!p.dead)out.push(p);}return out;} // an orphan household remains an owner even before its heir is grown
 function PL(){return (W&&W._pl)||1;} // the price level: labour and stuff cost what the market says
 const tilledOf=(s,si)=>(s.furl||[]).filter(f=>f.dom===si&&f.state===LS.TILLED&&ARABLE.has(f.kind));
@@ -19406,7 +19412,7 @@ function storageQuoteHTML(Q){if(!Q)return '';if(!Q.ok)return `<div class="note" 
 function storagePick(si){if(REPLAYING)return;const s=W.settlements[si],arch=document.getElementById('storage-arch-'+si)?.value;if(!s||!sovOn()||s.owner!==plyH()||!STORAGE_TYPES[arch])return;setPlaceMode('storage',{si,arch},`Choose a ${arch} site near ${s.name} — Esc to cancel`);}
 async function storagePreview(si,arch,x,z){const s=W.settlements[si];if(!s||!sovOn()||s.owner!==plyH())return;if(backgroundUserRequest()){
     try{await BACKGROUND.request('view',{kind:'storage-preview',si,arch,x,z});await showInspect({type:'settlement',s});setInspectorView('orders');}catch(e){storageFaultNotice(String(e.message||e));}return;}
-  STORAGE_UI.set(s,{arch,...storageSiteQuote(si,arch,x,z,plyH())});showInspect({type:'settlement',s});setInspectorView('orders');}
+  const prior=typeof QUERY_LAND_VALUES==='undefined'?null:QUERY_LAND_VALUES;if(typeof QUERY_LAND_VALUES!=='undefined')QUERY_LAND_VALUES=new Map();try{STORAGE_UI.set(s,{arch,...storageSiteQuote(si,arch,x,z,plyH())});}finally{if(typeof QUERY_LAND_VALUES!=='undefined')QUERY_LAND_VALUES=prior;}showInspect({type:'settlement',s});setInspectorView('orders');}
 function storagePlayerCommission(arg){let choice;try{choice=JSON.parse(decodeURIComponent(arg));}catch{return false;}const s=choice&&Number.isInteger(choice.si)&&W.settlements[choice.si];if(!s||!sovOn()||choice.payer!==plyH()||s.owner!==choice.payer||!Object.hasOwn(STORAGE_TYPES,choice.arch)||!Number.isFinite(choice.x)||!Number.isFinite(choice.z))return false;const project=storageCommission(storageSiteQuote(choice.si,choice.arch,choice.x,choice.z,choice.payer));if(project)STORAGE_UI.delete(s);return project;}
 function worksHTML(s){const si=W.settlements.indexOf(s),w=s.works||{};let x='<div class="dhead" style="margin-top:6px">Works</div>';
   for(const[k,l,c,d]of WORKS){const done=k==='clearing'?s.clearUntil>day():w[k]!=null&&w[k]!==false;x+=cbtn('s-work',si+':'+k,l,c,done?(k==='clearing'?'under way':'built'):'',d);}return x+storageWorksHTML(s);}
@@ -19821,7 +19827,7 @@ function runCmd(cmd,arg){
     case 'camp-len':W.player.campLen=+arg;break;
     case 'decree':result=runDecree(arg);break;
     case 'h-honour':case 'h-hostage':case 'h-match':case 'h-attaint':houseCmd(cmd.slice(2),+arg);break;
-    case 'notable':{const n=notableById(+arg);if(n)showInspect({type:'notable',n});break;}
+    case 'notable':if(arg!==''&&arg!=null&&Number.isFinite(+arg)){if(BACKGROUND&&!backgroundApplying)showInspect({type:'reference',workerCode:'n'+(+arg)});else{const n=notableById(+arg);if(n)showInspect({type:'notable',n});}}break;
     case 'army':{const a=W.armies.find(x=>x.id===+arg);if(a){showInspect({type:'army',a});const p=armyDisplayPos(a);flyTo(p.x,p.z,420);markManual();}break;}
     case 's-manage':{const s=W.settlements[+arg];if(s&&sovOn()&&s.owner===plyH()){const pk={type:'settlement',s},opened=showInspect(pk);if(opened?.then)return opened.then(()=>{if(inspTarget===pk){setInspectorView('orders');contextExpand(true);}});setInspectorView('orders');contextExpand(true);}break;}
     case 'storage-pick':storagePick(+arg);break;
@@ -20017,7 +20023,7 @@ function initAccessibleUI(){
     const tab=e.target.closest('[role=tab]');if(tab&&['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){const tabs=[...tab.closest('[role=tablist]').querySelectorAll('[role=tab]')].filter(b=>!b.hidden),i=tabs.indexOf(tab);const n=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;e.preventDefault();tabs[n].click();tabs[n].focus();}
   },true);
   document.getElementById('dbody').addEventListener('click',e=>{const b=e.target.closest('[data-cview]');if(b){crownSection=b.dataset.cview;if(BACKGROUND)workerRefreshCourt(true);else setHTML(document.getElementById('dbody'),crownPanelHTML());document.getElementById('dbody').scrollTop=0;document.getElementById('contextcontent').scrollTop=0;document.getElementById('court-'+crownSection)?.focus();}});
-  document.getElementById('inspnav').addEventListener('click',e=>{const b=e.target.closest('[data-iview]');if(b){setInspectorView(b.dataset.iview);document.getElementById('inspscroll').scrollTop=0;}});
+  document.getElementById('inspnav').addEventListener('click',e=>{const b=e.target.closest('[data-iview]');if(b){setInspectorView(b.dataset.iview);document.getElementById('inspscroll').scrollTop=0;document.getElementById('contextcontent').scrollTop=0;}});
   document.getElementById('drawerclose').onclick=()=>{setDrawerClosed(true);document.getElementById('drawertoggle').focus();};
   document.getElementById('menubtn').onclick=()=>{const b=document.getElementById('menubtn'),open=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',String(open));document.getElementById('hud').classList.toggle('menu-open',open);document.getElementById('toolmenu').hidden=!open;};
   document.getElementById('toolmenu').addEventListener('click',e=>{if(e.target.closest('button'))closeToolMenu();});
@@ -20150,10 +20156,9 @@ function initUI(){
   buildDrawer('crown');
   document.getElementById('drawertoggle').addEventListener('click',toggleDrawer);
   // one delegated handler for every data-cmd control (crown panel, inspector, house & succession rows)
-  const cmdClick=e=>{const t=e.target.closest('[data-cmd]');if(!t||t.disabled||!uiConfirmed(t))return;if(t.dataset.cmd!=='storage-pick'&&t.dataset.cmd!=='s-manage')jot({k:'c',c:t.dataset.cmd,a:t.dataset.arg});runCmd(t.dataset.cmd,t.dataset.arg);}; // committed choices include their arguments; surveys and opening town orders are only UI state
+  const cmdClick=e=>{const t=e.target.closest('[data-cmd]');if(!t||t.disabled||!uiConfirmed(t))return;if(!['storage-pick','s-manage','notable','army'].includes(t.dataset.cmd))jot({k:'c',c:t.dataset.cmd,a:t.dataset.arg});runCmd(t.dataset.cmd,t.dataset.arg);}; // committed choices include their arguments; surveys and opening cards are only UI state
   document.getElementById('dbody').addEventListener('click',cmdClick);
-  document.getElementById('dbody').addEventListener('pointerover',e=>{uiHover=!!(e.target.closest&&e.target.closest('button,select,input'));});
-  document.getElementById('dbody').addEventListener('pointerleave',()=>{uiHover=false;});
+  for(const id of ['dbody','inspscroll']){const el=document.getElementById(id);el.addEventListener('pointerover',e=>{uiHover=!!(e.target.closest&&e.target.closest('button,select,input,a'));});el.addEventListener('pointerleave',()=>{uiHover=false;});}
   document.getElementById('inspacts').addEventListener('click',cmdClick);
   document.getElementById('dbody').addEventListener('input',rulerRateInput);
   document.getElementById('dbody').addEventListener('change',e=>{if(e.target.type==='number')rulerRateInput(e);});
@@ -20168,7 +20173,7 @@ function initUI(){
     if(e.target.closest('[data-pv]')){const p=W.petitions[0];if(p&&p.pos){markManual();flyTo(p.pos.x,p.pos.z,480);}}
     const pk=e.target.closest('[data-pk]');if(pk){const[k,i]=pk.dataset.pk.split(':');markManual(); // a name in the petition: show it
       if(k==='s'){const t=W.settlements[+i];if(t){flyTo(t.pos.x,t.pos.z,520);showInspect({type:'settlement',s:t});}}
-      else{const h=W.houses[+i],seat=h&&W.settlements[h.seat];if(seat)flyTo(seat.pos.x,seat.pos.z,700);const hd=h&&notableById(h.head);if(hd)showInspect({type:'notable',n:hd});}}
+      else{const h=W.houses[+i],seat=h&&W.settlements[h.seat];if(seat)flyTo(seat.pos.x,seat.pos.z,700);if(BACKGROUND&&h?.head)showInspect({type:'reference',workerCode:'n'+h.head});else{const hd=h&&notableById(h.head);if(hd)showInspect({type:'notable',n:hd});}}}
   });
   document.getElementById('rulebtn').addEventListener('click',()=>{jot({k:'sov',on:!sovOn()});setSovereign(!sovOn());});
   document.getElementById('savebtn').addEventListener('click',saveUI);
@@ -22084,7 +22089,7 @@ function workerShowInspector(pk){
   const code=pk.workerCode||inspectorPickCode(pk);if(!code){if(pk.type==='event')return showEventDialog(pk.ev);return;}
   const changing=contextUI.kind!=='insp'||(inspTarget?.workerCode||inspectorPickCode(inspTarget))!==code;
   inspTarget=pk;pk.workerCode=code;const full=contextUI.expanded;
-  if(changing){setHTML(document.getElementById('insptitle'),'Opening card…');setHTML(document.getElementById('inspsub'),'');setHTML(document.getElementById('inspbody'),'<p class="note" role="status">Opening card…</p>');setHTML(document.getElementById('inspacts'),'');document.getElementById('inspfollow').style.display='none';setInspectorView('details');contextShow('insp');}
+  if(changing){if(!contextUI.restoring){inspectorView='details';contextUI.side=null;contextUI.scroll.delete('insp');document.getElementById('contextcontent').scrollTop=0;}setHTML(document.getElementById('insptitle'),'Opening card…');setHTML(document.getElementById('inspsub'),'');setHTML(document.getElementById('inspbody'),'<p class="note" role="status">Opening card…</p>');setHTML(document.getElementById('inspacts'),'');document.getElementById('inspfollow').style.display='none';setInspectorView(inspectorView);contextShow('insp');}
   const navigation=contextUI.navigation,current=()=>inspTarget===pk&&contextUI.navigation===navigation&&contextUI.expanded===full&&contextUI.kind==='insp';
   document.getElementById('contextpanel').setAttribute('aria-busy','true');
   return workerQuery('inspect:'+code+':'+full+':'+navigation,{kind:'inspect',code,full},card=>{if(!current())return;pk.workerCard={...card,title:workerHTML(card.title),sub:workerHTML(card.sub),body:workerHTML(card.body),actions:workerHTML(card.actions)};pk._anchor=card.anchor;backgroundApplying=true;try{showInspect(pk);}finally{backgroundApplying=false;}document.getElementById('contextpanel').removeAttribute('aria-busy');},
@@ -22409,7 +22414,7 @@ function simulationWorkerModel(){return{
   command(command,prepared){const n0=allLines.length,before=commandBefore(),result=workerCommandApply(command,prepared||workerCommandValidate(command)),r=commandReceipt(before,result,allLines.slice(n0)); // the reply carries the annals the command wrote,
     if(placeMode){r.place={mode:placeMode,arg:serializePlaceArg(placeMode,placeArg),hint:placeHint};setPlaceMode(null);}return r;}, // and a second place the first one asked for (a road's far end)
   view(kind,payload={}){
-    const prior=QUERY_LAND_VALUES;QUERY_LAND_VALUES=['inspect','ui','plan-quote','overlay','actors'].includes(kind)?new Map():prior;
+    const prior=QUERY_LAND_VALUES;QUERY_LAND_VALUES=['inspect','ui','plan-quote','storage-preview','overlay','actors'].includes(kind)?new Map():prior;
     try{
     if(kind==='bootstrap')return workerPresentation(true);
     if(kind==='landscape')return workerPresentation();
@@ -23741,7 +23746,7 @@ static host. Every push to `main` deploys
 a container image:
 
 ```sh
-docker run --rm -p 8080:80 ghcr.io/healdgar/furlong-kingdom-annals
+docker run --rm -p 8080:80 ghcr.io/healdgar/castle-and-commons
 # then open http://localhost:8080  (the browser fetches three.js from cdnjs)
 ```
 
