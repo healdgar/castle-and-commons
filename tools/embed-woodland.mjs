@@ -9,6 +9,8 @@ export function woodlandFiles(){
  const files={'library.json':fs.readFileSync(path.join(base,'library.json'),'utf8')},png=name=>{files[name]='data:image/png;base64,'+fs.readFileSync(path.join(base,name)).toString('base64');};
  for(const name of [library.atlas.colour,library.atlas.normal,library.atlas.depth])png(name);
  for(const row of library.plants)for(const lod of row.lods){const name=row.id+'/'+lod.file;files[name]=fs.readFileSync(path.join(base,name),'utf8');png(row.id+'/'+lod.texture);}
+ for(const row of library.plants)if(row.volume)for(const file of [row.volume,row.middleVolume]){const name=row.id+'/'+file;files[name]=fs.readFileSync(path.join(base,name),'utf8');}
+ for(const row of library.plants)if(row.middleWood){const name=row.id+'/'+row.middleWood;files[name]=fs.readFileSync(path.join(base,name),'utf8');}
  return files;
 }
 export const scriptSafe=text=>text.replace(/<\/script/gi,'<\\/script');

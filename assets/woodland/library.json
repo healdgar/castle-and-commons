@@ -2,12 +2,22 @@
   "format": "castle.woodland",
   "version": 1,
   "source": "healdgar/forestmodeler",
-  "sourceCommit": "dbcbce43db701018db4908262ab316b20fa1bbc0",
+  "sourceCommit": "fb6173c433a8905536c31bcbd24467aa367c9f57",
   "note": "North American native genomes, used as a rendering trial. Uniform display scaling preserves the existing game tree heights; it is not a biological age or species claim.",
+  "atlas": {
+    "columns": 2,
+    "bankSize": 1024,
+    "colour": "colour.png",
+    "normal": "normal.png",
+    "depth": "depth.png",
+    "width": 2048,
+    "height": 2560
+  },
   "plants": [
     {
       "id": "oak-101-20",
       "role": "dec",
+      "representation": "mesh",
       "species": "Quercus rubra",
       "seed": 101,
       "sourceFingerprint": "4933fb152acf4934343f15fdb569a76b1cf0d70f8fd623dca02df31a38faa92f",
@@ -42,12 +52,17 @@
         "padding": 2,
         "colour": "colour.png",
         "normal": "normal.png",
-        "depth": "depth.png"
+        "depth": "depth.png",
+        "origin": [
+          0,
+          2048
+        ]
       }
     },
     {
       "id": "oak-138-20",
       "role": "dec",
+      "representation": "mesh",
       "species": "Quercus rubra",
       "seed": 138,
       "sourceFingerprint": "d6ed78ec6c2ad125c574aa9cd84efb173a289138b2bd3bd94317ce1ac2d8192d",
@@ -82,12 +97,17 @@
         "padding": 2,
         "colour": "colour.png",
         "normal": "normal.png",
-        "depth": "depth.png"
+        "depth": "depth.png",
+        "origin": [
+          512,
+          2048
+        ]
       }
     },
     {
       "id": "birch-101-20",
       "role": "small",
+      "representation": "mesh",
       "species": "Betula populifolia",
       "seed": 101,
       "sourceFingerprint": "5f95e34e45082cd44f970c48166b96e0b5e9d07a7186d965f6ce701f2dc3f1c4",
@@ -122,12 +142,17 @@
         "padding": 2,
         "colour": "colour.png",
         "normal": "normal.png",
-        "depth": "depth.png"
+        "depth": "depth.png",
+        "origin": [
+          1024,
+          2048
+        ]
       }
     },
     {
       "id": "fir-101-20",
       "role": "pine",
+      "representation": "volume",
       "species": "Abies balsamea",
       "seed": 101,
       "sourceFingerprint": "b59afe25e2c296fd38377a76bd88ef60ed6ecf895aa692729d5d863c5cd706cf",
@@ -150,6 +175,9 @@
           "triangles": 64
         }
       ],
+      "volume": "woodland-volume.json",
+      "middleVolume": "woodland-volume-middle.json",
+      "middleWood": "woodland-volume-middle-wood.json",
       "atlas": {
         "centre": [
           -0.04392552375793457,
@@ -157,17 +185,22 @@
           0.11125689744949341
         ],
         "radius": 3.4086595167304443,
-        "size": 512,
-        "tileSize": 48,
+        "size": 1024,
+        "tileSize": 124,
         "padding": 2,
         "colour": "colour.png",
         "normal": "normal.png",
-        "depth": "depth.png"
+        "depth": "depth.png",
+        "origin": [
+          0,
+          0
+        ]
       }
     },
     {
       "id": "fir-138-20",
       "role": "pine",
+      "representation": "volume",
       "species": "Abies balsamea",
       "seed": 138,
       "sourceFingerprint": "77a408cc9c42e2c0c14223ca18921a34f9d4630c35dffd9b812cee60f02b63fa",
@@ -190,6 +223,8 @@
           "triangles": 38
         }
       ],
+      "volume": "woodland-volume.json",
+      "middleVolume": "woodland-volume-middle.json",
       "atlas": {
         "centre": [
           0.002996206283569336,
@@ -197,17 +232,22 @@
           0.20003211498260498
         ],
         "radius": 3.2031212748175504,
-        "size": 512,
-        "tileSize": 48,
+        "size": 1024,
+        "tileSize": 124,
         "padding": 2,
         "colour": "colour.png",
         "normal": "normal.png",
-        "depth": "depth.png"
+        "depth": "depth.png",
+        "origin": [
+          1024,
+          0
+        ]
       }
     },
     {
       "id": "larch-101-20",
       "role": "pine",
+      "representation": "volume",
       "species": "Larix laricina",
       "seed": 101,
       "sourceFingerprint": "99fd416d44b4b0b631d30444eddc5b695402b51287a47b2706549ba912285740",
@@ -230,6 +270,8 @@
           "triangles": 54
         }
       ],
+      "volume": "woodland-volume.json",
+      "middleVolume": "woodland-volume-middle.json",
       "atlas": {
         "centre": [
           -0.010900616645812988,
@@ -237,17 +279,22 @@
           0.24072545766830444
         ],
         "radius": 4.3233904159755285,
-        "size": 512,
-        "tileSize": 48,
+        "size": 1024,
+        "tileSize": 124,
         "padding": 2,
         "colour": "colour.png",
         "normal": "normal.png",
-        "depth": "depth.png"
+        "depth": "depth.png",
+        "origin": [
+          0,
+          1024
+        ]
       }
     },
     {
       "id": "larch-138-20",
       "role": "pine",
+      "representation": "volume",
       "species": "Larix laricina",
       "seed": 138,
       "sourceFingerprint": "77e3860f494200798f9ef0653fe77729df0d379a58d286511f9fad4d3abe10c6",
@@ -270,6 +317,8 @@
           "triangles": 18
         }
       ],
+      "volume": "woodland-volume.json",
+      "middleVolume": "woodland-volume-middle.json",
       "atlas": {
         "centre": [
           0.07973372936248779,
@@ -277,36 +326,31 @@
           -0.08548140525817871
         ],
         "radius": 4.323647811328069,
-        "size": 512,
-        "tileSize": 48,
+        "size": 1024,
+        "tileSize": 124,
         "padding": 2,
         "colour": "colour.png",
         "normal": "normal.png",
-        "depth": "depth.png"
+        "depth": "depth.png",
+        "origin": [
+          1024,
+          1024
+        ]
       }
     }
   ],
-  "atlas": {
-    "columns": 4,
-    "bankSize": 512,
-    "tileSize": 48,
-    "padding": 2,
-    "colour": "colour.png",
-    "normal": "normal.png",
-    "depth": "depth.png"
-  },
   "atlasFiles": {
     "colour.png": {
-      "bytes": 118555,
-      "sha256": "09d4278c53014ee01a8bda9886d7babebcd05d464153e0dd0a4c2897854bd7f3"
+      "bytes": 376562,
+      "sha256": "068606b10154bdf198d29082c6b8919da5d8bff5404ba7945825c4dd6a584580"
     },
     "normal.png": {
-      "bytes": 367194,
-      "sha256": "b7e5fe455bbbf2c262d5ee2019f676c6001fb2059e9dc30c959f9dc739229f8a"
+      "bytes": 1061172,
+      "sha256": "16ef8731acaa27b24152a0725c50ee013e227314327db775b17289e9f1b59bd5"
     },
     "depth.png": {
-      "bytes": 351201,
-      "sha256": "1ba70df99d519450177005e6138f7c05f460cbabb9b0cc6a91f47d41fa233085"
+      "bytes": 1293741,
+      "sha256": "3f9f63a39617568503a7292d33850ca7e63eb1f524cbc6ce3166c310b0a4c6c8"
     }
   }
 }

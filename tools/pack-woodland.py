@@ -9,15 +9,27 @@ from pathlib import Path
 from PIL import Image
 
 root = Path(sys.argv[1])
-plants = json.loads((root / 'library.json').read_text())['plants']
-size = plants[0]['atlas']['size']
-if any(p['atlas']['size'] != size or p['atlas']['tileSize'] != plants[0]['atlas']['tileSize'] or p['atlas']['padding'] != plants[0]['atlas']['padding'] for p in plants):
-    raise ValueError('Combined atlases require matching source dimensions')
+library = json.loads((root / 'library.json').read_text())
+plants = library['plants']
+size = max(p['atlas']['size'] for p in plants)
+width = size * 2
+x = y = row_height = 0
+for plant in sorted(plants, key=lambda p: -p['atlas']['size']):
+    bank = plant['atlas']['size']
+    if x + bank > width:
+        y += row_height
+        x = row_height = 0
+    plant['atlas']['origin'] = [x, y]
+    x += bank
+    row_height = max(row_height, bank)
+height = y + row_height
+library['atlas'].update(width=width, height=height, columns=2)
 for channel in ('colour', 'normal', 'depth'):
-    atlas = Image.new('RGBA', (size * 4, size * ((len(plants) + 3) // 4)))
-    for i, plant in enumerate(plants):
+    atlas = Image.new('RGBA', (width, height))
+    for plant in plants:
         with Image.open(root / plant['id'] / plant['atlas'][channel]) as image:
-            if image.size != (size, size):
+            if image.size != (plant['atlas']['size'], plant['atlas']['size']):
                 raise ValueError('Source PNG dimensions do not match the manifest')
-            atlas.paste(image.convert('RGBA'), (i % 4 * size, i // 4 * size))
+            atlas.paste(image.convert('RGBA'), tuple(plant['atlas']['origin']))
     atlas.save(root / (channel + '.png'))
+(root / 'library.json').write_text(json.dumps(library, indent=2) + '\n')

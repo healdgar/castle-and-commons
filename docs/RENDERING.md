@@ -111,6 +111,45 @@ views and verifies switching, display clearing and fixed winter shadows. Pass
 Pass `--standalone` to reject every external woodland request and first check
 loading in an opaque sandboxed frame with all fetch calls disabled.
 
+## Conifer crowns with 3D shapes and depth detail
+
+The conifer foreground export compressed roughly 98,000–179,000 needles into
+one large card while the painted texture capped the count at 160 enlarged
+blades. This made opaque green sheets. The four fir/larch individuals now use
+fixed enclosing volumes with the actual grown wood: 36 crown triangles nearby
+and 12 at middle distance. Combined wood/crown costs remain within 500/64.
+One middle wood companion is reduced with measured maximum displacement of
+0.04136 m; the original native wood export is retained.
+
+Forestmodeler's independent compiler reconstructs every exported depth view
+and season, then fits conservative support planes. It never alters growth or
+imports the game engine. The game traces a perspective ray through those shapes
+and reconstructs colour, normals and fragment depth from the nearby baked
+views. Invalid projections are rejected; shadows are sampled at reconstructed
+surfaces. Conifer PNGs are decoded from their declared sRGB colour before
+lighting, consistently in the far representation. Oak/birch retain their
+existing meshes, source pixels and palette.
+
+Conifer directional tiles are rebaked at 124 px, retaining the same skeleton
+fingerprints. Mixed-resolution atlases copy all 21 native banks verbatim into
+three 2048×2560 PNGs. These consume 60 MiB uncompressed rather than 96 MiB with
+uniform 1024 px banks; the previous all 48 px set consumed 24 MiB. This is a texture
+memory cost, not a claimed speed improvement. Near/middle instance caps,
+clearing and the independent fixed light caster are retained.
+
+Both WebGL2 and forced-WebGL1 pass 21 worker views with no page/GL errors and
+external woodland requests blocked. All four individuals are captured in
+summer/winter, with additional eye-level/reverse views. Switching preserves
+all 57,320 instances; conifer clearing/restoration retains native transforms;
+winter shadow-camera invariance also passes. The 17 native asset/volume checks
+pass. All 2,309 full regression checks pass (3,895.006 process CPU seconds, load2.84→1.00). The authoring checks use20.048 CPU seconds, load3.48→2.84. These are verification costs, not rendering throughput claims. Source equality reuses the prior
+150-day full-world/RNG proof: the game program is byte-identical. Evidence is
+in `/workspace/furlong-conifer-fix/`. The independent compiler is published in [fb6173c](https://github.com/healdgar/forestmodeler/commit/fb6173c).
+
+Close detail remains limited by the baked resolution; mobile/hardware art and
+throughput acceptance are open under #104. Regrowing saplings retain the original
+representation. The assets remain correctly labelled North American genomes.
+
 ## Original review evidence
 
 Current Furlong source: `075d97e09e3f4f96a9593ab59d1f3ce340d12b6e`;

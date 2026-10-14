@@ -54,6 +54,11 @@ with sync_playwright() as p:
    ('06-shadow-before-cutoff','[W.capital.pos.x,W.capital.pos.z,1590,2.3,0]',1),
    ('07-shadow-after-cutoff','[W.capital.pos.x,W.capital.pos.z,1610,2.3,0]',1),
    ('08-realm','[0,0,4200,.8,0]',1)]
+  if GROW_VOLUMES:=page.evaluate('G.woodland.plants.some(p=>p.volume)'):
+   for plant in page.evaluate('G.woodland.plants.filter(p=>p.volume).map(p=>p.id)'):
+    pose='(()=>{const r=G.woodland.records.find(r=>r.row.id==='+json.dumps(plant)+'&&r.view.shown&&!r.t.cut&&Math.hypot(r.t.x,r.t.z)<3000);return[r.t.x,r.t.z,45,.6,-.4];})()'
+    views.append(('volume-'+plant,pose,1));views.append(('volume-'+plant+'-winter',pose,3))
+   views.append(('volume-conifer-eye-level',views[2][1].replace('65,.6,0','25,.6,-.8'),1));views.append(('volume-conifer-reverse',views[2][1].replace('65,.6,0','65,2.1,0'),1))
   for name,expression,season in views:
    page.evaluate('(()=>{const q='+expression+';flyTo(...q);cam.pitchBias=cam.cur.pitchBias=q[4];cam.cur.focus.copy(cam.focus);cam.cur.dist=cam.dist;cam.cur.yaw=cam.yaw;updateCamera(0,0);animateWorld(0,0);lastSeasonKey="";updateTerrainColors('+str(season)+',.25,1);scene.updateMatrixWorld(true);if(G.woodland)G.woodland.update(0,true);renderer.render(scene,camera);})()')
    inspect=page.evaluate('(()=>{const gl=renderer.getContext();return{woodland:G.woodland?{near:G.woodland.near,middle:G.woodland.middle,records:G.woodland.records.length,batches:G.woodland.far.length,rebuildWallMs:G.woodland.lastRebuildMs,writeDepth:G.woodland.writeDepth}:null,day:day(),camera:camera.position.toArray(),distance:cam.cur.dist,render:{...renderer.info.render},geometry:renderer.info.memory.geometries,textures:renderer.info.memory.textures,shadowEnabled:G.sun.castShadow,shadowExtent:G.sun.shadow.camera.right,shadowTexel:G.sun.shadow.camera.right*2/2048,leafless:G.seasonU.uLeafless.value,glError:gl.getError(),linked:renderer.info.programs.every(p=>gl.getProgramParameter(p.program,gl.LINK_STATUS))};})()')
@@ -74,6 +79,9 @@ with sync_playwright() as p:
   result['ab']=page.evaluate('(()=>{const before=G.woodland.records.map(r=>r.view.shown);G.woodland.setEnabled(false);const original={instances:G.treeChunks.reduce((n,m)=>n+m.count,0),nativeShown:G.woodland.records.map(r=>G.treeInstances.get(r.t).shown)};G.woodland.setEnabled(true);G.woodland.update(0,true);return{before,original,after:G.woodland.records.map(r=>r.view.shown)};})()')
   assert result['ab']['before']==result['ab']['original']['nativeShown']==result['ab']['after']
   result['ab']={'matchedInstances':len(result['ab']['before']),'originalInstances':result['ab']['original']['instances']}
+  if GROW_VOLUMES:
+   result['volumes']=page.evaluate('(()=>{const before=G.woodland.records.filter(r=>r.row.volume).map(r=>[r.view.shown,...r.view.m.instanceMatrix.array.slice(r.view.ci*16,r.view.ci*16+16)]),r=G.woodland.records.find(r=>r.row.volume&&r.view.shown&&!r.t.cut);showTree(r.t,false);G.woodland.update(0,true);const hidden=!G.woodland.promoted.includes(r);showTree(r.t,true);G.woodland.update(0,true);return{hidden,unchanged:JSON.stringify(before)===JSON.stringify(G.woodland.records.filter(r=>r.row.volume).map(r=>[r.view.shown,...r.view.m.instanceMatrix.array.slice(r.view.ci*16,r.view.ci*16+16)])),tiers:G.woodland.plants.filter(p=>p.volume).map(p=>({id:p.id,near:p.near[1].geometry.index.count/3,middle:p.middle[1].geometry.index.count/3}))};})()')
+   assert result['volumes']['hidden'] and result['volumes']['unchanged'] and all(t['near']<=36 and t['middle']<=12 for t in result['volumes']['tiers']),result['volumes']
   # Clear and restore just the presentation; no model state or command is invented.
   result['clearing']=page.evaluate('(()=>{const r=G.woodland.promoted.find(r=>r.view.shown!==false),t=r.t;showTree(t,false);G.woodland.update(0,true);const removed=!G.woodland.promoted.includes(r);G.woodland.setEnabled(false);const oldHidden=G.treeInstances.get(t).shown===false;showTree(t,true);G.woodland.setEnabled(true);G.woodland.update(0,true);return{removed,oldHidden,restored:r.view.shown===true};})()')
   assert all(result['clearing'].values()),result['clearing']

@@ -46,7 +46,19 @@ test('directional image rows contain all azimuths, elevations and seasons in run
 
 test('the packed runtime atlases retain their checksums and complete bank dimensions',()=>{
  for(const [name,receipt]of Object.entries(library.atlasFiles)){const b=fs.readFileSync(new URL(name,root));assert.equal(b.length,receipt.bytes);assert.equal(createHash('sha256').update(b).digest('hex'),receipt.sha256);
-  assert.equal(b.readUInt32BE(16),library.atlas.columns*library.atlas.bankSize);assert.equal(b.readUInt32BE(20),Math.ceil(library.plants.length/library.atlas.columns)*library.atlas.bankSize);}
+  assert.equal(b.readUInt32BE(16),library.atlas.width);assert.equal(b.readUInt32BE(20),library.atlas.height);}
+});
+
+test('mixed-resolution banks fit without overlap and conifers use bounded 3D volumes',()=>{
+ const boxes=[];
+ for(const p of library.plants){const [x,y]=p.atlas.origin,size=p.atlas.size;assert(x>=0&&y>=0&&x+size<=library.atlas.width&&y+size<=library.atlas.height);
+  for(const [a,b,s]of boxes)assert(x+size<=a||a+s<=x||y+size<=b||b+s<=y,'atlas banks overlap');boxes.push([x,y,size]);
+  if(p.role==='pine'){assert.equal(p.representation,'volume');assert(p.atlas.tileSize>=96);
+   for(const [i,file]of [p.volume,p.middleVolume].entries()){const v=JSON.parse(fs.readFileSync(new URL(p.id+'/'+file,root))),native=JSON.parse(fs.readFileSync(new URL(p.id+'/'+p.lods[i].file,root)));
+    const wood=i&&p.middleWood?JSON.parse(fs.readFileSync(new URL(p.id+'/'+p.middleWood,root))):native.wood;
+    assert.equal(v.indices.length/3,v.triangles);assert(v.triangles<=(i?12:36));assert(wood.indices.length/3+v.triangles<=(i?64:500));assert(v.positions.flat().every(Number.isFinite));}
+  }else{assert.equal(p.representation,'mesh');assert.equal(p.atlas.tileSize,48);}
+ }
 });
 
 test('distance transitions preserve full coverage and stay continuous at both tier boundaries',()=>{

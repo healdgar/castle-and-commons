@@ -11,7 +11,7 @@ float woodlandDither(){vec2 p=mod(floor(gl_FragCoord.xy),4.);return (mod(p.x+p.y
 void woodlandCut(){float d=woodlandDither();if(d<vCover.x||d>=vCover.y)discard;}
 `;
 const VERTEX=`
-attribute vec2 aCover;attribute vec4 aShape;attribute float aPlant;varying vec4 vView,vShape;
+attribute vec2 aCover;attribute vec4 aTile;attribute vec4 aShape;attribute float aPlant;varying vec4 vView,vShape;varying vec4 vTile;
 varying vec4 vFrame0,vFrame1,vFrame2,vInfo;
 uniform vec3 uLightDirection;
 #include <common>
@@ -26,10 +26,17 @@ void main(){
  #endif
  vec3 eye=normalize(vec3(dot(delta,frame[0].xyz)/dot(frame[0].xyz,frame[0].xyz),dot(delta,frame[1].xyz)/dot(frame[1].xyz,frame[1].xyz),dot(delta,frame[2].xyz)/dot(frame[2].xyz,frame[2].xyz)));
  float az=atan(eye.z,eye.x);vec3 right=vec3(sin(az),0.,-cos(az)),up=normalize(cross(eye,right));
+ #ifdef WOODLAND_VOLUME
+ vec3 p=position;
+ #else
  vec3 p=aShape.xyz+aShape.w*((uv.x*2.-1.)*right+(uv.y*2.-1.)*up);
+ #endif
  vec4 worldPosition=frame*vec4(p,1.),mvPosition=viewMatrix*worldPosition;
  gl_Position=projectionMatrix*mvPosition;
- vView=vec4(uv,az,asin(clamp(eye.y,-1.,1.)));vShape=aShape;vInfo=vec4(aCover,-mvPosition.z,aPlant+.1);
+ vView=vec4(uv,az,asin(clamp(eye.y,-1.,1.)));vShape=aShape;vTile=aTile;vInfo=vec4(aCover,-mvPosition.z,aPlant+.1);
+ #ifdef WOODLAND_VOLUME
+ vView=vec4(p,1.);
+ #endif
  #ifdef USE_INSTANCING_COLOR
  vInfo.w=aPlant+instanceColor.g*.1;
  #endif
@@ -39,21 +46,29 @@ void main(){
 }
 `;
 const SAMPLE=`
-varying vec4 vView,vShape;
+varying vec4 vView,vShape;varying vec4 vTile;
 varying vec4 vFrame0,vFrame1,vFrame2,vInfo;
 uniform sampler2D uColour,uNormal,uDepth;
-uniform vec2 uAtlasSize;uniform float uBankSize,uTileSize,uPadding,uLeafless;
+uniform vec2 uAtlasSize;uniform float uLeafless;
 uniform mat4 projectionMatrix;
 float woodlandDither(){vec2 p=mod(floor(gl_FragCoord.xy),4.);return (mod(p.x+p.y*2.,4.)*4.+mod(p.y+p.x*2.,4.)+.5)/16.;}
-vec2 tileUV(vec2 q,float tile){float stride=uTileSize+2.*uPadding,bank=mod(floor(vInfo.w),16.);vec2 origin=vec2(mod(bank,4.),floor(bank/4.))*uBankSize;return vec2((origin.x+mod(tile,8.)*stride+uPadding+q.x*uTileSize)/uAtlasSize.x,1.-(origin.y+floor(tile/8.)*stride+uPadding+q.y*uTileSize)/uAtlasSize.y);}
+vec2 tileUV(vec2 q,float tile){float stride=vTile.z+2.*vTile.w;vec2 origin=vTile.xy;return vec2((origin.x+mod(tile,8.)*stride+vTile.w+q.x*vTile.z)/uAtlasSize.x,1.-(origin.y+floor(tile/8.)*stride+vTile.w+q.y*vTile.z)/uAtlasSize.y);}
 bool validUV(vec2 q){return q.x>=0.&&q.y>=0.&&q.x<=1.&&q.y<=1.;}
 void woodlandSample(out vec3 albedo,out vec3 normal,out vec3 hit,out float coverage,out float leaf){
+ #ifdef WOODLAND_VOLUME
+ vec3 delta=cameraPosition-vec3(vFrame0.w,vFrame1.w,vFrame2.w);
+ vec3 localCamera=vec3(dot(delta,vFrame0.xyz)/dot(vFrame0.xyz,vFrame0.xyz),dot(delta,vFrame1.xyz)/dot(vFrame1.xyz,vFrame1.xyz),dot(delta,vFrame2.xyz)/dot(vFrame2.xyz,vFrame2.xyz));
+ vec3 eye=normalize(localCamera-vView.xyz),start=(vView.xyz-vShape.xyz)/vShape.w;
+ float az=atan(eye.z,eye.x),elevation=asin(clamp(eye.y,-1.,1.));
+ #else
  float az=vView.z,elevation=vView.w;vec3 eye=vec3(cos(elevation)*cos(az),sin(elevation),cos(elevation)*sin(az));if(az<0.)az+=6.283185307;
- float ap=az/0.785398163,al=floor(ap),aw=fract(ap),ep=clamp(asin(clamp(eye.y,-1.,1.))/0.610865238,0.,2.),el=floor(min(ep,1.99999)),ew=ep-el;
  vec3 right=vec3(sin(az),0.,-cos(az)),up=normalize(cross(eye,right));
  vec3 start=(vView.x*2.-1.)*right+(vView.y*2.-1.)*up;
+ #endif
+ if(az<0.)az+=6.283185307;
+ float ap=az/0.785398163,al=floor(ap),aw=fract(ap),ep=clamp(asin(clamp(eye.y,-1.,1.))/0.610865238,0.,2.),el=floor(min(ep,1.99999)),ew=ep-el;
  albedo=vec3(0.);normal=vec3(0.);hit=vec3(0.);coverage=0.;leaf=0.;
- float loss=uLeafless*(1.-floor(floor(vInfo.w)/16.));
+ float loss=uLeafless*(1.-mod(floor(floor(vInfo.w)/16.),2.));
  #ifdef WOODLAND_SHADOW
  // One fixed light-facing sample suffices for a caster; never pay for beauty blending in the shadow map.
  al=floor(ap+.5);aw=0.;el=floor(ep+.5);ew=0.;loss=step(woodlandDither(),loss);
@@ -71,7 +86,13 @@ void woodlandSample(out vec3 albedo,out vec3 normal,out vec3 hit,out float cover
     float depth=(d.r*255.*256.+d.g*255.)/65535.;float den=dot(eye,se);if(abs(den)<.05)break;
     p=start+eye*((1.-2.*depth-dot(start,se))/den);
    }
+   // A neighbouring projection can land on a different branch. Reject rays
+   // outside the baked sphere instead of painting a streak across the volume.
    if(hasHit<.5)continue;
+   #ifdef WOODLAND_VOLUME
+   vec2 projected=vec2(.5+.5*dot(p,sr),.5-.5*dot(p,su));
+   if(length(p)>1.03||length(projected-lastQ)>2./vTile.z)continue;
+   #endif
    vec2 uv=tileUV(lastQ,tile);vec4 colour=texture2D(uColour,uv);float c=colour.a*w;
    albedo+=colour.rgb*c;normal+=(texture2D(uNormal,uv).rgb*2.-1.)*c;hit+=p*c;leaf+=d.b*c;coverage+=c;
   }
@@ -92,12 +113,33 @@ uniform bool receiveShadow;
 uniform vec3 uLightDirection,uSunColour,uSkyColour,uGroundColour,uAmbientColour,fogColor;
 uniform float fogNear,fogFar,uAutumn;
 ${SAMPLE}
+#ifdef WOODLAND_VOLUME
+#if NUM_DIR_LIGHT_SHADOWS > 0
+uniform mat4 directionalShadowMatrix[NUM_DIR_LIGHT_SHADOWS];
+#endif
+float volumeShadow(vec3 world){
+ float shadow=1.;
+ #if NUM_DIR_LIGHT_SHADOWS > 0
+ DirectionalLightShadow light=directionalLightShadows[0];
+ if(receiveShadow)shadow=getShadow(directionalShadowMap[0],light.shadowMapSize,light.shadowBias,light.shadowRadius,directionalShadowMatrix[0]*vec4(world,1.));
+ #endif
+ return shadow;
+}
+#endif
 void main(){
  float d=woodlandDither();if(d<vInfo.x||d>=vInfo.y)discard;
  vec3 albedo,normal,hit;float coverage,leaf;woodlandSample(albedo,normal,hit,coverage,leaf);
+ // Native PNG colour is sRGB. Decode the new volume palette before lighting;
+ // its metadata also selects this conversion in the distant representation.
+ if(vInfo.w>=32.)albedo=mix(albedo/12.92,pow((albedo+.055)/1.055,vec3(2.4)),step(vec3(.04045),albedo));
  vec3 wn=normalize(vFrame0.xyz*normal.x/dot(vFrame0.xyz,vFrame0.xyz)+vFrame1.xyz*normal.y/dot(vFrame1.xyz,vFrame1.xyz)+vFrame2.xyz*normal.z/dot(vFrame2.xyz,vFrame2.xyz));
  albedo*=mix(vec3(1.),vec3(1.15,.7,.32),leaf*uAutumn)*fract(vInfo.w)*10.;
- vec3 light=uAmbientColour+mix(uGroundColour,uSkyColour,wn.y*.5+.5)+uSunColour*max(0.,dot(wn,uLightDirection))*getShadowMask();
+ #ifdef WOODLAND_VOLUME
+ float shadow=volumeShadow(woodlandWorld(hit));
+ #else
+ float shadow=getShadowMask();
+ #endif
+ vec3 light=uAmbientColour+mix(uGroundColour,uSkyColour,wn.y*.5+.5)+uSunColour*max(0.,dot(wn,uLightDirection))*shadow;
  gl_FragColor=vec4(albedo*light,1.);
  #ifdef USE_FOG
  gl_FragColor.rgb=mix(gl_FragColor.rgb,fogColor,smoothstep(fogNear,fogFar,vInfo.z));
@@ -140,8 +182,9 @@ async function load({THREE:T,base='assets/woodland/',timeout=15000}){
   for(const t of atlas.slice(1))t.minFilter=t.magFilter=T.NearestFilter;
   const plants=await Promise.all(library.plants.map(async (row,variant)=>{
    const dir=row.id+'/',a=row.atlas;
-   const tiers=await Promise.all(row.lods.map(async lod=>{const data=await json(dir+lod.file),map=await texture(dir+lod.texture);return{wood:geometry(data.wood,row.scale),foliage:geometry(data.foliage,row.scale),map};}));
-   return{...row,variant,centre:new T.Vector3(...a.centre).multiplyScalar(row.scale),radius:a.radius*row.scale,tiers};
+   const volumeTiers=row.representation==='volume'?await Promise.all([row.volume,row.middleVolume].map(async file=>geometry(await json(dir+file),row.scale))):[],volume=volumeTiers[0]||null;
+   const tiers=await Promise.all(row.lods.map(async (lod,i)=>{const data=await json(dir+lod.file),wood=i&&row.middleWood?await json(dir+row.middleWood):data.wood,map=volume?null:await texture(dir+lod.texture);return{wood:geometry(wood,row.scale),foliage:volume?null:geometry(data.foliage,row.scale),map};}));
+   return{...row,variant,centre:new T.Vector3(...a.centre).multiplyScalar(row.scale),radius:a.radius*row.scale,tiers,volume,volumeTiers};
   }));
   return{plants,atlas,atlasSpec:spec,dispose(){textures.forEach(t=>t.dispose());geometries.forEach(g=>g.dispose());}};
  }catch(error){failed=true;controller.abort();textures.forEach(t=>t.dispose());geometries.forEach(g=>g.dispose());throw error;}
@@ -162,16 +205,18 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
   };m.customProgramCacheKey=()=>leaf?'woodland-leaf':'woodland-wood';return m;
  }
  const spec=library.atlasSpec,uniforms=T.UniformsUtils.merge([T.UniformsLib.lights,T.UniformsLib.fog]);
- Object.assign(uniforms,lighting,{uLeafless:G.seasonU.uLeafless,uAtlasSize:{value:new T.Vector2(library.atlas[0].image.width,library.atlas[0].image.height)},uBankSize:{value:spec.bankSize},uTileSize:{value:spec.tileSize},uPadding:{value:spec.padding},uColour:{value:library.atlas[0]},uNormal:{value:library.atlas[1]},uDepth:{value:library.atlas[2]}});
+ Object.assign(uniforms,lighting,{uLeafless:G.seasonU.uLeafless,uAtlasSize:{value:new T.Vector2(library.atlas[0].image.width,library.atlas[0].image.height)},uColour:{value:library.atlas[0]},uNormal:{value:library.atlas[1]},uDepth:{value:library.atlas[2]}});
  const material=new T.ShaderMaterial({uniforms,vertexShader:VERTEX,fragmentShader:FRAGMENT,lights:true,fog:true,extensions:{fragDepth:writeDepth},defines:writeDepth?{WRITE_DEPTH:1}:{}});
+ const volumeMaterial=new T.ShaderMaterial({uniforms,vertexShader:VERTEX,fragmentShader:FRAGMENT,lights:true,fog:true,side:T.DoubleSide,extensions:{fragDepth:writeDepth},defines:{WOODLAND_VOLUME:1,...(writeDepth?{WRITE_DEPTH:1}:{})}});
  const depth=new T.ShaderMaterial({uniforms,vertexShader:VERTEX,fragmentShader:DEPTH_FRAGMENT,extensions:{fragDepth:writeDepth},defines:{WOODLAND_SHADOW:1,...(writeDepth?{WRITE_DEPTH:1}:{})},side:T.DoubleSide});
  const plants=library.plants.map(row=>{
   row.near=[];row.middle=[];
   for(let tier=0;tier<2;tier++){
-   const limit=tier?LIMITS.middle:LIMITS.near,source=row.tiers[tier],cover=new T.InstancedBufferAttribute(new Float32Array(limit*2),2),pool=[];
-   for(const leaf of [false,true]){const g=(leaf?source.foliage:source.wood).clone();g.setAttribute('aCover',cover);
-    const m=new T.InstancedMesh(g,meshMaterial({...row,map:source.map},leaf),limit);m.count=0;m.frustumCulled=false;m.receiveShadow=true;m.userData.woodlandTier=tier?'middle':'near';scene.add(m);pool.push(m);}
-   pool[1].instanceMatrix=pool[0].instanceMatrix;pool[1].instanceColor=pool[0].instanceColor;pool.cover=cover;pool.used=0;row[tier?'middle':'near']=pool;state.pools.push(pool);
+   const limit=tier?LIMITS.middle:LIMITS.near,source=row.tiers[tier],volume=row.volumeTiers?.[tier],cover=new T.InstancedBufferAttribute(new Float32Array(limit*2),2),pool=[];
+   for(const leaf of [false,true]){const g=(leaf?(volume||source.foliage):source.wood).clone();g.setAttribute('aCover',cover);
+    if(volume&&leaf){const shape=new Float32Array(limit*4),tile=new Float32Array(limit*4),plant=new Float32Array(limit);for(let i=0;i<limit;i++){shape.set([...row.centre.toArray(),row.radius],i*4);tile.set([...row.atlas.origin,row.atlas.tileSize,row.atlas.padding],i*4);plant[i]=row.variant+row.season*16+32;}g.setAttribute('aShape',new T.InstancedBufferAttribute(shape,4));g.setAttribute('aTile',new T.InstancedBufferAttribute(tile,4));g.setAttribute('aPlant',new T.InstancedBufferAttribute(plant,1));}
+    const m=new T.InstancedMesh(g,volume&&leaf?volumeMaterial:meshMaterial({...row,map:source.map},leaf),limit);m.count=0;m.frustumCulled=false;m.receiveShadow=true;m.userData.woodlandTier=tier?'middle':'near';scene.add(m);pool.push(m);}
+   if(pool[1]){pool[1].instanceMatrix=pool[0].instanceMatrix;pool[1].instanceColor=pool[0].instanceColor;}pool.cover=cover;pool.used=0;row[tier?'middle':'near']=pool;state.pools.push(pool);
   }
   return row;
  });
@@ -182,12 +227,12 @@ function create({THREE:T,library,scene,camera,renderer,G,spots,size,hash}){
    if(!groups.has(key))groups.set(key,{chunk,records:[]});groups.get(key).records.push({t,row,old:old.get(t)});}
  }
  for(const {chunk,records}of groups.values()){
-  const geometry=new T.PlaneGeometry(2,2),cover=new T.InstancedBufferAttribute(new Float32Array(records.length*2),2),shape=new T.InstancedBufferAttribute(new Float32Array(records.length*4),4),plant=new T.InstancedBufferAttribute(new Float32Array(records.length),1);geometry.setAttribute('aCover',cover);geometry.setAttribute('aShape',shape);geometry.setAttribute('aPlant',plant);
+  const geometry=new T.PlaneGeometry(2,2),cover=new T.InstancedBufferAttribute(new Float32Array(records.length*2),2),shape=new T.InstancedBufferAttribute(new Float32Array(records.length*4),4),plant=new T.InstancedBufferAttribute(new Float32Array(records.length),1),tile=new T.InstancedBufferAttribute(new Float32Array(records.length*4),4);geometry.setAttribute('aCover',cover);geometry.setAttribute('aShape',shape);geometry.setAttribute('aPlant',plant);geometry.setAttribute('aTile',tile);
   const bounds=new T.Box3();for(const r of records){const row=r.row;r.old.m.getMatrixAt(r.old.ci,matrix);const e=matrix.elements,s=Math.max(Math.hypot(e[0],e[1],e[2]),Math.hypot(e[4],e[5],e[6]),Math.hypot(e[8],e[9],e[10])),radius=(row.centre.length()+row.radius)*Math.max(s,r.t.s*1.5);
    bounds.expandByPoint(new T.Vector3(e[12]-radius,e[13]-radius,e[14]-radius));bounds.expandByPoint(new T.Vector3(e[12]+radius,e[13]+radius,e[14]+radius));}
   geometry.boundingSphere=bounds.getBoundingSphere(new T.Sphere());
   const m=new T.InstancedMesh(geometry,material,records.length);m.castShadow=true;m.receiveShadow=true;m.customDepthMaterial=depth;m.userData.woodlandTier='far';
-  records.forEach((r,i)=>{const row=r.row;shape.setXYZW(i,row.centre.x,row.centre.y,row.centre.z,row.radius);plant.setX(i,row.variant+row.season*16);r.old.m.getMatrixAt(r.old.ci,matrix);m.setMatrixAt(i,matrix);m.setColorAt(i,new T.Color().setRGB(.9+r.t.v*.12,.9+r.t.v*.12,.9+r.t.v*.12));cover.setXY(i,0,1);
+  records.forEach((r,i)=>{const row=r.row;shape.setXYZW(i,row.centre.x,row.centre.y,row.centre.z,row.radius);plant.setX(i,row.variant+row.season*16+(row.volume?32:0));tile.setXYZW(i,...row.atlas.origin,row.atlas.tileSize,row.atlas.padding);r.old.m.getMatrixAt(r.old.ci,matrix);m.setMatrixAt(i,matrix);m.setColorAt(i,new T.Color().setRGB(.9+r.t.v*.12,.9+r.t.v*.12,.9+r.t.v*.12));cover.setXY(i,0,1);
    const v={m,ci:i,shown:r.old.shown};map.set(r.t,v);r.view=v;r.position=new T.Vector3(matrix.elements[12],matrix.elements[13],matrix.elements[14]);r.height=row.centre.y+row.radius;
    r.scale=Math.hypot(matrix.elements[4],matrix.elements[5],matrix.elements[6]);r.cover=cover;state.records.push(r);delete r.old;});
   m.instanceMatrix.needsUpdate=true;scene.add(m);state.far.push(m);
