@@ -123,12 +123,15 @@ void main(){vec3 albedo,normal,hit;float coverage,leaf;woodlandSample(albedo,nor
 `;
 
 async function load({THREE:T,base='assets/woodland/',timeout=15000}){
+ const embedded=typeof document!=='undefined'&&document.getElementById('woodlandassets'),files=embedded?JSON.parse(embedded.textContent):null;
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeout),textures=[],geometries=[];
  let failed=false;
- const json=async name=>{const r=await fetch(base+name,{signal:controller.signal});if(!r.ok)throw Error('Woodland HTTP '+r.status+': '+name);return r.json();};
+ const asset=name=>{if(!Object.prototype.hasOwnProperty.call(files,name))throw Error('Missing embedded woodland asset: '+name);return files[name];};
+ const json=async name=>{if(files)return JSON.parse(asset(name));const r=await fetch(base+name,{signal:controller.signal});if(!r.ok)throw Error('Woodland HTTP '+r.status+': '+name);return r.json();};
  const texture=name=>new Promise((resolve,reject)=>{
+  const url=files?asset(name):base+name;
   const timer=setTimeout(()=>reject(Error('Woodland texture timed out: '+name)),timeout);
-  new T.TextureLoader().load(base+name,t=>{clearTimeout(timer);if(failed){t.dispose();reject(Error('Woodland loading cancelled'));return;}textures.push(t);t.generateMipmaps=false;t.minFilter=t.magFilter=T.LinearFilter;resolve(t);},undefined,()=>{clearTimeout(timer);reject(Error('Missing woodland texture '+name));});
+  new T.TextureLoader().load(url,t=>{clearTimeout(timer);if(failed){t.dispose();reject(Error('Woodland loading cancelled'));return;}textures.push(t);t.generateMipmaps=false;t.minFilter=t.magFilter=T.LinearFilter;resolve(t);},undefined,()=>{clearTimeout(timer);reject(Error('Missing woodland texture '+name));});
  });
  const geometry=(data,scale)=>{const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(data.positions.flat().map(v=>v*scale),3));g.setAttribute('normal',new T.Float32BufferAttribute(data.normals.flat(),3));g.setAttribute('uv',new T.Float32BufferAttribute(data.uvs.flat(),2));g.setIndex(data.indices);geometries.push(g);return g;};
  try{

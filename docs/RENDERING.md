@@ -14,6 +14,39 @@ American genomes, not newly authored medieval European trees. The generator
 and its engine stay in Forestmodeler; only finished meshes, PNGs and provenance
 are imported into `assets/woodland/`.
 
+The release page now embeds the woodland renderer, all fourteen tier meshes,
+fourteen foliage textures and three directional atlases. Selecting the preview
+requires no external woodland requests. This repairs the missing-asset failure
+of an HTML-only host (`Woodland HTTP 404: library.json`) and removes the same
+dependency from file opening and sandboxed previews. The original trial's
+complete local asset server hid that publication gap. Three.js still uses the
+existing CDN, and the other game textures retain their existing asset paths.
+Run `node tools/embed-woodland.mjs` after changing the renderer or imported
+assets; `tools/stamp.sh` also regenerates it. The regression check verifies the
+embedded renderer and every runtime file against their sources, byte for byte.
+
+Both current WebGL2 and forced-WebGL1 checks load all seven specimens in an
+opaque sandbox with fetch disabled, then pass eleven native worker views with
+every external woodland request rejected. The game program remains exactly the
+previously verified 150-day candidate, so its native save/RNG proof is reused by
+source equality rather than rerunning identical simulation code. Evidence is in
+`/workspace/furlong-woodland-loading/`. Direct file navigation is blocked by this
+cloud browser policy and is not claimed as an executed scenario.
+Architecture and equivalence fixtures now select the game program through the
+existing `inlineGameScript` helper, avoiding the embedded library's separate
+strict directive and helper names. Their model assertions and source pins stay
+unchanged.
+
+The full batch finishes with 2,296 passes and seven source-reader failures;
+all 152 targeted rechecks pass after selecting the correct program, verifying
+2,308 distinct checks overall. Full-batch cost is 3,902.619 process CPU seconds,
+load3.40→1.01; rechecks use 211.253 CPU seconds, load1.09→2.10. This includes
+the unchanged native layout/save/economy assertions; it is not a runtime speed
+measurement. Automatic `?woodland=1` startup also passes on the stamped
+page served beneath `/castle-and-commons/`: all 57,320 native instances, linked
+shaders, no GL/page errors and no external woodland requests. Detailed logs
+and receipts are in the loading evidence directory.
+
 Native placement, per-tree variation, land clearing and the ground feature mask
 are reused. Display height is normalized to the old tree categories by uniform
 scaling; it is not a biological growth or age claim. Variant selection uses the
@@ -75,6 +108,8 @@ Python Playwright and Chrome/Chromium. It opens the actual worker build, pauses
 the native realm, clicks the preview control, captures matched summer/winter/map
 views and verifies switching, display clearing and fixed winter shadows. Pass
 `--webgl1` to exercise r128’s fallback without changing the shipped game.
+Pass `--standalone` to reject every external woodland request and first check
+loading in an opaque sandboxed frame with all fetch calls disabled.
 
 ## Original review evidence
 

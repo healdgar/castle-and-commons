@@ -1,15 +1,16 @@
 # Optional authoring check: Python Playwright and an installed Chrome/Chromium.
 # All captures and records go to a fresh --out folder, never the source tree.
-import argparse,json,subprocess,base64,time,hashlib,os,threading,http.server,functools,shutil
+import argparse,json,subprocess,base64,time,hashlib,os,threading,http.server,functools,shutil,re
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 parser=argparse.ArgumentParser(description='Capture the grown woodland trial in a real paused worker world, compare original views, and check camera-independent winter shadows.')
-parser.add_argument('--out',type=Path,required=True);parser.add_argument('--chrome',default=shutil.which('chromium') or shutil.which('google-chrome') or '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome');parser.add_argument('--webgl1',action='store_true');args=parser.parse_args()
+parser.add_argument('--out',type=Path,required=True);parser.add_argument('--chrome',default=shutil.which('chromium') or shutil.which('google-chrome') or '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome');parser.add_argument('--webgl1',action='store_true');parser.add_argument('--standalone',action='store_true',help='Reject every external woodland asset, as in an HTML-only preview');args=parser.parse_args()
 root=Path(__file__).resolve().parents[1];out=args.out.resolve();out.mkdir(parents=True,exist_ok=True)
 if (out/'audit.json').exists():raise SystemExit('Choose a fresh output directory')
 server=http.server.ThreadingHTTPServer(('127.0.0.1',0),functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(root)))
 threading.Thread(target=server.serve_forever,daemon=True).start()
 result={'sourceSHA256':hashlib.sha256((root/'index.html').read_bytes()).hexdigest(),'views':[],'errors':[],'loadBefore':os.getloadavg(),'forcedWebGL1':args.webgl1,'rendererSHA256':hashlib.sha256((root/'assets/woodland-renderer.js').read_bytes()).hexdigest(), 'librarySHA256':hashlib.sha256((root/'assets/woodland/library.json').read_bytes()).hexdigest()};start=time.monotonic()
+result['standalone']=args.standalone;result['externalWoodlandRequests']=[]
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path=args.chrome,headless=True,args=['--use-angle=swiftshader','--enable-unsafe-swiftshader'])
  page=browser.new_page(viewport={'width':1440,'height':1000});page.add_init_script('window.requestAnimationFrame=()=>0;');page.on('pageerror',lambda e:result['errors'].append(str(e)));page.on('console',lambda m:result['errors'].append(m.text) if m.type=='error' else print('Console '+m.type+': '+m.text[:500],flush=True) if m.type=='warning' else None)
@@ -18,8 +19,22 @@ with sync_playwright() as p:
   if r.returncode: raise RuntimeError('Remote resource failed: '+route.request.url)
   route.fulfill(status=200,content_type='text/css' if 'fonts.googleapis.com' in route.request.url else 'font/woff2' if 'fonts.gstatic.com' in route.request.url else 'text/javascript',body=r.stdout)
  page.route('https://**/*',remote)
+ if args.standalone:
+  def missing_woodland(route):
+   result['externalWoodlandRequests'].append(route.request.url);route.fulfill(status=404,body='Woodland assets are not separately published')
+  page.route('**/assets/woodland**',missing_woodland)
  if args.webgl1:page.route('**/index.html',lambda route:route.fulfill(content_type='text/html',body=(root/'index.html').read_text().replace('renderer=new THREE.WebGLRenderer(', 'renderer=new THREE.WebGL1Renderer(')))
  try:
+  if args.standalone:
+   # An opaque sandbox has no same-origin asset directory, like a single-file app preview.
+   html=(root/'index.html').read_text();packed=re.search(r'<script type="text/plain" id="woodlandassets">[\s\S]*?</script>\s*<script id="woodlandrenderer">[\s\S]*?</script>',html).group(0)
+   page.set_content('<iframe sandbox="allow-scripts"></iframe>')
+   three=subprocess.check_output(['curl','--fail','--silent','--show-error','--max-time','30','https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js']).decode().replace('</script','<\\/script')
+   page.evaluate('(html)=>document.querySelector("iframe").srcdoc=html','<script>'+three+'</script>'+packed)
+   page.wait_for_function('document.querySelector("iframe")!==null',polling=100)
+   frame=page.frames[1];frame.wait_for_function('typeof CastleWoodland!=="undefined"&&typeof THREE!=="undefined"',polling=100)
+   result['embeddedFrame']=frame.evaluate('(async()=>{let fetches=0;window.fetch=()=>{fetches++;throw Error("No asset host in this preview");};const x=await CastleWoodland.load({THREE});const r={origin:self.origin,plants:x.plants.length,textures:x.atlas.length,fetches};x.dispose();return r;})()')
+   assert result['embeddedFrame']=={'origin':'null','plants':7,'textures':3,'fetches':0},result['embeddedFrame']
   page.goto('http://127.0.0.1:'+str(server.server_port)+'/index.html#s=1001&f=42&c=sea&y=1066&km=9&fresh=1',wait_until='domcontentloaded')
   page.wait_for_function('document.getElementById("loading")===null&&!!renderer&&!!BACKGROUND&&G.rivers',polling=100,timeout=180000)
   page.evaluate('(async()=>{await workerSetSpeed(0);installPresentation(await BACKGROUND.request("view",{kind:"landscape"}));await G.miniatureReady;await G.waterRippleReady;contextDismiss();cam.mode="free";})()')
@@ -64,5 +79,6 @@ with sync_playwright() as p:
   assert all(result['clearing'].values()),result['clearing']
   result['endDay']=page.evaluate('day()');assert result['endDay']==0
   assert not result['errors'],result['errors']
+  if args.standalone:assert not result['externalWoodlandRequests'],result['externalWoodlandRequests']
  finally:
   browser.close();server.shutdown();result['wallSeconds']=time.monotonic()-start;result['loadAfter']=os.getloadavg();(out/'audit.json').write_text(json.dumps(result,indent=2))

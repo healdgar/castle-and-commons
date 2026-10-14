@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {inlineGameScript} from './simulation-boundary.mjs';
 import vm from 'node:vm';
 import {execFileSync} from 'node:child_process';
 const source=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
@@ -36,7 +37,7 @@ test('actual death transitions preserve spouse updates, dead archive lookup and 
 test('unknown accessor worlds retain original alive read counts during politics',()=>{const P=pair();for(const r of P)r.run("let aliveReads=0;W.notables=[{id:1,get alive(){aliveReads++;return false}}];tickPolitics()");assert.equal(P[1].run('aliveReads'),P[0].run('aliveReads'));});
 test('forced births and marriage exercise appended cast and paired cleanup with exact draw order',()=>{const P=pair();for(const r of P){r.run(cast);r.run("W.houses.push({name:'Other',seat:0,exiled:true,loyalty:70});mkNotable({name:'Suitor',sex:'m',age:22,birthDay:-7920,house:1,role:'scion',traits:['bold']});chance=(stream,p)=>{draws.push([stream,p]);return true};W.clock.day=9;tickPolitics();W.clock.day=37;tickPolitics()");}equal(P);assert.equal(P[1].run('W.notables.length'),5);assert.equal(P[1].run("W.notables.some(n=>Object.hasOwn(n,'_just'))"),false);assert.equal(P[1].run('W.notables[2].spouse'),4);});
 import * as acorn from './vendor/acorn/acorn.mjs';
-test('source mutation manifest rejects new alive, marriage-cleanup or archive writers',()=>{const program=source.slice(source.indexOf("'use strict';"),source.indexOf('</script>',source.indexOf("'use strict';"))),ast=acorn.parse(program,{ecmaVersion:'latest'}),writes=[],ids=[];
+test('source mutation manifest rejects new alive, marriage-cleanup or archive writers',()=>{const program=inlineGameScript(source),ast=acorn.parse(program,{ecmaVersion:'latest'}),writes=[],ids=[];
 function key(n){return n?.type==='MemberExpression'?(n.computed?n.property.type==='Literal'?n.property.value:null:n.property.name):null;}
 function visit(n){if(!n?.type)return;if(['AssignmentExpression','UpdateExpression'].includes(n.type)&&key(n.left||n.argument)==='id')ids.push(program.slice(n.start,n.end));if((n.type==='AssignmentExpression'||n.type==='UpdateExpression'||n.type==='UnaryExpression'&&n.operator==='delete')&&['alive','_just','notables'].includes(key(n.left||n.argument)))writes.push(program.slice(n.start,n.end));if(n.type==='CallExpression'&&key(n.callee?.object)==='notables'&&['push','pop','shift','unshift','splice','sort','reverse','fill','copyWithin'].includes(key(n.callee)))writes.push(program.slice(n.start,n.end));for(const v of Object.values(n))if(Array.isArray(v))v.forEach(visit);else if(v?.type)visit(v);}
 visit(ast);assert.deepEqual(writes,['n.alive=alive','delete n._just','delete n._just','W.notables.push(n)','a._just=b._just=true','b._just=true']);

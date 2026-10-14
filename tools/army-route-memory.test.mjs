@@ -1,12 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {inlineGameScript} from './simulation-boundary.mjs';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';
 // The route memory (armyRouteRecall) gives a host's land search again only while everything the search read is
 // unchanged. These tests run the game's own search and memory, with the memory checking every recall against a
 // fresh search (ARMY_ROUTES.verify), over a small world changed at random in every way the search can see.
-const html=fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8');
+const html=inlineGameScript(fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8'));
 const fn=name=>{const m=html.match(new RegExp('^function '+name+'\\b[\\s\\S]*?(?=^function |^/\\*|$(?![\\s\\S]))','m'));assert.ok(m,name);
   return m[0].replace(/(?:\n(?:\s*\/\/[^\n]*)?)+$/,'');}; // the function, without the comment lines that follow it
 const line=prefix=>{const i=html.indexOf('\n'+prefix);assert.ok(i>=0,prefix);return html.slice(i+1,html.indexOf('\n',i+1));};

@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {inlineGameScript} from './simulation-boundary.mjs';
 import vm from 'node:vm';
 // settleTracks searches the track graph once per place. The search now judges each node and edge once for all places,
 // reuses its tables, and stops once every field has met its nearest corner; this runs it against the original search
 // (frozen from 0f60c68) on random track graphs and requires the identical lanes, in the identical order.
-const source=fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8');
+const source=inlineGameScript(fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8'));
 const take=(start,end)=>{const i=source.indexOf(start);assert.ok(i>=0,start);const j=source.indexOf(end,i);assert.ok(j>i,end);return source.slice(i,j);};
 const current=take('function settleTracks(){','\nconst FEUD_NAMES');
 const frozen=String.raw`function settleTracks(){

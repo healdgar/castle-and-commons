@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {inlineGameScript} from './simulation-boundary.mjs';
 import vm from 'node:vm';
 // storageAccess remembers, per place, the step that last blocked each walk and tries it first (#15). It must answer
 // every call as the original walk (frozen from cfa6993) does, through random changes to water, slope, rivers, lakes,
 // walls and gates between calls, so that a remembered step that no longer blocks is never trusted.
-const source=fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8');
+const source=inlineGameScript(fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8'));
 const frozen="function storageAccess(s,a,b){const d=dist2d(a.x,a.z,b.x,b.z),fortified=typeof fortCircuits==='function'&&fortCircuits(s).length,steps=Math.max(1,Math.ceil(d/(fortified?1:5)));if(typeof wallRadAt==='function'&&s.wallRad){const side=p=>dist2d(p.x,p.z,s.pos.x,s.pos.z)-wallRadAt(s,Math.atan2(p.z-s.pos.z,p.x-s.pos.x));if(side(a)*side(b)<0)return false;}for(let i=0;i<=steps;i++){const f=i/steps,x=a.x+(b.x-a.x)*f,z=a.z+(b.z-a.z)*f;if(typeof toCell==='function'&&W.water){const ci=toCell(x),cj=toCell(z);if(!inB(ci,cj)||W.water[cIdx(ci,cj)]||slopeAt(ci,cj)>0.35)return false;}if(typeof riverAt==='function'&&riverAt(x,z,0.5)||typeof lakeAt==='function'&&lakeAt(s,x,z,0.5)||fortified&&fortRoadBlocked(s,x,z))return false;}return true;}";
 const line=prefix=>{const i=source.indexOf(prefix);assert.ok(i>=0,prefix);return source.slice(i,source.indexOf('\n',i));};
 const block=(start,end)=>{const i=source.indexOf(start);assert.ok(i>=0,start);const j=source.indexOf(end,i);assert.ok(j>i,end);return source.slice(i,j);};

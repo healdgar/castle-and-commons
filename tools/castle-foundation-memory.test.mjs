@@ -3,9 +3,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {inlineGameScript} from './simulation-boundary.mjs';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';
-const source=fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8');
+const source=inlineGameScript(fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8'));
 function fn(name){
   const start=source.search(new RegExp(`^function ${name}\\b`,'m'));assert.ok(start>=0,name);const open=source.indexOf('{',start);let depth=0,quote='',escape=false;
   for(let i=open;i<source.length;i++){const c=source[i];if(quote){if(escape)escape=false;else if(c==='\\')escape=true;else if(c===quote)quote='';continue;}

@@ -3,8 +3,26 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {createHash} from 'node:crypto';
+import {woodlandFiles,scriptSafe} from './embed-woodland.mjs';
 const root=new URL('../assets/woodland/',import.meta.url),library=JSON.parse(fs.readFileSync(new URL('library.json',root)));
 const context=vm.createContext({console,Math});vm.runInContext(fs.readFileSync(new URL('../assets/woodland-renderer.js',import.meta.url),'utf8'),context);
+
+test('single-file releases contain the current renderer and every finished asset it loads',()=>{
+ const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
+ const data=html.match(/<script type="text\/plain" id="woodlandassets">([\s\S]*?)<\/script>/),renderer=html.match(/<script id="woodlandrenderer">\n([\s\S]*?)\n<\/script>/);
+ assert(data&&renderer,'run node tools/embed-woodland.mjs before releasing');
+ assert.equal(renderer[1],scriptSafe(fs.readFileSync(new URL('../assets/woodland-renderer.js',import.meta.url),'utf8')));
+ const files=JSON.parse(data[1]);assert.equal(JSON.stringify(files),JSON.stringify(woodlandFiles()));
+ for(const [name,body]of Object.entries(files))assert.equal((name.endsWith('.png')?Buffer.from(body.split(',')[1],'base64'):Buffer.from(body)).compare(fs.readFileSync(new URL(name,root))),0,name);
+ assert(!html.includes('<script src="assets/woodland-renderer.js">'),'the preview must not need a separately published script');
+});
+
+test('an incomplete embedded release reports the missing asset instead of fetching another host',async()=>{
+ let fetched=false;
+ const c=vm.createContext({console,Math,AbortController,setTimeout,clearTimeout,document:{getElementById:()=>({textContent:'{}'})},fetch:()=>{fetched=true;throw Error('External assets are unavailable');}});
+ vm.runInContext(fs.readFileSync(new URL('../assets/woodland-renderer.js',import.meta.url),'utf8'),c);
+ await assert.rejects(c.CastleWoodland.load({THREE:{}}),/Missing embedded woodland asset: library.json/);assert.equal(fetched,false);
+});
 
 test('imported files match the native authoring receipts and retain their actual species',()=>{
  assert.equal(library.plants.length,7);assert.equal(new Set(library.plants.map(p=>p.id)).size,7);

@@ -1,6 +1,6 @@
 # Castle and Commons
 
-## [▶ Play in your browser](https://healdgar.github.io/furlong-kingdom-annals/)
+## [▶ Play in your browser](https://healdgar.github.io/castle-and-commons/)
 
 *A living medieval kingdom in a single file, from the strip of field to the crown.*
 
@@ -57,7 +57,7 @@ these reports and orders.
 
 Open `index.html` in a browser with `assets/` beside it, or put both on any
 static host. Every push to `main` deploys
-[GitHub Pages](https://healdgar.github.io/furlong-kingdom-annals/) and publishes
+[GitHub Pages](https://healdgar.github.io/castle-and-commons/) and publishes
 a container image:
 
 ```sh

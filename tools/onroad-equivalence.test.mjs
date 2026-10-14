@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {inlineGameScript} from './simulation-boundary.mjs';
 import vm from 'node:vm';
 // onRoad passes over a road segment whose two ends both lie beyond reach on one side of the point (#15). Against the
 // original (frozen from cfa6993) it must answer every ask the same, leave onRoad.reach the same and ask riverAt the same
 // questions, for any roads, pads, waterOnly and points, NaN and huge coordinates included.
-const source=fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8');
+const source=inlineGameScript(fs.readFileSync(process.env.FURLONG_TEST_SOURCE||new URL('../index.html',import.meta.url),'utf8'));
 const frozen="function onRoad(x,z,pad,waterOnly=false){ // on a built highway; crossings require its centreline to enter water\n  // onRoad.reach: the furthest road looked at (each look may store that road's bounds), for the route memory\n  const R=W.roads||[];for(let i=0;i<R.length;i++){const r=R[i],P=r.open||r.path;if(!P||P.length<2)continue;const bb=r._bb||(r._bb=P.reduce((q,p)=>[Math.min(q[0],p.x),Math.min(q[1],p.z),Math.max(q[2],p.x),Math.max(q[3],p.z)],[1e9,1e9,-1e9,-1e9]));\n    const m=pad+6;if(x<bb[0]-m||x>bb[2]+m||z<bb[1]-m||z>bb[3]+m)continue;for(let k=1;k<P.length;k++)if(segDist(x,z,P[k-1],P[k])<pad+5){if(!waterOnly){if(i>onRoad.reach)onRoad.reach=i;return true;}const a=P[k-1],b=P[k],dx=b.x-a.x,dz=b.z-a.z,L=dx*dx+dz*dz||1,t=clamp(((x-a.x)*dx+(z-a.z)*dz)/L,0,1);if(riverAt(a.x+dx*t,a.z+dz*t,0)){if(i>onRoad.reach)onRoad.reach=i;return true;}}}\n  if(R.length-1>onRoad.reach)onRoad.reach=R.length-1;return false;}";
 const line=prefix=>{const i=source.indexOf(prefix);assert.ok(i>=0,prefix);return source.slice(i,source.indexOf('\n',i));};
 const block=(start,end)=>{const i=source.indexOf(start);assert.ok(i>=0,start);const j=source.indexOf(end,i);assert.ok(j>i,end);return source.slice(i,j);};
