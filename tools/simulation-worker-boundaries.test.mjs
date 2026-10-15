@@ -37,7 +37,7 @@ const chronicle=extract('function chronicleAdd(evs){','function reignHeader(n){'
 const forbidden=new Set(['_owners','_hh','household','households','account','ownerAccount','beneficiary','storage','ledger','holdings','rng','simulationRNG']);
 
 function context(extra={}){
-  const c=vm.createContext({console,performance,Map,Set,WeakMap,WeakSet,ArrayBuffer,DataView,Uint8Array,Uint16Array,
+  const c=vm.createContext({contextUI:{ready:false},console,performance,Map,Set,WeakMap,WeakSet,ArrayBuffer,DataView,Uint8Array,Uint16Array,
     Uint8ClampedArray,Float32Array,Float64Array,structuredClone,Number,Math,JSON,Object,Array,RegExp,Error,TypeError,Infinity,NaN,...extra});
   new vm.Script(`
     let W={seed:33,clock:{day:7,frac:.2},weather:{state:'clear'},settlements:[],bldList:[],houses:[],monarch:{},petitions:[],armies:[],caravans:[],envoys:[],travellers:[],ships:[],banditCamps:[],dragon:null,memorials:[],roads:[],bridges:[],projects:[],trackSet:new Set(),treeSpots:[],land:{F:[],mask:new Uint8Array(8),flood:new Uint8Array(4)}};

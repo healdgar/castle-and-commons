@@ -27,3 +27,19 @@ test('one native physical component supports several purposes without duplicate 
 test('an unmet physical prerequisite cannot commission or consume a project',()=>{const r=setup();r.eval('plan.requires=["church"];q=compoundProjectCommission(s,C,plan)');assert.equal(r.eval('q'),null);assert.equal(r.W.projects.length,0);near(r.eval('A.gold'),100);});
 test('saved plain paid progress resumes from the paid fraction and retains material demand',()=>{const r=setup();r.eval('q=compoundProjectCommission(s,C,plan);const nativeWorks=buildWorks;buildWorks=(s,c,p,why)=>nativeWorks(s,c*0.4,p,why);compoundProjectTick(q);const saved=JSON.parse(JSON.stringify(q));if(saved.worked!==0.4)throw Error("expected the actual paid fraction");q=saved;buildWorks=nativeWorks;compoundProjectTick(q);compoundProjectTick(q)');near(r.eval('q.worked'),2);near(r.eval('q.paid'),10);assert.equal(r.eval('q.status'),'completed');assert.equal(r.eval('completeCalls'),1);});
 test('zero labour or unsupported adapter cannot create free native structures',()=>{const r=setup();assert.equal(r.eval('compoundProjectCommission(s,C,{...plan,labour:0})'),null);assert.equal(r.eval('compoundProjectCommission(s,C,{...plan,adapter:"unknown"})'),null);assert.equal(r.W.projects.length,0);});
+
+test('a commissioned capability stays bound to its original canonical object and purpose',()=>{
+ for(const change of ['C.components[0]={...C.components[0]}','W.bldList[0]={...W.bldList[0]}','C.components[0].purposes=[]','C.components[0].key="other"','church.title=propertyRightsResolve("crown")']){
+  const r=setup();r.eval('W.houses.push({name:"The Crown"});const church={idx:0,s,arch:"temple",state:"sound",compoundKey:"church",ownerId:A.storageOwnerId,title:propertyRightsResolve(A.storageOwnerId)};W.bldList.push(church);s.buildings.push(church);compoundBindBuilding(C,church,["worship"]);plan.requires=[{key:"church",purpose:"worship"}];q=compoundProjectCommission(s,C,plan);compoundProjectTick(q);');
+  assert.ok(r.eval('q&&q.worked>0'));const total=coins(r),paid=r.eval('q.paid+q.materialPaid');
+  r.eval(change+';compoundProjectTick(q)');assert.equal(r.eval('q.status'),'abandoned',change);assert.equal(r.eval('q.reason'),'component-prerequisite-lost');near(r.eval('q.paid+q.materialPaid'),paid);near(coins(r),total);
+ }
+});
+
+test('permanent prerequisite loss takes precedence over another component awaiting repair',()=>{
+ for(const change of ['range.removed=true;range.state="gone"','range.title=propertyRightsResolve("crown")']){
+  const r=setup();r.eval('const church={idx:0,s,arch:"temple",state:"sound",compoundKey:"church",ownerId:A.storageOwnerId,title:propertyRightsResolve(A.storageOwnerId)},range={...church,idx:1,arch:"longhouse",compoundKey:"residence"};W.bldList.push(church,range);s.buildings.push(church,range);compoundBindBuilding(C,church,["worship"]);compoundBindBuilding(C,range,["residential"]);plan.requires=["church","residence"];q=compoundProjectCommission(s,C,plan);compoundProjectTick(q);church.state="ruin";');
+  assert.ok(r.eval('q&&q.worked>0'));const total=coins(r),paid=r.eval('q.paid+q.materialPaid');
+  r.eval(change+';compoundProjectTick(q)');assert.equal(r.eval('q.status'),'abandoned',change);assert.equal(r.eval('q.reason'),'component-prerequisite-lost');near(r.eval('q.paid+q.materialPaid'),paid);near(coins(r),total);
+ }
+});

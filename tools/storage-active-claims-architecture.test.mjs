@@ -201,7 +201,11 @@ test('managed claim and commodity balance architecture remains reviewed',()=>{
  // s._storageGraph when QUERY_LAND_VALUES is active or the settlement is frozen,
  // caching on the local batch C when provided. Simulation routing, quantity,
  // title, claim and payment writers are unchanged.
- assert.equal(digest(source.slice(a,b)),"bd9e0a41a1118ac017811127174cc37509044ac3de2a5263b10612fb263a4096");
+ // Recovery (#81–82): commission pins canonical prerequisites; permanent loss
+ // abandons without refund/rebinding, and compatible paid castle repair can join
+ // its retained upgrade. Exact footprint/title/access and native payment/goods
+ // writers remain intact. Recovery, layout and binary-save fixtures cover this.
+ assert.equal(digest(source.slice(a,b)),"5358af77c61113133edc047f4605f5c4e54e1d57aafd8aba5b67dbf2f9a9302d");
  // This explicit worker inspector copies existing balances. Pin the entire line
  // before excluding it so a future mutation cannot hide behind the read exemption.
  const inspectorLine=source.split('\n').find(l=>l.trim().startsWith("if(kind==='household'){const h=W.households.get(payload.id);"));
@@ -265,9 +269,9 @@ test('retained Abbey licences and recruitment books stay private while actual ap
  const project=source.split('\n').find(l=>l.trim().startsWith('project:q=>')).trim().replace(/^project:/,'').replace(/};$/,'');
  const c=vm.createContext({});vm.runInContext(helpers+'\n'+put+'\nconst nativeProject='+project+';',c);
  const raw=vm.runInContext(`(()=>{
-   const privateNames=['approachClaim','approachPayments','approachPaid','approachCash','accessDonor','abbeyRecruitment','skilledOffers','skilledRecruitmentPlans','recruitmentPaid','_skilledOfferDay'];
+   const privateNames=['prerequisites','approachClaim','approachPayments','approachPaid','approachCash','accessDonor','abbeyRecruitment','skilledOffers','skilledRecruitmentPlans','recruitmentPaid','_skilledOfferDay'];
    const q={id:'abbey:0:project:0',type:'compound',key:'church',site:{f:{x:200,z:0,w:12,d:22,rot:0},path:[{x:200,z:11},{x:200,z:14},{x:0,z:14}],access:{endpoint:{kind:'road',ref:0,segment:1,point:{x:0,z:14}},privatePolys:[[{x:3,z:12},{x:200,z:12},{x:200,z:16},{x:3,z:16}]]}},
-     approachClaim:{cells:[1,2],recipients:[{id:'household:hh1',due:3}]},approachPayments:{'household:hh1':3},approachPaid:true,approachCash:3,accessDonor:0,
+     prerequisites:[{component:{key:'church'},object:{idx:0,s:{name:'canonical town'}},key:'church',purpose:'worship'}],approachClaim:{cells:[1,2],recipients:[{id:'household:hh1',due:3}]},approachPayments:{'household:hh1':3},approachPaid:true,approachCash:3,accessDonor:0,
      abbeyRecruitment:'abbey:0',skilledOffers:[{person:{id:1},household:{id:'hh1'},state:'outward'}],skilledRecruitmentPlans:{tanner:'native household offer'},recruitmentPaid:2,_skilledOfferDay:1};
    let reads=0;Object.defineProperty(q,'economicAccessor',{enumerable:true,get(){reads++;return {holder:'private'};}});
    const before=JSON.stringify(Object.fromEntries(Object.entries(Object.getOwnPropertyDescriptors(q)).filter(([,d])=>Object.hasOwn(d,'value')).map(([k,d])=>[k,d.value]))),record=nativeProject(q),geometry=visualGeometry(q),privateFlags=privateNames.map(k=>VISUAL_PRIVATE.has(k));

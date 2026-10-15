@@ -1,5 +1,35 @@
 # Simulation performance
 
+## Recovery release profiles, 14 October 2026
+
+Four audited Chrome years use seeds 1001/2002, fate 42, sea/inland, AD850 and
+6 km on Apple M4 Max hardware (load 5.85→5.83). Each completes 360 days,
+720 independent inventory checks, no simulation faults and no daily cash
+discrepancies. These are profiled, instrumented runs, including harness work;
+they establish a fresh baseline, not a before/after speedup.
+
+| World | Sampled CPU ms/day | Of which `tickCastles` |
+|---|---:|---:|
+| 1001 sea | 91.412 | 40.227 |
+| 1001 inland | 86.064 | 21.393 |
+| 2002 sea | 51.077 | 7.197 |
+| 2002 inland | 47.399 | 3.626 |
+
+First-castle failed-site surveys remain the main castle cost; `clear`,
+`boxMayHit`, retained polygons and street access lead their samples. Abbey
+approach work is also substantial in 1001 inland (13.709 sampled CPU ms/day).
+Finite daily crew allocation (#80), complete paid Abbey operation (#35), browser
+snapshot resume (#6) and century-scale growth (#48) remain unfinished; these
+annual checks do not certify them.
+
+Stamped HTML SHA256:
+`4dc3e4bc46610c87b8a58417aafca5ff0dac2b8744f602530192ca1206294d53`.
+The executable script SHA256 is
+`3b32277b7140aa64f30fd1e63e07307ecfc3928b964c24bdbebae73c433beb02`.
+Profiles and audit receipts remain local in
+`tools/soak-results/construction-20261014/release-soak/`; the local hot list
+includes these four source-pinned runs.
+
 ## Follow-up measurements and report integrity, 13 October 2026
 
 The next castle-survey pass established no reliable additional CPU gain.

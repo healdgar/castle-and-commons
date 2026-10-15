@@ -132,6 +132,22 @@ work survives stalls; loss of legal authority abandons sunk work without refund.
 A final validation precedes the institution adapter’s canonical completion.
 Adapter functions are source globals, never saved closures.
 
+Commissioned prerequisites retain both the compound component and its canonical
+native object, including any required purpose. Damage to that same building
+waits for repair. Removal, transfer, lost purpose or replacement abandons the
+dependent contract without refund; an identical key or footprint cannot rebind
+paid work. Binary world saves preserve these shared references. They stay in the
+worker rather than crossing in drawing packets.
+
+A pending castle upgrade permits independent paid recovery of its original
+ruined keep or hall only when title, retained shape and component identity still
+match. Only the repair's exact native footprint/access can join its reservation.
+Repair restores the original object; the upgrade then resumes its unchanged
+site and paid progress. Changed geometry, lost title and unrelated reservations
+retain their vetoes. Neither recovery nor abandonment reverses sunk payments.
+These corrections intentionally change histories containing damaged or lost
+prerequisites. Finite shared crew attendance remains unfinished under #80.
+
 The abbey contract is `abbeyCompoundValidate(q,s,C)` returning `{ok,reason,abandon}`
 and `abbeyCompoundComplete(q,s,C)` returning truthy only after actual installation,
 rights, mask and layout updates. `live.compoundSite` surveys a native footprint
@@ -161,6 +177,37 @@ named native wages and cash conservation, no-crew stalls, lost-title abandonment
 prerequisites, partial saved progress, single canonical completion and multiple
 purposes without duplicate identity. These are source-level controlled fixtures,
 not native generation, replay, worker, world-save or performance proof.
+
+### Recovery validation, 14 October 2026
+
+The clean recovery build passes all 2,324 suite checks, including three native
+120-day coastal/inland street histories and four day-37 binary-save scenarios
+(55 continued days, or 90 for the paid first castle). Targeted paid contracts
+exercise damaged upgrade resumption, exact retained sites, transferred/missing
+non-parent ranges, replacement identity, lost purposes, simultaneous damaged/lost
+prerequisites and conserved sunk payments. The binary codec retains shared
+component/building identity and byte-identical resave.
+
+On the stamped source, four native Chrome campaigns (1001/2002, fate 42,
+sea/inland, AD850, 6 km) each complete 360 days and 720 inventory checks, with no
+faults or daily cash discrepancies. Hardware Apple M4 Max drawn play passes
+13 flows, including Reel/pause, accounts and exact save/replay continuation.
+The AD1066 worker/reference gate matches full world graphs, every RNG, commands,
+annals, settings and journal sequence after eight days and eight resumed days;
+all ten queried views match and leave state unchanged.
+
+Tested executable SHA256:
+`3b32277b7140aa64f30fd1e63e07307ecfc3928b964c24bdbebae73c433beb02`.
+Stamped HTML SHA256:
+`4dc3e4bc46610c87b8a58417aafca5ff0dac2b8744f602530192ca1206294d53`.
+The full-suite HTML differs only in its loading-screen build stamp. Receipts
+remain local in `tools/soak-results/construction-20261014/`.
+
+These checks do not close finite crew attendance (#80), a genuinely paid native
+Abbey core/industry campaign (#35), famine calibration (#12/#23), browser world
+snapshot resume (#6) or centuries of operation (#48). The inland 1001 famine,
+food, population and money metrics match baseline `37b9097` exactly. Fresh CPU
+profiles are recorded in [PERFORMANCE.md](PERFORMANCE.md#recovery-release-profiles-14-october-2026).
 
 ### Native mask width correction
 
